@@ -539,17 +539,13 @@ function atualizarSelecoes() {
     const codigo = `MJ${Date.now()}`;
 
     // Monta objeto para salvar no Firebase
-    const aposta = {
-      codigo,
-      valorUnico,
-      selecoes: selecionados.map(btn => {
-        const grupo = btn.dataset.grupo;
-        const valor = Number(btn.dataset.valor);
-        const texto = btn.textContent;
-        return { grupo, texto, valor };
-      }),
-      dataHora: new Date().toISOString()
-    };
+    // Monta objeto para salvar no Firebase
+const aposta = {
+  codigo,
+  valorUnico,
+  selecoes: selects,
+  dataHora: new Date().toISOString()
+};
 
     set(ref(db, 'apostas/' + codigo), aposta)
       .then(() => {
