@@ -2,268 +2,228 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Consulta de Aposta</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; background: grey; margin-top:3%; font-weight:bold; }
-    .duelo {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      margin: 10px auto;
-      max-width: 500px;
-      text-align: left;
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: #f0f0f0;
     }
-    #whatsappBtn, #btnGerarPDF, #btnGerarLink { display: none; margin-top: 10px; }
-    button { padding: 10px 15px; background: #25d366; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #1ebd5b; }
-    #dataHora { margin-top: 10px; font-weight: bold; color: #444; }
-    .codigoInput {
-      text-align:center;
-      display: flex;
-      height:30px;
-      background:black;
-      color:white;
-      border-radius:20px;
-      margin: 0 auto 10px;
-      width: 150px;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
+    input, button {
+      padding: 10px;
       font-size: 16px;
-    }
-    #menuHamburguer {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: black;
-      color: white;
-      padding: 10px;
       border-radius: 8px;
+      margin: 5px;
+      border: 1px solid #ccc;
+    }
+    button:hover {
+      background-color: #ddd;
       cursor: pointer;
-      user-select: none;
-      z-index: 1000;
     }
-    #agendaMenu {
-      display: none;
-      position: fixed;
-      top: 60px;
-      left: 10px;
-      background: white;
-      padding: 15px;
+    #resultado {
+      background: #fff;
       border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 10px #ccc;
       text-align: left;
-      width: 250px;
-      max-height: 300px;
-      overflow-y: auto;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      z-index: 999;
     }
-    #agendaMenu input, #agendaMenu select {
-      display: block;
-      width: 100%;
-      margin-bottom: 8px;
-      padding: 6px;
-      box-sizing: border-box;
-      font-weight: normal;
-      font-size: 14px;
+    h2 {
+      background: #ddd;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .duelo-box {
+      border-bottom: 1px dashed #ccc;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <div id="menuHamburguer">☰ Agenda</div>
-  <div id="agendaMenu">
-    <h3>Agenda de Contatos</h3>
-    <select id="contatoSelect">
-      <option value="">-- Selecione um contato --</option>
-    </select>
-    <input type="text" id="novoNome" placeholder="Novo nome" />
-    <input type="text" id="novoTelefone" placeholder="Telefone com DDD" />
-    <button id="btnAdicionarContato">Adicionar Contato</button>
-  </div>
-
-  <h2>Buscar Aposta por Código</h2>
-  <input class="codigoInput" type="text" id="codigoBusca" placeholder="Ex: 123456" maxlength="6" />
-  <button id="btnBuscar">Buscar</button>
+  <h1>🔍 Consulta de Aposta</h1>
+  <input type="text" id="codigoInput" placeholder="Digite o código da aposta">
+  <button onclick="consultarAposta()">Consultar</button>
 
   <div id="resultado"></div>
-  <p id="dataHora"></p>
-  <button id="whatsappBtn">👉 Enviar no WhatsApp</button>
-  <button id="btnGerarPDF">📄 Gerar PDF</button>
-  <button id="btnGerarLink">🔗 Gerar Link</button>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-import { getDatabase, ref, get, child, push, set, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+  <div id="acoes" style="display:none;">
+    <button onclick="baixarPDF()">📥 Baixar PDF</button>
+    <button onclick="compartilharLink()">🔗 Compartilhar Link</button>
+    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button>
+  </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
-  authDomain: "jogo-60a9e.firebaseapp.com",
-  projectId: "jogo-60a9e",
-  storageBucket: "jogo-60a9e.appspot.com",
-  messagingSenderId: "352852303591",
-  appId: "1:352852303591:web:8083c950047c9026bd8c42",
-  databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+      authDomain: "jogo-60a9e.firebaseapp.com",
+      projectId: "jogo-60a9e",
+      storageBucket: "jogo-60a9e.appspot.com",
+      messagingSenderId: "352852303591",
+      appId: "1:352852303591:web:8083c950047c9026bd8c42",
+      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+    };
 
-const btnBuscar = document.getElementById("btnBuscar");
-const resultado = document.getElementById("resultado");
-const dataHoraEl = document.getElementById("dataHora");
-const whatsappBtn = document.getElementById("whatsappBtn");
-const btnGerarPDF = document.getElementById("btnGerarPDF");
-const btnGerarLink = document.getElementById("btnGerarLink");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-const contatoSelect = document.getElementById("contatoSelect");
-const novoNome = document.getElementById("novoNome");
-const novoTelefone = document.getElementById("novoTelefone");
-const btnAdicionarContato = document.getElementById("btnAdicionarContato");
+    window.consultarAposta = async function () {
+      const codigo = document.getElementById('codigoInput').value.trim();
+      const resultadoDiv = document.getElementById('resultado');
+      const acoes = document.getElementById('acoes');
+      resultadoDiv.innerHTML = "";
+      acoes.style.display = "none";
 
-const menuHamburguer = document.getElementById("menuHamburguer");
-const agendaMenu = document.getElementById("agendaMenu");
+      if (!codigo) return alert("Digite o código");
 
-menuHamburguer.onclick = () => {
-  agendaMenu.style.display = agendaMenu.style.display === "none" ? "block" : "none";
-};
+      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
+      if (!snapshot.exists()) {
+        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
+        return;
+      }
 
-function carregarContatos() {
-  const contatosRef = ref(db, "contatos/");
-  onValue(contatosRef, (snapshot) => {
-    contatoSelect.innerHTML = '<option value="">-- Selecione um contato --</option>';
-    snapshot.forEach((child) => {
-      const contato = child.val();
-      const opt = document.createElement("option");
-      opt.value = contato.telefone;
-      opt.textContent = `${contato.nome} - ${contato.telefone}`;
-      opt.setAttribute("data-nome", contato.nome);
-      contatoSelect.appendChild(opt);
-    });
-  });
-}
-carregarContatos();
+      const aposta = snapshot.val();
+      window.apostaGlobal = aposta;
 
-btnAdicionarContato.onclick = () => {
-  const nome = novoNome.value.trim();
-  const tel = novoTelefone.value.trim();
-  if (!nome || !tel) return alert("Preencha nome e telefone!");
-  const novoRef = push(ref(db, "contatos/"));
-  set(novoRef, { nome, telefone: tel }).then(() => {
-    novoNome.value = "";
-    novoTelefone.value = "";
-    alert("Contato adicionado!");
-  }).catch(err => {
-    alert("Erro ao adicionar contato: " + err.message);
-  });
-};
+      let multiplicador = 1;
+      aposta.selecoes.forEach(sel => multiplicador *= sel.valor);
+      const totalReceber = aposta.valorUnico * multiplicador;
 
-btnBuscar.onclick = () => {
-  const codigo = document.getElementById("codigoBusca").value.trim();
-  resultado.innerHTML = "";
-  dataHoraEl.textContent = "";
-  whatsappBtn.style.display = "none";
-  btnGerarPDF.style.display = "none";
-  btnGerarLink.style.display = "none";
-
-  if (!codigo) return alert("Digite o código!");
-
-  get(child(ref(db), `apostas/${codigo}`)).then(snapshot => {
-    if (snapshot.exists()) {
-      const dados = snapshot.val();
-      const data = new Date(dados.dataRegistro);
-      const dataFormatada = data.toLocaleString("pt-BR");
-
-      const valorUnicoGlobal = (typeof dados.valorDigitado === "number" ? dados.valorDigitado.toFixed(2) : "0,00");
-      const valorTotal = (typeof dados.valorTotal === "number" ? dados.valorTotal.toFixed(2) : "0,00");
-
-      dataHoraEl.innerHTML = `
-        📅 Data da aposta: ${dataFormatada}<br>
-        💸 VALOR POR APOSTA: R$ ${valorUnicoGlobal}<br>
-        💰 TOTAL A PAGAR: R$ ${valorTotal}
+      let html = `
+        <h3>🔢 Código: <b>${aposta.codigo}</b></h3>
+        <h3>💸 Valor por aposta: R$ ${aposta.valorUnico.toFixed(2)}</h3>
+        <h3>📊 Multiplicador: ${multiplicador.toFixed(2)}</h3>
+        <h3 style="color:green;">💰 Valor a receber: R$ ${totalReceber.toFixed(2)}</h3>
       `;
 
-      let mensagemWhatsapp = `📅 Data: ${dataFormatada}\n💸 Valor por aposta: R$ ${valorUnicoGlobal}\n💰 Total a pagar: R$ ${valorTotal}\n============================\n`;
+      const ganhou = aposta.selecoes.filter(s => s.status === "ganhou").length;
+      const perdeu = aposta.selecoes.filter(s => s.status === "perdeu").length;
+      const aguardando = aposta.selecoes.filter(s => !s.status || s.status === "aguardando").length;
 
-    (dados.duelos || []).forEach((duelo) => {
-  const jogo = document.createElement("div");
-  jogo.className = "duelo";
+      html += `
+        <p><strong style="color:green;">✅ Ganhou:</strong> ${ganhou} |
+        <strong style="color:red;">❌ Perdeu:</strong> ${perdeu} |
+        <strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
+      `;
 
-  const timeA = duelo.nomeTimeA || (duelo.duelo?.split(" x ")[0]) || "Time A";
-  const timeB = duelo.nomeTimeB || (duelo.duelo?.split(" x ")[1]) || "Time B";
-  const dataHoraJogo = new Date(duelo.dataHora).toLocaleString("pt-BR");
+  // Agrupar por data
+const agrupadoPorData = {};
 
-  const selecaoTexto = duelo.escolha || "Não selecionado";
-
-  jogo.innerHTML = `
-    <strong>Jogo:</strong> ${timeA} x ${timeB}<br>
-    <strong>Escolha:</strong> ${selecaoTexto}<br>
-    <strong>Data/Hora do Jogo:</strong> ${dataHoraJogo}
-  `;
-  resultado.appendChild(jogo);
-
-  mensagemWhatsapp += `\n⚽ ${timeA} x ${timeB}\n🎯 Escolha: ${selecaoTexto}\n🕒 ${dataHoraJogo}\n============================`;
+aposta.selecoes.forEach((sel, i) => {
+  const data = sel.dataHora.split(" ")[0]; // Ex: "09/07/2025"
+  if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
+  agrupadoPorData[data].push({ ...sel, index: i });
 });
 
-      whatsappBtn.style.display = "inline-block";
-      btnGerarPDF.style.display = "inline-block";
-      btnGerarLink.style.display = "inline-block";
+// Ordenar datas do mais recente para o mais antigo (ex: 09/07 > 08/07 > 07/07)
+const datasOrdenadas = Object.keys(agrupadoPorData).sort((a, b) => {
+  
+  const [d1, m1, y1] = a.split('/').map(Number);
+  const [d2, m2, y2] = b.split('/').map(Number);
+  return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
+});
 
-      whatsappBtn.onclick = () => {
-        const telefone = contatoSelect.value;
-        if (!telefone) return alert("Selecione um contato da agenda!");
-        const selectedOption = contatoSelect.options[contatoSelect.selectedIndex];
-        const nomeContato = selectedOption.getAttribute("data-nome") || "Contato";
-        const mensagemFinal = `JOGADOR: ${nomeContato}\n${mensagemWhatsapp}`;
-        const url = `https://wa.me/55${telefone.replace(/\D/g, "")}?text=${encodeURIComponent(mensagemFinal)}`;
-        window.open(url, "_blank");
-      };
+// Criar HTML agrupado por data > campeonato > cotação (menor para maior)
+datasOrdenadas.forEach(data => {
+  html += `<h2 style="background:#222; color:white; padding:10px; border-radius:8px;">📅 ${data}</h2>`;
 
-      btnGerarPDF.onclick = () => {
-        const element = document.createElement("div");
-        element.innerHTML = `<h2>Aposta #${codigo}</h2>` + resultado.innerHTML + "<br>" + dataHoraEl.innerHTML.replace(/\n/g, "<br>");
-        html2pdf().from(element).save(`Aposta-${codigo}.pdf`);
-      };
-
-      btnGerarLink.onclick = () => {
-        const selectedOption = contatoSelect.options[contatoSelect.selectedIndex];
-        const nomeContato = selectedOption?.getAttribute("data-nome") || "Desconhecido";
-        const telefoneContato = contatoSelect.value;
-
-        const dadosParaSalvar = {
-          nome: nomeContato,
-          telefone: telefoneContato,
-          dataHora: dataHoraEl.textContent,
-          jogos: Array.from(resultado.children).map(el => el.innerText)
-        };
-
-        const dbRef = ref(db, "links_apostas");
-        const novoRef = push(dbRef);
-
-        set(novoRef, dadosParaSalvar).then(() => {
-          const id = novoRef.key;
-          const linkFinal = `${location.origin}/aposta_viewer.html?id=${id}`;
-          navigator.clipboard.writeText(linkFinal).then(() => {
-            alert("🔗 Link gerado e copiado com sucesso!");
-          });
-        }).catch(error => {
-          alert("Erro ao salvar os dados no Firebase.");
-          console.log("Erro ao salvar:", error);
-        });
-      };
-
-    } else {
-      resultado.innerHTML = "<p><strong>Código não encontrado.</strong></p>";
-    }
-  }).catch(error => {
-    console.error("Erro ao buscar:", error);
-    alert("Erro ao buscar código.");
+  const campeonatos = {};
+  agrupadoPorData[data].forEach(sel => {
+    const camp = sel.campeonato || "Outros";
+    if (!campeonatos[camp]) campeonatos[camp] = [];
+    campeonatos[camp].push(sel);
   });
-};
-</script>
+
+  // Exibir os campeonatos dentro da data
+  for (let camp in campeonatos) {
+    html += `<h3 style="background:#eee; padding:8px; border-radius:6px;">🏆 ${camp}</h3>`;
+
+    // Ordenar os jogos do campeonato da menor para a maior cotação
+    const jogosOrdenados = campeonatos[camp].sort((a, b) => a.valor - b.valor);
+
+    jogosOrdenados.forEach(sel => {
+      const status = sel.status || "aguardando";
+      let cor = "#888", label = "⏳ Aguardando";
+
+      if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
+      else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
+
+      html += `
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+        <div class="duelo-box">
+         <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
+<p><strong>🏆 Campeonato:</strong> ${sel.campeonato || 'Não informado'}</p>
+<p><strong>Escolha:</strong> ${sel.escolha} | <strong>Cotação:</strong> R$ ${sel.valor.toFixed(2)}</p>
+<p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
+<p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p></div>
+      `;
+    });
+  }
+});
+      resultadoDiv.innerHTML = html;
+      acoes.style.display = "block";
+    };
+
+    window.compartilharLink = () => {
+      const codigo = document.getElementById('codigoInput').value.trim();
+      const url = `${location.origin}${location.pathname}?codigo=${codigo}`;
+      navigator.clipboard.writeText(url).then(() => alert("🔗 Link copiado: " + url));
+    };
+
+    window.enviarWhatsApp = () => {
+      const aposta = window.apostaGlobal;
+      if (!aposta) return;
+
+      let msg = `🔢 Código: ${aposta.codigo}\n💸 Valor: R$ ${aposta.valorUnico.toFixed(2)}\n`;
+      let multi = 1;
+      aposta.selecoes.forEach(s => multi *= s.valor);
+      const total = aposta.valorUnico * multi;
+      msg += `📊 Multiplicador: ${multi.toFixed(2)}\n💰 Receber: R$ ${total.toFixed(2)}\n\n`;
+
+      aposta.selecoes.forEach((s, i) => {
+        msg += `${i + 1}. ${s.timeA} x ${s.timeB} (${s.campeonato || "Outros"})\n`;
+        msg += `Escolha: ${s.escolha} | Cotação: R$ ${s.valor.toFixed(2)}\nData/Hora: ${s.dataHora}\n\n`;
+      });
+
+      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+    };
+
+    window.baixarPDF = () => {
+      import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js").then(({ jsPDF }) => {
+        const doc = new jsPDF.jsPDF();
+        const aposta = window.apostaGlobal;
+        let y = 10;
+
+        doc.text("CÓDIGO: " + aposta.codigo, 10, y); y += 10;
+        doc.text("Valor por aposta: R$ " + aposta.valorUnico.toFixed(2), 10, y); y += 10;
+        let multi = 1;
+        aposta.selecoes.forEach(s => multi *= s.valor);
+        const total = aposta.valorUnico * multi;
+        doc.text("Multiplicador: " + multi.toFixed(2), 10, y); y += 10;
+        doc.text("Valor a receber: R$ " + total.toFixed(2), 10, y); y += 10;
+
+        aposta.selecoes.forEach((s, i) => {
+          y += 10;
+          doc.text(`${i + 1}. ${s.timeA} x ${s.timeB}`, 10, y); y += 6;
+          doc.text(`   ${s.escolha} - R$ ${s.valor.toFixed(2)}`, 10, y); y += 6;
+          doc.text(`   ${s.dataHora} - ${s.campeonato || "Outros"}`, 10, y);
+        });
+
+        doc.save("aposta_" + aposta.codigo + ".pdf");
+      });
+    };
+
+    // Consulta automática por URL
+    const params = new URLSearchParams(location.search);
+    if (params.has("codigo")) {
+      document.getElementById("codigoInput").value = params.get("codigo");
+      consultarAposta();
+    }
+  </script>
 </body>
 </html>
