@@ -1,0 +1,93 @@
+<!-- salvar como editar-status.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Atualizar Status da Aposta</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    input, select, button {
+      margin: 8px; padding: 10px; font-size: 16px;
+    }
+    .duelo {
+      background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 10px;
+      box-shadow: 0 0 4px #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔧 Atualizar Status da Aposta</h2>
+  <input type="text" id="codigoInput" placeholder="Código da aposta" />
+  <button onclick="carregarAposta()">🔍 Carregar Aposta</button>
+
+  <div id="duelos"></div>
+  <button onclick="salvarStatus()">💾 Salvar Alterações</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, get, update, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+      authDomain: "jogo-60a9e.firebaseapp.com",
+      projectId: "jogo-60a9e",
+      storageBucket: "jogo-60a9e.appspot.com",
+      messagingSenderId: "352852303591",
+      appId: "1:352852303591:web:8083c950047c9026bd8c42",
+      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let apostaAtual = null;
+
+    window.carregarAposta = async function () {
+      const codigo = document.getElementById('codigoInput').value.trim();
+      if (!codigo) return alert("Digite o código");
+
+      const snap = await get(child(ref(db), 'apostas/' + codigo));
+      if (!snap.exists()) {
+        return alert("❌ Código não encontrado.");
+      }
+
+      apostaAtual = snap.val();
+      const container = document.getElementById('duelos');
+      container.innerHTML = '';
+
+      apostaAtual.selecoes.forEach((sel, i) => {
+        const status = sel.status || "aguardando";
+        container.innerHTML += `
+          <div class="duelo">
+            <p><strong>${sel.timeA} x ${sel.timeB}</strong></p>
+            <p>Escolha: ${sel.escolha} | Cotação: R$ ${sel.valor.toFixed(2)}</p>
+            <p>Data/Hora: ${sel.dataHora}</p>
+            <label>Status:
+              <select id="status-${i}">
+                <option value="aguardando" ${status === 'aguardando' ? 'selected' : ''}>⏳ Aguardando</option>
+                <option value="ganhou" ${status === 'ganhou' ? 'selected' : ''}>✅ Ganhou</option>
+                <option value="perdeu" ${status === 'perdeu' ? 'selected' : ''}>❌ Perdeu</option>
+              </select>
+            </label>
+          </div>
+        `;
+      });
+    };
+
+    window.salvarStatus = async function () {
+      if (!apostaAtual) return alert("Nenhuma aposta carregada");
+
+      apostaAtual.selecoes.forEach((sel, i) => {
+        const novoStatus = document.getElementById(`status-${i}`).value;
+        sel.status = novoStatus;
+      });
+
+      const codigo = document.getElementById('codigoInput').value.trim();
+      const apostaRef = ref(db, 'apostas/' + codigo);
+      await update(apostaRef, { selecoes: apostaAtual.selecoes });
+
+      alert("✅ Status atualizado com sucesso!");
+    };
+  </script>
+</body>
+</html>
