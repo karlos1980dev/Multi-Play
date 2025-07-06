@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MULTIJOGO SPORT</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding-top: 80px;
+      background: #ff1515;
+      color: black;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0px;
+    }
+    h2 {
+      margin-top: 2px;
+      background: red;
+      color: white;
+      font-size: 20px;
+      border-radius: 5px;
+      margin-bottom: 0px;
+    }
+    .topo-fixo {
+      position: fixed;
+      top: 0;
+      height:50px;
+      left: 0;
+      width: 95%;
+      background: white;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topo-fixo > * {
+      flex: 1;
+      margin: 0 5px;
+      text-align: center;
+    }
+    .serie-container {
+      margin: 8px auto 4px;
+      max-width: 600px;
+      background: #a3a3a3;
+      border-radius: 8px;
+      padding: 4px;
+    }
+    .duelo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-weight: bold;
+      background: #f0f0f0;
+      color: black;
+      padding: 2px;
+      border-radius: 8px;
+      max-width: 95vw;
+      margin: 6px auto;
+      box-sizing: border-box;
+    }
+    button {
+      display: inline;
+      margin: 2px;
+      padding: 4px 8px;
+      width: 50px;
+      font-size: 12px;
+      border: none;
+      background: #008cff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s;
+    }
+    button:hover:not(:disabled) {
+      background: #0072d3;
+    }
+    button.selecionado {
+      background: #00cc00 !important;
+    }
+    img {
+      width: 80px;
+      height: 120px;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+    input[type="number"] {
+      padding: 8px;
+      width: 30%;
+      margin-bottom: 50px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      text-align: center;
+    }
+    #totalFinal {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: black;
+    }
+    .valor-cotacao {
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 2px;
+    }
+    #valorUnico {
+      width: 100%;
+      height: 35px;
+      font-size: 16px;
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #apostarBtn {
+      width: 100%;
+      height: 40px;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .linha-duelo {
+      display: grid;
+      grid-template-columns: 1fr 0.9fr 0.9fr 0.9fr 1fr 0.5fr;
+      align-items: center;
+      gap: 5px;
+      margin: 10px 0;
+    }
+    .time-nome-img {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: 60px;
+      height: 80px;
+      margin: 0 auto;
+    }
+    .time-nome-img img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .nome-time {
+      font-size: 12px;
+      font-weight: bold;
+      color: black;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80%;
+    }
+    .coluna-botao {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .coluna-botao button {
+      width: 95%;
+      height: 30px;
+    }
+    .valor-cotacao {
+      font-size: 12px;
+      margin-top: 2px;
+      color: #444;
+    }
+    .toggleExtras {
+      width: 30px;
+      height: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      background: #008cff;
+      color: white;
+      border: none;
+    }
+    .extras {
+      display: none;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+    .carrossel-container {
+      width: 95%;
+      max-width: 600px;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      margin: 20px auto 10px;
+    }
+    .carrossel {
+      display: flex;
+      width: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+    .carrossel img {
+      width: 100%;
+      height: 100px;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+    .linha-botoes {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .coluna-botao {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #totalFinal {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .erro-limite {
+      color: red;
+    }
+    .ok-limite {
+      color: green;
+    }
+    .dias {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+    }
+    .dias button {
+      padding: 10px;
+      background: white;
+      color: black;
+      border-radius: 5px;
+      border: 1px solid #999;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s;
+    }
+    .dias button:hover {
+      background: #ddd;
+    }
+    .conteudo-dia {
+      display: none;
+    }
+    .conteudo-dia.ativa {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>MULTISPORT.BET</h1>
+
+  <div class="topo-fixo">
+    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />
+   
+    <div id="totalFinal">Total: R$ 0,00</div>
+    <button id="apostarBtn">Apostar</button>
+  </div>
+
+  <div class="carrossel-container">
+    <div class="carrossel" id="carrossel">
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/carrocel.jpg" alt="Carrossel" />
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg" alt="Avaí" />
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />
+    </div>
+  </div>
+
+  <div class="dias">
+    <button onclick="mostrarDia('segunda')">Segunda</button>
+    <button onclick="mostrarDia('terca')">Terça</button>
+    <button onclick="mostrarDia('quarta')">Quarta</button>
+    <div id="contadorMarcados">Times 0</div>
+  </div>
+
+  <div id="conteudo-segunda" class="conteudo-dia ativa"></div>
+  <div id="conteudo-terca" class="conteudo-dia"></div>
+  <div id="conteudo-quarta" class="conteudo-dia"></div>
+
+  <!-- Modal -->
+  <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:350px; text-align:center;">
+      <h2>Código da Aposta</h2>
+      <p id="codigoAposta" style="font-weight:bold; font-size:24px; margin:15px 0;"></p>
+      <div id="qrPix" style="margin: 10px 0;"></div>
+      <button id="btnCopiar" style="margin:5px;">Copiar Código</button>
+      <button id="btnWhatsapp" style="margin:5px;">Enviar via WhatsApp</button>
+      <button id="btnFechar" style="margin:5px;">Fechar</button>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+    authDomain: "jogo-60a9e.firebaseapp.com",
+    projectId: "jogo-60a9e",
+    storageBucket: "jogo-60a9e.appspot.com",
+    messagingSenderId: "352852303591",
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const series = {
+    segunda: {
+      ladoAImagens: [
+          "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona sc.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg"
+      ],
+      ladoBImagens: [
+        "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",
+        "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",
+        "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png"
+      ],
+      horarios: ["2025-07-07T18:00:00", "2025-07-07T19:30:00", "2025-07-07T21:00:00"]
+    },
+    terca: {
+      ladoAImagens: [
+        "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg"
+      ],
+      ladoBImagens: [
+        "https://upload.wikimedia.org/wikipedia/en/f/fc/Manchester_United_FC_crest.svg",
+        "https://upload.wikimedia.org/wikipedia/en/7/7a/Chelsea_FC.svg"
+      ],
+      horarios: ["2025-07-08T17:00:00", "2025-07-08T20:00:00"]
+    },
+    quarta: {
+      ladoAImagens: [
+        "https://upload.wikimedia.org/wikipedia/en/a/ae/Bayern_Munich_logo.svg",
+        "https://upload.wikimedia.org/wikipedia/en/c/cd/Paris_Saint-Germain_F.C..svg"
+      ],
+      ladoBImagens: [
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"
+      ],
+      horarios: ["2025-07-09T18:00:00", "2025-07-09T20:30:00"]
+    }
+  };
+
+  const cotacoesPadrao = {
+    casa: 2.0,
+    empate: 3.0,
+    fora: 3.5,
+    ambasMarcam: 2.5,
+    acima2: 3.0,
+    abaixo2: 3.8,
+    casaFora: 1.5,
+    casaEmpate: 2.0,
+    empateFora: 1.8
+  };
+
+  const LIMITE_VALOR_RECEBER = 3000;
+  const chavePix = "71992290058";
+  const selects = [];
+
+  function extrairNomeDoTime(url) {
+    let nome = url.split("/").pop().split(".")[0];
+    nome = decodeURIComponent(nome).replace(/_/g, " ");
+
+    nome = nome.toLowerCase().trim();
+
+    if (nome.length % 2 === 0) {
+      const metade = nome.length / 2;
+      const primeiraMetade = nome.substring(0, metade);
+      const segundaMetade = nome.substring(metade);
+      if (primeiraMetade === segundaMetade) {
+        return primeiraMetade;
+      }
+    }
+    return nome;
+  }
+
+  window.mostrarDia = function(dia) {
+    document.querySelectorAll(".conteudo-dia").forEach(d => d.classList.remove("ativa"));
+    document.getElementById(`conteudo-${dia}`).classList.add("ativa");
+  };
+
+  function criarJogos(dia) {
+  const container = document.getElementById(`conteudo-${dia}`);
+  container.innerHTML = "";
+  const dados = series[dia];
+  if (!dados) return;
+
+  for (let i = 0; i < dados.ladoAImagens.length; i++) {
+    const nomeA = extrairNomeDoTime(dados.ladoAImagens[i]);
+    const nomeB = extrairNomeDoTime(dados.ladoBImagens[i]);
+    const dataJogo = new Date(dados.horarios[i]);
+    const agora = new Date();
+    if (dataJogo < agora) continue;
+
+    const c = cotacoesPadrao;
+
+    const div = document.createElement("div");
+    div.className = "duelo";
+    div.innerHTML = `
+      <div class="linha-duelo">
+        <div class="time-nome-img">
+          <img src="${dados.ladoAImagens[i]}" alt="${nomeA}" />
+          <div class="nome-time">${nomeA}</div>
+        </div>
+
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.casa}">Casa</button><span class="valor-cotacao">R$ ${c.casa.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.empate}">Empate</button><span class="valor-cotacao">R$ ${c.empate.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.fora}">Fora</button><span class="valor-cotacao">R$ ${c.fora.toFixed(2)}</span></div>
+
+        <div class="time-nome-img">
+          <img src="${dados.ladoBImagens[i]}" alt="${nomeB}" />
+          <div class="nome-time">${nomeB}</div>
+        </div>
+
+        <button class="toggleExtras">+</button>
+      </div>
+
+      <div class="extras" style="display:none; flex-wrap:wrap;">
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.ambasMarcam}">Ambas Marcam</button><span class="valor-cotacao">R$ ${c.ambasMarcam.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.acima2}">+2 Gols</button><span class="valor-cotacao">R$ ${c.acima2.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.abaixo2}">-2 Gols</button><span class="valor-cotacao">R$ ${c.abaixo2.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.casaFora}">Casa/Fora</button><span class="valor-cotacao">R$ ${c.casaFora.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.casaEmpate}">Casa/Empate</button><span class="valor-cotacao">R$ ${c.casaEmpate.toFixed(2)}</span></div>
+        <div class="coluna-botao"><button class="btn" data-grupo="grupo-${i}" data-valor="${c.empateFora}">Empate/Fora</button><span class="valor-cotacao">R$ ${c.empateFora.toFixed(2)}</span></div>
+      </div>
+
+      <small><strong>Data/Hora:</strong> ${dataJogo.toLocaleString()}</small>
+    `;
+    container.appendChild(div);
+
+    // Toggle extras
+    const toggleBtn = div.querySelector(".toggleExtras");
+    const extrasDiv = div.querySelector(".extras");
+    toggleBtn.onclick = () => {
+      extrasDiv.style.display = extrasDiv.style.display === "flex" ? "none" : "flex";
+    };
+
+    // Botões de aposta
+    const botoes = div.querySelectorAll("button.btn");
+    botoes.forEach((btn) => {
+      btn.onclick = () => {
+        const grupo = btn.dataset.grupo;
+        const botoesGrupo = container.querySelectorAll(`button[data-grupo="${grupo}"]`);
+        botoesGrupo.forEach(b => b.classList.remove("selecionado"));
+        btn.classList.add("selecionado");
+
+        atualizarSelecoes();
+        atualizarTotal();
+      };
+    });
+  }
+}
+function atualizarSelecoes() {
+  selects.length = 0; // Limpa as seleções anteriores
+
+  document.querySelectorAll(".duelo").forEach((duelo, i) => {
+    const selecionado = duelo.querySelector("button.selecionado");
+    if (selecionado) {
+      const texto = selecionado.textContent;
+      const valor = parseFloat(selecionado.dataset.valor);
+      const imgA = duelo.querySelectorAll("img")[0]?.alt || "";
+      const imgB = duelo.querySelectorAll("img")[1]?.alt || "";
+      const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora: ", "") || "";
+
+      selects.push({
+        dueloIndex: i,
+        escolha: texto,
+        valor,
+        timeA: imgA,
+        timeB: imgB,
+        dataHora
+      });
+    }
+  });
+
+  document.getElementById("contadorMarcados").textContent = `Times ${selects.length}`;
+}
+  function atualizarTotal() {
+    const valorUnicoInput = document.getElementById('valorUnico');
+    const valorUnico = Number(valorUnicoInput.value) || 0;
+
+    const selecionados = document.querySelectorAll('.btn.selecionado');
+    let multiplicador = 1;
+    selecionados.forEach(btn => {
+      multiplicador *= Number(btn.dataset.valor);
+    });
+
+    const total = valorUnico * multiplicador;
+
+    const totalFinal = document.getElementById('totalFinal');
+    if (total > LIMITE_VALOR_RECEBER) {
+      totalFinal.innerHTML = `<span class="erro-limite">Total: R$ ${total.toFixed(2)} (Limite R$ ${LIMITE_VALOR_RECEBER})</span>`;
+    } else {
+      totalFinal.innerHTML = `<span class="ok-limite">Total: R$ ${total.toFixed(2)}</span>`;
+    }
+  }
+
+  function atualizarContador() {
+    const selecionados = document.querySelectorAll('.btn.selecionado').length;
+    document.getElementById('contadorMarcados').textContent = `Times ${selecionados}`;
+  }
+
+  // Evento no input valorUnico
+  document.getElementById('valorUnico').addEventListener('input', () => {
+    atualizarTotal();
+  });
+
+  // Botão apostar
+  document.getElementById('apostarBtn').addEventListener('click', () => {
+    const valorUnicoInput = document.getElementById('valorUnico');
+    const valorUnico = Number(valorUnicoInput.value);
+    if (!valorUnico || valorUnico <= 0) {
+      alert('Digite um valor válido para apostar');
+      return;
+    }
+
+    const selecionados = Array.from(document.querySelectorAll('.btn.selecionado'));
+    if (selecionados.length === 0) {
+      alert('Selecione pelo menos um palpite');
+      return;
+    }
+
+    // Gera código aposta
+    const codigo = `MJ${Date.now()}`;
+
+    // Monta objeto para salvar no Firebase
+    const aposta = {
+      codigo,
+      valorUnico,
+      selecoes: selecionados.map(btn => {
+        const grupo = btn.dataset.grupo;
+        const valor = Number(btn.dataset.valor);
+        const texto = btn.textContent;
+        return { grupo, texto, valor };
+      }),
+      dataHora: new Date().toISOString()
+    };
+
+    set(ref(db, 'apostas/' + codigo), aposta)
+      .then(() => {
+        abrirModal(codigo, aposta);
+        limparSelecoes();
+      })
+      .catch(err => {
+        alert('Erro ao salvar aposta: ' + err);
+      });
+  });
+
+  function abrirModal(codigo, aposta) {
+    const modal = document.getElementById('codigoModal');
+    modal.style.display = 'flex';
+
+    document.getElementById('codigoAposta').textContent = codigo;
+
+    // Gerar QR Pix simples (exemplo)
+    const qrPixDiv = document.getElementById('qrPix');
+    qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
+
+    // Copiar código
+    document.getElementById('btnCopiar').onclick = () => {
+      navigator.clipboard.writeText(codigo).then(() => {
+        alert('Código copiado!');
+      });
+    };
+
+    // Enviar WhatsApp
+    document.getElementById('btnWhatsapp').onclick = () => {
+      const texto = `Código da aposta: ${codigo}\nValor por aposta: R$ ${aposta.valorUnico.toFixed(2)}\nPalpites:\n` +
+        aposta.selecoes.map(s => `- ${s.texto} (R$ ${s.valor.toFixed(2)})`).join('\n');
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+      window.open(url, '_blank');
+    };
+
+    // Fechar modal
+    document.getElementById('btnFechar').onclick = () => {
+      modal.style.display = 'none';
+    };
+  }
+
+  function limparSelecoes() {
+    document.querySelectorAll('.btn.selecionado').forEach(btn => {
+      btn.classList.remove('selecionado');
+    });
+    atualizarTotal();
+    atualizarContador();
+  }
+
+  // Inicialização
+  criarJogos('segunda');
+  criarJogos('terca');
+  criarJogos('quarta');
+
+  mostrarDia('segunda');
+  atualizarTotal();
+  atualizarContador();
+
+</script>
+</body>
+</html>
