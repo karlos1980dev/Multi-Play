@@ -1,0 +1,932 @@
+<!DOCTYPE html>  <html lang="pt-br">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>MULTIJOGO SPORT</title>  
+  <style>  
+    body {  
+  font-family: sans-serif;  
+  text-align: center;  
+  margin: 0;  
+  padding-top: 80px;  
+  background: #ff1515;  
+  color: black;  
+}  
+h1 {
+
+display:inline;
+font-size: 20px;
+margin: 0;
+}
+
+h2 {
+margin: 2px 0;
+background: red;
+color: white;
+display:inline;
+font-size: 20px;
+border-radius: 5px;
+}
+
+.topo-fixo {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+background: white;
+padding: 8px 12px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+z-index: 999;
+display: flex;
+align-items: center;
+gap: 10px;
+box-sizing: border-box;
+}
+
+.topo-fixo input#valorUnico {
+flex: 1;
+height: 40px;
+font-size: 14px;
+padding: 0 10px;
+border-radius: 6px;
+border: 1px solid #ccc;
+}
+
+.topo-fixo #totalFinal {
+flex: 1.2;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #f3f3f3;
+border-radius: 6px;
+font-weight: bold;
+font-size: 14px;
+color: black;
+}
+
+.topo-fixo button#apostarBtn {
+flex: 1;
+height: 40px;
+font-size: 14px;
+border-radius: 6px;
+background: #00b300;
+color: white;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+}
+.topo-fixo button#apostarBtn:hover {
+background: #009900;
+}
+
+.serie-container {
+margin: 8px auto 4px;
+max-width: 600px;
+background: #a3a3a3;
+border-radius: 8px;
+padding: 4px;
+}
+
+.duelo {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 4px;
+font-weight: bold;
+background: #f0f0f0;
+color: black;
+padding: 2px;
+border-radius: 8px;
+max-width: 95vw;
+margin: 6px auto;
+box-sizing: border-box;
+}
+
+button {
+display: inline;
+margin: 2px;
+padding: 4px 8px;
+width: 50px;
+font-size: 12px;
+border: none;
+background: #008cff;
+color: black;
+border-radius: 4px;
+cursor: pointer;
+user-select: none;
+transition: background 0.3s;
+}
+button:hover:not(:disabled) {
+background: #0072d3;
+}
+button.selecionado {
+background: #00cc00 !important;
+}
+input[type="number"] {
+padding: 8px;
+width: 30%;
+border-radius: 5px;
+border: 1px solid #ccc;
+font-size: 16px;
+text-align: center;
+}
+
+#valorUnico {
+width: 100%;
+height: 35px;
+font-size: 16px;
+padding: 5px;
+border-radius: 8px;
+border: 1px solid #ccc;
+}
+
+#apostarBtn {
+width: 100%;
+height: 40px;
+border-radius: 20px;
+font-size: 16px;
+cursor: pointer;
+}
+
+#totalFinal {
+font-weight: bold;
+font-size: 18px;
+color: black;
+}
+
+.valor-cotacao {
+font-size: 12px;
+color: #444;
+margin-top: 2px;
+font-weight: bold;
+}
+
+.time-nome-img {
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 80px;
+}
+.time-nome-img img {
+width: 50px;
+height: 50px;
+object-fit: contain;
+margin-bottom: 2px;
+border-radius: 6px;
+background: #fff;
+}
+
+.nome-time {
+font-size: 14px;
+font-weight: bold;
+color: black;
+text-align: center;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 80%;
+}
+
+.linha-duelo {
+display: grid;
+grid-template-columns: 60px 1fr 1fr 1fr 60px 35px;
+align-items: center;
+justify-content: center;
+gap: 6px;
+width: 100%;
+padding: 5px 0;
+}
+
+.botoes-duelo button {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+font-size: 13px;
+padding: 5px;
+border-radius: 6px;
+background: #008cff;
+color: white;
+min-width: 55px;
+border: none;
+}
+.botoes-duelo button .valor-cotacao {
+font-size: 11px;
+margin-top: 2px;
+color: #f3f3f3;
+}
+
+.extras {
+display: none;
+justify-content: center;
+gap: 10px;
+margin-top: 2px;
+flex-wrap: wrap;
+}
+
+.toggleExtras {
+width: 30px;
+height: 60px;
+font-weight: bold;
+font-size: 20px;
+padding: 5px 10px;
+cursor: pointer;
+border-radius: 4px;
+background: #008cff;
+color: white;
+border: none;
+}
+
+.carrossel-container {
+width: 98%;
+max-width: 600px;
+overflow: hidden;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0,0,0,0.3);
+margin: 0px;
+}
+.carrossel {
+display: flex;
+width: 100%;
+transition: transform 0.5s ease-in-out;
+}
+.carrossel img {
+width: 100%;
+height: 100px;
+object-fit: cover;
+flex-shrink: 0;
+}
+
+.dias {
+margin-top: 20px;
+display: flex;
+justify-content: center;
+gap: 10px;
+align-items: center;
+}
+.dias button {
+padding: 10px 14px;
+background: white;
+width:100%;
+color: black;
+border-radius: 5px;
+border: 1px solid #999;
+cursor: pointer;
+font-size: 12px;
+white-space: nowrap;
+transition: background 0.3s;
+}
+.dias button:hover {
+background: green;
+}
+.dias button.ativo {
+background-color: #0072d3;
+color: white;
+font-weight: bold;
+}
+
+.conteudo-dia {
+display: none;
+}
+.conteudo-dia.ativa {
+display: block;
+}
+
+.erro-limite {
+color: red;
+}
+.ok-limite {
+color: green;
+}
+.contadorTime{
+    display:inline
+    font-weight:bold;
+}
+.extras {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.coluna-botao {
+  flex: 1 1 30%;
+  max-width: 100px;
+}
+
+.coluna-botao .btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: normal;
+  height: 60px;
+  width: 100%;
+  word-wrap: break-word;
+  border-radius: 5px;
+  background: #008cff;
+  color:white;
+  border: 1px solid #aaa;
+  font-weight: bold;
+}
+
+.valor-cotacao-interna {
+  font-size: 11px;
+  font-weight: normal;
+  margin-top: 3px;
+  color: #333;
+}
+  </style>  
+</head>  
+<body>  <div class="contadorTime">
+  <h1>MULTISPORT.BET</h1> 
+</div>
+   <div class="topo-fixo">  
+    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />  <div id="totalFinal">Total: R$ 0,00</div>  
+<button id="apostarBtn">Apostar  <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
+
+  </div>    <div class="carrossel-container">  
+    <div class="carrossel" id="carrossel">  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/carrocel.jpg" alt="Carrossel" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg" alt="Avaí" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />  
+    </div>  
+  </div>  
+  
+    <div class="dias">  
+      <button onclick="mostrarDia('domingo')">Domingo</button>  
+    <button onclick="mostrarDia('segunda')">Segunda</button>  
+    <button onclick="mostrarDia('terca')">Terça</button>  
+  <button onclick="mostrarDia('quarta')">Quarta</button>  
+<button onclick="mostrarDia('quinta')">Quinta</button>  
+<button onclick="mostrarDia('sexta')">Sexta</button>  
+<button onclick="mostrarDia('sabado')">Sábado</button> </br>
+  </div>  
+
+
+<div id="conteudo-quinta" class="conteudo-dia"></div>  
+<div id="conteudo-sexta" class="conteudo-dia"></div>  
+<div id="conteudo-sabado" class="conteudo-dia"></div>  
+<div id="conteudo-domingo" class="conteudo-dia"></div>  
+  <div id="conteudo-segunda" class="conteudo-dia ativa"></div>  
+  <div id="conteudo-terca" class="conteudo-dia"></div>  
+  <div id="conteudo-quarta" class="conteudo-dia"></div>    <!-- Modal -->    <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">  
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:350px; text-align:center;">  
+      <h2>Código da Aposta</h2>  
+      <p id="codigoAposta" style="font-weight:bold; font-size:24px; margin:15px 0;"></p>  
+      <div id="qrPix" style="margin: 10px 0;"></div>  
+      <button id="btnCopiar" style="margin:5px;">Copiar Código</button>  
+      <button id="btnWhatsapp" style="margin:5px;">Enviar via WhatsApp</button>  
+      <button id="btnFechar" style="margin:5px;">Fechar</button>  
+    </div>  
+  </div>  <script type="module">  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";  
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";  
+  
+  const firebaseConfig = {  
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",  
+    authDomain: "jogo-60a9e.firebaseapp.com",  
+    projectId: "jogo-60a9e",  
+    storageBucket: "jogo-60a9e.appspot.com",  
+    messagingSenderId: "352852303591",  
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",  
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"  
+  };  
+  
+  const app = initializeApp(firebaseConfig);  
+  const db = getDatabase(app);  
+  
+  const series = {  
+  domingo: {  
+      ladoAImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Drogheda United FC.png",  
+          "https://upload.wikimedia.org/wikipedia/en/a/ae/coritiba.jpeg",  
+            
+        
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      
+      
+      horarios: ["2025-07-09T18:00:00", "2025/07/09T20:30:00"]  
+    },  
+      
+    segunda: {  
+      ladoAImagens: [  
+          "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona sc.png",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg"  
+      ],  
+      ladoBImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png"  
+      ],  
+     horarios: ["2025/07/08T17:00:00", "2025-07-08T20:00",
+     "2025/07/08T17:00:00"]  
+    },  
+  
+    terca: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      ladoBImagens: [  
+"https://upload.wikimedia.org/wikipedia/en/f/fc/Manchester_United_FC_crest.svg", 
+ 
+"https://upload.wikimedia.org/wikipedia/en/7/7a/Chelsea_FC.svg" , 
+  "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      horarios: ["2025-07-08T17:00:00", "2025-07-08T20:00:00",
+    " 2025-07-08T17:00:00", "2025-07-08T20:00:00"]  
+    },  
+    quarta: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/a/ae/Bayern_Munich_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/c/cd/Paris_Saint-Germain_F.C..svg"  
+        
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      horarios: ["2025-07-09T18:00:00", "2025-07-09T20:30:00"]  
+    },  
+    quinta: {  
+      ladoAImagens: [  
+          "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona sc.png",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg"  
+      ],  
+      ladoBImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png"  
+      ],  
+      horarios: ["2025-07-07T18:00:00", "2025-07-07T19:30:00", "2025-07-07T21:00:00"]  
+    },  
+    sexta: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg"  
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/f/fc/Manchester_United_FC_crest.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/7/7a/Chelsea_FC.svg"  
+      ],  
+      horarios: ["2025-07-08T17:00:00", "2025-07-08T20:00:00"]  
+    },  
+    sabado: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/a/ae/Bayern_Munich_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/c/cd/Paris_Saint-Germain_F.C..svg"  
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      horarios: ["2025-07-09T18:00:00", "2025-07-09T20:30:00"]  
+    }  
+      
+  };  
+
+
+const distribuicaoGrupos = {
+  terca: [1, 3, 2],       // 5 jogos na Premier, 3 na La Liga, 2 no Brasileirão
+  quarta: [2, 2],         // 2 jogos em cada
+  quinta: [3, 3]          // 3 jogos em cada
+};
+  const cotacoesPadrao = {  
+    casa: 2.0,  
+    empate: 3.0,  
+    fora: 3.5,  
+    ambasMarcam: 2.5,  
+    acima2: 3.0,  
+    abaixo2: 3.8,  
+    casaFora: 1.5,  
+    casaEmpate: 2.0,  
+    empateFora: 1.8  
+  };  
+  
+  const LIMITE_VALOR_RECEBER = 3000;  
+  const chavePix = "71992290058";  
+  const selects = [];  
+  
+  function extrairNomeDoTime(url) {  
+  let nome = url.split("/").pop().split(".")[0];  
+  nome = decodeURIComponent(nome).replace(/[_\-]/g, " "); // troca _ e - por espaço  
+  nome = nome.replace(/\.(jpeg|jpg|png|svg)$/i, ""); // remove extensão  
+  return nome.trim().replace(/\s+/g, " "); // remove espaços duplos  
+}  
+  window.mostrarDia = function(dia) {  
+    document.querySelectorAll(".conteudo-dia").forEach(d => d.classList.remove("ativa"));  
+    document.getElementById(`conteudo-${dia}`).classList.add("ativa");  
+  };  
+  
+  const nomesGrupos = {
+  terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
+  quarta: ["Campeonato Francês"],
+  quinta: ["Série A"],
+  sexta: ["Amistoso"],
+  sabado: ["Premier League"],
+  domingo: ["Brasileirão Série B"],
+  segunda: ["Campeonato Inglês"]
+};
+
+function criarJogos(dia) {
+  const container = document.getElementById(`conteudo-${dia}`);
+  container.innerHTML = "";
+
+  const dados = series[dia];
+  if (!dados) return;
+
+  const agora = new Date();
+  const jogosValidos = [];
+
+  for (let i = 0; i < dados.horarios.length; i++) {
+    const dataJogo = new Date(dados.horarios[i]);
+    if (dataJogo > agora) {
+      jogosValidos.push({
+        index: i,
+        ladoA: dados.ladoAImagens[i],
+        ladoB: dados.ladoBImagens[i],
+        horario: dataJogo
+      });
+    }
+  }
+
+  if (jogosValidos.length === 0) return;
+
+  const distribuicao = [5, 8, 10];
+  const nomesGrupoDia = nomesGrupos[dia] || [];
+  let atual = 0;
+
+  for (let g = 0; g < distribuicao.length; g++) {
+    const qtd = distribuicao[g];
+    const nomeGrupo = nomesGrupoDia[g] || `Grupo ${g + 1}`;
+
+    if (atual >= jogosValidos.length) break;
+
+    const h2 = document.createElement("h2");
+    h2.textContent = nomeGrupo;
+    h2.classList.add("titulo-grupo");
+    container.appendChild(h2);
+
+    for (let j = 0; j < qtd && atual < jogosValidos.length; j++, atual++) {
+      const jogo = jogosValidos[atual];
+      const i = jogo.index;
+      const nomeA = extrairNomeDoTime(dados.ladoAImagens[i]);
+      const nomeB = extrairNomeDoTime(dados.ladoBImagens[i]);
+      const dataJogo = jogo.horario;
+      const c = cotacoesPadrao;
+
+      const div = document.createElement("div");
+      div.className = "duelo";
+      div.dataset.nomeGrupo = nomeGrupo;
+
+      div.innerHTML = `
+        <div class="linha-duelo">
+          <div class="time-nome-img">
+            <img src="${jogo.ladoA}" />
+            <div class="nome-time">${nomeA}</div>
+          </div>
+
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.casa}">Casa</button>
+            <span class="valor-cotacao">${c.casa.toFixed(2)}</span>
+          </div>
+
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.empate}">Empate</button>
+            <span class="valor-cotacao">${c.empate.toFixed(2)}</span>
+          </div>
+
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.fora}">Fora</button>
+            <span class="valor-cotacao">${c.fora.toFixed(2)}</span>
+          </div>
+
+          <div class="time-nome-img">
+            <img src="${jogo.ladoB}" />
+            <div class="nome-time">${nomeB}</div>
+          </div>
+
+          <button class="toggleExtras">+</button>
+        </div>
+
+        <div class="extras">
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.ambasMarcam}">Ambas</button>
+            <span class="valor-cotacao">${c.ambasMarcam.toFixed(2)}</span>
+          </div>
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.acima2}">+2 Gols</button>
+            <span class="valor-cotacao">${c.acima2.toFixed(2)}</span>
+          </div>
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.abaixo2}">-2 Gols</button>
+            <span class="valor-cotacao">${c.abaixo2.toFixed(2)}</span>
+          </div>
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.casaFora}">Casa/Fora</button>
+            <span class="valor-cotacao">${c.casaFora.toFixed(2)}</span>
+          </div>
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.casaEmpate}">Casa/Empate</button>
+            <span class="valor-cotacao">${c.casaEmpate.toFixed(2)}</span>
+          </div>
+          <div class="coluna-botao">
+            <button class="btn" data-grupo="grupo-${i}" data-valor="${c.empateFora}">Empate/Fora</button>
+            <span class="valor-cotacao">${c.empateFora.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <small><strong>Data/Hora:</strong> ${dataJogo.toLocaleString()}</small>
+      `;
+
+      container.appendChild(div);
+
+      div.querySelectorAll(".time-nome-img img").forEach(img => {
+        img.addEventListener("click", () => {
+          const nomeTime = img.parentElement.querySelector(".nome-time");
+          if (nomeTime) alert(` ${nomeTime.textContent.trim()}`);
+        });
+      });
+
+      const toggleBtn = div.querySelector(".toggleExtras");
+      const extrasDiv = div.querySelector(".extras");
+      toggleBtn.onclick = () => {
+        extrasDiv.style.display = extrasDiv.style.display === "flex" ? "none" : "flex";
+      };
+
+   div.querySelectorAll("button.btn").forEach(btn => {
+  btn.onclick = () => {
+    const grupo = btn.dataset.grupo;
+    const duelo = btn.closest(".duelo");
+
+    // Se já está selecionado, desmarca
+    if (btn.classList.contains("selecionado")) {
+      btn.classList.remove("selecionado");
+    } else {
+      // Remove todos os outros do grupo
+      duelo.querySelectorAll(`button[data-grupo="${grupo}"]`).forEach(b => {
+        b.classList.remove("selecionado");
+      });
+
+      // Marca o clicado
+      btn.classList.add("selecionado");
+    }
+
+    atualizarSelecoes();
+    atualizarTotal();
+  };
+});
+    }
+  }
+}
+function atualizarSelecoes() {
+  selects.length = 0; // Limpa as seleções anteriores
+
+  document.querySelectorAll(".duelo").forEach((duelo, i) => {
+    const selecionado = duelo.querySelector("button.selecionado");
+    if (selecionado) {
+      const texto = selecionado.textContent;
+      const valor = parseFloat(selecionado.dataset.valor);
+      const timeA = duelo.querySelectorAll(".nome-time")[0]?.textContent || "";
+      const timeB = duelo.querySelectorAll(".nome-time")[1]?.textContent || "";
+      const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora: ", "") || "";
+      const campeonato = duelo.dataset.nomeGrupo || "Campeonato não informado";
+
+      selects.push({
+        timeA: timeA.trim(),
+        timeB: timeB.trim(),
+        valor: valor,
+        escolha: texto.split('\n')[0].trim(), // só o nome do botão
+        dataHora: dataHora,
+        campeonato: campeonato
+      });
+    }
+  });
+
+  document.getElementById("contadorMarcados").textContent = `Times ${selects.length}`;
+}
+  function atualizarTotal() {  
+  const valorUnicoInput = document.getElementById('valorUnico');  
+  const valorUnico = Number(valorUnicoInput.value) || 0;  
+  
+  const selecionados = document.querySelectorAll('.btn.selecionado');  
+  let multiplicador = 1;  
+  selecionados.forEach(btn => {  
+    multiplicador *= Number(btn.dataset.valor);  
+  });  
+  
+  const total = valorUnico * multiplicador;  
+  const totalFinal = document.getElementById('totalFinal');  
+  const apostarBtn = document.getElementById('apostarBtn');  
+  
+  if (total > LIMITE_VALOR_RECEBER) {  
+    totalFinal.innerHTML = `<span class="erro-limite">Total: R$ ${total.toFixed(2)} (Limite R$ ${LIMITE_VALOR_RECEBER})</span>`;  
+    apostarBtn.disabled = true;  
+    apostarBtn.style.background = "#aaa";  
+    apostarBtn.style.cursor = "not-allowed";  
+  } else {  
+    totalFinal.innerHTML = `<span class="ok-limite">Total: R$ ${total.toFixed(2)}</span>`;  
+    apostarBtn.disabled = false;  
+    apostarBtn.style.background = ""; // volta para o padrão  
+    apostarBtn.style.cursor = "pointer";  
+  }  
+}  
+  function atualizarContador() {  
+    const selecionados = document.querySelectorAll('.btn.selecionado').length;  
+    document.getElementById('contadorMarcados').textContent = `Times ${selecionados}`;  
+  }  
+  
+  // Evento no input valorUnico  
+  document.getElementById('valorUnico').addEventListener('input', () => {  
+    atualizarTotal();  
+  });  
+  
+  // Botão apostar  
+  document.getElementById('apostarBtn').addEventListener('click', () => {  
+    const valorUnicoInput = document.getElementById('valorUnico');  
+    const valorUnico = Number(valorUnicoInput.value);  
+    if (!valorUnico || valorUnico <= 0) {  
+      alert('Digite um valor válido para apostar');  
+      return;  
+    }  
+  
+    const selecionados = Array.from(document.querySelectorAll('.btn.selecionado'));  
+    if (selecionados.length === 0) {  
+      alert('Selecione pelo menos um palpite');  
+      return;  
+    }  
+  
+    // Gera código aposta  
+    const codigo = `MJ${Date.now()}`;  
+  
+    // Monta objeto para salvar no Firebase  
+    // Monta objeto para salvar no Firebase  
+const aposta = {  
+  codigo,  
+  valorUnico,  
+  selecoes: selects,  
+  dataHora: new Date().toISOString()  
+};  
+  
+    set(ref(db, 'apostas/' + codigo), aposta)  
+      .then(() => {  
+        abrirModal(codigo, aposta);  
+        limparSelecoes();  
+      })  
+      .catch(err => {  
+        alert('Erro ao salvar aposta: ' + err);  
+      });  
+  });  
+  
+  function abrirModal(codigo, aposta) {  
+    const modal = document.getElementById('codigoModal');  
+    modal.style.display = 'flex';  
+  
+    document.getElementById('codigoAposta').textContent = codigo;  
+  
+    // Gerar QR Pix simples (exemplo)  
+    const qrPixDiv = document.getElementById('qrPix');  
+    qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;  
+  
+    // Copiar código  
+    document.getElementById('btnCopiar').onclick = () => {  
+      navigator.clipboard.writeText(codigo).then(() => {  
+        alert('Código copiado!');  
+      });  
+    };  
+  
+    // Enviar WhatsApp  
+    document.getElementById('btnWhatsapp').onclick = () => {  
+  const total = document.getElementById('totalFinal').textContent.replace("Total: ", "").trim();  
+  
+  const texto = ` *Código da Aposta:* ${codigo}\n *Valor Total a Pagar:* ${total}`;  
+  const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;  
+  window.open(url, '_blank');  
+  
+    };  
+  
+    // Fechar modal  
+    document.getElementById('btnFechar').onclick = () => {  
+      modal.style.display = 'none';  
+    };  
+  }  
+  
+  function limparSelecoes() {  
+    document.querySelectorAll('.btn.selecionado').forEach(btn => {  
+      btn.classList.remove('selecionado');  
+    });  
+      
+  }  
+   
+  // Função que esconde os botões de dias passados  
+  
+// 1. Função que esconde os botões de dias passados
+function esconderDiasPassados() {
+  const hoje = new Date();
+  const diasSemana = [
+    { nome: 'domingo', data: new Date("2025-07-13") },
+    { nome: 'segunda', data: new Date("2025-07-13") },
+    { nome: 'terca', data: new Date("2025-07-09") },
+    { nome: 'quarta', data: new Date("2025-07-09") },
+    { nome: 'quinta', data: new Date("2025-07-10") },
+    { nome: 'sexta', data: new Date("2025-07-11") },
+    { nome: 'sabado', data: new Date("2025-07-12") },
+  ];
+
+  diasSemana.forEach(dia => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia.nome}"]`);
+    if (hoje > dia.data && btn) {
+      btn.style.display = 'none';
+    }
+  });
+}
+
+// 2. Verifica se um dia tem jogo futuro (não usada aqui, mas útil)
+function diaTemJogoFuturo(dia) {
+  if (!series[dia]) return false;
+  const agora = new Date();
+  return series[dia].horarios.some(h => new Date(h) > agora);
+}
+
+// 3. Mostra automaticamente hoje + 2 dias seguintes
+function mostrarHojeMais2Dias() {
+  const nomesDias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+  const hoje = new Date();
+  const indiceHoje = hoje.getDay(); // 0 = domingo, 1 = segunda...
+
+  const diasMostrar = [];
+  for (let i = 0; i < 3; i++) {
+    const diaIndex = (indiceHoje + i) % 7;
+    diasMostrar.push(nomesDias[diaIndex]);
+  }
+
+  // Oculta todos os botões
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.style.display = 'none';
+    btn.classList.remove('ativo');
+  });
+
+  // Mostra apenas os 3 dias atuais e ativa o primeiro
+  diasMostrar.forEach((dia, idx) => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia}"]`);
+    if (btn) {
+      btn.style.display = 'inline-block';
+      if (idx === 0) btn.classList.add('ativo');
+    }
+    criarJogos(dia); // Cria os jogos do dia
+  });
+
+  mostrarDia(diasMostrar[0]); // Ativa o primeiro dia
+}
+
+// 4. Carrossel automático
+const carrossel = document.getElementById('carrossel');
+const slides = carrossel?.children.length || 0;
+let indiceAtual = 0;
+
+function avancarSlide() {
+  if (slides === 0) return;
+  indiceAtual = (indiceAtual + 1) % slides;
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+}
+
+// Avança slide a cada 3 segundos
+setInterval(avancarSlide, 3000);
+
+// Ajusta slide ao redimensionar
+window.addEventListener('resize', () => {
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+});
+
+// 5. Executa tudo ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  esconderDiasPassados();
+  mostrarHojeMais2Dias();
+  atualizarTotal();
+  atualizarContador();
+
+  // Cria jogos de todos os dias no background
+  Object.keys(series).forEach(dia => criarJogos(dia));
+});
+
+</script>  </body>  
+</html>  
