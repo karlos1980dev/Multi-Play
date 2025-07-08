@@ -13,6 +13,7 @@
     input, button {
       padding: 10px;
       font-size: 16px;
+      text-align:center;
       border-radius: 8px;
       margin: 5px;
       border: 1px solid #ccc;
@@ -96,7 +97,7 @@
       let html = `
         <h3>🔢 Código: <b>${aposta.codigo}</b></h3>
         <h3>💸 Valor por aposta: R$ ${aposta.valorUnico.toFixed(2)}</h3>
-        <h3>📊 Multiplicador: ${multiplicador.toFixed(2)}</h3>
+        <h3>📊 Cotacao: ${multiplicador.toFixed(2)}</h3>
         <h3 style="color:green;">💰 Valor a receber: R$ ${totalReceber.toFixed(2)}</h3>
       `;
 
@@ -107,7 +108,7 @@
       html += `
         <p><strong style="color:green;">✅ Ganhou:</strong> ${ganhou} |
         <strong style="color:red;">❌ Perdeu:</strong> ${perdeu} |
-        <strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
+        </br><strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
       `;
 
   // Agrupar por data
@@ -156,8 +157,8 @@ datasOrdenadas.forEach(data => {
         <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
         <div class="duelo-box">
          <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
-<p><strong>🏆 Campeonato:</strong> ${sel.campeonato || 'Não informado'}</p>
-<p><strong>Escolha:</strong> ${sel.escolha} | <strong>Cotação:</strong> R$ ${sel.valor.toFixed(2)}</p>
+
+<p><strong>Escolha:</strong> ${sel.escolha} | <strong>Cotação:</strong> ${sel.valor}</p>
 <p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
 <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p></div>
       `;
@@ -169,11 +170,15 @@ datasOrdenadas.forEach(data => {
     };
 
     window.compartilharLink = () => {
-      const codigo = document.getElementById('codigoInput').value.trim();
-      const url = `${location.origin}${location.pathname}?codigo=${codigo}`;
-      navigator.clipboard.writeText(url).then(() => alert("🔗 Link copiado: " + url));
-    };
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const url = `${location.origin}${location.pathname}?codigo=${codigo}`;
 
+  const texto = `📎 Link para seu bilhete:\n👉 ${url}\n\n📱 Acompanhe no App CENTRAL DAS APOSTAS!\n🔗 ${url}\nJOGUE COM RESPOSABILIDADAE\n       Boa Sorte`;
+
+  navigator.clipboard.writeText(texto).then(() => {
+    alert("🔗 Link com mensagem copiado para a área de transferência!");
+  });
+};
     window.enviarWhatsApp = () => {
       const aposta = window.apostaGlobal;
       if (!aposta) return;
