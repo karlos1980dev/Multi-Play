@@ -3,51 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buscar Código da Aposta</title>
+  <title>Visualização da Aposta</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #f0f0f0;
+      background: #47ff15;
       text-align: center;
       padding: 20px;
     }
-    input, button {
-      padding: 12px;
-      font-size: 16px;
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 700px;
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .duelo {
+      margin-top: 10px;
+      padding: 10px;
       border-radius: 8px;
-      margin: 10px;
-      border: 1px solid #ccc;
-      width: 80%;
-      max-width: 400px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      text-align: left;
     }
-    button {
-      background: #25d366;
-      color: white;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #1da851;
-      cursor: pointer;
-    }
-    .msg {
-      margin-top: 20px;
-      font-weight: bold;
-    }
+    h2 { color: #25d366; }
+    .ganhou { color: green; font-weight: bold; }
+    .perdeu { color: red; font-weight: bold; }
+    .carregando { color: orange; }
   </style>
 </head>
 <body>
-  <h1>🔎 Buscar Aposta</h1>
-
-  <input type="text" id="codigoInput" placeholder="Digite o código da aposta" />
-  <br />
-  <button onclick="buscarAposta()">Visualizar Resultado</button>
-
-  <div class="msg" id="mensagem"></div>
+  <div class="container" id="visualizacao">
+    <h2>🔎 Carregando aposta...</h2>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
+    // 🔧 Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
       authDomain: "jogo-60a9e.firebaseapp.com",
@@ -61,41 +56,100 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    window.buscarAposta = async () => {
-      const codigo = document.getElementById("codigoInput").value.trim();
-      const msg = document.getElementById("mensagem");
+    const container = document.getElementById("visualizacao");
 
-      if (!codigo) {
-        msg.innerHTML = "❌ Digite um código válido!";
-        msg.style.color = "red";
-        return;
-      }
+    // ✅ Aceita ?id= ou ?codigo=
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id") || urlParams.get("codigo");
 
-      msg.innerHTML = "⏳ Verificando...";
-      msg.style.color = "black";
+    const token = "5e66c06518f74e779bc07e73ef0266c5"; // Seu token da API Futebol
 
+    async function buscarResultado(idPartida) {
       try {
-        const snapshot = await get(child(ref(db), `apostas/${codigo}`));
+        const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Erro na API Futebol");
+        const data = await res.json();
+        return {
+          placarA: data.placar_oficial_mandante,
+          placarB: data.placar_oficial_visitante
+        };
+      } catch (e) {
+        console.warn("Erro ao buscar resultado:", e);
+        return null;
+      }
+    }
+
+    function verificarResultado(placarA, placarB, escolha) {
+      if (escolha === "Casa" && placarA > placarB) return "Ganhou";
+      if (escolha === "Fora" && placarB > placarA) return "Ganhou";
+      if (escolha === "Empate" && placarA === placarB) return "Ganhou";
+      return "Perdeu";
+    }
+
+    if (!id) {
+      container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
+    } else {
+      get(child(ref(db), `apostas/${id}`)).then(async snapshot => {
         if (!snapshot.exists()) {
-          msg.innerHTML = "❌ Código não encontrado.";
-          msg.style.color = "red";
+          container.innerHTML = "<h2>❌ Aposta não encontrada.</h2>";
           return;
         }
 
-        msg.innerHTML = "✅ Código encontrado! Redirecionando...";
-        msg.style.color = "green";
+        const dados = snapshot.val();
+        const nome = dados.nome || "Apostador";
+        const data = dados.dataHora || "Data não disponível";
+        const jogos = dados.selecoes || [];
 
-        // Redirecionar para a visualização do resultado
-        setTimeout(() => {
-          window.location.href = `aposta_viewer.html?id=${codigo}`;
-        }, 1000);
+        let html = `
+          <h2>📄 Visualização da Aposta</h2>
+          <p><strong>👤 Jogador:</strong> ${nome}</p>
+          <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString()}</p>
+          <hr />
+          <h3>🎮 Jogos Selecionados:</h3>
+        `;
 
-      } catch (error) {
-        console.error(error);
-        msg.innerHTML = "⚠️ Erro ao consultar. Tente novamente.";
-        msg.style.color = "orange";
-      }
-    };
+        let acertos = 0;
+
+        for (const jogo of jogos) {
+          const { timeA, timeB, escolha, dataHora, idPartida } = jogo;
+
+          let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando resultado...</span>";
+
+          if (idPartida) {
+            const resultado = await buscarResultado(idPartida);
+            if (resultado) {
+              placarA = resultado.placarA;
+              placarB = resultado.placarB;
+              const final = verificarResultado(placarA, placarB, escolha);
+              status = `<span class="${final === "Ganhou" ? "ganhou" : "perdeu"}">${final}</span>`;
+              if (final === "Ganhou") acertos++;
+            } else {
+              status = "<span class='carregando'>Resultado indisponível</span>";
+            }
+          } else {
+            status = "<span class='perdeu'>Sem ID da partida</span>";
+          }
+
+          html += `
+            <div class="duelo">
+              <p><strong>⚽ ${timeA} x ${timeB}</strong></p>
+              <p><strong>Escolha:</strong> ${escolha}</p>
+              <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
+              <p><strong>Status:</strong> ${status}</p>
+              <p><strong>Data/Hora Jogo:</strong> ${new Date(dataHora).toLocaleString()}</p>
+            </div>
+          `;
+        }
+
+        html += `<hr /><h3>✅ Acertos: ${acertos} de ${jogos.length}</h3>`;
+        container.innerHTML = html;
+      }).catch(err => {
+        console.error(err);
+        container.innerHTML = "<h2>⚠️ Erro ao buscar dados da aposta.</h2>";
+      });
+    }
   </script>
 </body>
 </html>
