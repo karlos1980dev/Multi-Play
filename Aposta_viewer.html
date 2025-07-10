@@ -42,6 +42,7 @@
     }
     .carregando {
       color: orange;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -70,7 +71,7 @@
     const container = document.getElementById("visualizacao");
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
-    const token = "5e66c06518f74e779bc07e73ef0266c5";
+    const token = "5e66c06518f74e779bc07e73ef0266c5"; // SUA CHAVE DA API DE FUTEBOL
 
     let dadosAposta = null;
 
@@ -100,13 +101,14 @@
 
     function exibirAposta(dados, resultados = {}) {
       const nome = dados.nome || "Apostador";
-      const data = dados.dataAposta || "Data não disponível";
-      const jogos = dados.jogos || [];
+      const data = dados.dataHora || "Data não disponível";
+      const jogos = dados.selecoes || [];
 
       let html = `
         <h2>📄 Visualização da Aposta</h2>
         <p><strong>👤 Jogador:</strong> ${nome}</p>
         <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString()}</p>
+        <p><strong>💰 Valor Apostado:</strong> R$ ${dados.valorUnico?.toFixed(2) || "0,00"}</p>
         <hr />
         <table>
           <thead>
@@ -114,7 +116,7 @@
               <th>Duelos</th>
               <th>Escolha</th>
               <th>Placar</th>
-              <th>Data e Horas</th>
+              <th>Data e Hora</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -122,9 +124,11 @@
       `;
 
       let acertos = 0;
+      let erros = 0;
+      let aguardando = 0;
 
       for (const jogo of jogos) {
-        const { nomeTimeA, nomeTimeB, escolha, dataHoraJogo, idPartida } = jogo;
+        const { timeA: nomeTimeA, timeB: nomeTimeB, escolha, dataHora, idPartida } = jogo;
 
         let placarA = "-", placarB = "-", status = "<span class='carregando'>Aguardando...</span>";
 
@@ -134,8 +138,9 @@
           const resultadoFinal = verificarResultado(placarA, placarB, escolha);
           status = `<span class='${resultadoFinal === "Ganhou" ? "ganhou" : "perdeu"}'>${resultadoFinal}</span>`;
           if (resultadoFinal === "Ganhou") acertos++;
-        } else if (!idPartida) {
-          status = "<span class='perdeu'>ID ausente</span>";
+          else erros++;
+        } else {
+          aguardando++;
         }
 
         html += `
@@ -143,69 +148,68 @@
             <td>${nomeTimeA} x ${nomeTimeB}</td>
             <td>${escolha}</td>
             <td>${placarA} x ${placarB}</td>
-            <td>${new Date(dataHoraJogo).toLocaleString()}</td>
+            <td>${new Date(dataHora).toLocaleString()}</td>
             <td>${status}</td>
           </tr>
         `;
       }
 
+      html += `</tbody></table><hr />`;
+
+      // Status final
+      let statusFinal = "⏳ Aguardando resultado de jogos...";
+      let cor = "orange";
+
+      if (aguardando === 0 && erros > 0) {
+        statusFinal = "❌ Perdeu";
+        cor = "red";
+      } else if (aguardando === 0 && erros === 0) {
+        statusFinal = "🎉 Ganhou";
+        cor = "green";
+      }
+
       html += `
-          </tbody>
-        </table>
-        <hr />
-        <h3 style="color:${acertos === jogos.length ? 'green' : 'red'};">
-          Status Final: ${acertos === jogos.length ? "🎉 Ganhou" : "❌ Perdeu"}
-        </h3>
+        <h3 style="color:${cor};">Status Final: ${statusFinal}</h3>
+        <p>✅ Acertos: <strong>${acertos}</strong> &nbsp;&nbsp; ❌ Erros: <strong>${erros}</strong> &nbsp;&nbsp; ⏳ Aguardando: <strong>${aguardando}</strong></p>
       `;
 
       container.innerHTML = html;
     }
 
     async function atualizarResultados() {
-      if (!dadosAposta || !dadosAposta.jogos) return;
+      if (!dadosAposta || !dadosAposta.selecoes) return;
       const resultados = {};
-      for (const jogo of dadosAposta.jogos) {
+
+      for (const jogo of dadosAposta.selecoes) {
         if (jogo.idPartida) {
           const placar = await buscarResultado(jogo.idPartida);
-          if (placar) {
-            resultados[jogo.idPartida] = placar;
-          }
+          if (placar) resultados[jogo.idPartida] = placar;
         }
       }
+
       exibirAposta(dadosAposta, resultados);
     }
 
-    // 🔍 INÍCIO
     if (!id) {
       container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
     } else {
-      console.log("📌 ID da aposta (URL):", id);
       const apostaRef = ref(db, `apostas/${id}`);
       onValue(apostaRef, async (snapshot) => {
-        try {
-          if (!snapshot.exists()) {
-            console.warn("❌ Sem dados para o ID:", id);
-            container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
-            return;
-          }
-
-          const dados = snapshot.val();
-          console.log("📥 Dados recebidos do Firebase:", dados);
-
-          if (!dados.jogos || !Array.isArray(dados.jogos)) {
-            container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos registrados.</h2>`;
-            return;
-          }
-
-          dadosAposta = dados;
-          await atualizarResultados();
-        } catch (erro) {
-          console.error("💥 Erro ao processar a aposta:", erro);
-          container.innerHTML = `<h2>⚠️ Erro ao carregar aposta.</h2>`;
+        if (!snapshot.exists()) {
+          container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
+          return;
         }
+
+        const dados = snapshot.val();
+        if (!dados.selecoes || !Array.isArray(dados.selecoes)) {
+          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos registrados.</h2>`;
+          return;
+        }
+
+        dadosAposta = dados;
+        await atualizarResultados();
       });
 
-      // Atualização automática a cada 30 segundos
       setInterval(atualizarResultados, 30000);
     }
   </script>
