@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Visualização de Aposta</title>
+<!DOCTYPE html>  <html lang="pt-br">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>Visualização da Aposta</title>
   <style>
     body {
       font-family: sans-serif;
-      text-align: center;
       background: #47ff15;
+      text-align: center;
       padding: 20px;
     }
     .container {
@@ -41,6 +41,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
+    // 🔧 Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
       authDomain: "jogo-60a9e.firebaseapp.com",
@@ -57,25 +58,28 @@
     const container = document.getElementById("visualizacao");
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
-    const token = "5e66c06518f74e779bc07e73ef0266c5";
 
+    const token = "5e66c06518f74e779bc07e73ef0266c5"; // ⚠️ Seu token da API Futebol
+
+    // 🔍 Buscar placar da API
     async function buscarResultado(idPartida) {
       try {
         const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error("Erro na API");
+        if (!res.ok) throw new Error("Erro na API Futebol");
         const data = await res.json();
         return {
           placarA: data.placar_oficial_mandante,
           placarB: data.placar_oficial_visitante
         };
       } catch (e) {
-        console.warn("Erro ao buscar resultado da API:", e);
+        console.warn("Erro ao buscar resultado:", e);
         return null;
       }
     }
 
+    // ✅ Verifica se o usuário acertou
     function verificarResultado(placarA, placarB, escolha) {
       if (escolha === "Casa" && placarA > placarB) return "Ganhou";
       if (escolha === "Fora" && placarB > placarA) return "Ganhou";
@@ -83,6 +87,7 @@
       return "Perdeu";
     }
 
+    // 🚀 Início da lógica
     if (!id) {
       container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
     } else {
@@ -94,59 +99,57 @@
 
         const dados = snapshot.val();
         const nome = dados.nome || "Apostador";
-        const data = dados.dataHora || dados.dataAposta || "Data não disponível";
-        const jogos = dados.jogos || dados.selecoes || [];
+        const data = dados.dataHora || "Data não disponível";
+        const jogos = dados.selecoes || [];
 
         let html = `
           <h2>📄 Visualização da Aposta</h2>
           <p><strong>👤 Jogador:</strong> ${nome}</p>
           <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString()}</p>
           <hr />
-          <h3>🎮 Jogos:</h3>
+          <h3>🎮 Jogos Selecionados:</h3>
         `;
 
         let acertos = 0;
 
         for (const jogo of jogos) {
-          const nomeTimeA = jogo.nomeTimeA || jogo.timeA || "Time A";
-          const nomeTimeB = jogo.nomeTimeB || jogo.timeB || "Time B";
-          const escolha = jogo.escolha || "-";
-          const dataHoraJogo = jogo.dataHoraJogo || jogo.dataHora || "";
-          const idPartida = jogo.idPartida || null;
+          const {
+            timeA, timeB, escolha, dataHora, idPartida
+          } = jogo;
 
-          let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando placar...</span>";
+          let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando resultado...</span>";
 
           if (idPartida) {
             const resultado = await buscarResultado(idPartida);
             if (resultado) {
               placarA = resultado.placarA;
               placarB = resultado.placarB;
-              const resultadoFinal = verificarResultado(placarA, placarB, escolha);
-              status = `<span class='${resultadoFinal === "Ganhou" ? "ganhou" : "perdeu"}'>${resultadoFinal}</span>`;
-              if (resultadoFinal === "Ganhou") acertos++;
+              const final = verificarResultado(placarA, placarB, escolha);
+              status = `<span class="${final === "Ganhou" ? "ganhou" : "perdeu"}">${final}</span>`;
+              if (final === "Ganhou") acertos++;
             } else {
-              status = "<span class='carregando'>Sem dados</span>";
+              status = "<span class='carregando'>Resultado indisponível</span>";
             }
           } else {
-            status = "<span class='perdeu'>ID de partida não cadastrado</span>";
+            status = "<span class='perdeu'>Sem ID da partida</span>";
           }
 
           html += `
             <div class="duelo">
-              <p><strong>⚽ ${nomeTimeA} x ${nomeTimeB}</strong></p>
+              <p><strong>⚽ ${timeA} x ${timeB}</strong></p>
               <p><strong>Escolha:</strong> ${escolha}</p>
               <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
               <p><strong>Status:</strong> ${status}</p>
-              <p><strong>Data:</strong> ${new Date(dataHoraJogo).toLocaleString()}</p>
+              <p><strong>Data/Hora Jogo:</strong> ${new Date(dataHora).toLocaleString()}</p>
             </div>
           `;
         }
 
-        html += `<hr /><h3>✅ Acertos: ${acertos} / ${jogos.length}</h3>`;
+        html += `<hr /><h3>✅ Acertos: ${acertos} de ${jogos.length}</h3>`;
         container.innerHTML = html;
       }).catch(err => {
         console.error(err);
-        container.innerHTML = "<h2>⚠️ Erro ao buscar dados.</h2>";
+        container.innerHTML = "<h2>⚠️ Erro ao buscar dados da aposta.</h2>";
       });
     }
   </script>
