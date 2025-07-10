@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Editar Status</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #47ff15;
+      border: none;
+      border-radius: 6px;
+      margin-left: 10px;
+    }
+    .duelo {
+      border-top: 1px solid #ccc;
+      padding: 10px 0;
+    }
+    .duelo label {
+      margin-right: 15px;
+    }
+    .status-select {
+      font-size: 16px;
+      padding: 5px;
+    }
+    .salvar-btn {
+      margin-top: 20px;
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin - Editar Status Manual</h2>
+    <input type="text" id="codigoAposta" placeholder="Digite o código da aposta (ex: MJ1234567890)">
+    <button onclick="carregarAposta()">Carregar</button>
+    
+    <div id="areaDuelo"></div>
+    <button class="salvar-btn" onclick="salvarStatus()">💾 Salvar Alterações</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+      authDomain: "jogo-60a9e.firebaseapp.com",
+      projectId: "jogo-60a9e",
+      storageBucket: "jogo-60a9e.appspot.com",
+      messagingSenderId: "352852303591",
+      appId: "1:352852303591:web:8083c950047c9026bd8c42",
+      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let selecoes = [];
+    let apostaPath = "";
+
+    window.carregarAposta = async function() {
+      const codigo = document.getElementById("codigoAposta").value.trim();
+      if (!codigo) return alert("Digite o código da aposta.");
+      
+      apostaPath = `apostas/${codigo}`;
+      const snap = await get(ref(db, apostaPath));
+      
+      if (!snap.exists()) {
+        document.getElementById("areaDuelo").innerHTML = "<p>❌ Aposta não encontrada.</p>";
+        return;
+      }
+
+      const dados = snap.val();
+      selecoes = dados.selecoes || [];
+
+      if (!Array.isArray(selecoes) || selecoes.length === 0) {
+        document.getElementById("areaDuelo").innerHTML = "<p>⚠️ Sem seleções nesta aposta.</p>";
+        return;
+      }
+
+      let html = "";
+      selecoes.forEach((jogo, index) => {
+        html += `
+          <div class="duelo">
+            <p><strong>Duelo:</strong> ${jogo.timeA} x ${jogo.timeB}</p>
+            <p><strong>Escolha:</strong> ${jogo.escolha}</p>
+            <label>Status:
+              <select class="status-select" id="status-${index}">
+                <option value="Aguardando" ${jogo.statusManual === "Aguardando" ? "selected" : ""}>Aguardando</option>
+                <option value="Ganhou" ${jogo.statusManual === "Ganhou" ? "selected" : ""}>Ganhou</option>
+                <option value="Perdeu" ${jogo.statusManual === "Perdeu" ? "selected" : ""}>Perdeu</option>
+              </select>
+            </label>
+          </div>
+        `;
+      });
+
+      document.getElementById("areaDuelo").innerHTML = html;
+    }
+
+    window.salvarStatus = async function() {
+      if (!apostaPath || selecoes.length === 0) return;
+
+      selecoes = selecoes.map((jogo, i) => {
+        const status = document.getElementById(`status-${i}`).value;
+        return { ...jogo, statusManual: status };
+      });
+
+      await update(ref(db, apostaPath), {
+        selecoes: selecoes
+      });
+
+      alert("✅ Status atualizado com sucesso!");
+    }
+  </script>
+</body>
+</html>
