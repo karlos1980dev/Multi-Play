@@ -3,43 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visualizar Aposta - MULTI PLAY</title>
+  <title>MULTI PLAY ACOMPANHAR APOSTA</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #e7ffe3;
+      background: #47ff15;
       margin: 0;
       padding: 20px;
-      text-align: center;
     }
     .container {
-      max-width: 900px;
-      margin: 0 auto;
       background: white;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    h2 {
+      margin-bottom: 10px;
     }
     .duelo {
       border-top: 1px solid #ccc;
-      padding: 15px 0;
+      padding: 10px 0;
+      margin-top: 10px;
       text-align: left;
     }
-    h2 {
-      margin-top: 30px;
-      color: #1c681c;
+    .duelo strong {
+      display: inline-block;
+      width: 140px;
     }
     .status {
       font-weight: bold;
     }
-    .ganhou { color: green; }
-    .perdeu { color: red; }
-    .carregando { color: orange; }
-    .final-status {
-      margin-top: 30px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+    .status.ganhou { color: green; }
+    .status.perdeu { color: red; }
+    .status.aguardando { color: orange; }
   </style>
 </head>
 <body>
@@ -52,118 +50,116 @@
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
     const firebaseConfig = {
-      /* sua config aqui (igual ao anterior) */
+      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+      authDomain: "jogo-60a9e.firebaseapp.com",
+      projectId: "jogo-60a9e",
+      storageBucket: "jogo-60a9e.appspot.com",
+      messagingSenderId: "352852303591",
+      appId: "1:352852303591:web:8083c950047c9026bd8c42",
+      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const container = document.getElementById("visualizacao");
-    const id = new URLSearchParams(window.location.search).get("id");
-    const token = "5e66c06518f74e779bc07e73ef0266c5";
 
-    async function buscarResultado(idPartida) {
-      try {
-        const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) return null;
-        const data = await res.json();
-        return {
-          placarA: data.placar_oficial_mandante,
-          placarB: data.placar_oficial_visitante
-        };
-      } catch {
-        return null;
-      }
-    }
-
-    function verificarResultado(a, b, escolha) {
-      if (a == null || b == null) return "Aguardando";
-      if (escolha === "Casa" && a > b) return "Ganhou";
-      if (escolha === "Fora" && b > a) return "Ganhou";
-      if (escolha === "Empate" && a === b) return "Ganhou";
-      return "Perdeu";
-    }
-
-    async function exibirAposta(dados) {
-      const selecoes = dados.selecoes || dados.jogos;
-      if (!Array.isArray(selecoes) || selecoes.length === 0) {
-        container.innerHTML = "<h2>⚠️ Aposta inválida ou sem jogos.</h2>";
-        return;
-      }
-
-      let html = `
-        <h2>📄 Aposta de ${dados.nome || "Apostador"}</h2>
-        <p><strong>Data da Aposta:</strong> ${new Date(dados.dataHora || Date.now()).toLocaleString("pt-BR")}</p>
-        <hr />
-      `;
-
-      const resultados = {};
-      for (const j of selecoes) {
-        if (j.idPartida) {
-          const r = await buscarResultado(j.idPartida);
-          if (r) resultados[j.idPartida] = r;
-        }
-      }
-
-      let algumPerdeu = false;
-      let aguardando = false;
-
-      let ultimoCampe = "";
-      for (const j of selecoes) {
-        const timeA = j.nomeTimeA || j.timeA || "Time A";
-        const timeB = j.nomeTimeB || j.timeB || "Time B";
-        const escolha = j.escolha || "";
-        const dt = j.dataHoraJogo || j.dataHora || "";
-        const dts = dt ? new Date(dt).toLocaleString("pt-BR") : "-";
-        const camp = j.campeonato || "Campeonato";
-
-        const resObj = j.idPartida ? resultados[j.idPartida] : null;
-        const placarA = resObj ? resObj.placarA : null;
-        const placarB = resObj ? resObj.placarB : null;
-        const status = verificarResultado(placarA, placarB, escolha);
-
-        if (status === "Perdeu") algu pe rdeu = true;
-        else if (status === "Aguardando") aguardando = true;
-
-        if (camp !== ultimoCampe) {
-          html += `<h2>🏆 ${camp}</h2>`;
-          ultimoCampe = camp;
-        }
-
-        html += `
-          <div class="duelo">
-            <p><strong>${timeA} x ${timeB}</strong></p>
-            <p>🕒 ${dts}</p>
-            <p>🎯 Escolha: <strong>${escolha}</strong></p>
-            <p>🏁 Placar: ${(placarA!=null?placarA:"-")} x ${(placarB!=null?placarB:"-")}</p>
-            <p class="status ${status==="Ganhou"? "ganhou":status==="Perdeu"? "perdeu":"carregando"}">${status}</p>
-          </div>`;
-      }
-
-      let finalStatus = aguardando ? "⏳ Aguardando resultado" : (algumPerdeu ? "❌ Perdeu" : "🎉 Ganhou");
-      const finalClass = aguardando ? "carregando" : (algumPerdeu ? "perdeu" : "ganhou");
-
-      html += `
-        <hr />
-        <div class="final-status ${finalClass}">
-          Status Final: ${finalStatus}
-        </div>
-      `;
-
-      container.innerHTML = html;
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
 
     if (!id) {
-      container.innerHTML = "<h2>❌ ID não informado.</h2>";
+      container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
     } else {
-      const apoRef = ref(db, `apostas/${id}`);
-      onValue(apoRef, snap => {
-        if (!snap.exists()) {
+      const apostaRef = ref(db, `apostas/${id}`);
+      onValue(apostaRef, (snapshot) => {
+        if (!snapshot.exists()) {
           container.innerHTML = `<h2>❌ Aposta não encontrada: ${id}</h2>`;
           return;
         }
-        exibirAposta(snap.val());
+
+        const dados = snapshot.val();
+        if (!dados.selecoes || !Array.isArray(dados.selecoes)) {
+          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem seleções.</h2>`;
+          return;
+        }
+
+        exibirAposta(dados);
       });
+    }
+
+    function exibirAposta(dados) {
+      const selecoes = dados.selecoes;
+      const nome = dados.nome || "Apostador";
+      const data = dados.dataHora ? new Date(dados.dataHora).toLocaleString() : "Não informado";
+
+      let html = `
+        <h2>📄 Visualização da Aposta</h2>
+        <p><strong>👤 Jogador:</strong> ${nome}</p>
+        <p><strong>📅 Data da Aposta:</strong> ${data}</p>
+        <hr />
+      `;
+
+      let algumPerdeu = false;
+      let todosGanhou = true;
+
+      // Agrupar por campeonato
+      const porCampeonato = {};
+      selecoes.forEach(sel => {
+        const camp = sel.campeonato || "Sem campeonato";
+        if (!porCampeonato[camp]) porCampeonato[camp] = [];
+        porCampeonato[camp].push(sel);
+      });
+
+      // Percorrer cada campeonato
+      for (const campeonato in porCampeonato) {
+        html += `<h2>🏆 ${campeonato}</h2>`;
+        porCampeonato[campeonato].forEach(jogo => {
+          const {
+            timeA = "Time A",
+            timeB = "Time B",
+            escolha = "Não informado",
+            dataHora = "",
+            statusManual = ""
+          } = jogo;
+
+          let statusText = "🕒 Aguardando";
+          let statusClass = "aguardando";
+
+          if (statusManual === "Ganhou") {
+            statusText = "✅ Ganhou";
+            statusClass = "ganhou";
+          } else if (statusManual === "Perdeu") {
+            statusText = "❌ Perdeu";
+            statusClass = "perdeu";
+            algumPerdeu = true;
+            todosGanhou = false;
+          } else {
+            todosGanhou = false;
+          }
+
+          html += `
+            <div class="duelo">
+              <div><strong>Duelo:</strong> ${timeA} x ${timeB}</div>
+              <div><strong>Escolha:</strong> ${escolha}</div>
+              <div><strong>Data/Hora:</strong> ${new Date(dataHora).toLocaleString()}</div>
+              <div><strong>Status:</strong> <span class="status ${statusClass}">${statusText}</span></div>
+            </div>
+          `;
+        });
+      }
+
+      // Status final
+      let statusFinal = "🕒 Aguardando";
+      if (algumPerdeu) statusFinal = "❌ Perdeu";
+      else if (todosGanhou) statusFinal = "🎉 Ganhou";
+
+      html += `
+        <hr />
+        <h3 style="text-align:center; color:${algumPerdeu ? 'red' : (todosGanhou ? 'green' : 'orange')}">
+          Status Final: ${statusFinal}
+        </h3>
+      `;
+
+      container.innerHTML = html;
     }
   </script>
 </body>
