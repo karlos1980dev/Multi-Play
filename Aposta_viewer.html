@@ -27,7 +27,7 @@
       border: 1px solid #ddd;
       text-align: left;
     }
-    h2 { color: #25d366; }
+    h2 { color: #25d366; margin-bottom: 5px; }
     .ganhou { color: green; font-weight: bold; }
     .perdeu { color: red; font-weight: bold; }
     .carregando { color: orange; }
@@ -57,13 +57,12 @@
     const db = getDatabase(app);
 
     const container = document.getElementById("visualizacao");
-
-    // ✅ Aceita ?id= ou ?codigo=
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id") || urlParams.get("codigo");
+    const id = urlParams.get("id");
 
-    const token = "5e66c06518f74e779bc07e73ef0266c5"; // Seu token da API Futebol
+    const token = "5e66c06518f74e779bc07e73ef0266c5"; // Token da API de Futebol
 
+    // Buscar placar na API
     async function buscarResultado(idPartida) {
       try {
         const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
@@ -113,7 +112,11 @@
         let acertos = 0;
 
         for (const jogo of jogos) {
-          const { timeA, timeB, escolha, dataHora, idPartida } = jogo;
+          const {
+            timeA, timeB, escolha, dataHora, idPartida, campeonato
+          } = jogo;
+
+          const nomeCamp = campeonato || "Amistoso";
 
           let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando resultado...</span>";
 
@@ -134,6 +137,7 @@
 
           html += `
             <div class="duelo">
+              <h2>🏆 ${nomeCamp}</h2>
               <p><strong>⚽ ${timeA} x ${timeB}</strong></p>
               <p><strong>Escolha:</strong> ${escolha}</p>
               <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
