@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MULTI PLAY.BET</title>
-   <style>  
+<!DOCTYPE html>  <html lang="pt-br">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>MULTI PLAY</title>  
+  <style>  
     body {  
   font-family: sans-serif;  
   text-align: center;  
@@ -371,85 +370,81 @@ color: green;
   margin-bottom: 10px;
 }
   </style>  
-</head>
-<body>
-  <div class="contadorTime">
-    <h1>MULTI PLAY.BET</h1> 
-  </div>
+</head>  
+<body>  <div class="contadorTime">
+  <h1>MULTI PLAY.BET</h1> 
+</div>
+   <div class="topo-fixo">  
+    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />  <div id="totalFinal">Total: R$ 0,00</div>  
+<button id="apostarBtn">Apostar  <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
 
-  <div class="topo-fixo">
-    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />
-    <div id="totalFinal">Total: R$ 0,00</div>
-    <button id="apostarBtn">Apostar <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
-  </div>
+  </div>    <div class="carrossel-container">  
+    <div class="carrossel" id="carrossel">  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/carrocel.jpg" alt="Carrossel" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg" alt="Avaí" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />  
+    </div>  
+  </div>  
+  
+    <div class="dias">  
+      <button onclick="mostrarDia('domingo')">Domingo</button>  
+    <button onclick="mostrarDia('segunda')">Segunda</button>  
+    <button onclick="mostrarDia('terca')">Terça</button>  
+  <button onclick="mostrarDia('quarta')">Quarta</button>  
+<button onclick="mostrarDia('quinta')">Quinta</button>  
+<button onclick="mostrarDia('sexta')">Sexta</button>  
+<button onclick="mostrarDia('sabado')">Sábado</button> </br>
+  </div>  
 
-  <div class="carrossel-container">
-    <div class="carrossel" id="carrossel">
-      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />
-      <img src="https://raw.githubusercontent.com/Savanty/AE/main/carrocel.jpg" alt="Carrossel" />
-      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg" alt="Avaí" />
-      <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />
-    </div>
-  </div>
 
-  <div class="dias">
-    <button onclick="mostrarDia('domingo')">Domingo</button>
-    <button onclick="mostrarDia('segunda')">Segunda</button>
-    <button onclick="mostrarDia('terca')">Terça</button>
-    <button onclick="mostrarDia('quarta')">Quarta</button>
-    <button onclick="mostrarDia('quinta')">Quinta</button>
-    <button onclick="mostrarDia('sexta')">Sexta</button>
-    <button onclick="mostrarDia('sabado')">Sábado</button> <br/>
-  </div>
-
-  <div id="conteudo-domingo" class="conteudo-dia"></div>
-  <div id="conteudo-segunda" class="conteudo-dia"></div>
-  <div id="conteudo-terca" class="conteudo-dia"></div>
-  <div id="conteudo-quarta" class="conteudo-dia"></div>
-  <div id="conteudo-quinta" class="conteudo-dia"></div>
-  <div id="conteudo-sexta" class="conteudo-dia"></div>
-  <div id="conteudo-sabado" class="conteudo-dia"></div>
-
-  <!-- Modal de código da aposta -->
-  <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">
-    <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
-      <h2>Código da Aposta</h2>
-      <p id="codigoAposta" style="font-weight:bold; font-size:24px; margin:15px 0;"></p>
-      <div id="qrPix" style="margin: 10px 0;"></div>
-      <button id="btnCopiar" style="margin:5px;">Copiar Código</button>
-      <button id="btnWhatsapp" style="margin:5px;">Enviar via WhatsApp</button>
-      <button id="btnFechar" style="margin:5px;">Fechar</button>
-    </div>
-  </div>
-
+<div id="conteudo-quinta" class="conteudo-dia"></div>  
+<div id="conteudo-sexta" class="conteudo-dia"></div>  
+<div id="conteudo-sabado" class="conteudo-dia"></div>  
+<div id="conteudo-domingo" class="conteudo-dia"></div>  
+  <div id="conteudo-segunda" class="conteudo-dia ativa"></div>  
+  <div id="conteudo-terca" class="conteudo-dia"></div>  
+  <div id="conteudo-quarta"
+  class="conteudo-dia"></div>  
+  
+    <!-- Modal -->    
+    <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">  
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">  
+      <h2>Código da Aposta</h2>  
+      <p id="codigoAposta" style="font-weight:bold; font-size:24px; margin:15px 0;"></p>  
+      <div id="qrPix" style="margin: 10px 0;"></div>  
+      <button id="btnCopiar" style="margin:5px;">Copiar Código</button>  
+      <button id="btnWhatsapp" style="margin:5px;">Enviar via WhatsApp</button>  
+      <button id="btnFechar" style="margin:5px;">Fechar</button>  
+    </div>  
+  </div> 
   <!-- Modal de carregamento -->
-  <div id="modalCarregando" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9998; flex-direction: column;">
-    <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">
-      <img src="https://media.tenor.com/GfSX-u7VGM4AAAAC/loading-loading-gif.gif" alt="Carregando..." style="width:100px;"/>
-      <p>Carregando jogos e imagem MultiPlay...</p>
-    </div>
+<div id="modalCarregando" class="modal-carregando">
+  <div class="modal-conteudo">
+    <img src="https://media.tenor.com/GfSX-u7VGM4AAAAC/loading-loading-gif.gif" alt="Carregando..." class="animacao" />
+    <p>Carregando jogos e imagem MultiPlay...</p>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
-      authDomain: "jogo-60a9e.firebaseapp.com",
-      projectId: "jogo-60a9e",
-      storageBucket: "jogo-60a9e.appspot.com",
-      messagingSenderId: "352852303591",
-      appId: "1:352852303591:web:8083c950047c9026bd8c42",
-      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // Dados do usuário fornecidos por você na parte 2 e 3:
-    const series = {
-      
+ <script type="module">
+     
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";  
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";  
+  
+  const firebaseConfig = {  
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",  
+    authDomain: "jogo-60a9e.firebaseapp.com",  
+    projectId: "jogo-60a9e",  
+    storageBucket: "jogo-60a9e.appspot.com",  
+    messagingSenderId: "352852303591",  
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",  
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"  
+  };  
+  
+  const app = initializeApp(firebaseConfig);  
+  const db = getDatabase(app); 
+  
+  const series = {  
   domingo: {  
       ladoAImagens: [  
         "https://raw.githubusercontent.com/Savanty/AE/main/Drogheda United FC.png",  
@@ -1518,7 +1513,7 @@ color: green;
     "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
       ],  
       horarios: [
-        "2025-07-12T16:00", //1 
+        "2025-07-12T18:00", //1 
      
        "2025-07-12T16:30",//2
       
@@ -1546,132 +1541,390 @@ color: green;
       
   };  
 
-    const distribuicaoGrupos = {
-      domingo: [3,3],
-      segunda: [1,3,2],
-      terca: [1,3,2],
-      quarta: [2,3,3,11],
-      quinta: [1,2,2,12,22,8,2,1,1,3,1,1,1,1,1,1],
-      sexta: [1,1,2,2,1,1,1,1,2,2,2,1,1,1,4,1,2],
-      sabado: [1,4,3,4]
-    };
 
-    const nomesGrupos = {
-      domingo: ["Brasileirão Série B"],
-      segunda: ["Campeonato Inglês", "Outro Grupo", "Mais um Grupo"],
-      terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
-      quarta: ["Mundial de Clubes", "Copa do Nordeste", "Liga dos Campeões UEFA", "Brasileirão Sub20"],
-      quinta: ["Brasileirão Série B", "European Championship, Women", "Africa Cup of Nations, Women", "Jogos Amistosos de Clube", "Uefa Europa Conference League", "Liga Europa UEFA", "Copa do Chile", "Copa Equador", "Copa Paraguay", "Copa Division Profesional", "Usl League Two", "Kakkonen Grupo B", "Finlândia Kakkonen Grupo C", "Finlândia 3ª Divisão Grupo 2", "Noruega 3ª Divisão Grupo 2", "Venezuela Copa Venezuela"],
-      sexta: ["Serie B", "Copa America women", "Euro Liga Conferencia UEFA", "Campeonato Colombiano 1 div", "Campeonato Paraguaio", "Campeonato Mexicano", "Campeonato Equatoriano", "Campeonato Peruano", "Campeonato Boliviano", "Usl Estados Unidos", "Campeonato irlandes 1 div", "Campeonato Romano", "Campeonato Estonia", "Liga Escocesa", "Campeonato Agentino", "Campeonato irlandes 2 div", "Amistoso Internacional de Clubes", "Euro Copa Femenina"],
-      sabado: ["Copa America Feminina", "Brasileirao Serie A", "Brasileirao Serie B", "Brasileirao Serie C"]
-    };
+const distribuicaoGrupos = {
+segunda: [1, 3, 2],   
 
-    const cotacoesPadrao = {
-      casa: 1.50,
-      empate: 3.0,
-      fora: 2.5,
-      ambasMarcam: 2.5,
-      acima2: 2.0,
-      abaixo2: 2.8,
-      casaFora: 1.5,
-      casaEmpate: 2.0,
-      empateFora: 1.8,
-    };
+  terca: [1, 3, 2],      
+  
+  quarta: [2, 3, 3, 11],         // 2 jogos em cada
+  
+  quinta: [1, 2, 2, 12,22, 8, 2,1,1,3, 1 ,1, 1, 1, 1,1],         
+  
+    sexta: [1, 1, 2,2,1,1, 1,1,2 ,2,2,1,  1,1,4,1,2],      
+    
+     
+  sabado: [1, 4, 3, 4],  // 2 jogos em cada
+  
+  domingo: [3, 3]   // 3 jogos em cada
+};
 
-    const cotacoesIndividuais = {
-      domingo: {
-        0: { casa: 1.50, empate: 2.5, fora: 3.0, ambasMarcam: 2.5, acima2: 2.0, abaixo2: 2.8, casaFora: 1.5, casaEmpate: 2.0, empateFora: 1.8 },
-        1: { casa: 1.55, empate: 3.0, fora: 2.7, ambasMarcam: 2.2, acima2: 2.1, abaixo2: 2.5, casaFora: 1.4, casaEmpate: 1.9, empateFora: 1.9 }
-      },
-      segunda: {
-        0: { casa: 1.60, empate: 2.7, fora: 2.8, ambasMarcam: 2.4, acima2: 2.2, abaixo2: 2.6, casaFora: 1.6, casaEmpate: 2.1, empateFora: 1.9 }
-      }
-    };
 
-    // Funções reutilizáveis
-    function extrairNomeDoTime(url) {
-      if (!url || typeof url !== "string") return "";
-      let nome = url.split("/").pop();
-      nome = decodeURIComponent(nome);
-      nome = nome.replace(/\.(jpeg|jpg|png|svg)$/i, "");
-      nome = nome.replace(/[_\-]/g, " ");
-      return nome.trim().replace(/\s+/g, " ");
+  // Cotação padrão caso não encontre individual
+const cotacoesPadrao = {
+  casa: 1.50,
+  empate: 3.0,
+  fora: 2.5,
+  ambasMarcam: 2.5,
+  acima2: 2.0,
+  abaixo2: 2.8,
+  casaFora: 1.5,
+  casaEmpate: 2.0,
+  empateFora: 1.8,
+};
+
+function getCotacaoIndividual(dia, dueloIndex) {
+  // Tenta pegar cotação individual para o dia e duelo
+  const cotacoesDia = cotacoesIndividuais[dia];
+  if (!cotacoesDia) return cotacoesPadrao;
+
+  // Retorna cotação individual ou padrão caso não exista para esse duelo
+  return cotacoesDia[dueloIndex] || cotacoesPadrao;
+}
+  const nomesGrupos = {
+  terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
+  
+  quarta: ["Mundial de Clubes", "Copa do Nordeste","Liga dos Campeaoes UEFA","Brasileirao Sub20",],
+  
+  quinta: ["Brasileirão Série B","European Championship, Women","Africa Cup of Nations, Women","Jogos Amistosos de Clube","Uefa Europa Conference Leagu","Liga Europa UEFA","Copa do Chile","Copa Equador","Copa Paraguay","Copa Division Profesional","Usl League Two","Kakkonen Grupo B","Finlândia Kakkonen Grupo C","Finlândia 3ª Divisão Grupo 2","Noruega 3ª Divisão Grupo 2","Venezuela Copa Venezuela"],
+  
+  sexta: ["Serie B","Copa America women","Euro Liga Conferencia UEFA","Campeonato Colombiano 1 div","Campeonato Paraguaio","Campeonato Mexicano","Campeonato Equatoriano","Campeonato Peruano","Campeonato Boliviano","Usl Estados Unidos" , "Campeonato irlandes 1 div", "Campeonato Romano","Campeonato Estonia","Liga Escocesa","Campeonato Agentino","Campeonato irlandes 2 div","Amistoso Internacional de Clubes","Euro Copa Femenina"],
+  
+  sabado: ["Copa America Feminina", "Brasileirao Serie A","Brasileirao Serie B","Brasileirao Serie C",""],
+  domingo: ["Brasileirão Série B"],
+  segunda: ["Campeonato Inglês"]
+};
+
+const cotacoesIndividuais = {
+  terca: {
+    0: { casa: 1.50, empate: 2.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    1: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    2: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+     4: { casa: 1.30, empate: 3.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    5: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    6: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+    
+    // etc...
+  },
+  quarta: {
+    0: { casa: 1.65, empate: 2.20, fora: 3.0, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    // ...
+  },
+  quinta: {
+    0: { casa: 3.35, empate: 3.0, fora: 2.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    1: { casa: 3.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    2: { casa: 2.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    3: { casa: 4.65, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    4: { casa: 21.65, empate: 6.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    5: { casa: 3.05, empate: 5.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        6: { casa: 1.15, empate: 6.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    7: { casa: 4.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   9: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    11: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    12: { casa: 1.35, empate: 3.70, fora: 5.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    13: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    14: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    15: { casa: 1.65, empate: 3.52, fora: 3.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        16: { casa: 1.55, empate: 3.80, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    18: { casa: 4.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    20: { casa: 1.35, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    21: { casa: 2.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    22: { casa: 1.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    23: { casa: 1.95, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 2.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    25: { casa: 3.05, empate: 3.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        26: { casa: 2.55, empate: 2.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    27: { casa: 2.65, empate: 3.80, fora: 4.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    28: { casa: 2.91, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   29: { casa: 1.75, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    30: { casa: 1.85, empate: 3.52, fora: 10.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    31: { casa: 3.55, empate: 3.2, fora: 1.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    32: { casa: 3.35, empate: 3.70, fora: 1.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    33: { casa: 2.35, empate: 5.5, fora: 2.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    34: { casa: 3.65, empate: 3.33, fora: 2.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    35: { casa: 2.65, empate: 3.52, fora: 1.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        36: { casa: 1.55, empate: 3.40, fora: 2.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    37: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    38: { casa: 2.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   39: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    40: { casa: 1.35, empate: 3.52, fora: 2.45, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+  
+  
+    41: { casa: 2.35, empate: 3.0, fora: 1.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   
+   
+   
+   
+  42: { casa: 3.35, empate: 3.0, fora: 2.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    43: { casa: 3.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    44: { casa: 2.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    45: { casa: 4.65, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    46: { casa: 21.65, empate: 6.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    47: { casa: 3.05, empate: 5.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        48: { casa: 1.15, empate: 6.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    48: { casa: 4.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    49: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   50: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    51: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    52: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    53: { casa: 1.35, empate: 3.70, fora: 5.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    54: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    55: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    56: { casa: 1.65, empate: 3.52, fora: 3.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        57: { casa: 1.55, empate: 3.80, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    58: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    59: { casa: 4.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   60: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   
+   },
+   
+  sexta: {
+    0: { casa: 2.50, empate: 2.0, fora: 2.65, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    1: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    2: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+     4: { casa: 1.30, empate: 3.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    5: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    6: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+    
+    7: { casa: 1.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   9: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    11: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    12: { casa: 1.35, empate: 3.70, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    13: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    14: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    15: { casa: 1.65, empate: 3.52, fora: 1.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        16: { casa: 1.55, empate: 3.5, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    18: { casa: 2.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    20: { casa: 1.35, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    21: { casa: 2.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    22: { casa: 1.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    23: { casa: 1.95, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 1.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 2.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    25: { casa: 3.05, empate: 3.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        26: { casa: 2.55, empate: 2.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    27: { casa: 2.65, empate: 3.80, fora: 4.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    
+  },
+  sabado: {
+    0: { casa: 24.05, empate: 3.2, fora: 1.2, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   1: { casa: 1.98, empate: 3.07, fora: 7.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    2: { casa: 1.65, empate: 3.52, fora: 4.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    3: { casa: 3.55, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    4: { casa: 2.19, empate: 3.7, fora: 3.33, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    5: { casa: 2.2, empate: 3.5, fora: 3.36, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    6: { casa: 2.25, empate: 2.33, fora: 3.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    7: { casa: 1.45, empate: 2.33, fora: 3.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.05, empate: 3.52, fora: 3.10, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        9: { casa: 2.55, empate: 2.80, fora: 2.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.25, empate: 3.80, fora: 2.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+  },
+  domingo: {
+    0: { casa: 1.65, empate: 3.2, fora: 3.3, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    // ...
+  },
+};
+
+function getCotacaoPorDuelo(dia, dueloNumero) {
+  const faixas = cotacoesDinamicas[dia];
+  if (!faixas) return cotacoesPadrao;
+
+  for (const faixa of faixas) {
+    if (dueloNumero >= faixa.de && dueloNumero <= faixa.ate) {
+      return faixa.cot;
     }
+  }
 
-    // Variáveis globais para seleções e limite
-    const LIMITE_VALOR_RECEBER = 3000;
-    const chavePix = "71992290058";
-    const selects = [];
+  return cotacoesPadrao;
+}
+const LIMITE_VALOR_RECEBER = 3000;  
+  const chavePix = "71992290058";  
+  const selects = [];  
+  
+  function extrairNomeDoTime(url) {
+  if (!url || typeof url !== "string") return "";
 
-    // Exibir o dia ativo
-    window.mostrarDia = function(dia) {
-      document.querySelectorAll(".conteudo-dia").forEach(d => d.style.display = "none");
-      const el = document.getElementById(`conteudo-${dia}`);
-      if (el) el.style.display = "block";
+  let nome = url.split("/").pop(); // pega o nome do arquivo
+  nome = decodeURIComponent(nome); // decodifica espaços, acentos etc.
 
-      // Atualizar botão ativo
-      document.querySelectorAll(".dias button").forEach(btn => btn.classList.remove("ativo"));
-      const btnAtivo = [...document.querySelectorAll(".dias button")].find(b => b.getAttribute("onclick")?.includes(dia));
-      if (btnAtivo) btnAtivo.classList.add("ativo");
-    };
+  nome = nome.replace(/\.(jpeg|jpg|png|svg)$/i, ""); // remove extensão
+  nome = nome.replace(/[_\-]/g, " "); // troca _ e - por espaço
+  return nome.trim().replace(/\s+/g, " "); // remove espaços extras
+}
+  window.mostrarDia = function(dia) {  
+    document.querySelectorAll(".conteudo-dia").forEach(d => d.classList.remove("ativa"));  
+    document.getElementById(`conteudo-${dia}`).classList.add("ativa");  
+  };  
+  
+function criarJogos(dia) {
+  const container = document.getElementById(`conteudo-${dia}`);
+  container.innerHTML = "";
 
-    // Criar jogos para o dia
-    function criarJogos(dia) {
-      const container = document.getElementById(`conteudo-${dia}`);
-      if (!container) return;
+  const dados = series[dia];
+  if (!dados) return;
 
-      container.innerHTML = "";
+  const agora = new Date();
+  const jogosValidos = [];
 
-      const dados = series[dia];
-      if (!dados) {
-        container.innerHTML = "<p>Nenhum jogo disponível.</p>";
-        return;
-      }
+  for (let i = 0; i < dados.horarios.length; i++) {
+    const dataJogo = new Date(dados.horarios[i]);
+    if (dataJogo > agora) {
+      jogosValidos.push({
+        index: i,
+        ladoA: dados.ladoAImagens[i],
+        ladoB: dados.ladoBImagens[i],
+        horario: dataJogo
+      });
+    }
+  }
 
-      const agora = new Date();
-      let jogosValidos = [];
+  if (jogosValidos.length === 0) {
+  mostrarModalCarregando();
+  setTimeout(esconderModalCarregando, 2000); // esconde após 2 segundos
+  return;
+}
 
-      for (let i = 0; i < dados.horarios.length; i++) {
-        const dataJogo = new Date(dados.horarios[i]);
-        if (dataJogo > agora) {
-          jogosValidos.push({ index: i, ladoA: dados.ladoAImagens[i], ladoB: dados.ladoBImagens[i], horario: dataJogo });
-        }
-      }
+  const distribuicao = distribuicaoGrupos[dia] || [jogosValidos.length];
+const nomesGrupoDia = nomesGrupos[dia] || [];
+let atual = 0;
 
-      if (jogosValidos.length === 0) {
-        container.innerHTML = "<p>Não há jogos futuros para este dia.</p>";
-        return;
-      }
+for (let g = 0; g < distribuicao.length; g++) {
+  const qtd = distribuicao[g];
+  const nomeGrupo = nomesGrupoDia[g] || `Grupo ${g + 1}`;
 
-      const distribuicao = distribuicaoGrupos[dia] || [jogosValidos.length];
-      const nomesGrupoDia = nomesGrupos[dia] || [];
-      let atual = 0;
+  if (atual >= jogosValidos.length) break;
 
-      for (let g = 0; g < distribuicao.length; g++) {
-        const qtd = distribuicao[g];
-        const nomeGrupo = nomesGrupoDia[g] || `Grupo ${g + 1}`;
+  const h2 = document.createElement("h2");
+  h2.textContent = nomeGrupo;
+  h2.classList.add("titulo-grupo");
+  container.appendChild(h2);
 
-        if (atual >= jogosValidos.length) break;
+  for (let j = 0; j < qtd && atual < jogosValidos.length; j++, atual++) {
+    const jogo = jogosValidos[atual];
+    const i = jogo.index;
+    const nomeA = extrairNomeDoTime(dados.ladoAImagens[i]);
+    const nomeB = extrairNomeDoTime(dados.ladoBImagens[i]);
+    const dataJogo = jogo.horario || jogo.dataJogo;
+ const c = getCotacaoIndividual(dia, atual); // ou jogo.index
 
-        const h2 = document.createElement("h2");
-        h2.textContent = nomeGrupo;
-        h2.classList.add("titulo-grupo");
-        container.appendChild(h2);
+    const div = document.createElement("div");
+    div.className = "duelo";
+    div.dataset.nomeGrupo = nomeGrupo;
 
-        for (let j = 0; j < qtd && atual < jogosValidos.length; j++, atual++) {
-          const jogo = jogosValidos[atual];
-          const i = jogo.index;
-
-          const nomeA = extrairNomeDoTime(jogo.ladoA);
-          const nomeB = extrairNomeDoTime(jogo.ladoB);
-          const dataJogo = jogo.horario;
-          const c = cotacoesIndividuais[dia]?.[atual] || cotacoesPadrao;
-
-          const div = document.createElement("div");
-          div.className = "duelo";
-          div.dataset.nomeGrupo = nomeGrupo;
-
-          div.innerHTML = `
+    div.innerHTML = `
   <div class="linha-duelo">
     <div class="time-nome-img">
       <img src="${jogo.ladoA}" />
@@ -1702,298 +1955,324 @@ color: green;
   <small><strong>Data/Hora:</strong> ${dataJogo.toLocaleString?.() || dataJogo}</small>
 `;
 
-          container.appendChild(div);
+    container.appendChild(div);
 
-          // Clique para alertar nome do time
-          div.querySelectorAll(".time-nome-img img").forEach(img => {
-            img.addEventListener("click", () => {
-              const nomeTime = img.parentElement.querySelector(".nome-time")?.textContent || "";
-              alert(`Time: ${nomeTime.trim()}`);
-            });
-          });
-
-          // Toggle extras
-          const toggleBtn = div.querySelector(".toggleExtras");
-          const extrasDiv = div.querySelector(".extras");
-          toggleBtn.onclick = () => {
-            extrasDiv.style.display = extrasDiv.style.display === "flex" ? "none" : "flex";
-            extrasDiv.style.flexWrap = "wrap";
-            extrasDiv.style.gap = "5px";
-          };
-
-          // Lógica seleção botões (um só por grupo)
-          div.querySelectorAll("button.btn").forEach(btn => {
-            btn.onclick = () => {
-              const grupo = btn.dataset.grupo;
-              const botoesGrupo = container.querySelectorAll(`button[data-grupo="${grupo}"]`);
-              const jaSelecionado = btn.classList.contains("selecionado");
-
-              botoesGrupo.forEach(b => b.classList.remove("selecionado"));
-              if (!jaSelecionado) {
-                btn.classList.add("selecionado");
-              }
-
-              atualizarSelecoes();
-              atualizarTotal();
-              atualizarContador();
-            };
-          });
-        }
-      }
-    }
-
-    // Atualiza array de seleções
-    function atualizarSelecoes() {
-      selects.length = 0;
-
-      document.querySelectorAll(".duelo").forEach(duelo => {
-        const selecionado = duelo.querySelector("button.selecionado");
-        if (selecionado) {
-          const texto = selecionado.textContent.split("\n")[0].trim();
-          const valor = parseFloat(selecionado.dataset.valor);
-          const timeA = duelo.querySelectorAll(".nome-time")[0]?.textContent.trim() || "";
-          const timeB = duelo.querySelectorAll(".nome-time")[1]?.textContent.trim() || "";
-          const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora:", "").trim() || "";
-          const campeonato = duelo.dataset.nomeGrupo || "Campeonato não informado";
-
-          selects.push({ timeA, timeB, valor, escolha: texto, dataHora, campeonato });
-        }
+    const imagens = div.querySelectorAll(".time-nome-img img");
+    imagens.forEach(img => {
+      img.addEventListener("click", () => {
+        const nomeTime = img.parentElement.querySelector(".nome-time");
+        if (nomeTime) alert(` ${nomeTime.textContent.trim()}`);
       });
-
-      document.getElementById("contadorMarcados").textContent = `Times ${selects.length}`;
-    }
-
-    // Atualiza valor total e controla botão apostar
-    function atualizarTotal() {
-      const valorUnicoInput = document.getElementById('valorUnico');
-      const valorUnico = Number(valorUnicoInput.value) || 0;
-
-      const selecionados = document.querySelectorAll('.btn.selecionado');
-      let multiplicador = 1;
-      selecionados.forEach(btn => {
-        multiplicador *= Number(btn.dataset.valor);
-      });
-
-      const total = valorUnico * multiplicador;
-      const totalFinal = document.getElementById('totalFinal');
-      const apostarBtn = document.getElementById('apostarBtn');
-
-      if (total > LIMITE_VALOR_RECEBER) {
-        totalFinal.innerHTML = `<span style="color:red;">Total: R$ ${total.toFixed(2)} (Limite R$ ${LIMITE_VALOR_RECEBER})</span>`;
-        apostarBtn.disabled = true;
-        apostarBtn.style.background = "#aaa";
-        apostarBtn.style.cursor = "not-allowed";
-      } else if (valorUnico <= 0 || selecionados.length === 0) {
-        totalFinal.textContent = `Total: R$ 0,00`;
-        apostarBtn.disabled = true;
-        apostarBtn.style.background = "#aaa";
-        apostarBtn.style.cursor = "not-allowed";
-      } else {
-        totalFinal.innerHTML = `<span style="color:green;">Total: R$ ${total.toFixed(2)}</span>`;
-        apostarBtn.disabled = false;
-        apostarBtn.style.background = "";
-        apostarBtn.style.cursor = "pointer";
-      }
-    }
-
-    // Atualiza contador visual (opcional, aqui chamado dentro atualizarSelecoes)
-    function atualizarContador() {
-      const selecionados = document.querySelectorAll('.btn.selecionado').length;
-      document.getElementById('contadorMarcados').textContent = `Times ${selecionados}`;
-    }
-
-    // Limpa seleções (após apostar)
-    function limparSelecoes() {
-      document.querySelectorAll('.btn.selecionado').forEach(btn => btn.classList.remove('selecionado'));
-      selects.length = 0;
-      atualizarTotal();
-      atualizarContador();
-    }
-
-    // Botão apostar salva no Firebase e abre modal
-    document.getElementById('apostarBtn').addEventListener('click', () => {
-      const valorUnicoInput = document.getElementById('valorUnico');
-      const valorUnico = Number(valorUnicoInput.value);
-
-      if (!valorUnico || valorUnico <= 0) {
-        alert('Digite um valor válido para apostar');
-        return;
-      }
-
-      if (selects.length === 0) {
-        alert('Selecione pelo menos um palpite');
-        return;
-      }
-
-      const codigo = `MJ${Date.now()}`;
-      const aposta = {
-        codigo,
-        valorUnico,
-        selecoes: selects,
-        dataHora: new Date().toISOString()
-      };
-
-      set(ref(db, 'apostas/' + codigo), aposta)
-        .then(() => {
-          abrirModal(codigo, aposta);
-          limparSelecoes();
-          document.getElementById('valorUnico').value = "";
-        })
-        .catch(err => {
-          alert('Erro ao salvar aposta: ' + err);
-        });
     });
 
-    // Modal código aposta com QR Pix e WhatsApp
-    function abrirModal(codigo, aposta) {
-      const modal = document.getElementById('codigoModal');
-      if (!modal) return;
+    const toggleBtn = div.querySelector(".toggleExtras");
+    const extrasDiv = div.querySelector(".extras");
+    toggleBtn.onclick = () => {
+      extrasDiv.style.display = extrasDiv.style.display === "flex" ? "none" : "flex";
+    };
 
-      modal.style.display = 'flex';
-      document.getElementById('codigoAposta').textContent = codigo;
+    div.querySelectorAll("button.btn").forEach(btn => {
+      btn.onclick = () => {
+        const grupo = btn.dataset.grupo;
+        const botoesGrupo = container.querySelectorAll(`button[data-grupo="${grupo}"]`);
+        const jaSelecionado = btn.classList.contains("selecionado");
 
-      const linkViewer = `https://SEUSITE.netlify.app/aposta_viewer.html?id=${codigo}`;
+        botoesGrupo.forEach(b => b.classList.remove("selecionado"));
 
-      const qrPixDiv = document.getElementById('qrPix');
-      qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
-
-      const btnCopiar = document.getElementById('btnCopiar');
-      btnCopiar.onclick = () => {
-        navigator.clipboard.writeText(linkViewer);
-        alert("🔗 Link copiado!\n\n" + linkViewer);
-      };
-
-      const btnWhatsapp = document.getElementById('btnWhatsapp');
-      btnWhatsapp.onclick = () => {
-        const total = document.getElementById('totalFinal').textContent.replace("Total:", "").trim();
-        const texto = `*Código da Aposta:* ${codigo}\n*Valor Total:* ${total}\n\n🔗 Acesse sua aposta:\n${linkViewer}`;
-        const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-        window.open(url, "_blank");
-      };
-
-      const btnFechar = document.getElementById('btnFechar');
-      btnFechar.onclick = () => {
-        modal.style.display = "none";
-      };
-    }
-
-    // Modal carregando
-    function mostrarModalCarregando() {
-      const modal = document.getElementById("modalCarregando");
-      if (modal) modal.style.display = "flex";
-    }
-    function esconderModalCarregando() {
-      const modal = document.getElementById("modalCarregando");
-      if (modal) modal.style.display = "none";
-    }
-
-    // Esconde dias já passados com base em datas (exemplo simplificado)
-    function esconderDiasPassados() {
-      const hoje = new Date();
-      const diasSemana = [
-        { nome: 'domingo', data: new Date("2025-07-13") },
-        { nome: 'segunda', data: new Date("2025-07-14") },
-        { nome: 'terca', data: new Date("2025-07-15") },
-        { nome: 'quarta', data: new Date("2025-07-16") },
-        { nome: 'quinta', data: new Date("2025-07-17") },
-        { nome: 'sexta', data: new Date("2025-07-18") },
-        { nome: 'sabado', data: new Date("2025-07-19") },
-      ];
-
-      diasSemana.forEach(dia => {
-        const btn = document.querySelector(`.dias button[onclick*="${dia.nome}"]`);
-        if (hoje > dia.data && btn) {
-          btn.style.display = 'none';
+        if (!jaSelecionado) {
+          btn.classList.add("selecionado");
         }
-      });
-    }
 
-    // Exibe hoje + 2 dias seguintes automaticamente
-    function mostrarHojeMais2Dias() {
-      const nomesDias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-      const hoje = new Date();
-      const indiceHoje = hoje.getDay(); // domingo=0
-
-      const diasMostrar = [];
-      for (let i = 0; i < 3; i++) {
-        const diaIndex = (indiceHoje + i) % 7;
-        diasMostrar.push(nomesDias[diaIndex]);
-      }
-
-      // Oculta todos os botões
-      document.querySelectorAll('.dias button').forEach(btn => {
-        btn.style.display = 'none';
-        btn.classList.remove('ativo');
-      });
-
-      // Mostra só 3 dias e ativa primeiro
-      diasMostrar.forEach((dia, idx) => {
-        const btn = document.querySelector(`.dias button[onclick*="${dia}"]`);
-        if (btn) {
-          btn.style.display = 'inline-block';
-          if (idx === 0) btn.classList.add('ativo');
-        }
-        criarJogos(dia);
-      });
-
-      mostrarDia(diasMostrar[0]);
-    }
-
-    // Ativa eventos nos botões de dias
-    function ativarEventosBotoesDias() {
-      document.querySelectorAll('.dias button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
-          if (!dia) return;
-
-          mostrarModalCarregando();
-
-          setTimeout(() => {
-            criarJogos(dia);
-            mostrarDia(dia);
-            esconderModalCarregando();
-          }, 1000);
-        });
-      });
-    }
-
-    // Carrossel simples automático
-    const carrossel = document.getElementById('carrossel');
-    let indiceAtual = 0;
-
-    function avancarSlide() {
-      if (!carrossel) return;
-      const slides = carrossel.children.length;
-      if (slides === 0) return;
-      indiceAtual = (indiceAtual + 1) % slides;
-      const largura = carrossel.clientWidth;
-      carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
-    }
-    setInterval(avancarSlide, 3000);
-    window.addEventListener('resize', () => {
-      if (!carrossel) return;
-      const largura = carrossel.clientWidth;
-      carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+        atualizarSelecoes();
+        atualizarTotal();
+      };
     });
+  }
+}
+ }  
+ function esconderDiasSemJogos() {
+  // Aplica evento em todos os botões de dias
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
+      if (!dia) return;
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      mostrarModalCarregando();
+      mostrarModalCarregando(); // Mostra modal de carregamento
 
       setTimeout(() => {
-        esconderDiasPassados();
-        mostrarHojeMais2Dias();
-        ativarEventosBotoesDias();
-        atualizarTotal();
-        atualizarContador();
-        esconderModalCarregando();
-      }, 1500);
+        mostrarDia(dia); // Mostra o conteúdo normalmente
+        esconderModalCarregando(); // Esconde o modal
+      }, 1000);
     });
+  });
+}
+function atualizarSelecoes() {
+  selects.length = 0; // Limpa as seleções anteriores
 
-    // Atualizar total ao alterar valor único
-    document.getElementById('valorUnico').addEventListener('input', () => {
-      atualizarTotal();
+  document.querySelectorAll(".duelo").forEach((duelo, i) => {
+    const selecionado = duelo.querySelector("button.selecionado");
+    if (selecionado) {
+      const texto = selecionado.textContent;
+      const valor = parseFloat(selecionado.dataset.valor);
+      const timeA = duelo.querySelectorAll(".nome-time")[0]?.textContent || "";
+      const timeB = duelo.querySelectorAll(".nome-time")[1]?.textContent || "";
+      const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora ", "") || "";
+      const campeonato = duelo.dataset.nomeGrupo || "Campeonato não informado";
+
+      selects.push({
+        timeA: timeA.trim(),
+        timeB: timeB.trim(),
+        valor: valor,
+        escolha: texto.split('\n')[0].trim(), // só o nome do botão
+        dataHora: dataHora,
+        campeonato: campeonato
+      });
+    }
+  });
+
+  document.getElementById("contadorMarcados").textContent = `Times ${selects.length}`;
+}
+  function atualizarTotal() {  
+  const valorUnicoInput = document.getElementById('valorUnico');  
+  const valorUnico = Number(valorUnicoInput.value) || 0;  
+  
+  const selecionados = document.querySelectorAll('.btn.selecionado');  
+  let multiplicador = 1;  
+  selecionados.forEach(btn => {  
+    multiplicador *= Number(btn.dataset.valor);  
+  });  
+  
+  const total = valorUnico * multiplicador;  
+  const totalFinal = document.getElementById('totalFinal');  
+  const apostarBtn = document.getElementById('apostarBtn');  
+  
+  if (total > LIMITE_VALOR_RECEBER) {  
+    totalFinal.innerHTML = `<span class="erro-limite">Total: R$ ${total.toFixed(2)} (Limite R$ ${LIMITE_VALOR_RECEBER})</span>`;  
+    apostarBtn.disabled = true;  
+    apostarBtn.style.background = "#aaa";  
+    apostarBtn.style.cursor = "not-allowed";  
+  } else {  
+    totalFinal.innerHTML = `<span class="ok-limite">Total: R$ ${total.toFixed(2)}</span>`;  
+    apostarBtn.disabled = false;  
+    apostarBtn.style.background = ""; // volta para o padrão  
+    apostarBtn.style.cursor = "pointer";  
+  }  
+}  
+  function atualizarContador() {  
+    const selecionados = document.querySelectorAll('.btn.selecionado').length;  
+    document.getElementById('contadorMarcados').textContent = `Times ${selecionados}`;  
+  }  
+  
+  // Evento no input valorUnico  
+  document.getElementById('valorUnico').addEventListener('input', () => {  
+    atualizarTotal();  
+  });  
+  
+  // Botão apostar  
+  document.getElementById('apostarBtn').addEventListener('click', () => {  
+    const valorUnicoInput = document.getElementById('valorUnico');  
+    const valorUnico = Number(valorUnicoInput.value);  
+    if (!valorUnico || valorUnico <= 0) {  
+      alert('Digite um valor válido para apostar');  
+      return;  
+    }  
+  
+    const selecionados = Array.from(document.querySelectorAll('.btn.selecionado'));  
+    if (selecionados.length === 0) {  
+      alert('Selecione pelo menos um palpite');  
+      return;  
+    }  
+  
+    // Gera código aposta  
+    const codigo = `MJ${Date.now()}`;  
+  
+    // Monta objeto para salvar no Firebase  
+    // Monta objeto para salvar no Firebase  
+const aposta = {  
+  codigo,  
+  valorUnico,  
+  selecoes: selects,  
+  dataHora: new Date().toISOString()  
+};  
+  
+    set(ref(db, 'apostas/' + codigo), aposta)  
+      .then(() => {  
+        abrirModal(codigo, aposta);  
+        limparSelecoes();  
+      })  
+      .catch(err => {  
+        alert('Erro ao salvar aposta: ' + err);  
+      });  
+  });  
+  function esconderDiasPassados() {
+  const hoje = new Date();
+  const diasSemana = [
+    { nome: 'domingo', data: new Date("2025-07-13") },
+    { nome: 'segunda', data: new Date("2025-07-13") },
+    { nome: 'terca', data: new Date("2025-07-10") },
+    { nome: 'quarta', data: new Date("2025-07-10") },
+    { nome: 'quinta', data: new Date("2025-07-10") },
+    { nome: 'sexta', data: new Date("2025-07-11") },
+    { nome: 'sabado', data: new Date("2025-07-12") },
+  ];
+
+  diasSemana.forEach(dia => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia.nome}"]`);
+    if (hoje > dia.data && btn) {
+      btn.style.display = 'none';
+    }
+  });
+}
+  function abrirModal(codigo, aposta) {
+  const modal = document.getElementById('codigoModal');
+  if (!modal) {
+    console.error("Elemento #codigoModal não encontrado");
+    return;
+  }
+
+  modal.style.display = 'flex';
+  document.getElementById('codigoAposta').textContent = codigo;
+
+  // ✅ LINK DO VISUALIZADOR
+  const linkViewer = `https://SEUSITE.netlify.app/aposta_viewer.html?id=${codigo}`;
+
+  // ✅ QR CODE PIX
+  const qrPixDiv = document.getElementById('qrPix');
+  qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
+
+  // ✅ BOTÃO COPIAR
+  const btnCopiar = document.getElementById('btnCopiar');
+  if (btnCopiar) {
+    btnCopiar.onclick = () => {
+      navigator.clipboard.writeText(linkViewer);
+      alert("🔗 Link copiado!\n\n" + linkViewer);
+    };
+  }
+
+  // ✅ BOTÃO WHATSAPP
+  const btnWhatsapp = document.getElementById('btnWhatsapp');
+  if (btnWhatsapp) {
+    btnWhatsapp.onclick = () => {
+      const total = document.getElementById('totalFinal').textContent.replace("Total: ", "").trim();
+      const texto = `*Código da Aposta:* ${codigo}\n*Valor Total:* ${total}\n\n🔗 Acesse sua aposta:\n${linkViewer}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+      window.open(url, "_blank");
+    };
+  }
+
+  // ✅ BOTÃO FECHAR
+  const btnFechar = document.getElementById('btnFechar');
+  if (btnFechar) {
+    btnFechar.onclick = () => {
+      modal.style.display = "none";
+    };
+  }
+}
+  function limparSelecoes() {  
+    document.querySelectorAll('.btn.selecionado').forEach(btn => {  
+      btn.classList.remove('selecionado');  
+    });  
+      
+  }  
+function ativarModalNosBotoesDosDias() {
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
+      if (!dia) return;
+
+      mostrarModalCarregando(); // Mostra o modal imediatamente
+
+      setTimeout(() => {
+        criarJogos(dia);         // Cria os jogos (verifica se tem ou não jogos)
+        mostrarDia(dia);         // Mostra a aba do dia
+        esconderModalCarregando(); // Esconde o modal
+      }, 1000); // tempo do carregamento (pode ajustar)
     });
-  </script>
-</body>
-</html>
+  });
+}
+// 2. Verifica se um dia tem jogo futuro (não usada aqui, mas útil)
+function diaTemJogoFuturo(dia) {
+  if (!series[dia]) return false;
+  const agora = new Date();
+  return series[dia].horarios.some(h => new Date(h) > agora);
+}
+
+// 3. Mostra automaticamente hoje + 2 dias seguintes
+function mostrarHojeMais2Dias() {
+  const nomesDias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+  const hoje = new Date();
+  const indiceHoje = hoje.getDay(); // 0 = domingo, 1 = segunda...
+
+  const diasMostrar = [];
+  for (let i = 0; i < 3; i++) {
+    const diaIndex = (indiceHoje + i) % 7;
+    diasMostrar.push(nomesDias[diaIndex]);
+  }
+
+  // Oculta todos os botões
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.style.display = 'none';
+    btn.classList.remove('ativo');
+  });
+
+  // Mostra apenas os 3 dias atuais e ativa o primeiro
+  diasMostrar.forEach((dia, idx) => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia}"]`);
+    if (btn) {
+      btn.style.display = 'inline-block';
+      if (idx === 0) btn.classList.add('ativo');
+    }
+    criarJogos(dia); // Cria os jogos do dia
+  });
+
+  mostrarDia(diasMostrar[0]); // Ativa o primeiro dia
+}
+
+// 4. Carrossel automático
+const carrossel = document.getElementById('carrossel');
+const slides = carrossel?.children.length || 0;
+let indiceAtual = 0;
+
+function avancarSlide() {
+  if (slides === 0) return;
+  indiceAtual = (indiceAtual + 1) % slides;
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+}
+
+// Avança slide a cada 3 segundos
+setInterval(avancarSlide, 3000);
+
+// Ajusta slide ao redimensionar
+window.addEventListener('resize', () => {
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  mostrarModalCarregando(); // ✅ MOSTRA AO INICIAR
+
+  setTimeout(() => {
+    esconderDiasPassados();
+    mostrarHojeMais2Dias();
+    atualizarTotal();
+    atualizarContador();
+
+    Object.keys(series).forEach(dia => criarJogos(dia));
+
+    esconderModalCarregando(); // ✅ ESCONDE APÓS CARREGAR
+  }, 1500); // tempo do modal inicial
+});
+function mostrarModalCarregando() {
+  const modal = document.getElementById("modalCarregando");
+  if (modal) modal.style.display = "flex";
+}
+
+function esconderModalCarregando() {
+  const modal = document.getElementById("modalCarregando");
+  if (modal) modal.style.display = "none";
+}
+
+</script>  
+</body>  
+</html>  
