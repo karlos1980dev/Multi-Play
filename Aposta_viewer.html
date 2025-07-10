@@ -62,9 +62,7 @@
     async function buscarResultado(idPartida) {
       try {
         const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Erro na API");
         const data = await res.json();
@@ -95,9 +93,9 @@
         }
 
         const dados = snapshot.val();
-        const nome = "Apostador"; // se tiver campo nome, use: dados.nome
-        const data = dados.dataAposta || "Data não disponível";
-        const jogos = dados.jogos || [];
+        const nome = dados.nome || "Apostador";
+        const data = dados.dataHora || dados.dataAposta || "Data não disponível";
+        const jogos = dados.jogos || dados.selecoes || [];
 
         let html = `
           <h2>📄 Visualização da Aposta</h2>
@@ -110,9 +108,11 @@
         let acertos = 0;
 
         for (const jogo of jogos) {
-          const {
-            nomeTimeA, nomeTimeB, escolha, dataHoraJogo, idPartida
-          } = jogo;
+          const nomeTimeA = jogo.nomeTimeA || jogo.timeA || "Time A";
+          const nomeTimeB = jogo.nomeTimeB || jogo.timeB || "Time B";
+          const escolha = jogo.escolha || "-";
+          const dataHoraJogo = jogo.dataHoraJogo || jogo.dataHora || "";
+          const idPartida = jogo.idPartida || null;
 
           let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando placar...</span>";
 
