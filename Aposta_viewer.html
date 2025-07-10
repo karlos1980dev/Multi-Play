@@ -1,7 +1,8 @@
-<!DOCTYPE html>  <html lang="pt-br">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visualização da Aposta</title>
   <style>
     body {
@@ -26,14 +27,14 @@
       border: 1px solid #ddd;
       text-align: left;
     }
-    h2 { font-size:18px;color: #25d366; }
+    h2 { font-size:18px; color: #25d366; }
     .ganhou { color: green; font-weight: bold; }
     .perdeu { color: red; font-weight: bold; }
     .carregando { color: orange; }
   </style>
 </head>
 <body>
-  <div id="visualizacao">
+  <div class="container" id="visualizacao">
     <h2>🔎 Carregando aposta...</h2>
   </div>
 
@@ -41,6 +42,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
+    // 🔧 Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
       authDomain: "jogo-60a9e.firebaseapp.com",
@@ -53,11 +55,14 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const container = document.getElementById("visualizacao");
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
 
-    const token = "5e66c06518f74e779bc07e73ef0266c5";
+    const container = document.getElementById("visualizacao");
+
+    // ✅ Aceita ?id= ou ?codigo=
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id") || urlParams.get("codigo");
+
+    const token = "5e66c06518f74e779bc07e73ef0266c5"; // Seu token da API Futebol
 
     async function buscarResultado(idPartida) {
       try {
@@ -65,23 +70,14 @@
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Erro na API Futebol");
-        return await res.json();
+        const data = await res.json();
+        return {
+          placarA: data.placar_oficial_mandante,
+          placarB: data.placar_oficial_visitante
+        };
       } catch (e) {
         console.warn("Erro ao buscar resultado:", e);
         return null;
-      }
-    }
-
-    async function buscarEventos(idPartida) {
-      try {
-        const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}/eventos`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error("Erro ao buscar eventos");
-        return await res.json();
-      } catch (e) {
-        console.warn("Erro ao buscar eventos:", e);
-        return [];
       }
     }
 
@@ -107,9 +103,11 @@
         const jogos = dados.selecoes || [];
 
         let html = `
-          <h2>📄 Aposta de ${nome}</h2>
-          <p><strong>Data:</strong> ${new Date(data).toLocaleString()}</p>
+          <h2>📄 Visualização da Aposta</h2>
+          <p><strong>👤 Jogador:</strong> ${nome}</p>
+          <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString()}</p>
           <hr />
+          <h3>🎮 Jogos Selecionados:</h3>
         `;
 
         let acertos = 0;
@@ -117,47 +115,35 @@
         for (const jogo of jogos) {
           const { timeA, timeB, escolha, dataHora, idPartida } = jogo;
 
-          html += `<h3>⚽ ${timeA} x ${timeB}</h3>`;
-          html += `<p><strong>Escolha:</strong> ${escolha}</p>`;
-          html += `<p><strong>Data/Hora:</strong> ${new Date(dataHora).toLocaleString()}</p>`;
+          let placarA = "-", placarB = "-", status = "<span class='carregando'>Buscando resultado...</span>";
 
-          if (!idPartida) {
-            html += `<p style="color:red;">Sem ID da partida</p><hr/>`;
-            continue;
-          }
-
-          const resultado = await buscarResultado(idPartida);
-          if (!resultado) {
-            html += `<p style="color:orange;">Resultado indisponível</p><hr/>`;
-            continue;
-          }
-
-          const placarA = resultado.placar_oficial_mandante;
-          const placarB = resultado.placar_oficial_visitante;
-          const campeonato = resultado.campeonato?.nome || "Desconhecido";
-          const statusFinal = verificarResultado(placarA, placarB, escolha);
-          const statusClass = statusFinal === "Ganhou" ? "green" : "red";
-
-          html += `<p><strong>🏆 Campeonato:</strong> ${campeonato}</p>`;
-          html += `<p><strong>Placar final:</strong> ${placarA} x ${placarB}</p>`;
-          html += `<p><strong>Status:</strong> <span style="color:${statusClass};">${statusFinal}</span></p>`;
-
-          const eventos = await buscarEventos(idPartida);
-          if (eventos.length > 0) {
-            html += `<details><summary>📋 Ver eventos minuto a minuto</summary><ul>`;
-            eventos.forEach(ev => {
-              html += `<li>${ev.tempo}' - ${ev.tipo} - ${ev.descricao}</li>`;
-            });
-            html += `</ul></details>`;
+          if (idPartida) {
+            const resultado = await buscarResultado(idPartida);
+            if (resultado) {
+              placarA = resultado.placarA;
+              placarB = resultado.placarB;
+              const final = verificarResultado(placarA, placarB, escolha);
+              status = `<span class="${final === "Ganhou" ? "ganhou" : "perdeu"}">${final}</span>`;
+              if (final === "Ganhou") acertos++;
+            } else {
+              status = "<span class='carregando'>Resultado indisponível</span>";
+            }
           } else {
-            html += `<p>⏳ Sem eventos disponíveis ainda.</p>`;
+            status = "<span class='perdeu'>Sem ID da partida</span>";
           }
 
-          html += `<hr/>`;
-          if (statusFinal === "Ganhou") acertos++;
+          html += `
+            <div class="duelo">
+              <p><strong>⚽ ${timeA} x ${timeB}</strong></p>
+              <p><strong>Escolha:</strong> ${escolha}</p>
+              <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
+              <p><strong>Status:</strong> ${status}</p>
+              <p><strong>Data/Hora Jogo:</strong> ${new Date(dataHora).toLocaleString()}</p>
+            </div>
+          `;
         }
 
-        html += `<h3>✅ Acertos: ${acertos} de ${jogos.length}</h3>`;
+        html += `<hr /><h3>✅ Acertos: ${acertos} de ${jogos.length}</h3>`;
         container.innerHTML = html;
       }).catch(err => {
         console.error(err);
