@@ -1,8 +1,9 @@
-<!DOCTYPE html>  <html lang="pt-br ">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />  
-  <title>MULTI PLAY Bilhete</title> 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MULTI PLAY - Buscar Aposta</title>
   <style>
     body {
       font-family: sans-serif;
@@ -13,7 +14,7 @@
     input, button {
       padding: 10px;
       font-size: 16px;
-      text-align:center;
+      text-align: center;
       border-radius: 8px;
       margin: 5px;
       border: 1px solid #ccc;
@@ -30,205 +31,32 @@
       box-shadow: 0 0 10px #ccc;
       text-align: left;
     }
-    h2 {
-      background: #ddd;
-      padding: 10px;
-      border-radius: 6px;
-    }
-    .duelo-box {
-      border-bottom: 1px dashed #ccc;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-    }
   </style>
 </head>
 <body>
-  <h1>🔍 Consulta de Aposta</h1>
-  <input type="text" id="codigoInput" placeholder="Digite o código da aposta">
-  <button onclick="consultarAposta()">Consultar</button>
-
-  <div id="resultado"></div>
-
-  <div id="acoes" style="display:none;">
-    <button onclick="baixarPDF()">📥 Baixar PDF</button>
-    <button onclick="compartilharLink()">🔗 Compartilhar Link</button>
-    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button>
-  </div>
+  <h1>🔍 Buscar Aposta</h1>
+  <input type="text" id="codigoInput" placeholder="Digite o código da aposta" />
+  <button onclick="buscarAposta()">Buscar</button>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
-      authDomain: "jogo-60a9e.firebaseapp.com",
-      projectId: "jogo-60a9e",
-      storageBucket: "jogo-60a9e.appspot.com",
-      messagingSenderId: "352852303591",
-      appId: "1:352852303591:web:8083c950047c9026bd8c42",
-      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    window.consultarAposta = async function () {
-      const codigo = document.getElementById('codigoInput').value.trim();
-      const resultadoDiv = document.getElementById('resultado');
-      const acoes = document.getElementById('acoes');
-      resultadoDiv.innerHTML = "";
-      acoes.style.display = "none";
-
-      if (!codigo) return alert("Digite o código");
-
-      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
-      if (!snapshot.exists()) {
-        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
-        return;
-      }
-
-      const aposta = snapshot.val();
-      window.apostaGlobal = aposta;
-
-      let multiplicador = 1;
-      aposta.selecoes.forEach(sel => multiplicador *= sel.valor);
-      const totalReceber = aposta.valorUnico * multiplicador;
-
-      let html = `
-        <h3>🔢 Código: <b>${aposta.codigo}</b></h3>
-        <h3>💸 Valor por aposta: R$ ${aposta.valorUnico.toFixed(2)}</h3>
-        <h3>📊 Cotacao: ${multiplicador.toFixed(2)}</h3>
-        <h3 style="color:green;">💰 Valor a receber: R$ ${totalReceber.toFixed(2)}</h3>
-      `;
-
-      const ganhou = aposta.selecoes.filter(s => s.status === "ganhou").length;
-      const perdeu = aposta.selecoes.filter(s => s.status === "perdeu").length;
-      const aguardando = aposta.selecoes.filter(s => !s.status || s.status === "aguardando").length;
-
-      html += `
-        <p><strong style="color:green;">✅ Ganhou:</strong> ${ganhou} |
-        <strong style="color:red;">❌ Perdeu:</strong> ${perdeu} |
-        </br><strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
-      `;
-
-  // Agrupar por data
-const agrupadoPorData = {};
-
-aposta.selecoes.forEach((sel, i) => {
-  const data = sel.dataHora.split(" ")[0]; // Ex: "09/07/2025"
-  if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
-  agrupadoPorData[data].push({ ...sel, index: i });
-});
-
-// Ordenar datas do mais recente para o mais antigo (ex: 09/07 > 08/07 > 07/07)
-const datasOrdenadas = Object.keys(agrupadoPorData).sort((a, b) => {
-  
-  const [d1, m1, y1] = a.split('/').map(Number);
-  const [d2, m2, y2] = b.split('/').map(Number);
-  return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
-});
-
-// Criar HTML agrupado por data > campeonato > cotação (menor para maior)
-datasOrdenadas.forEach(data => {
-  html += `<h2 style="background:#222; color:white; padding:10px; border-radius:8px;">📅 ${data}</h2>`;
-
-  const campeonatos = {};
-  agrupadoPorData[data].forEach(sel => {
-    const camp = sel.campeonato || "Outros";
-    if (!campeonatos[camp]) campeonatos[camp] = [];
-    campeonatos[camp].push(sel);
-  });
-
-  // Exibir os campeonatos dentro da data
-  for (let camp in campeonatos) {
-    html += `<h3 style="background:#eee; padding:8px; border-radius:6px;">🏆 ${camp}</h3>`;
-
-    // Ordenar os jogos do campeonato da menor para a maior cotação
-    const jogosOrdenados = campeonatos[camp].sort((a, b) => a.valor - b.valor);
-
-    jogosOrdenados.forEach(sel => {
-      const status = sel.status || "aguardando";
-      let cor = "#888", label = "⏳ Aguardando";
-
-      if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
-      else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
-
-      html += `
-        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-        <div class="duelo-box">
-         <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
-
-<p><strong>Escolha:</strong> ${sel.escolha} | <strong>Cotação:</strong> ${sel.valor}</p>
-<p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
-<p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p></div>
-      `;
-    });
-  }
-});
-      resultadoDiv.innerHTML = html;
-      acoes.style.display = "block";
-    };
-
-    window.compartilharLink = () => {
-  const codigo = document.getElementById('codigoInput').value.trim();
-  const url = `${location.origin}${location.pathname}?codigo=${codigo}`;
-
-  const texto = `📎 Link para seu bilhete:\n👉 ${url}\n\n📱 Acompanhe no App CENTRAL DAS APOSTAS!\n🔗 ${url}\nJOGUE COM RESPOSABILIDADAE\n       Boa Sorte`;
-
-  navigator.clipboard.writeText(texto).then(() => {
-    alert("🔗 Link com mensagem copiado para a área de transferência!");
-  });
-};
-    window.enviarWhatsApp = () => {
-      const aposta = window.apostaGlobal;
-      if (!aposta) return;
-
-      let msg = `🔢 Código: ${aposta.codigo}\n💸 Valor: R$ ${aposta.valorUnico.toFixed(2)}\n`;
-      let multi = 1;
-      aposta.selecoes.forEach(s => multi *= s.valor);
-      const total = aposta.valorUnico * multi;
-      msg += `📊 Multiplicador: ${multi.toFixed(2)}\n💰 Receber: R$ ${total.toFixed(2)}\n\n`;
-
-      aposta.selecoes.forEach((s, i) => {
-        msg += `${i + 1}. ${s.timeA} x ${s.timeB} (${s.campeonato || "Outros"})\n`;
-        msg += `Escolha: ${s.escolha} | Cotação: R$ ${s.valor.toFixed(2)}\nData/Hora: ${s.dataHora}\n\n`;
-      });
-
-      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
-    };
-
-    window.baixarPDF = () => {
-      import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js").then(({ jsPDF }) => {
-        const doc = new jsPDF.jsPDF();
-        const aposta = window.apostaGlobal;
-        let y = 10;
-
-        doc.text("CÓDIGO: " + aposta.codigo, 10, y); y += 10;
-        doc.text("Valor por aposta: R$ " + aposta.valorUnico.toFixed(2), 10, y); y += 10;
-        let multi = 1;
-        aposta.selecoes.forEach(s => multi *= s.valor);
-        const total = aposta.valorUnico * multi;
-        doc.text("Multiplicador: " + multi.toFixed(2), 10, y); y += 10;
-        doc.text("Valor a receber: R$ " + total.toFixed(2), 10, y); y += 10;
-
-        aposta.selecoes.forEach((s, i) => {
-          y += 10;
-          doc.text(`${i + 1}. ${s.timeA} x ${s.timeB}`, 10, y); y += 6;
-          doc.text(`   ${s.escolha} - R$ ${s.valor.toFixed(2)}`, 10, y); y += 6;
-          doc.text(`   ${s.dataHora} - ${s.campeonato || "Outros"}`, 10, y);
-        });
-
-        doc.save("aposta_" + aposta.codigo + ".pdf");
-      });
-    };
-
-    // Consulta automática por URL
+    // Redirecionar automaticamente se tiver ?codigo= na URL
     const params = new URLSearchParams(location.search);
     if (params.has("codigo")) {
-      document.getElementById("codigoInput").value = params.get("codigo");
-      consultarAposta();
+      const codigo = params.get("codigo");
+      // Redireciona para o visualizador de aposta
+      window.location.href = `aposta_viewer.html?id=${codigo}`;
     }
+
+    // Se o usuário digitar o código manualmente
+    window.buscarAposta = () => {
+      const codigo = document.getElementById("codigoInput").value.trim();
+      if (!codigo) {
+        alert("Digite um código válido.");
+        return;
+      }
+      // Redireciona manualmente também
+      window.location.href = `aposta_viewer.html?id=${codigo}`;
+    };
   </script>
 </body>
 </html>
