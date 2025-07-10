@@ -19,30 +19,20 @@
       margin: 0 auto;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
+    .duelo {
+      text-align: left;
+      margin-bottom: 20px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 10px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
+    h2 {
+      text-align: left;
+      margin-top: 30px;
+      color: #333;
     }
-    th {
-      background-color: #eee;
-    }
-    .ganhou {
-      color: green;
-      font-weight: bold;
-    }
-    .perdeu {
-      color: red;
-      font-weight: bold;
-    }
-    .carregando {
-      color: orange;
-    }
+    .ganhou { color: green; font-weight: bold; }
+    .perdeu { color: red; font-weight: bold; }
+    .carregando { color: orange; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -72,7 +62,12 @@
     const id = urlParams.get("id");
     const token = "5e66c06518f74e779bc07e73ef0266c5";
 
-    let dadosAposta = null;
+    function verificarResultado(placarA, placarB, escolha) {
+      if (escolha === "Casa" && placarA > placarB) return "Ganhou";
+      if (escolha === "Fora" && placarB > placarA) return "Ganhou";
+      if (escolha === "Empate" && placarA === placarB) return "Ganhou";
+      return "Perdeu";
+    }
 
     async function buscarResultado(idPartida) {
       try {
@@ -86,131 +81,122 @@
           placarB: data.placar_oficial_visitante
         };
       } catch (e) {
-        console.warn("Erro ao buscar resultado da API:", e);
+        console.warn("Erro ao buscar resultado:", e);
         return null;
       }
     }
 
-    function verificarResultado(placarA, placarB, escolha) {
-      if (escolha === "Casa" && placarA > placarB) return "Ganhou";
-      if (escolha === "Fora" && placarB > placarA) return "Ganhou";
-      if (escolha === "Empate" && placarA === placarB) return "Ganhou";
-      return "Perdeu";
-    }
-
     function exibirAposta(dados, resultados = {}) {
-  const nome = dados.nome || "Apostador";
-  const data = dados.dataAposta || "Data não disponível";
-  const jogos = dados.jogos || [];
+      const nome = dados.nome || "Apostador";
+      const data = dados.dataAposta || dados.dataHora || new Date().toISOString();
+      const jogos = dados.jogos || dados.selecoes || [];
 
-  let html = `
-    <h2>📄 Visualização da Aposta</h2>
-    <p><strong>👤 Jogador:</strong> ${nome}</p>
-    <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString("pt-BR")}</p>
-    <hr />
-  `;
-
-  let acertos = 0;
-  let totalJogos = jogos.length;
-
-  const jogosPorCampeonato = {};
-
-  // Organizar por campeonato
-  for (const jogo of jogos) {
-    const campeonato = jogo.campeonato || "Campeonato não informado";
-    if (!jogosPorCampeonato[campeonato]) {
-      jogosPorCampeonato[campeonato] = [];
-    }
-    jogosPorCampeonato[campeonato].push(jogo);
-  }
-
-  for (const campeonato in jogosPorCampeonato) {
-    html += `<h2>🏆 ${campeonato}</h2>`;
-
-    for (const jogo of jogosPorCampeonato[campeonato]) {
-      const { nomeTimeA, nomeTimeB, escolha, dataHoraJogo, idPartida } = jogo;
-
-      let placarA = "-", placarB = "-", status = "<span class='carregando'>Aguardando...</span>";
-
-      if (idPartida && resultados[idPartida]) {
-        placarA = resultados[idPartida].placarA;
-        placarB = resultados[idPartida].placarB;
-        const resultadoFinal = verificarResultado(placarA, placarB, escolha);
-        status = `<span class='${resultadoFinal === "Ganhou" ? "ganhou" : "perdeu"}'>${resultadoFinal}</span>`;
-        if (resultadoFinal === "Ganhou") acertos++;
-      } else if (!idPartida) {
-        status = "<span class='perdeu'>ID ausente</span>";
+      if (jogos.length === 0) {
+        container.innerHTML = `<h2>⚠️ Aposta sem jogos registrados.</h2>`;
+        return;
       }
 
-      html += `
-        <div class="duelo">
-          <p><strong>Duelo:</strong> ${nomeTimeA} x ${nomeTimeB}</p>
-          <p><strong>Escolha:</strong> ${escolha}</p>
-          <p><strong>Data/Hora:</strong> ${new Date(dataHoraJogo).toLocaleString("pt-BR")}</p>
-          <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
-          <p><strong>Status:</strong> ${status}</p>
-          <p style="color:#999;">-----------------------------------------</p>
-        </div>
+      let html = `
+        <h2>📄 Visualização da Aposta</h2>
+        <p><strong>👤 Jogador:</strong> ${nome}</p>
+        <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString("pt-BR")}</p>
+        <hr />
       `;
-    }
-  }
 
-  const ganhouTudo = acertos === totalJogos;
-  html += `
-    <hr />
-    <h3 style="color:${ganhouTudo ? 'green' : 'red'};">
-      Status Final: ${ganhouTudo ? "🎉 Ganhou" : "❌ Perdeu"}
-    </h3>
-  `;
+      let acertos = 0;
+      let total = jogos.length;
 
-  container.innerHTML = html;
-}
-    async function atualizarResultados() {
-      if (!dadosAposta || !dadosAposta.jogos) return;
-      const resultados = {};
-      for (const jogo of dadosAposta.jogos) {
-        if (jogo.idPartida) {
-          const placar = await buscarResultado(jogo.idPartida);
-          if (placar) {
-            resultados[jogo.idPartida] = placar;
-          }
-        }
-      }
-      exibirAposta(dadosAposta, resultados);
-    }
+      const porCampeonato = {};
 
-    // 🔍 INÍCIO
-    if (!id) {
-      container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
-    } else {
-      console.log("📌 ID da aposta (URL):", id);
-      const apostaRef = ref(db, `apostas/${id}`);
-      onValue(apostaRef, async (snapshot) => {
-        try {
-          if (!snapshot.exists()) {
-            console.warn("❌ Sem dados para o ID:", id);
-            container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
-            return;
-          }
-
-          const dados = snapshot.val();
-          console.log("📥 Dados recebidos do Firebase:", dados);
-
-          if (!dados.jogos || !Array.isArray(dados.jogos)) {
-            container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos registrados.</h2>`;
-            return;
-          }
-
-          dadosAposta = dados;
-          await atualizarResultados();
-        } catch (erro) {
-          console.error("💥 Erro ao processar a aposta:", erro);
-          container.innerHTML = `<h2>⚠️ Erro ao carregar aposta.</h2>`;
-        }
+      jogos.forEach(jogo => {
+        const campeonato = jogo.campeonato || "Campeonato não informado";
+        if (!porCampeonato[campeonato]) porCampeonato[campeonato] = [];
+        porCampeonato[campeonato].push(jogo);
       });
 
-      // Atualização automática a cada 30 segundos
-      setInterval(atualizarResultados, 30000);
+      for (const campeonato in porCampeonato) {
+        html += `<h2>🏆 ${campeonato}</h2>`;
+
+        for (const jogo of porCampeonato[campeonato]) {
+          const { timeA, timeB, nomeTimeA, nomeTimeB, escolha, dataHora, idPartida } = jogo;
+
+          let placarA = "-", placarB = "-";
+          let status = "<span class='carregando'>Aguardando...</span>";
+
+          const nomeA = nomeTimeA || timeA || "Time A";
+          const nomeB = nomeTimeB || timeB || "Time B";
+
+          if (idPartida && resultados[idPartida]) {
+            placarA = resultados[idPartida].placarA;
+            placarB = resultados[idPartida].placarB;
+            const res = verificarResultado(placarA, placarB, escolha);
+            status = `<span class='${res === "Ganhou" ? "ganhou" : "perdeu"}'>${res}</span>`;
+            if (res === "Ganhou") acertos++;
+          } else if (!idPartida) {
+            status = "<span class='perdeu'>ID ausente</span>";
+          }
+
+          html += `
+            <div class="duelo">
+              <p><strong>Duelo:</strong> ${nomeA} x ${nomeB}</p>
+              <p><strong>Escolha:</strong> ${escolha}</p>
+              <p><strong>Data/Hora:</strong> ${new Date(dataHora).toLocaleString("pt-BR")}</p>
+              <p><strong>Placar:</strong> ${placarA} x ${placarB}</p>
+              <p><strong>Status:</strong> ${status}</p>
+              <p style="color:#aaa;">-----------------------------------------</p>
+            </div>
+          `;
+        }
+      }
+
+      const statusFinal = acertos === total ? "🎉 Ganhou" : "❌ Perdeu";
+      const corFinal = acertos === total ? "green" : "red";
+
+      html += `
+        <hr />
+        <h3 style="color:${corFinal};">Status Final: ${statusFinal}</h3>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    async function atualizarResultados(dados) {
+      const resultados = {};
+      const jogos = dados.jogos || dados.selecoes || [];
+
+      for (const jogo of jogos) {
+        if (jogo.idPartida) {
+          const resultado = await buscarResultado(jogo.idPartida);
+          if (resultado) resultados[jogo.idPartida] = resultado;
+        }
+      }
+
+      exibirAposta(dados, resultados);
+    }
+
+    if (!id) {
+      container.innerHTML = `<h2>❌ Código da aposta não informado na URL</h2>`;
+    } else {
+      const refAposta = ref(db, "apostas/" + id);
+      onValue(refAposta, async snapshot => {
+        if (!snapshot.exists()) {
+          container.innerHTML = `<h2>❌ Aposta não encontrada</h2>`;
+          return;
+        }
+
+        const dados = snapshot.val();
+        await atualizarResultados(dados);
+      });
+
+      setInterval(async () => {
+        const refAposta = ref(db, "apostas/" + id);
+        onValue(refAposta, async snapshot => {
+          if (snapshot.exists()) {
+            const dados = snapshot.val();
+            await atualizarResultados(dados);
+          }
+        });
+      }, 30000);
     }
   </script>
 </body>
