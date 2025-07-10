@@ -2,42 +2,72 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MULTI PLAY ACOMPANHAR APOSTA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizar Aposta - MULTI PLAY</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #47ff15;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
       margin: 0;
-      padding: 20px;
     }
+
     .container {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
       max-width: 900px;
-      margin: 0 auto;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     h2 {
-      margin-bottom: 10px;
+      background: #47ff15;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
     }
+
+    .grupo {
+      margin-top: 20px;
+    }
+
     .duelo {
-      border-top: 1px solid #ccc;
-      padding: 10px 0;
-      margin-top: 10px;
-      text-align: left;
+      padding: 15px;
+      border-top: 1px dashed #ccc;
     }
-    .duelo strong {
-      display: inline-block;
-      width: 140px;
+
+    .info {
+      margin: 5px 0;
+      font-size: 16px;
     }
-    .status {
+
+    .info strong {
+      color: #333;
+    }
+
+    .status-aguardando {
+      color: orange;
       font-weight: bold;
     }
-    .status.ganhou { color: green; }
-    .status.perdeu { color: red; }
-    .status.aguardando { color: orange; }
+
+    .status-ganhou {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-perdeu {
+      color: red;
+      font-weight: bold;
+    }
+
+    .final-status {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 20px;
+      padding: 10px;
+      border-top: 2px solid #000;
+    }
   </style>
 </head>
 <body>
@@ -61,105 +91,83 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const container = document.getElementById("visualizacao");
 
+    const container = document.getElementById("visualizacao");
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
 
     if (!id) {
-      container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
+      container.innerHTML = "<h2>❌ ID da aposta não encontrado na URL</h2>";
     } else {
       const apostaRef = ref(db, `apostas/${id}`);
       onValue(apostaRef, (snapshot) => {
         if (!snapshot.exists()) {
-          container.innerHTML = `<h2>❌ Aposta não encontrada: ${id}</h2>`;
+          container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
           return;
         }
 
         const dados = snapshot.val();
-        if (!dados.selecoes || !Array.isArray(dados.selecoes)) {
-          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem seleções.</h2>`;
+        const selecoes = dados.selecoes || [];
+
+        if (!Array.isArray(selecoes) || selecoes.length === 0) {
+          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos</h2>`;
           return;
         }
 
-        exibirAposta(dados);
-      });
-    }
+        let html = `<h2>📄 Visualização da Aposta</h2>
+        <p><strong>Jogador:</strong> ${dados.nome || "Não informado"}</p>
+        <p><strong>Data da Aposta:</strong> ${new Date(dados.dataHora).toLocaleString()}</p>`;
 
-    function exibirAposta(dados) {
-      const selecoes = dados.selecoes;
-      const nome = dados.nome || "Apostador";
-      const data = dados.dataHora ? new Date(dados.dataHora).toLocaleString() : "Não informado";
+        let statusFinal = "Aguardando";
+        let perdeuAlgum = false;
+        let ganhouTodos = true;
 
-      let html = `
-        <h2>📄 Visualização da Aposta</h2>
-        <p><strong>👤 Jogador:</strong> ${nome}</p>
-        <p><strong>📅 Data da Aposta:</strong> ${data}</p>
-        <hr />
-      `;
+        const grupos = {};
 
-      let algumPerdeu = false;
-      let todosGanhou = true;
-
-      // Agrupar por campeonato
-      const porCampeonato = {};
-      selecoes.forEach(sel => {
-        const camp = sel.campeonato || "Sem campeonato";
-        if (!porCampeonato[camp]) porCampeonato[camp] = [];
-        porCampeonato[camp].push(sel);
-      });
-
-      // Percorrer cada campeonato
-      for (const campeonato in porCampeonato) {
-        html += `<h2>🏆 ${campeonato}</h2>`;
-        porCampeonato[campeonato].forEach(jogo => {
-          const {
-            timeA = "Time A",
-            timeB = "Time B",
-            escolha = "Não informado",
-            dataHora = "",
-            statusManual = ""
-          } = jogo;
-
-          let statusText = "🕒 Aguardando";
-          let statusClass = "aguardando";
-
-          if (statusManual === "Ganhou") {
-            statusText = "✅ Ganhou";
-            statusClass = "ganhou";
-          } else if (statusManual === "Perdeu") {
-            statusText = "❌ Perdeu";
-            statusClass = "perdeu";
-            algumPerdeu = true;
-            todosGanhou = false;
-          } else {
-            todosGanhou = false;
-          }
-
-          html += `
-            <div class="duelo">
-              <div><strong>Duelo:</strong> ${timeA} x ${timeB}</div>
-              <div><strong>Escolha:</strong> ${escolha}</div>
-              <div><strong>Data/Hora:</strong> ${new Date(dataHora).toLocaleString()}</div>
-              <div><strong>Status:</strong> <span class="status ${statusClass}">${statusText}</span></div>
-            </div>
-          `;
+        // Agrupar por campeonato
+        selecoes.forEach(s => {
+          const grupo = s.campeonato || "Grupo Desconhecido";
+          if (!grupos[grupo]) grupos[grupo] = [];
+          grupos[grupo].push(s);
         });
-      }
 
-      // Status final
-      let statusFinal = "🕒 Aguardando";
-      if (algumPerdeu) statusFinal = "❌ Perdeu";
-      else if (todosGanhou) statusFinal = "🎉 Ganhou";
+        for (const grupoNome in grupos) {
+          html += `<div class="grupo"><h2>${grupoNome}</h2>`;
 
-      html += `
-        <hr />
-        <h3 style="text-align:center; color:${algumPerdeu ? 'red' : (todosGanhou ? 'green' : 'orange')}">
-          Status Final: ${statusFinal}
-        </h3>
-      `;
+          grupos[grupoNome].forEach(jogo => {
+            const status = jogo.statusManual || "Aguardando";
 
-      container.innerHTML = html;
+            if (status === "Perdeu") perdeuAlgum = true;
+            if (status !== "Ganhou") ganhouTodos = false;
+
+            html += `
+              <div class="duelo">
+                <div class="info"><strong>Duelo:</strong> ${jogo.timeA} x ${jogo.timeB}</div>
+                <div class="info"><strong>Escolha:</strong> ${jogo.escolha}</div>
+                <div class="info"><strong>Data e Hora:</strong> ${new Date(jogo.dataHora).toLocaleString()}</div>
+                <div class="info"><strong>Status:</strong> <span class="status-${status.toLowerCase()}">${status}</span></div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+
+        if (perdeuAlgum) {
+          statusFinal = "Perdeu";
+        } else if (ganhouTodos) {
+          statusFinal = "Ganhou";
+        }
+
+        html += `
+          <div class="final-status">
+            <strong>Status Final:</strong> 
+            <span class="status-${statusFinal.toLowerCase()}">${statusFinal}</span>
+          </div>
+        `;
+
+        container.innerHTML = html;
+      });
     }
   </script>
 </body>
