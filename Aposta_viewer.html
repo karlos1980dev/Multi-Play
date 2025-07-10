@@ -1,55 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Visualizador de Aposta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buscar Código da Aposta</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #f5f5f5;
+      background: #f0f0f0;
+      text-align: center;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
+    input, button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 400px;
     }
-    .duelo {
-      background: white;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-    .duelo img {
-      height: 50px;
-    }
-    .linha {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .linha > div {
-      flex: 1;
-      text-align: center;
-    }
-    .escolha {
+    button {
+      background: #25d366;
+      color: white;
       font-weight: bold;
-      background: #d4edda;
-      color: #155724;
-      padding: 5px;
-      border-radius: 5px;
-      display: inline-block;
-      margin-top: 5px;
+    }
+    button:hover {
+      background-color: #1da851;
+      cursor: pointer;
+    }
+    .msg {
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Visualizador de Aposta</h1>
-  <div id="infoAposta"></div>
-  <div id="listaDuelo"></div>
+  <h1>🔎 Buscar Aposta</h1>
+
+  <input type="text" id="codigoInput" placeholder="Digite o código da aposta" />
+  <br />
+  <button onclick="buscarAposta()">Visualizar Resultado</button>
+
+  <div class="msg" id="mensagem"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+    import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
@@ -64,61 +61,41 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
+    window.buscarAposta = async () => {
+      const codigo = document.getElementById("codigoInput").value.trim();
+      const msg = document.getElementById("mensagem");
 
-    if (!id) {
-      document.getElementById("infoAposta").innerHTML = `<p style="color:red;">ID da aposta ausente na URL</p>`;
-      throw new Error("ID ausente");
-    }
+      if (!codigo) {
+        msg.innerHTML = "❌ Digite um código válido!";
+        msg.style.color = "red";
+        return;
+      }
 
-    get(child(ref(db), "apostas/" + id))
-      .then(snapshot => {
+      msg.innerHTML = "⏳ Verificando...";
+      msg.style.color = "black";
+
+      try {
+        const snapshot = await get(child(ref(db), `apostas/${codigo}`));
         if (!snapshot.exists()) {
-          document.getElementById("infoAposta").innerHTML = `<p style="color:red;">Aposta não encontrada para o código: ${id}</p>`;
+          msg.innerHTML = "❌ Código não encontrado.";
+          msg.style.color = "red";
           return;
         }
 
-        const aposta = snapshot.val();
-        const { valorUnico, selecoes, dataHora } = aposta;
+        msg.innerHTML = "✅ Código encontrado! Redirecionando...";
+        msg.style.color = "green";
 
-        document.getElementById("infoAposta").innerHTML = `
-          <h2>Código: ${id}</h2>
-          <p><strong>Valor por Palpite:</strong> R$ ${valorUnico.toFixed(2)}</p>
-          <p><strong>Data da Aposta:</strong> ${new Date(dataHora).toLocaleString("pt-BR")}</p>
-          <hr/>
-        `;
+        // Redirecionar para a visualização do resultado
+        setTimeout(() => {
+          window.location.href = `aposta_viewer.html?id=${codigo}`;
+        }, 1000);
 
-        const lista = document.getElementById("listaDuelo");
-
-        selecoes.forEach((sel, idx) => {
-          const div = document.createElement("div");
-          div.className = "duelo";
-          div.innerHTML = `
-            <h3>${sel.campeonato}</h3>
-            <div class="linha">
-              <div>
-                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(sel.timeA)}&background=random" />
-                <div>${sel.timeA}</div>
-              </div>
-              <div>
-                <div class="escolha">${sel.escolha}</div>
-                <div style="margin-top: 5px;">R$ ${(valorUnico * sel.valor).toFixed(2)}</div>
-              </div>
-              <div>
-                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(sel.timeB)}&background=random" />
-                <div>${sel.timeB}</div>
-              </div>
-            </div>
-            <small>Data do Jogo: ${sel.dataHora}</small>
-          `;
-          lista.appendChild(div);
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("infoAposta").innerHTML = `<p style="color:red;">Erro ao buscar aposta: ${err.message}</p>`;
-      });
+      } catch (error) {
+        console.error(error);
+        msg.innerHTML = "⚠️ Erro ao consultar. Tente novamente.";
+        msg.style.color = "orange";
+      }
+    };
   </script>
 </body>
 </html>
