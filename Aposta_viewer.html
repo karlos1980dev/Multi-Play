@@ -7,30 +7,27 @@
   <style>
     body {
       font-family: sans-serif;
-      text-align: center;
       background: #47ff15;
+      margin: 0;
       padding: 20px;
     }
     .container {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
+      background: #fff;
       max-width: 900px;
       margin: 0 auto;
+      padding: 20px;
+      border-radius: 15px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
+    h2, h3 {
       text-align: center;
     }
-    th {
-      background-color: #eee;
+    .duelo {
+      margin-bottom: 20px;
+    }
+    .linha {
+      border-top: 1px dashed #ccc;
+      margin: 15px 0;
     }
     .ganhou {
       color: green;
@@ -43,6 +40,9 @@
     .carregando {
       color: orange;
       font-weight: bold;
+    }
+    .dado {
+      margin: 4px 0;
     }
   </style>
 </head>
@@ -58,11 +58,11 @@
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
       authDomain: "jogo-60a9e.firebaseapp.com",
+      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com",
       projectId: "jogo-60a9e",
       storageBucket: "jogo-60a9e.appspot.com",
       messagingSenderId: "352852303591",
-      appId: "1:352852303591:web:8083c950047c9026bd8c42",
-      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+      appId: "1:352852303591:web:8083c950047c9026bd8c42"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -71,7 +71,7 @@
     const container = document.getElementById("visualizacao");
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
-    const token = "5e66c06518f74e779bc07e73ef0266c5"; // SUA CHAVE DA API DE FUTEBOL
+    const token = "5e66c06518f74e779bc07e73ef0266c5";
 
     let dadosAposta = null;
 
@@ -87,7 +87,7 @@
           placarB: data.placar_oficial_visitante
         };
       } catch (e) {
-        console.warn("Erro ao buscar resultado da API:", e);
+        console.warn("Erro ao buscar resultado:", e);
         return null;
       }
     }
@@ -102,84 +102,70 @@
     function exibirAposta(dados, resultados = {}) {
       const nome = dados.nome || "Apostador";
       const data = dados.dataHora || "Data não disponível";
-      const jogos = dados.selecoes || [];
+      const valor = dados.valorUnico || 0;
+      const selecoes = dados.selecoes || [];
 
       let html = `
-        <h2>📄 Visualização da Aposta</h2>
-        <p><strong>👤 Jogador:</strong> ${nome}</p>
-        <p><strong>📅 Data da Aposta:</strong> ${new Date(data).toLocaleString()}</p>
-        <p><strong>💰 Valor Apostado:</strong> R$ ${dados.valorUnico?.toFixed(2) || "0,00"}</p>
-        <hr />
-        <table>
-          <thead>
-            <tr>
-              <th>Duelos</th>
-              <th>Escolha</th>
-              <th>Placar</th>
-              <th>Data e Hora</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
+        <h2>📄 Aposta de ${nome}</h2>
+        <p><strong>Data:</strong> ${new Date(data).toLocaleString()}</p>
+        <p><strong>Valor:</strong> R$ ${valor.toFixed(2)}</p>
+        <div class="linha"></div>
       `;
 
-      let acertos = 0;
-      let erros = 0;
-      let aguardando = 0;
+      let acertos = 0, erros = 0, aguardando = 0;
 
-      for (const jogo of jogos) {
-        const { timeA: nomeTimeA, timeB: nomeTimeB, escolha, dataHora, idPartida } = jogo;
+      for (const jogo of selecoes) {
+        const timeA = jogo.timeA || "-";
+        const timeB = jogo.timeB || "-";
+        const escolha = jogo.escolha || "-";
+        const dataHora = new Date(jogo.dataHora || "").toLocaleString();
+        const idPartida = jogo.idPartida;
 
         let placarA = "-", placarB = "-", status = "<span class='carregando'>Aguardando...</span>";
 
         if (idPartida && resultados[idPartida]) {
           placarA = resultados[idPartida].placarA;
           placarB = resultados[idPartida].placarB;
-          const resultadoFinal = verificarResultado(placarA, placarB, escolha);
-          status = `<span class='${resultadoFinal === "Ganhou" ? "ganhou" : "perdeu"}'>${resultadoFinal}</span>`;
-          if (resultadoFinal === "Ganhou") acertos++;
+          const result = verificarResultado(placarA, placarB, escolha);
+          status = `<span class="${result === "Ganhou" ? "ganhou" : "perdeu"}">${result}</span>`;
+          if (result === "Ganhou") acertos++;
           else erros++;
         } else {
           aguardando++;
         }
 
         html += `
-          <tr>
-            <td>${nomeTimeA} x ${nomeTimeB}</td>
-            <td>${escolha}</td>
-            <td>${placarA} x ${placarB}</td>
-            <td>${new Date(dataHora).toLocaleString()}</td>
-            <td>${status}</td>
-          </tr>
+          <div class="duelo">
+            <div class="dado"><strong>Duelo:</strong> ${timeA} x ${timeB}</div>
+            <div class="dado"><strong>Escolha:</strong> ${escolha}</div>
+            <div class="dado"><strong>Placar:</strong> ${placarA} x ${placarB}</div>
+            <div class="dado"><strong>Data/Hora:</strong> ${dataHora}</div>
+            <div class="dado"><strong>Status:</strong> ${status}</div>
+          </div>
+          <div class="linha">-----------------------------------------</div>
         `;
       }
 
-      html += `</tbody></table><hr />`;
-
-      // Status final
-      let statusFinal = "⏳ Aguardando resultado de jogos...";
+      let statusFinal = "⏳ Aguardando...";
       let cor = "orange";
-
-      if (aguardando === 0 && erros > 0) {
-        statusFinal = "❌ Perdeu";
-        cor = "red";
-      } else if (aguardando === 0 && erros === 0) {
+      if (aguardando === 0 && erros === 0) {
         statusFinal = "🎉 Ganhou";
         cor = "green";
+      } else if (aguardando === 0 && erros > 0) {
+        statusFinal = "❌ Perdeu";
+        cor = "red";
       }
 
-      html += `
-        <h3 style="color:${cor};">Status Final: ${statusFinal}</h3>
-        <p>✅ Acertos: <strong>${acertos}</strong> &nbsp;&nbsp; ❌ Erros: <strong>${erros}</strong> &nbsp;&nbsp; ⏳ Aguardando: <strong>${aguardando}</strong></p>
-      `;
+      html += `<h3 style="color:${cor};">Status Final: ${statusFinal}</h3>`;
+      html += `<p>✅ Acertos: ${acertos} | ❌ Erros: ${erros} | ⏳ Aguardando: ${aguardando}</p>`;
 
       container.innerHTML = html;
     }
 
     async function atualizarResultados() {
-      if (!dadosAposta || !dadosAposta.selecoes) return;
-      const resultados = {};
+      if (!dadosAposta?.selecoes) return;
 
+      const resultados = {};
       for (const jogo of dadosAposta.selecoes) {
         if (jogo.idPartida) {
           const placar = await buscarResultado(jogo.idPartida);
@@ -191,22 +177,16 @@
     }
 
     if (!id) {
-      container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
+      container.innerHTML = "<h2>❌ Código da aposta não informado na URL.</h2>";
     } else {
       const apostaRef = ref(db, `apostas/${id}`);
       onValue(apostaRef, async (snapshot) => {
         if (!snapshot.exists()) {
-          container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
+          container.innerHTML = `<h2>❌ Nenhuma aposta encontrada com o código: ${id}</h2>`;
           return;
         }
 
-        const dados = snapshot.val();
-        if (!dados.selecoes || !Array.isArray(dados.selecoes)) {
-          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos registrados.</h2>`;
-          return;
-        }
-
-        dadosAposta = dados;
+        dadosAposta = snapshot.val();
         await atualizarResultados();
       });
 
