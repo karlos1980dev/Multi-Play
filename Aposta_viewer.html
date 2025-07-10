@@ -66,17 +66,18 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
     const container = document.getElementById("visualizacao");
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
     const token = "5e66c06518f74e779bc07e73ef0266c5";
 
+    let dadosAposta = null;
+
     async function buscarResultado(idPartida) {
       try {
         const res = await fetch(`https://api.api-futebol.com.br/v1/partidas/${idPartida}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Erro na API");
         const data = await res.json();
@@ -96,8 +97,6 @@
       if (escolha === "Empate" && placarA === placarB) return "Ganhou";
       return "Perdeu";
     }
-
-    let dadosAposta = null;
 
     function exibirAposta(dados, resultados = {}) {
       const nome = dados.nome || "Apostador";
@@ -164,7 +163,6 @@
 
     async function atualizarResultados() {
       if (!dadosAposta || !dadosAposta.jogos) return;
-
       const resultados = {};
       for (const jogo of dadosAposta.jogos) {
         if (jogo.idPartida) {
@@ -177,21 +175,38 @@
       exibirAposta(dadosAposta, resultados);
     }
 
+    // 🔍 INÍCIO
     if (!id) {
       container.innerHTML = "<h2>❌ ID inválido ou ausente na URL.</h2>";
     } else {
+      console.log("📌 ID da aposta (URL):", id);
       const apostaRef = ref(db, `apostas/${id}`);
-      onValue(apostaRef, async snapshot => {
-        if (!snapshot.exists()) {
-          container.innerHTML = "<h2>❌ Aposta não encontrada.</h2>";
-          return;
-        }
+      onValue(apostaRef, async (snapshot) => {
+        try {
+          if (!snapshot.exists()) {
+            console.warn("❌ Sem dados para o ID:", id);
+            container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
+            return;
+          }
 
-        dadosAposta = snapshot.val();
-        await atualizarResultados(); // primeira vez
+          const dados = snapshot.val();
+          console.log("📥 Dados recebidos do Firebase:", dados);
+
+          if (!dados.jogos || !Array.isArray(dados.jogos)) {
+            container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos registrados.</h2>`;
+            return;
+          }
+
+          dadosAposta = dados;
+          await atualizarResultados();
+        } catch (erro) {
+          console.error("💥 Erro ao processar a aposta:", erro);
+          container.innerHTML = `<h2>⚠️ Erro ao carregar aposta.</h2>`;
+        }
       });
 
-      setInterval(atualizarResultados, 30000); // atualiza a cada 30 segundos
+      // Atualização automática a cada 30 segundos
+      setInterval(atualizarResultados, 30000);
     }
   </script>
 </body>
