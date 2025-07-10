@@ -1,0 +1,2271 @@
+<!DOCTYPE html>  <html lang="pt-br">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />  
+  <title>MULTI PLAY</title>  
+  <style>  
+    body {  
+  font-family: sans-serif;  
+  text-align: center;  
+  margin: 0;  
+  padding-top: 80px;  
+  background: #ff1515;  
+  color: black;  
+}  
+h1 {
+
+display:inline;
+font-size: 20px;
+margin: 0;
+}
+
+h2 {
+margin: 2px 0;
+background: red;
+color: white;
+display:inline;
+font-size: 15px;
+border-radius: 5px;
+}
+
+.topo-fixo {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+background: white;
+padding: 8px 12px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+z-index: 999;
+display: flex;
+align-items: center;
+gap: 10px;
+box-sizing: border-box;
+}
+
+.topo-fixo input#valorUnico {
+flex: 1;
+height: 40px;
+font-size: 14px;
+padding: 0 10px;
+border-radius: 6px;
+border: 1px solid #ccc;
+}
+
+.topo-fixo #totalFinal {
+flex: 1.2;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #f3f3f3;
+border-radius: 6px;
+font-weight: bold;
+font-size: 14px;
+color: black;
+}
+
+.topo-fixo button#apostarBtn {
+flex: 1;
+height: 40px;
+font-size: 14px;
+border-radius: 6px;
+background: #00b300;
+color: white;
+border: none;
+cursor: pointer;
+transition: background 0.3s;
+}
+.topo-fixo button#apostarBtn:hover {
+background: #009900;
+}
+
+.serie-container {
+margin: 8px auto 4px;
+max-width: 600px;
+background: #a3a3a3;
+border-radius: 8px;
+padding: 4px;
+}
+
+.duelo {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 4px;
+font-weight: bold;
+background: #f0f0f0;
+color: black;
+padding: 2px;
+border-radius: 8px;
+max-width: 95vw;
+margin: 6px auto;
+box-sizing: border-box;
+}
+
+button {
+display: inline;
+margin: 2px;
+padding: 4px 8px;
+width: 50px;
+font-size: 12px;
+border: none;
+background: #008cff;
+color: black;
+border-radius: 4px;
+cursor: pointer;
+user-select: none;
+transition: background 0.3s;
+}
+button:hover:not(:disabled) {
+background: #0072d3;
+}
+button.selecionado {
+background: #00cc00 !important;
+}
+input[type="number"] {
+padding: 8px;
+width: 30%;
+border-radius: 5px;
+border: 1px solid #ccc;
+font-size: 16px;
+text-align: center;
+}
+
+#valorUnico {
+width: 100%;
+height: 35px;
+font-size: 16px;
+padding: 5px;
+border-radius: 8px;
+border: 1px solid #ccc;
+}
+
+#apostarBtn {
+width: 100%;
+height: 4px;
+border-radius: 20px;
+font-size: 16px;
+cursor: pointer;
+}
+
+#totalFinal {
+font-weight: bold;
+font-size: 18px;
+color: black;
+}
+
+.valor-cotacao {
+font-size: 12px;
+color: #444;
+margin-top: 2px;
+font-weight: bold;
+}
+
+.time-nome-img {
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 80px;
+}
+.time-nome-img img {
+width: 50px;
+height: 50px;
+
+margin-bottom: 2px;
+border-radius: 6px;
+background: #fff;
+}
+
+<!--.nome-time {
+font-size: 14px;
+font-weight: bold;
+color: black;
+text-align: center;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 80%;
+}-->
+.nome-time {
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  white-space: normal;     /* permite quebra de linha */
+  overflow-wrap: break-word;
+  max-width: 80px;         /* limite para não ultrapassar a imagem */
+}
+
+.linha-duelo {
+display: grid;
+grid-template-columns: 60px 1fr 1fr 1fr 60px 35px;
+align-items: center;
+justify-content: center;
+gap: 6px;
+width: 100%;
+padding: 5px 0;
+}
+
+.botoes-duelo button {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+font-size: 13px;
+padding: 5px;
+border-radius: 6px;
+background: #008cff;
+color: white;
+min-width: 55px;
+border: none;
+}
+.botoes-duelo button .valor-cotacao {
+font-size: 11px;
+margin-top: 2px;
+color: #f3f3f3;
+}
+
+.toggleExtras {
+width: 30px;
+height: 50px;
+font-weight: bold;
+font-size: 20px;
+padding: 5px 8px;
+cursor: pointer;
+border-radius: 4px;
+background: #008cff;
+color: white;
+border: none;
+}
+
+.carrossel-container {
+width: 98%;
+max-width: 600px;
+overflow: hidden;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0,0,0,0.3);
+margin: 0px;
+}
+.carrossel {
+display: flex;
+width: 100%;
+transition: transform 0.5s ease-in-out;
+}
+.carrossel img {
+width: 100%;
+height: 100px;
+object-fit: cover;
+flex-shrink: 0;
+}
+
+.dias {
+margin-top: 20px;
+display: flex;
+justify-content: center;
+gap: 10px;
+align-items: center;
+}
+.dias button {
+padding: 10px 14px;
+background: white;
+width:100%;
+color: black;
+border-radius: 5px;
+border: 1px solid #999;
+cursor: pointer;
+font-size: 12px;
+white-space: nowrap;
+transition: background 0.3s;
+}
+.dias button:hover {
+background: green;
+}
+.dias button.ativo {
+background-color: #0072d3;
+color: white;
+font-weight: bold;
+}
+
+.conteudo-dia {
+display: none;
+}
+.conteudo-dia.ativa {
+display: block;
+}
+
+.erro-limite {
+color: red;
+}
+.ok-limite {
+color: green;
+}
+.contadorTime{
+    display:inline
+    font-weight:bold;
+}
+.extras {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 2px;
+
+}
+
+.coluna-botao {
+  flex: 1 1 30%;
+  max-width: 100px;
+}
+
+.coluna-botao .btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: normal;
+  height: 40px;
+  width: 100%;
+  word-wrap: break-word;
+  border-radius: 5px;
+  background: #008cff;
+  color:white;
+  border: 1px solid #aaa;
+  font-weight: bold;
+}
+
+.valor-cotacao-interna {
+  font-size: 11px;
+  font-weight: normal;
+  margin-top: 3px;
+  color: #333;
+}
+.modal-carregando {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 80%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+}
+
+.modal-carregando .modal-conteudo {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0, 0 10px black;
+}
+
+.modal-carregando .modal-conteudo img.animacao {
+  width: 100px;
+  height: auto;
+  margin-bottom: 10px;
+}
+  </style>  
+</head>  
+<body>  <div class="contadorTime">
+  <h1>MULTI PLAY.BET</h1> 
+</div>
+   <div class="topo-fixo">  
+    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />  <div id="totalFinal">Total: R$ 0,00</div>  
+<button id="apostarBtn">Apostar  <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
+
+  </div>    <div class="carrossel-container">  
+    <div class="carrossel" id="carrossel">  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/carrocel.jpg" alt="Carrossel" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg" alt="Avaí" />  
+      <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />  
+    </div>  
+  </div>  
+  
+    <div class="dias">  
+      <button onclick="mostrarDia('domingo')">Domingo</button>  
+    <button onclick="mostrarDia('segunda')">Segunda</button>  
+    <button onclick="mostrarDia('terca')">Terça</button>  
+  <button onclick="mostrarDia('quarta')">Quarta</button>  
+<button onclick="mostrarDia('quinta')">Quinta</button>  
+<button onclick="mostrarDia('sexta')">Sexta</button>  
+<button onclick="mostrarDia('sabado')">Sábado</button> </br>
+  </div>  
+
+
+<div id="conteudo-quinta" class="conteudo-dia"></div>  
+<div id="conteudo-sexta" class="conteudo-dia"></div>  
+<div id="conteudo-sabado" class="conteudo-dia"></div>  
+<div id="conteudo-domingo" class="conteudo-dia"></div>  
+  <div id="conteudo-segunda" class="conteudo-dia ativa"></div>  
+  <div id="conteudo-terca" class="conteudo-dia"></div>  
+  <div id="conteudo-quarta"
+  class="conteudo-dia"></div>  
+  
+    <!-- Modal -->    
+    <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">  
+    <div style="background:#fff; padding:20px; border-radius:8px; max-width:300px; text-align:center;">  
+      <h2>Código da Aposta</h2>  
+      <p id="codigoAposta" style="font-weight:bold; font-size:24px; margin:15px 0;"></p>  
+      <div id="qrPix" style="margin: 10px 0;"></div>  
+      <button id="btnCopiar" style="margin:5px;">Copiar Código</button>  
+      <button id="btnWhatsapp" style="margin:5px;">Enviar via WhatsApp</button>  
+      <button id="btnFechar" style="margin:5px;">Fechar</button>  
+    </div>  
+  </div> 
+  <!-- Modal de carregamento -->
+<div id="modalCarregando" class="modal-carregando">
+  <div class="modal-conteudo">
+    <img src="https://media.tenor.com/GfSX-u7VGM4AAAAC/loading-loading-gif.gif" alt="Carregando..." class="animacao" />
+    <p>Carregando jogos MultiPlay...</p>
+  </div>
+</div>
+
+   <script <script type="module">  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";  
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";  
+  
+  const firebaseConfig = {  
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",  
+    authDomain: "jogo-60a9e.firebaseapp.com",  
+    projectId: "jogo-60a9e",  
+    storageBucket: "jogo-60a9e.appspot.com",  
+    messagingSenderId: "352852303591",  
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",  
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"  
+  };  
+  
+  const app = initializeApp(firebaseConfig);  
+  const db = getDatabase(app); 
+  
+  const series = {  
+  domingo: {  
+      ladoAImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Drogheda United FC.png",  
+          "https://upload.wikimedia.org/wikipedia/en/a/ae/coritiba.jpeg",  
+            
+        
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      
+      
+      horarios: [ ]  
+    },  
+      
+    segunda: {  
+      ladoAImagens: [  
+          "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona sc.png",  
+      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg"  
+      ],  
+      ladoBImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png"  
+      ],  
+     horarios: [" " ]  
+    },  
+  
+    terca: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      ladoBImagens: [  
+"https://upload.wikimedia.org/wikipedia/en/f/fc/Manchester_United_FC_crest.svg", 
+ 
+"https://upload.wikimedia.org/wikipedia/en/7/7a/Chelsea_FC.svg" , 
+  "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
+      ],  
+      horarios: ["" ]  
+    },  
+    quarta: {  
+      ladoAImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/a/ae/Bayern_Munich_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/c/cd/Paris_Saint-Germain_F.C..svg",
+          "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
+            "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
+            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg" 
+        
+      ],  
+      ladoBImagens: [  
+        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
+            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
+            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
+           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
+        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg" 
+      ],  
+      horarios: [""    ]  
+    },  
+    quinta: {  
+    
+  ladoAImagens: [
+  
+    "https://raw.githubusercontent.com/Savanty/AE/main/CRB.jpeg",//1
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Finlândia.png",//2
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Noruega.png",//3
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tunisia.png",//4
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Botswana.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KS Widzew Lodz.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Stade Rennais FC.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/TSV Hartberg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Dinamo Kiev.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/AC Sparta Praga.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Widzew Lodz.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/DAC 1904 Dunajska Streda.png",
+    
+  
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Arminia Bielefeld.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Rapperswil-Jona.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KS SKN St. Polten.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/ NAC Breda.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Crusaders FC.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Atletic Club d'Escaldes.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FCB Magpies.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Torpedo .png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Kauno Zalgiris.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Seinajoen JK.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/urartu.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KS Racing FC União Luxe.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Nomme Kalju.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Decic Tuzi.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FKF Vllaznia Shkoder.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Birkirkara FC.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Torpedo Belaz Zhodino.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KF Malisheva.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Vardar Skopje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sutjeska Niksic.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Zeljeznicar Sarajevo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NSI Runavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Saint Patrick´s Atlético.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Borac Banja Luka.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/SP Tre Fiori.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Larne FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Valur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Sabah Masazir.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/AEK Larnaca FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KS Paksi SE.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Sheriff Tiraspol.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Levski Sófia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Shakhtar Donetsk.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Spartak Trnava.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/KP Legia Varsóvia.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Huachipato.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Limache.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CD Santo Domingo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Juventud.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/San Antonio Bulo Bulo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Bolivar La Paz.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Club Jorge Wilstermann.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Rochester FC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Ppj Helsinki.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Narpes Kraft.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Ranheim II.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Mineros de Guayana.png",
+    
+
+      ],  
+      ladoBImagens: [  
+        
+   "https://raw.githubusercontent.com/Savanty/AE/main/Coritiba PR.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Suica.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Islândia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Argélia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Nigéria.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Piast Cliwice.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Stade Briochin.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Estrela Vermelha.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Midtjylland.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BSC Young Boys.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Miedz Legnica.jpeg",
+ 
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Oleksandriya.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/TSV Havelse.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC FC Basel 1893.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Besiktas JC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KSC Lokeren Temse.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Limavady United FC.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/F91 Dudelange.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Paide Linnameeskond.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Ordabasy.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pen-y-Bont FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/KI Klaksvik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fc neman Grodno.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Dila Gori",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Partizani Tirana.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sileks Kratovo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
+    
+
+
+      ],  
+      horarios: [ 
+     
+       "2025-07-10T21:35", //1 
+     
+       "2025-07-10T16:00",//2
+      
+       "2025-07-10T16:00", //3
+      
+       "2025-07-10T13:00" , //4
+       
+       "2025-07-10T16:00",  //5
+     
+       "2025-07-10T06:00" ,  //6  
+      
+       "2025-07-10T06:00",    //7
+       
+       "2025-07-10T11:00",//8 
+     
+       "2025-07-10T11:00",      //9
+      
+       "2025-07-10T11:30",  //10
+        
+       "2025-07-10T11:30", //11
+       
+       "2025-07-10T12:30", //12
+       
+       "2025-07-10T13:00", //13
+      
+       "2025-07-10T13:30" , //14
+      
+       "2025-07-10T14:00",   //15
+        
+       "2025-07-10T14:30" , //16
+      
+       "2025-07-10T15:45",    //17
+        
+       
+       
+       
+       
+       "2025-07-10T11:00",//18
+     
+       "2025-07-10T12:00",      //19
+       //20
+       "2025-07-10T13:00", 
+        //21
+       "2025-07-10T13:00",   
+       //22
+       "2025-07-10T13:00",
+       //23
+       "2025-07-10T13:30",   
+       //24
+       "2025-07-10T13:30" ,
+       //25
+       "2025-07-10T13:45",  
+       //26  
+       "2025-07-10T15:00" ,
+       //27
+       "2025-07-10T15:00",   
+       //28 
+       "2025-07-10T15:00",
+       //29
+       "2025-07-10T15:00",    
+       //30
+       "2025-07-10T15:15", 
+        //31
+       "2025-07-10T15:30",   
+       //32
+       "2025-07-10T15:30",
+       //33
+       "2025-07-10T15:30",   
+       //34
+       "2025-07-10T15:45" ,
+       //35
+       "2025-07-10T15:45",  
+       //36  
+       "2025-07-10T16:00" ,
+       //37
+       "2025-07-10T16:00",   
+       //38 
+       "2025-07-10T16:00",
+       //39
+       "2025-07-10T17:00",    
+      
+       
+       
+       
+      //40
+       "2025-07-10T13:00", 
+        //41
+       "2025-07-10T13:30",   
+       //42
+       "2025-07-10T14:00",
+       //43
+       "2025-07-10T14:00",   
+       //44
+       "2025-07-10T14:30" ,
+       //45
+       "2025-07-10T15:00",  
+       //46  
+       "2025-07-10T15:15" ,
+       //47
+       "2025-07-10T16:00",   
+       
+       
+       
+       //48 
+       "2025-07-10T19:00",
+       //49
+       "2025-07-10T21:30",    
+       //50
+       "2025-07-10T20:00", 
+        //51
+       "2025-07-10T13:00",   
+       //52
+       "2025-07-10T16:00",
+       //53
+       "2025-07-10T19:00",   
+       //54
+       "2025-07-10T21:30" ,
+       //55
+       "2025-07-10T21:00",  
+       //56  
+       "2025-07-10T12:00" ,
+       //57
+       "2025-07-10T12:30",   
+       //58 
+       "2025-07-10T14:00",
+       //59
+       "2025-07-10T17:00",  
+       
+       
+       
+       
+         
+       //60
+       "2025-07-10T20:00", 
+        //61
+       "2025-07-10T17:00",   
+       //62
+       "2025-07-10T20:00",
+       //63
+       "2025-07-10T17:00",   
+       //64
+       "2025-07-10T20:00" ,
+       //65
+       "2025-07-10T17:00",  
+       //66  
+       "2025-07-10T20:00" ,
+       //67
+       "2025-07-10T17:00",   
+       //68 
+       "2025-07-10T20:00",
+       //69
+       "2025-07-10T17:00",    
+       //70
+       "2025-07-10T20:00", 
+        //71
+       "2025-07-10T17:00",   
+       //72
+       "2025-07-10T20:00",
+       //73
+       "2025-07-10T17:00",   
+       //74
+       "2025-07-10T20:00" ,
+       //75
+       "2025-07-10T17:00",  
+       //76  
+       "2025-07-10T20:00" ,
+       //77
+       "2025-07-10T17:00",   
+       //78 
+       "2025-07-10T20:00",
+       //79
+       "2025-07-10T17:00",    
+       //80
+       "2025-07-10T20:00", 
+       
+            ]  
+    },  
+   
+    sexta: {  
+      ladoAImagens: [  
+        "https://raw.githubusercontent.com/Savanty/AE/main/Equador",
+     "https://raw.githubusercontent.com/Savanty/AE/main/Vila Nova.png",
+     
+    "https://raw.githubusercontent.com/Savanty/AE/main/LIaneros Fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CD Once Caldas.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Clube Desportivo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Puebla Fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Csd Macara.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Asociacion Deportiva.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Guabira Monteiro.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/North Carolina.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monterey Bay.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians Dublin.jpeg",
+ 
+    "https://raw.githubusercontent.com/Savanty/AE/main/waterford fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Metaloglobus.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Acs Champions",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fc kuressares.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cidade De.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Gimnasia y tyro De.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Bray.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Colegio Univesitario.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/treaty.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Wexford.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Mfk Skalica.png",
+    
+     "https://raw.githubusercontent.com/Savanty/AE/main/Sku Amstetten",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Italia",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Portugal.png",
+   //fim
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sileks Kratovo.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
+    
+ 
+      ],  
+      ladoBImagens: [  
+           "https://raw.githubusercontent.com/Savanty/AE/main/Uruguai.jpeg",
+     "https://raw.githubusercontent.com/Savanty/AE/main/Operario Ferroviaro.png",
+    "https://raw.githubusercontent.com/Savanty/AE/main/America de Cali.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athetico Naxional.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Club General.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Clube Libertade.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Altas.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Csd Indepedente.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Comerciante.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Alway Ready.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Birmighan.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Orange County.jpeg",
+ 
+    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
+    //fim
+    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
+    
+
+      ],  
+      horarios: [ "2025-07-11T21:00", //1 
+     
+       "2025-07-11T19:00",//2
+      
+       "2025-07-11T20:00", //3
+      
+       "2025-07-11T22:10" , //4
+       
+       "2025-07-11T16:00",  //5
+     "2025-07-11T18:30" , 
+       "2025-07-11T22:00" ,  //6  
+      
+       "2025-07-11T21:00",  //7
+       
+       "2025-07-11T17:00", //8 
+     
+       "2025-07-11T20:00", //9
+       "2025-07-11T20:30",
+       "2025-07-11T15:45",  //10
+        
+       "2025-07-11T15:45", //11
+       
+       "2025-07-11T13:00", //12
+       
+       "2025-07-11T15:30", //13
+      
+       "2025-07-11T13:00" , //14
+      
+       "2025-07-11T15:45",   //15
+         "2025-07-11T22:00",
+       "2025-07-11T15:45" , //16
+       "2025-07-11T15:45",
+       "2025-07-11T15:45",  //17
+       
+       "2025-07-11T15:45",//18
+      "2025-07-11T06:00",  
+       "2025-07-11T06:00",  
+           //19
+       
+        "2025-07-11T16:00",//20
+     
+       "2025-07-11T16:00",      //21
+        "2025-07-11T15:45",   //15
+        
+       "2025-07-11T15:45" , //16
+      
+       "2025-07-11T15:45",  //17
+       
+       "2025-07-11T15:45",//18
+     
+       "2025-07-11T06:00",      //19
+       
+        "2025-07-11T16:00",//20
+     
+       "2025-07-11T16:00",      //21
+       ]  
+      
+    },  
+    sabado: {  
+      ladoAImagens: [  
+         "https://raw.githubusercontent.com/Savanty/AE/main/peru.jpeg",
+         
+     "https://raw.githubusercontent.com/Savanty/AE/main/Flamengo%20(1).jpeg",
+     
+    "https://raw.githubusercontent.com/Savanty/AE/main/Internacional.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/vasco.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/bahia.jpg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Novorizontino.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Paysandu SC PA.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athletico.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Itabaiana SE.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Sao_Bernardo.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Floresta.jpeg",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/Tombense.jpeg",
+ 
+    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
+    //fim
+    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
+      ],  
+      ladoBImagens: [  
+     "https://raw.githubusercontent.com/Savanty/AE/main/Chile.jpeg",
+     
+     "https://raw.githubusercontent.com/Savanty/AE/main/Sao-Paulo.jpeg",
+     
+    "https://raw.githubusercontent.com/Savanty/AE/main/vitoria.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Botafogo_Rio.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athletic-MG_serieC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/America-MG.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Atletico Goianiense.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Goiás.jpeg",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Confianca.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Ponte_Preta.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Ypiranga Fc Rs.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/ABC.jpeg",
+ 
+    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
+    //fim
+    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
+  
+     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
+  
+  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
+ 
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
+   
+    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
+    
+ "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
+    
+    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
+      ],  
+      horarios: [
+        "2025-07-12T18:00", //1 
+     
+       "2025-07-12T16:30",//2
+      
+       "2025-07-12T16:30", //3
+      
+       "2025-07-12T18:30" , //4
+       
+       "2025-07-12T21:00",  //5
+    
+       "2025-07-12T16:00" ,  //6  
+      
+       "2025-07-12T18:30",  //7
+       
+       "2025-07-12T20:30", //8 
+     
+       "2025-07-12T17:00", //9
+     
+       "2025-07-12T17:00",  //10
+       
+         "2025-07-12T19:30", //11
+     
+       "2025-07-12T19:30",  //12
+        ]  
+    }  
+      
+  };  
+
+
+const distribuicaoGrupos = {
+segunda: [1, 3, 2],   
+
+  terca: [1, 3, 2],      
+  
+  quarta: [2, 3, 3, 11],         // 2 jogos em cada
+  
+  quinta: [1, 2, 2, 12,22, 8, 2,1,1,3, 1 ,1, 1, 1, 1,1],         
+  
+    sexta: [1, 1, 2,2,1,1, 1,1,2 ,2,2,1,  1,1,4,1,2],      
+    
+     
+  sabado: [1, 4, 3, 4],  // 2 jogos em cada
+  
+  domingo: [3, 3]   // 3 jogos em cada
+};
+
+
+  // Cotação padrão caso não encontre individual
+const cotacoesPadrao = {
+  casa: 1.50,
+  empate: 3.0,
+  fora: 2.5,
+  ambasMarcam: 2.5,
+  acima2: 2.0,
+  abaixo2: 2.8,
+  casaFora: 1.5,
+  casaEmpate: 2.0,
+  empateFora: 1.8,
+};
+
+function getCotacaoIndividual(dia, dueloIndex) {
+  // Tenta pegar cotação individual para o dia e duelo
+  const cotacoesDia = cotacoesIndividuais[dia];
+  if (!cotacoesDia) return cotacoesPadrao;
+
+  // Retorna cotação individual ou padrão caso não exista para esse duelo
+  return cotacoesDia[dueloIndex] || cotacoesPadrao;
+}
+  const nomesGrupos = {
+  terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
+  
+  quarta: ["Mundial de Clubes", "Copa do Nordeste","Liga dos Campeaoes UEFA","Brasileirao Sub20",],
+  
+  quinta: ["Brasileirão Série B","European Championship, Women","Africa Cup of Nations, Women","Jogos Amistosos de Clube","Uefa Europa Conference Leagu","Liga Europa UEFA","Copa do Chile","Copa Equador","Copa Paraguay","Copa Division Profesional","Usl League Two","Kakkonen Grupo B","Finlândia Kakkonen Grupo C","Finlândia 3ª Divisão Grupo 2","Noruega 3ª Divisão Grupo 2","Venezuela Copa Venezuela"],
+  
+  sexta: ["Serie B","Copa America women","Euro Liga Conferencia UEFA","Campeonato Colombiano 1 div","Campeonato Paraguaio","Campeonato Mexicano","Campeonato Equatoriano","Campeonato Peruano","Campeonato Boliviano","Usl Estados Unidos" , "Campeonato irlandes 1 div", "Campeonato Romano","Campeonato Estonia","Liga Escocesa","Campeonato Agentino","Campeonato irlandes 2 div","Amistoso Internacional de Clubes","Euro Copa Femenina"],
+  
+  sabado: ["Copa America Feminina", "Brasileirao Serie A","Brasileirao Serie B","Brasileirao Serie C",""],
+  domingo: ["Brasileirão Série B"],
+  segunda: ["Campeonato Inglês"]
+};
+
+const cotacoesIndividuais = {
+  terca: {
+    0: { casa: 1.50, empate: 2.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    1: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    2: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+     4: { casa: 1.30, empate: 3.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    5: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    6: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+    
+    // etc...
+  },
+  quarta: {
+    0: { casa: 1.65, empate: 2.20, fora: 3.0, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    // ...
+  },
+  quinta: {
+    0: { casa: 3.35, empate: 3.0, fora: 2.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    1: { casa: 3.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    2: { casa: 2.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    3: { casa: 4.65, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    4: { casa: 21.65, empate: 6.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    5: { casa: 3.05, empate: 5.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        6: { casa: 1.15, empate: 6.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    7: { casa: 4.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   9: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    11: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    12: { casa: 1.35, empate: 3.70, fora: 5.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    13: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    14: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    15: { casa: 1.65, empate: 3.52, fora: 3.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        16: { casa: 1.55, empate: 3.80, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    18: { casa: 4.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    20: { casa: 1.35, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    21: { casa: 2.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    22: { casa: 1.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    23: { casa: 1.95, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 2.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    25: { casa: 3.05, empate: 3.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        26: { casa: 2.55, empate: 2.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    27: { casa: 2.65, empate: 3.80, fora: 4.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    28: { casa: 2.91, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   29: { casa: 1.75, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    30: { casa: 1.85, empate: 3.52, fora: 10.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    31: { casa: 3.55, empate: 3.2, fora: 1.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    32: { casa: 3.35, empate: 3.70, fora: 1.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    33: { casa: 2.35, empate: 5.5, fora: 2.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    34: { casa: 3.65, empate: 3.33, fora: 2.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    35: { casa: 2.65, empate: 3.52, fora: 1.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        36: { casa: 1.55, empate: 3.40, fora: 2.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    37: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    38: { casa: 2.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   39: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    40: { casa: 1.35, empate: 3.52, fora: 2.45, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+  
+  
+    41: { casa: 2.35, empate: 3.0, fora: 1.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   
+   
+   
+   
+  42: { casa: 3.35, empate: 3.0, fora: 2.93, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    43: { casa: 3.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    44: { casa: 2.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    45: { casa: 4.65, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    46: { casa: 21.65, empate: 6.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    47: { casa: 3.05, empate: 5.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        48: { casa: 1.15, empate: 6.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    48: { casa: 4.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    49: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   50: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    51: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    52: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    53: { casa: 1.35, empate: 3.70, fora: 5.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    54: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    55: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    56: { casa: 1.65, empate: 3.52, fora: 3.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        57: { casa: 1.55, empate: 3.80, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    58: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    59: { casa: 4.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   60: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   
+   },
+   
+  sexta: {
+    0: { casa: 2.50, empate: 2.0, fora: 2.65, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    1: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    2: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+     4: { casa: 1.30, empate: 3.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
+    
+    5: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 2.0, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.2, empateFora: 1.9 },
+    
+    6: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
+    
+    7: { casa: 1.65, empate: 3.80, fora: 1.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.15, empate: 3.90, fora: 2.60, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   9: { casa: 2.65, empate: 3.60, fora: 2.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    11: { casa: 2.55, empate: 3.2, fora: 2.22, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    12: { casa: 1.35, empate: 3.70, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    13: { casa: 9.35, empate: 5.5, fora: 1.16, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    14: { casa: 7.65, empate: 5.33, fora: 1.12, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    15: { casa: 1.65, empate: 3.52, fora: 1.51, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        16: { casa: 1.55, empate: 3.5, fora: 4.03, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    18: { casa: 2.15, empate: 3.20, fora: 1.70, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    20: { casa: 1.35, empate: 3.52, fora: 1.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    21: { casa: 2.25, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    22: { casa: 1.15, empate: 3.7, fora: 2.84, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    23: { casa: 1.95, empate: 3.5, fora: 1.56, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 1.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    24: { casa: 2.65, empate: 2.33, fora: 1.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    25: { casa: 3.05, empate: 3.52, fora: 1.81, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        26: { casa: 2.55, empate: 2.80, fora: 13.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    27: { casa: 2.65, empate: 3.80, fora: 4.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    
+  },
+  sabado: {
+    0: { casa: 24.05, empate: 3.2, fora: 1.2, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+   1: { casa: 1.98, empate: 3.07, fora: 7.13, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 1.9 },
+    
+    2: { casa: 1.65, empate: 3.52, fora: 4.95, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.5 },
+  
+    
+    3: { casa: 3.55, empate: 3.2, fora: 1.92, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    4: { casa: 2.19, empate: 3.7, fora: 3.33, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    5: { casa: 2.2, empate: 3.5, fora: 3.36, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    6: { casa: 2.25, empate: 2.33, fora: 3.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    7: { casa: 1.45, empate: 2.33, fora: 3.02, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    8: { casa: 2.05, empate: 3.52, fora: 3.10, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+        9: { casa: 2.55, empate: 2.80, fora: 2.73, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+    10: { casa: 2.25, empate: 3.80, fora: 2.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
+  },
+  domingo: {
+    0: { casa: 1.65, empate: 3.2, fora: 3.3, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    // ...
+  },
+};
+
+function getCotacaoPorDuelo(dia, dueloNumero) {
+  const faixas = cotacoesDinamicas[dia];
+  if (!faixas) return cotacoesPadrao;
+
+  for (const faixa of faixas) {
+    if (dueloNumero >= faixa.de && dueloNumero <= faixa.ate) {
+      return faixa.cot;
+    }
+  }
+
+  return cotacoesPadrao;
+}
+const LIMITE_VALOR_RECEBER = 3000;  
+  const chavePix = "71992290058";  
+  const selects = [];  
+  
+  function extrairNomeDoTime(url) {
+  if (!url || typeof url !== "string") return "";
+
+  let nome = url.split("/").pop(); // pega o nome do arquivo
+  nome = decodeURIComponent(nome); // decodifica espaços, acentos etc.
+
+  nome = nome.replace(/\.(jpeg|jpg|png|svg)$/i, ""); // remove extensão
+  nome = nome.replace(/[_\-]/g, " "); // troca _ e - por espaço
+  return nome.trim().replace(/\s+/g, " "); // remove espaços extras
+}
+  window.mostrarDia = function(dia) {  
+    document.querySelectorAll(".conteudo-dia").forEach(d => d.classList.remove("ativa"));  
+    document.getElementById(`conteudo-${dia}`).classList.add("ativa");  
+  };  
+  
+function criarJogos(dia) {
+  const container = document.getElementById(`conteudo-${dia}`);
+  container.innerHTML = "";
+
+  const dados = series[dia];
+  if (!dados) return;
+
+  const agora = new Date();
+  const jogosValidos = [];
+
+  for (let i = 0; i < dados.horarios.length; i++) {
+    const dataJogo = new Date(dados.horarios[i]);
+    if (dataJogo > agora) {
+      jogosValidos.push({
+        index: i,
+        ladoA: dados.ladoAImagens[i],
+        ladoB: dados.ladoBImagens[i],
+        horario: dataJogo
+      });
+    }
+  }
+
+  if (jogosValidos.length === 0) {
+  mostrarModalCarregando();
+  setTimeout(esconderModalCarregando, 2000); // esconde após 2 segundos
+  return;
+}
+
+  const distribuicao = distribuicaoGrupos[dia] || [jogosValidos.length];
+const nomesGrupoDia = nomesGrupos[dia] || [];
+let atual = 0;
+
+for (let g = 0; g < distribuicao.length; g++) {
+  const qtd = distribuicao[g];
+  const nomeGrupo = nomesGrupoDia[g] || `Grupo ${g + 1}`;
+
+  if (atual >= jogosValidos.length) break;
+
+  const h2 = document.createElement("h2");
+  h2.textContent = nomeGrupo;
+  h2.classList.add("titulo-grupo");
+  container.appendChild(h2);
+
+  for (let j = 0; j < qtd && atual < jogosValidos.length; j++, atual++) {
+    const jogo = jogosValidos[atual];
+    const i = jogo.index;
+    const nomeA = extrairNomeDoTime(dados.ladoAImagens[i]);
+    const nomeB = extrairNomeDoTime(dados.ladoBImagens[i]);
+    const dataJogo = jogo.horario || jogo.dataJogo;
+ const c = getCotacaoIndividual(dia, atual); // ou jogo.index
+
+    const div = document.createElement("div");
+    div.className = "duelo";
+    div.dataset.nomeGrupo = nomeGrupo;
+
+    div.innerHTML = `
+  <div class="linha-duelo">
+    <div class="time-nome-img">
+      <img src="${jogo.ladoA}" />
+      <div class="nome-time">${nomeA}</div>
+    </div>
+
+    <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.casa}">Casa<br><span class="valor-cotacao">${c.casa.toFixed(2)}</span></button>
+    <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.empate}">Empate<br><span class="valor-cotacao">${c.empate.toFixed(2)}</span></button>
+    <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.fora}">Fora<br><span class="valor-cotacao">${c.fora.toFixed(2)}</span></button>
+
+    <div class="time-nome-img">
+      <img src="${jogo.ladoB}" />
+      <div class="nome-time">${nomeB}</div>
+    </div>
+
+    <button class="toggleExtras">+</button>
+  </div>
+
+  <div class="extras">
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.ambasMarcam}">Ambas</button><span class="valor-cotacao">${c.ambasMarcam.toFixed(2)}</span></div>
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.acima2}">+2 Gols</button><span class="valor-cotacao">${c.acima2.toFixed(2)}</span></div>
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.abaixo2}">-2 Gols</button><span class="valor-cotacao">${c.abaixo2.toFixed(2)}</span></div>
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.casaFora}">Casa/Fora</button><span class="valor-cotacao">${c.casaFora.toFixed(2)}</span></div>
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.casaEmpate}">Casa/Empate</button><span class="valor-cotacao">${c.casaEmpate.toFixed(2)}</span></div>
+    <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.empateFora}">Empate/Fora</button><span class="valor-cotacao">${c.empateFora.toFixed(2)}</span></div>
+  </div>
+
+  <small><strong>Data/Hora:</strong> ${dataJogo.toLocaleString?.() || dataJogo}</small>
+`;
+
+    container.appendChild(div);
+
+    const imagens = div.querySelectorAll(".time-nome-img img");
+    imagens.forEach(img => {
+      img.addEventListener("click", () => {
+        const nomeTime = img.parentElement.querySelector(".nome-time");
+        if (nomeTime) alert(` ${nomeTime.textContent.trim()}`);
+      });
+    });
+
+    const toggleBtn = div.querySelector(".toggleExtras");
+    const extrasDiv = div.querySelector(".extras");
+    toggleBtn.onclick = () => {
+      extrasDiv.style.display = extrasDiv.style.display === "flex" ? "none" : "flex";
+    };
+
+    div.querySelectorAll("button.btn").forEach(btn => {
+      btn.onclick = () => {
+        const grupo = btn.dataset.grupo;
+        const botoesGrupo = container.querySelectorAll(`button[data-grupo="${grupo}"]`);
+        const jaSelecionado = btn.classList.contains("selecionado");
+
+        botoesGrupo.forEach(b => b.classList.remove("selecionado"));
+
+        if (!jaSelecionado) {
+          btn.classList.add("selecionado");
+        }
+
+        atualizarSelecoes();
+        atualizarTotal();
+      };
+    });
+  }
+}
+ }  
+ function esconderDiasSemJogos() {
+  // Aplica evento em todos os botões de dias
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
+      if (!dia) return;
+
+      mostrarModalCarregando(); // Mostra modal de carregamento
+
+      setTimeout(() => {
+        mostrarDia(dia); // Mostra o conteúdo normalmente
+        esconderModalCarregando(); // Esconde o modal
+      }, 1000);
+    });
+  });
+}
+function atualizarSelecoes() {
+  selects.length = 0; // Limpa as seleções anteriores
+
+  document.querySelectorAll(".duelo").forEach((duelo, i) => {
+    const selecionado = duelo.querySelector("button.selecionado");
+    if (selecionado) {
+      const texto = selecionado.textContent;
+      const valor = parseFloat(selecionado.dataset.valor);
+      const timeA = duelo.querySelectorAll(".nome-time")[0]?.textContent || "";
+      const timeB = duelo.querySelectorAll(".nome-time")[1]?.textContent || "";
+      const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora ", "") || "";
+      const campeonato = duelo.dataset.nomeGrupo || "Campeonato não informado";
+
+      selects.push({
+        timeA: timeA.trim(),
+        timeB: timeB.trim(),
+        valor: valor,
+        escolha: texto.split('\n')[0].trim(), // só o nome do botão
+        dataHora: dataHora,
+        campeonato: campeonato
+      });
+    }
+  });
+
+  document.getElementById("contadorMarcados").textContent = `Times ${selects.length}`;
+}
+  function atualizarTotal() {  
+  const valorUnicoInput = document.getElementById('valorUnico');  
+  const valorUnico = Number(valorUnicoInput.value) || 0;  
+  
+  const selecionados = document.querySelectorAll('.btn.selecionado');  
+  let multiplicador = 1;  
+  selecionados.forEach(btn => {  
+    multiplicador *= Number(btn.dataset.valor);  
+  });  
+  
+  const total = valorUnico * multiplicador;  
+  const totalFinal = document.getElementById('totalFinal');  
+  const apostarBtn = document.getElementById('apostarBtn');  
+  
+  if (total > LIMITE_VALOR_RECEBER) {  
+    totalFinal.innerHTML = `<span class="erro-limite">Total: R$ ${total.toFixed(2)} (Limite R$ ${LIMITE_VALOR_RECEBER})</span>`;  
+    apostarBtn.disabled = true;  
+    apostarBtn.style.background = "#aaa";  
+    apostarBtn.style.cursor = "not-allowed";  
+  } else {  
+    totalFinal.innerHTML = `<span class="ok-limite">Total: R$ ${total.toFixed(2)}</span>`;  
+    apostarBtn.disabled = false;  
+    apostarBtn.style.background = ""; // volta para o padrão  
+    apostarBtn.style.cursor = "pointer";  
+  }  
+}  
+  function atualizarContador() {  
+    const selecionados = document.querySelectorAll('.btn.selecionado').length;  
+    document.getElementById('contadorMarcados').textContent = `Times ${selecionados}`;  
+  }  
+  
+  // Evento no input valorUnico  
+  document.getElementById('valorUnico').addEventListener('input', () => {  
+    atualizarTotal();  
+  });  
+  
+  // Botão apostar  
+  document.getElementById('apostarBtn').addEventListener('click', () => {  
+    const valorUnicoInput = document.getElementById('valorUnico');  
+    const valorUnico = Number(valorUnicoInput.value);  
+    if (!valorUnico || valorUnico <= 0) {  
+      alert('Digite um valor válido para apostar');  
+      return;  
+    }  
+  
+    const selecionados = Array.from(document.querySelectorAll('.btn.selecionado'));  
+    if (selecionados.length === 0) {  
+      alert('Selecione pelo menos um palpite');  
+      return;  
+    }  
+  
+    // Gera código aposta  
+    const codigo = `MJ${Date.now()}`;  
+  
+    // Monta objeto para salvar no Firebase  
+    // Monta objeto para salvar no Firebase  
+const aposta = {  
+  codigo,  
+  valorUnico,  
+  selecoes: selects,  
+  dataHora: new Date().toISOString()  
+};  
+  
+    set(ref(db, 'apostas/' + codigo), aposta)  
+      .then(() => {  
+        abrirModal(codigo, aposta);  
+        limparSelecoes();  
+      })  
+      .catch(err => {  
+        alert('Erro ao salvar aposta: ' + err);  
+      });  
+  });  
+  function esconderDiasPassados() {
+  const hoje = new Date();
+  const diasSemana = [
+    { nome: 'domingo', data: new Date("2025-07-13") },
+    { nome: 'segunda', data: new Date("2025-07-13") },
+    { nome: 'terca', data: new Date("2025-07-10") },
+    { nome: 'quarta', data: new Date("2025-07-10") },
+    { nome: 'quinta', data: new Date("2025-07-10") },
+    { nome: 'sexta', data: new Date("2025-07-11") },
+    { nome: 'sabado', data: new Date("2025-07-12") },
+  ];
+
+  diasSemana.forEach(dia => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia.nome}"]`);
+    if (hoje > dia.data && btn) {
+      btn.style.display = 'none';
+    }
+  });
+}
+  function abrirModal(codigo, aposta) {
+  const modal = document.getElementById('codigoModal');
+  if (!modal) {
+    console.error("Elemento #codigoModal não encontrado");
+    return;
+  }
+
+  modal.style.display = 'flex';
+  document.getElementById('codigoAposta').textContent = codigo;
+
+  // Gerar QR Code
+  const qrPixDiv = document.getElementById('qrPix');
+  qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
+
+  const btnCopiar = document.getElementById('btnCopiar');
+  const btnWhatsapp = document.getElementById('btnWhatsapp');
+  const btnFechar = document.getElementById('btnFechar');
+
+  if (btnCopiar) {
+    btnCopiar.onclick = () => {
+      navigator.clipboard.writeText(codigo);
+      alert("Código copiado!");
+    };
+  }
+
+  if (btnWhatsapp) {
+    btnWhatsapp.onclick = () => {
+      const total = document.getElementById('totalFinal').textContent.replace("Total: ", "").trim();
+      const texto = `*Código da Aposta:* ${codigo}\n*Valor Total:* ${total}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+      window.open(url, "_blank");
+    };
+  }
+
+  if (btnFechar) {
+    btnFechar.onclick = () => {
+      modal.style.display = "none";
+    };
+  }
+}
+  function limparSelecoes() {  
+    document.querySelectorAll('.btn.selecionado').forEach(btn => {  
+      btn.classList.remove('selecionado');  
+    });  
+      
+  }  
+function ativarModalNosBotoesDosDias() {
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
+      if (!dia) return;
+
+      mostrarModalCarregando(); // Mostra o modal imediatamente
+
+      setTimeout(() => {
+        criarJogos(dia);         // Cria os jogos (verifica se tem ou não jogos)
+        mostrarDia(dia);         // Mostra a aba do dia
+        esconderModalCarregando(); // Esconde o modal
+      }, 1000); // tempo do carregamento (pode ajustar)
+    });
+  });
+}
+// 2. Verifica se um dia tem jogo futuro (não usada aqui, mas útil)
+function diaTemJogoFuturo(dia) {
+  if (!series[dia]) return false;
+  const agora = new Date();
+  return series[dia].horarios.some(h => new Date(h) > agora);
+}
+
+// 3. Mostra automaticamente hoje + 2 dias seguintes
+function mostrarHojeMais2Dias() {
+  const nomesDias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+  const hoje = new Date();
+  const indiceHoje = hoje.getDay(); // 0 = domingo, 1 = segunda...
+
+  const diasMostrar = [];
+  for (let i = 0; i < 3; i++) {
+    const diaIndex = (indiceHoje + i) % 7;
+    diasMostrar.push(nomesDias[diaIndex]);
+  }
+
+  // Oculta todos os botões
+  document.querySelectorAll('.dias button').forEach(btn => {
+    btn.style.display = 'none';
+    btn.classList.remove('ativo');
+  });
+
+  // Mostra apenas os 3 dias atuais e ativa o primeiro
+  diasMostrar.forEach((dia, idx) => {
+    const btn = document.querySelector(`.dias button[onclick*="${dia}"]`);
+    if (btn) {
+      btn.style.display = 'inline-block';
+      if (idx === 0) btn.classList.add('ativo');
+    }
+    criarJogos(dia); // Cria os jogos do dia
+  });
+
+  mostrarDia(diasMostrar[0]); // Ativa o primeiro dia
+}
+
+// 4. Carrossel automático
+const carrossel = document.getElementById('carrossel');
+const slides = carrossel?.children.length || 0;
+let indiceAtual = 0;
+
+function avancarSlide() {
+  if (slides === 0) return;
+  indiceAtual = (indiceAtual + 1) % slides;
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+}
+
+// Avança slide a cada 3 segundos
+setInterval(avancarSlide, 3000);
+
+// Ajusta slide ao redimensionar
+window.addEventListener('resize', () => {
+  const largura = carrossel.clientWidth;
+  carrossel.style.transform = `translateX(-${indiceAtual * largura}px)`;
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  mostrarModalCarregando(); // ✅ MOSTRA AO INICIAR
+
+  setTimeout(() => {
+    esconderDiasPassados();
+    mostrarHojeMais2Dias();
+    atualizarTotal();
+    atualizarContador();
+
+    Object.keys(series).forEach(dia => criarJogos(dia));
+
+    esconderModalCarregando(); // ✅ ESCONDE APÓS CARREGAR
+  }, 1500); // tempo do modal inicial
+});
+function mostrarModalCarregando() {
+  const modal = document.getElementById("modalCarregando");
+  if (modal) modal.style.display = "flex";
+}
+
+function esconderModalCarregando() {
+  const modal = document.getElementById("modalCarregando");
+  if (modal) modal.style.display = "none";
+}
+
+</script>  </body>  
+</html>  
