@@ -394,13 +394,14 @@ color: green;
   </div>
 
   <div class="dias">
-    <button onclick="mostrarDia('domingo')">Domingo</button>
+   
     <button onclick="mostrarDia('segunda')">Segunda</button>
     <button onclick="mostrarDia('terca')">Terça</button>
     <button onclick="mostrarDia('quarta')">Quarta</button>
     <button onclick="mostrarDia('quinta')">Quinta</button>
     <button onclick="mostrarDia('sexta')">Sexta</button>
-    <button onclick="mostrarDia('sabado')">Sábado</button> <br/>
+    <button onclick="mostrarDia('sabado')">Sábado</button> 
+    <button onclick="mostrarDia('domingo')">Domingo</button>
   </div>
 
   <div id="conteudo-domingo" class="conteudo-dia"></div>
@@ -410,6 +411,7 @@ color: green;
   <div id="conteudo-quinta" class="conteudo-dia"></div>
   <div id="conteudo-sexta" class="conteudo-dia"></div>
   <div id="conteudo-sabado" class="conteudo-dia"></div>
+  
 
   <!-- Modal de código da aposta -->
   <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">
@@ -1545,29 +1547,29 @@ color: green;
       
       
       horarios: [
-        "2025-07-13T16:00", //1 
+        //"2025-07-13T16:00", //1 
      
-       "2025-07-12T16:30",//2
+     //  "2025-07-12T16:30",//2
       
-       "2025-07-12T16:30", //3
+      // "2025-07-12T16:30", //3
       
-       "2025-07-12T18:30" , //4
+    //   "2025-07-12T18:30" , //4
        
-       "2025-07-12T21:00",  //5
+     //  "2025-07-12T21:00",  //5
     
-       "2025-07-12T16:00" ,  //6  
+      // "2025-07-12T16:00" ,  //6  
       
-       "2025-07-12T18:30",  //7
+      // "2025-07-12T18:30",  //7
        
-       "2025-07-12T20:30", //8 
+    //   "2025-07-12T20:30", //8 
      
-       "2025-07-12T17:00", //9
+      // "2025-07-12T17:00", //9
      
-       "2025-07-12T17:00",  //10
+     //  "2025-07-12T17:00",  //10
        
-         "2025-07-12T19:30", //11
+       //  "2025-07-12T19:30", //11
      
-       "2025-07-12T19:30",  //12
+       //"2025-07-12T19:30",  //12
         ]  
     },   
   };  
@@ -1585,6 +1587,8 @@ color: green;
 
     const nomesGrupos = {
       
+   
+
       segunda: ["Campeonato Inglês", "Outro Grupo", "Mais um Grupo"],
       terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
       quarta: ["Mundial de Clubes", "Copa do Nordeste", "Liga dos Campeões UEFA", "Brasileirão Sub20"],
@@ -1592,8 +1596,8 @@ color: green;
       sexta: ["Serie B", "Copa America women", "Euro Liga Conferencia UEFA", "Campeonato Colombiano 1 div", "Campeonato Paraguaio", "Campeonato Mexicano", "Campeonato Equatoriano", "Campeonato Peruano", "Campeonato Boliviano", "Usl Estados Unidos", "Campeonato irlandes 1 div", "Campeonato Romano", "Campeonato Estonia", "Liga Escocesa", "Campeonato Agentino", "Campeonato irlandes 2 div", "Amistoso Internacional de Clubes", "Euro Copa Femenina"],
       sabado: ["Copa America Feminina", "Brasileirao Serie A", "Brasileirao Serie B", "Brasileirao Serie C"],
       domingo: ["Brasileirão Série B"],
-    };
-
+      };
+      
     const cotacoesPadrao = {
       casa: 1.50,
       empate: 3.0,
@@ -1608,6 +1612,9 @@ color: green;
 
     
       const cotacoesIndividuais = {
+       domingo: {
+    0: { casa: 1.65, empate: 3.2, fora: 3.3, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+    
   terca: {
     0: { casa: 1.50, empate: 2.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
     
@@ -1844,8 +1851,7 @@ color: green;
     10: { casa: 2.25, empate: 3.80, fora: 2.43, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
     
   },
-  domingo: {
-    0: { casa: 1.65, empate: 3.2, fora: 3.3, ambasMarcam: 2.1, acima2: 2.3, abaixo2: 1.9, casaFora: 1.55, casaEmpate: 1.25, empateFora: 2.0 },
+ 
     // ...
   },
 };
@@ -2155,14 +2161,14 @@ color: green;
     function esconderDiasPassados() {
       const hoje = new Date();
       const diasSemana = [
-      
+          { nome: 'domingo', data: new Date("2025-07-13") },
         { nome: 'segunda', data: new Date("2025-07-14") },
         { nome: 'terca', data: new Date("2025-07-15") },
         { nome: 'quarta', data: new Date("2025-07-16") },
         { nome: 'quinta', data: new Date("2025-07-17") },
         { nome: 'sexta', data: new Date("2025-07-11") },
         { nome: 'sabado', data: new Date("2025-07-12") },
-          { nome: 'domingo', data: new Date("2025-07-13") },
+      
       ];
 
       diasSemana.forEach(dia => {
@@ -2175,7 +2181,7 @@ color: green;
 
     // Exibe hoje + 2 dias seguintes automaticamente
     function mostrarHojeMais2Dias() {
-      const nomesDias = [, 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+      const nomesDias = [ 'domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
       const hoje = new Date();
       const indiceHoje = hoje.getDay(); // domingo=0
 
