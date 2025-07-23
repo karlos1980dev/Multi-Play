@@ -117,7 +117,7 @@
 
         let html = `<h2>📄 Visualização da Aposta</h2>
         <p><strong>Jogador:</strong> ${dados.nome || "Não informado"}</p>
-        <p><strong>Data da Aposta:</strong> ${dados.dataHora ? new Date(dados.dataHora).toLocaleString("pt-BR") : "Não informada"}</p>`;
+        <p><strong>Data da Aposta:</strong> ${dados.dataHora || "Não informada"}</p>`;
 
         let statusFinal = "Aguardando";
         let perdeuAlgum = false;
@@ -135,28 +135,19 @@
         for (const grupoNome in grupos) {
           html += `<div class="grupo"><h2>${grupoNome}</h2>`;
 
-          grupos[grupoNome].forEach(jogo => {
-            const status = jogo.statusManual || "Aguardando";
-            const dataHoraJogo = jogo.dataHoraJogo || jogo.dataHora || null;
+          grupos[grupoNome].forEach((jogo, index) => {
+            const status = jogo.statusManual || jogo.status || "Aguardando";
+            const dataHora = jogo.dataHora || "Não informada";
 
-            if (status === "Perdeu") perdeuAlgum = true;
-            if (status !== "Ganhou") ganhouTodos = false;
+            if (status.toLowerCase() === "perdeu") perdeuAlgum = true;
+            if (status.toLowerCase() !== "ganhou") ganhouTodos = false;
 
             html += `
               <div class="duelo">
-                <div class="info"><strong>Duelo:</strong> </br> ${jogo.timeA} x ${jogo.timeB}</div>
-                <div class="info"><strong>Escolha:</strong> ${jogo.escolha || "Não informado"}</div>
-                <div class="info"><strong>Data e Hora do Jogo:</strong> ${
-                  dataHoraJogo
-                    ? new Date(dataHoraJogo).toLocaleString("pt-BR", {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })
-                    : "Não informada"
-                }</div>
+                <div class="info"><strong>Duelo ${index + 1}:</strong> ${jogo.timeA} x ${jogo.timeB}</div>
+                <div class="info"><strong>Escolha:</strong> ${jogo.escolha || "Não informada"}</div>
+                <div class="info"><strong>Cotação:</strong> ${jogo.valor || "-"}</div>
+                <div class="info"><strong>🕒 Data/Hora do Jogo:</strong> ${dataHora}</div>
                 <div class="info"><strong>Status:</strong> <span class="status-${status.toLowerCase()}">${status}</span></div>
               </div>
             `;
