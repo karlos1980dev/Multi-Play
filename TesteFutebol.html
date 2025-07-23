@@ -983,7 +983,7 @@ quarta: {
   },
 };
 
-    // Funções reutilizáveis
+  // Funções reutilizáveis
     function extrairNomeDoTime(url) {
       if (!url || typeof url !== "string") return "";
       let nome = url.split("/").pop();
@@ -1069,8 +1069,8 @@ quarta: {
           div.innerHTML = `
   <div class="linha-duelo">
     <div class="time-nome-img">
-    <img src="${jogo.ladoA || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
-     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
+    <img src="${jogo.ladoA || 'https://raw.githubusercontent.com/Savanty/AE/main/imgEdite.jpg'}"
+     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/imgEdite.jpg';" />
       <div class="nome-time">${nomeA}</div>
     </div>
 
@@ -1079,8 +1079,8 @@ quarta: {
     <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.fora}">Fora<br><span class="valor-cotacao">${c.fora.toFixed(2)}</span></button>
 
     <div class="time-nome-img">
-   <img src="${jogo.ladoB || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
-     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
+   <img src="${jogo.ladoB || 'https://raw.githubusercontent.com/Savanty/AE/main/Flamengo%20(1).jpeg'}"
+     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/imgEdite.jpg';" />
       <div class="nome-time">${nomeB}</div>
     </div>
 
@@ -1153,13 +1153,7 @@ quarta: {
           const dataHora = duelo.querySelector("small")?.textContent.replace("Data/Hora:", "").trim() || "";
           const campeonato = duelo.dataset.nomeGrupo || "Campeonato não informado";
 
-          selecoes.push({
-  serie: serieAtual,
-  duelo: duelo,
-  selecao: selecao,
-  cotacao: cotacaoEscolhida,
-  horario: horario,
-});
+          selects.push({ timeA, timeB, valor, escolha: texto, dataHora, campeonato });
         }
       });
 
@@ -1215,62 +1209,71 @@ quarta: {
 
     // Botão apostar salva no Firebase e abre modal
     document.getElementById('apostarBtn').addEventListener('click', () => {
-  const valorUnicoInput = document.getElementById('valorUnico');
-  const valorUnico = Number(valorUnicoInput.value);
+      const valorUnicoInput = document.getElementById('valorUnico');
+      const valorUnico = Number(valorUnicoInput.value);
 
-  atualizarSelecoes(); // ✅ Atualiza as seleções antes da validação
+      if (!valorUnico || valorUnico <= 0) {
+        alert('Digite um valor válido para apostar');
+        return;
+      }
 
-  if (!valorUnico || valorUnico <= 0) {
-    alert('Digite um valor válido para apostar');
-    return;
-  }
+      if (selects.length === 0) {
+        alert('Selecione pelo menos um palpite');
+        return;
+      }
 
-  if (selects.length === 0) {
-    alert('Selecione pelo menos um palpite');
-    return;
-  }
+      const codigo = `MJ${Date.now()}`;
+      const aposta = {
+        codigo,
+        valorUnico,
+        selecoes: selects,
+        dataHora: new Date().toISOString()
+      };
 
-  const total = valorUnico * selects.length;
-  if (total > 3000) {
-    alert("Limite máximo de R$3000 por aposta excedido!");
-    return;
-  }
+      set(ref(db, 'apostas/' + codigo), aposta)
+        .then(() => {
+          abrirModal(codigo, aposta);
+          limparSelecoes();
+          document.getElementById('valorUnico').value = "";
+        })
+        .catch(err => {
+          alert('Erro ao salvar aposta: ' + err);
+        });
+    });
 
-  // Geração de código da aposta
-  const codigo = gerarCodigo();
+    // Modal código aposta com QR Pix e WhatsApp
+    function abrirModal(codigo, aposta) {
+      const modal = document.getElementById('codigoModal');
+      if (!modal) return;
 
-  // Salvar no Firebase
-  salvarNoFirebase(codigo, selects, valorUnico, total);
+      modal.style.display = 'flex';
+      document.getElementById('codigoAposta').textContent = codigo;
 
-  // Mostrar modal com código
-  const modal = document.getElementById("modal");
-  const codigoSpan = document.getElementById("codigoAposta");
-  codigoSpan.textContent = codigo;
-  modal.style.display = "flex";
+      const linkViewer = `${codigo}`;
 
-  // Copiar código
-  const copiarBtn = document.getElementById("copiarCodigo");
-  copiarBtn.onclick = () => {
-    navigator.clipboard.writeText(codigo);
-    copiarBtn.textContent = "Copiado!";
-    setTimeout(() => copiarBtn.textContent = "Copiar Código", 2000);
-  };
+      const qrPixDiv = document.getElementById('qrPix');
+      qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
 
-  // Enviar via WhatsApp
-  const whatsappBtn = document.getElementById("enviarWhatsapp");
-  whatsappBtn.onclick = () => {
-    const mensagem = `Código da aposta: ${codigo}`;
-    const link = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-    window.open(link, '_blank');
-  };
+      const btnCopiar = document.getElementById('btnCopiar');
+      btnCopiar.onclick = () => {
+        navigator.clipboard.writeText(linkViewer);
+        alert("🔗 Link copiado!\n\n" + linkViewer);
+      };
 
-  // Fechar modal ao clicar fora do conteúdo
-  window.onclick = (event) => {
-    if (event.target === modal) {
-      modal.style.display = "none";
+      const btnWhatsapp = document.getElementById('btnWhatsapp');
+      btnWhatsapp.onclick = () => {
+        const total = document.getElementById('totalFinal').textContent.replace("Total:", "").trim();
+        const texto = `*Código da Aposta:* ${codigo}\n*Valor Total:* ${total}\n\n🔗 Acesse sua aposta:\n${linkViewer}`;
+        const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+        window.open(url, "_blank");
+      };
+
+      const btnFechar = document.getElementById('btnFechar');
+      btnFechar.onclick = () => {
+        modal.style.display = "none";
+      };
     }
-  };
-});
+
     // Modal carregando
     function mostrarModalCarregando() {
       const modal = document.getElementById("modalCarregando");
@@ -1287,7 +1290,7 @@ quarta: {
       const diasSemana = [
           { nome: 'domingo', data: new Date("2025-07-13") },
         { nome: 'segunda', data: new Date("2025-07-14") },
-        { nome: 'terca', data: new Date("2025-07-22") },
+        { nome: 'terca', data: new Date("2025-07-15") },
         { nome: 'quarta', data: new Date("2025-07-16") },
         { nome: 'quinta', data: new Date("2025-07-17") },
         { nome: 'sexta', data: new Date("2025-07-11") },
