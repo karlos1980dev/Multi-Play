@@ -117,7 +117,7 @@
 
         let html = `<h2>📄 Visualização da Aposta</h2>
         <p><strong>Jogador:</strong> ${dados.nome || "Não informado"}</p>
-        <p><strong>Data da Aposta:</strong> ${new Date(dados.dataHora).toLocaleString()}</p>`;
+        <p><strong>Data da Aposta:</strong> ${dados.dataHora ? new Date(dados.dataHora).toLocaleString("pt-BR") : "Não informada"}</p>`;
 
         let statusFinal = "Aguardando";
         let perdeuAlgum = false;
@@ -137,6 +137,7 @@
 
           grupos[grupoNome].forEach(jogo => {
             const status = jogo.statusManual || "Aguardando";
+            const dataHoraJogo = jogo.dataHoraJogo || jogo.dataHora || null;
 
             if (status === "Perdeu") perdeuAlgum = true;
             if (status !== "Ganhou") ganhouTodos = false;
@@ -144,8 +145,18 @@
             html += `
               <div class="duelo">
                 <div class="info"><strong>Duelo:</strong> </br> ${jogo.timeA} x ${jogo.timeB}</div>
-                <div class="info"><strong>Escolha:</strong> ${jogo.escolha}</div>
-                <div class="info"><strong>Data e Hora:</strong> ${new Date(jogo.dataHora).toLocaleString()}</div>
+                <div class="info"><strong>Escolha:</strong> ${jogo.escolha || "Não informado"}</div>
+                <div class="info"><strong>Data e Hora do Jogo:</strong> ${
+                  dataHoraJogo
+                    ? new Date(dataHoraJogo).toLocaleString("pt-BR", {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                    : "Não informada"
+                }</div>
                 <div class="info"><strong>Status:</strong> <span class="status-${status.toLowerCase()}">${status}</span></div>
               </div>
             `;
