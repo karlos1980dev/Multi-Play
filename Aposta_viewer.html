@@ -9,7 +9,7 @@
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
-      background: #f0f0f0;
+        transition: background-color 0.5s ease;
     }
     #resultado {
       background: #fff;
@@ -28,6 +28,9 @@
       border-bottom: 1px dashed #ccc;
       margin-bottom: 10px;
       padding-bottom: 10px;
+    }
+    .duelo-box:last-child {
+      border-bottom: none;
     }
   </style>
 </head>
@@ -55,55 +58,90 @@
     const resultadoDiv = document.getElementById('resultado');
 
     async function carregarAposta(codigo) {
-      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
-      if (!snapshot.exists()) {
-        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
-        return;
-      }
+      try {
+        const snapshot = await get(child(ref(db), 'apostas/' + codigo));
 
-      const aposta = snapshot.val();
-      let multi = 1;
-      aposta.selecoes.forEach(s => multi *= parseFloat(s.valor));
-      const total = parseFloat(aposta.valorPago) * multi;
+        if (!snapshot.exists()) {
+          resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
+          return;
+        }
 
-      let html = `
-        <h2>🎫 CÓDIGO: ${codigo}</h2>
-        <p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
-        <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
-        <p><strong>💸 Valor Apostado:</strong>  R$ ${aposta.valorUnico.toFixed(2)}</p>
-        <p><strong>📊 Multiplicador:</strong> ${multi.toFixed(2)}</p>
-        <p style="color:green;"><strong>💰 Valor a Receber:</strong>R$ ${totalReceber.toFixed(2)}</p>
-        <hr>
-      `;
-  
+        const aposta = snapshot.val();
 
-      aposta.selecoes.forEach((s, i) => {
-        let status = s.status || "aguardando";
-        let cor = "#888", label = "⏳ Aguardando";
-        if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
-        else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
+        let multiplicador = 1;
+        aposta.selecoes.forEach(s => {
+          multiplicador *= parseFloat(s.valor || 1);
+        });
 
-        html += `
-          <div class="duelo-box">
-            <p><strong>Duelo ${i + 1}:</strong> ${s.timeA} x ${s.timeB}</p>
-            <p><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</p>
-            <p><strong>Escolha:</strong> ${s.escolha}</p>
-            <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
-            <p><strong>🕒 Data/Hora:</strong> ${s.dataHora}</p>
-            <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
-          </div>
+        const valorApostado = parseFloat(aposta.valorUnico || 0);
+        const valorReceber = valorApostado * multiplicador;
+
+        let html = `
+          <h2>🎫 CÓDIGO: ${codigo}</h2>
+          <p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
+          <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
+          <p><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
+          <p><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
+          <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
+          <hr>
         `;
-      });
 
-      resultadoDiv.innerHTML = html;
+        aposta.selecoes.forEach((s, i) => {
+          const status = s.status || "aguardando";
+          let cor = "#888", label = "⏳ Aguardando";
+
+          if (status === "ganhou") {
+            cor = "green";
+            label = "✅ Ganhou";
+          } else if (status === "perdeu") {
+            cor = "red";
+            label = "❌ Perdeu";
+          }
+
+          html += `
+            <div class="duelo-box">
+              <p><strong>Duelo ${i + 1}:</strong> ${s.timeA} x ${s.timeB}</p>
+              <p><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</p>
+              <p><strong>Escolha:</strong> ${s.escolha}</p>
+              <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
+              <p><strong>🕒 Data/Hora:</strong> ${s.dataHora}</p>
+              <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
+            </div>
+          `;
+        });
+
+        resultadoDiv.innerHTML = html;
+      } catch (error) {
+        resultadoDiv.innerHTML = `<p style="color:red;">Erro ao carregar dados: ${error.message}</p>`;
+        console.error("Erro ao buscar aposta:", error);
+      }
     }
 
+    // Captura o código da URL ?id=XXXX
     const params = new URLSearchParams(location.search);
     if (params.has("id")) {
-      carregarAposta(params.get("id"));
+      const codigo = params.get("id").trim();
+      if (codigo) {
+        carregarAposta(codigo);
+      } else {
+        resultadoDiv.innerHTML = "<p style='color:red;'>Código inválido fornecido na URL.</p>";
+      }
     } else {
       resultadoDiv.innerHTML = "<p style='color:red;'>Código não fornecido na URL (?id=)</p>";
     }
+        // Gera uma cor hexadecimal aleatória
+    function gerarCorAleatoria() {
+      const letras = '0123456789ABCDEF';
+      let cor = '#';
+      for (let i = 0; i < 6; i++) {
+        cor += letras[Math.floor(Math.random() * 16)];
+      }
+      return cor;
+    }
+
+    // Aplica a cor ao background do body
+    document.body.style.backgroundColor = gerarCorAleatoria();
+ 
   </script>
 </body>
 </html>
