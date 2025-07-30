@@ -21,6 +21,8 @@
       text-align: left;
     }
     h2 {
+    display:flex;
+    justify-content:center;
     text-align:center;
       background: #ddd;
       padding: 10px;
@@ -29,8 +31,8 @@
     }
     .duelo-box {
       border-bottom: 1px dashed #ccc;
-      margin-bottom: 5px;
-      padding-bottom: 5px;
+      margin-bottom: 2px;
+      padding-bottom: 2px;
     }
     .duelo-box:last-child {
       border-bottom: none;
@@ -83,7 +85,7 @@
           <h2>🎫 CÓDIGO: ${codigo}</h2>
           <!--<p><strong>👤 Jogador:</strong> ${aposta.nome}</p>-->
           <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
-          <p style="color:$green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
+          <p style="color:green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
           <p style="color:blue;"><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
           <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
           
