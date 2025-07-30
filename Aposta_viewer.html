@@ -24,7 +24,7 @@
     h2 {
       background: #47ff15;
       padding: 10px;
-      font-size:16px;
+      font-size: 16px;
       border-radius: 6px;
       text-align: center;
     }
@@ -117,7 +117,9 @@
 
         let html = `<h2>📄 Visualização da Aposta</h2>
         <p><strong>Jogador:</strong> ${dados.nome || "Não informado"}</p>
-        <p><strong>Data da Aposta:</strong> ${dados.dataHora || "Não informada"}</p>`;
+        <p><strong>Data da Aposta:</strong> ${dados.dataHora || "Não informada"}</p>
+        <p><strong>💰 Valor Apostado:</strong> R$ ${dados.valorPago || "0,00"}</p>
+        <p><strong>🎯 Valor a Receber:</strong> R$ ${dados.valorReceber || dados.valorTotal || "0,00"}</p>`;
 
         let statusFinal = "Aguardando";
         let perdeuAlgum = false;
@@ -125,13 +127,14 @@
 
         const grupos = {};
 
-        // Agrupar por campeonato
+        // Agrupar jogos por campeonato
         selecoes.forEach(s => {
           const grupo = s.campeonato || "Grupo Desconhecido";
           if (!grupos[grupo]) grupos[grupo] = [];
           grupos[grupo].push(s);
         });
 
+        // Exibir jogos agrupados
         for (const grupoNome in grupos) {
           html += `<div class="grupo"><h2>${grupoNome}</h2>`;
 
@@ -144,7 +147,7 @@
 
             html += `
               <div class="duelo">
-                <div class="info"><strong>Duelo ${index + 1}:</br><b></strong> ${jogo.timeA} x ${jogo.timeB}</b></div>
+                <div class="info"><strong>Duelo ${index + 1}:</strong><br><b>${jogo.timeA} x ${jogo.timeB}</b></div>
                 <div class="info"><strong>Escolha:</strong> ${jogo.escolha || "Não informada"}</div>
                 <div class="info"><strong>Cotação:</strong> ${jogo.valor || "-"}</div>
                 <div class="info"><strong>🕒 Data/Hora do Jogo:</strong> ${dataHora}</div>
@@ -156,6 +159,7 @@
           html += `</div>`;
         }
 
+        // Determinar status final
         if (perdeuAlgum) {
           statusFinal = "Perdeu";
         } else if (ganhouTodos) {
