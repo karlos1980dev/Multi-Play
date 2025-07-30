@@ -9,10 +9,11 @@
       font-family: sans-serif;
       text-align: center;
       padding: 10px;
+      font-weight:bold;
         transition: background-color 0.5s ease;
     }
     #resultado {
-      background: #ffa815;
+      background: #ff9e55;
       border-radius: 10px;
       padding: 10px;
       margin-top: 20px;
@@ -20,6 +21,7 @@
       text-align: left;
     }
     h2 {
+    text-align:center;
       background: #ddd;
       padding: 10px;
       font-size:18px;
@@ -79,7 +81,7 @@
 
         let html = `
           <h2>🎫 CÓDIGO: ${codigo}</h2>
-          <p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
+          //<p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
           <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
           <p><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
           <p><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
@@ -102,7 +104,7 @@
           html += `
             <div class="duelo-box">
                 <h3><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</h3>
-              <p><strong>Duelo ${i + 1}:</strong> ${s.timeA} x ${s.timeB}</p>
+              <p><strong>Duelo ${i + 1}:</strong><b> ${s.timeA} x ${s.timeB}</b></p>
               
               <p><strong>Escolha:</strong> ${s.escolha}</p>
               <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
