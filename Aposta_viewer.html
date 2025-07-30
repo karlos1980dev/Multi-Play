@@ -25,7 +25,6 @@
     justify-content:center;
     text-align:center;
       background: #4615ff;
-      color:white;
       padding: 10px;
       font-size:18px;
       border-radius: 6px;
@@ -44,57 +43,68 @@
   <h1>📄 Bilhete da Aposta</h1>
   <div id="resultado">Carregando...</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+  <<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
-      authDomain: "jogo-60a9e.firebaseapp.com",
-      projectId: "jogo-60a9e",
-      storageBucket: "jogo-60a9e.appspot.com",
-      messagingSenderId: "352852303591",
-      appId: "1:352852303591:web:8083c950047c9026bd8c42",
-      databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+    authDomain: "jogo-60a9e.firebaseapp.com",
+    projectId: "jogo-60a9e",
+    storageBucket: "jogo-60a9e.appspot.com",
+    messagingSenderId: "352852303591",
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    const resultadoDiv = document.getElementById('resultado');
+  const resultadoDiv = document.getElementById('resultado');
 
-    async function carregarAposta(codigo) {
-      try {
-        const snapshot = await get(child(ref(db), 'apostas/' + codigo));
+  async function carregarAposta(codigo) {
+    try {
+      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
 
-        if (!snapshot.exists()) {
-          resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
-          return;
+      if (!snapshot.exists()) {
+        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
+        return;
+      }
+
+      const aposta = snapshot.val();
+
+      let multiplicador = 1;
+      aposta.selecoes.forEach(s => {
+        multiplicador *= parseFloat(s.valor || 1);
+      });
+
+      const valorApostado = parseFloat(aposta.valorUnico || 0);
+      const valorReceber = valorApostado * multiplicador;
+
+      let html = `
+        <h2>🎫 CÓDIGO: ${codigo}</h2>
+        <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
+        <p style="color:green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
+        <p style="color:blue;"><strong>📊 Cotação:</strong> ${multiplicador.toFixed(2)}</p>
+        <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
+        <hr>
+      `;
+
+      // Agrupar por campeonato
+      const porCampeonato = {};
+      aposta.selecoes.forEach((s, i) => {
+        const campeonato = s.campeonato || "Outro";
+        if (!porCampeonato[campeonato]) {
+          porCampeonato[campeonato] = [];
         }
+        porCampeonato[campeonato].push({ ...s, index: i });
+      });
 
-        const aposta = snapshot.val();
+      // Montar HTML agrupado
+      for (const campeonato in porCampeonato) {
+        html += `<h3 style="color:blue;"><strong>🏆 Campeonato:</strong> ${campeonato}</h3>`;
 
-        let multiplicador = 1;
-        aposta.selecoes.forEach(s => {
-          multiplicador *= parseFloat(s.valor || 1);
-        });
-
-        const valorApostado = parseFloat(aposta.valorUnico || 0);
-        const valorReceber = valorApostado * multiplicador;
-
-        let html = `
-          <h2>🎫 CÓDIGO: ${codigo}</h2>
-          <!--<p><strong>👤 Jogador:</strong> ${aposta.nome}</p>-->
-          <p style="color:blue;"><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
-          <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
-          <p style="color:green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
-          
-          <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
-          
-          <hr>
-        `;
-
-        aposta.selecoes.forEach((s, i) => {
+        porCampeonato[campeonato].forEach((s, i) => {
           const status = s.status || "aguardando";
           let cor = "#888", label = "⏳ Aguardando";
 
@@ -107,51 +117,48 @@
           }
 
           html += `
-            <div class="duelo-box"><hr>
-                     <h3 style="color:blue;"><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</h3>
-            
-              <p><strong>Duelo ${i + 1}:</strong><br> ${s.timeA} x ${s.timeB}</p>
-              <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
+            <div class="duelo-box">
+              <p><strong>Duelo ${s.index + 1}:</strong><br> ${s.timeA} x ${s.timeB}</p>
               <p><strong>Escolha:</strong> ${s.escolha}</p>
-      
+              <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
               <p><strong>🕒 Data/Hora:</strong> ${s.dataHora}</p>
               <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
             </div>
           `;
         });
 
-        resultadoDiv.innerHTML = html;
-      } catch (error) {
-        resultadoDiv.innerHTML = `<p style="color:red;">Erro ao carregar dados: ${error.message}</p>`;
-        console.error("Erro ao buscar aposta:", error);
+        html += `<hr>`;
       }
-    }
 
-    // Captura o código da URL ?id=XXXX
-    const params = new URLSearchParams(location.search);
-    if (params.has("id")) {
-      const codigo = params.get("id").trim();
-      if (codigo) {
-        carregarAposta(codigo);
-      } else {
-        resultadoDiv.innerHTML = "<p style='color:red;'>Código inválido fornecido na URL.</p>";
-      }
+      resultadoDiv.innerHTML = html;
+    } catch (error) {
+      resultadoDiv.innerHTML = `<p style="color:red;">Erro ao carregar dados: ${error.message}</p>`;
+      console.error("Erro ao buscar aposta:", error);
+    }
+  }
+
+  const params = new URLSearchParams(location.search);
+  if (params.has("id")) {
+    const codigo = params.get("id").trim();
+    if (codigo) {
+      carregarAposta(codigo);
     } else {
-      resultadoDiv.innerHTML = "<p style='color:red;'>Código não fornecido na URL (?id=)</p>";
+      resultadoDiv.innerHTML = "<p style='color:red;'>Código inválido fornecido na URL.</p>";
     }
-        // Gera uma cor hexadecimal aleatória
-    function gerarCorAleatoria() {
-      const letras = '0123456789ABCDEF';
-      let cor = '#';
-      for (let i = 0; i < 6; i++) {
-        cor += letras[Math.floor(Math.random() * 16)];
-      }
-      return cor;
-    }
+  } else {
+    resultadoDiv.innerHTML = "<p style='color:red;'>Código não fornecido na URL (?id=)</p>";
+  }
 
-    // Aplica a cor ao background do body
-    document.body.style.backgroundColor = gerarCorAleatoria();
- 
-  </script>
+  function gerarCorAleatoria() {
+    const letras = '0123456789ABCDEF';
+    let cor = '#';
+    for (let i = 0; i < 6; i++) {
+      cor += letras[Math.floor(Math.random() * 16)];
+    }
+    return cor;
+  }
+
+  document.body.style.backgroundColor = gerarCorAleatoria();
+</script>
 </body>
 </html>
