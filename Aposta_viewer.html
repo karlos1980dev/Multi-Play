@@ -2,83 +2,42 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualizar Aposta - MULTI PLAY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MULTI PLAY - Visualização de Aposta</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: sans-serif;
+      text-align: center;
       padding: 20px;
-      margin: 0;
+      background: #f0f0f0;
     }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
+    #resultado {
       background: #fff;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      background: #47ff15;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      text-align: center;
-    }
-
-    .grupo {
       margin-top: 20px;
+      box-shadow: 0 0 10px #ccc;
+      text-align: left;
     }
-
-    .duelo {
-      padding: 15px;
-      border-top: 1px dashed #ccc;
-    }
-
-    .info {
-      margin: 5px 0;
-      font-size: 16px;
-    }
-
-    .info strong {
-      color: #333;
-    }
-
-    .status-aguardando {
-      color: orange;
-      font-weight: bold;
-    }
-
-    .status-ganhou {
-      color: green;
-      font-weight: bold;
-    }
-
-    .status-perdeu {
-      color: red;
-      font-weight: bold;
-    }
-
-    .final-status {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 20px;
+    h2 {
+      background: #ddd;
       padding: 10px;
-      border-top: 2px solid #000;
+      border-radius: 6px;
+    }
+    .duelo-box {
+      border-bottom: 1px dashed #ccc;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="visualizacao">
-    <h2>🔎 Carregando aposta...</h2>
-  </div>
+  <h1>📄 Bilhete da Aposta</h1>
+  <div id="resultado">Carregando...</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
@@ -93,88 +52,56 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const container = document.getElementById("visualizacao");
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
+    const resultadoDiv = document.getElementById('resultado');
 
-    if (!id) {
-      container.innerHTML = "<h2>❌ ID da aposta não encontrado na URL</h2>";
-    } else {
-      const apostaRef = ref(db, `apostas/${id}`);
-      onValue(apostaRef, (snapshot) => {
-        if (!snapshot.exists()) {
-          container.innerHTML = `<h2>❌ Aposta não encontrada com ID: ${id}</h2>`;
-          return;
-        }
+    async function carregarAposta(codigo) {
+      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
+      if (!snapshot.exists()) {
+        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
+        return;
+      }
 
-        const dados = snapshot.val();
-        const selecoes = dados.selecoes || [];
+      const aposta = snapshot.val();
+      let multi = 1;
+      aposta.selecoes.forEach(s => multi *= parseFloat(s.valor));
+      const total = parseFloat(aposta.valorPago) * multi;
 
-        if (!Array.isArray(selecoes) || selecoes.length === 0) {
-          container.innerHTML = `<h2>⚠️ Aposta inválida ou sem jogos</h2>`;
-          return;
-        }
+      let html = `
+        <h2>🎫 CÓDIGO: ${codigo}</h2>
+        <p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
+        <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
+        <p><strong>💸 Valor Apostado:</strong> R$ ${parseFloat(aposta.valorPago).toFixed(2)}</p>
+        <p><strong>📊 Multiplicador:</strong> ${multi.toFixed(2)}</p>
+        <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${total.toFixed(2)}</p>
+        <hr>
+      `;
 
-        let html = `<h2>📄 Visualização da Aposta</h2>
-        <p><strong>Jogador:</strong> ${dados.nome || "Não informado"}</p>
-        <p><strong>Data da Aposta:</strong> ${dados.dataHora || "Não informada"}</p>
-        <p><strong>💰 Valor Apostado:</strong> R$ ${dados.valorPago || "0,00"}</p>
-        <p><strong>🎯 Valor a Receber:</strong> R$ ${dados.valorReceber || dados.valorTotal || "0,00"}</p>`;
-
-        let statusFinal = "Aguardando";
-        let perdeuAlgum = false;
-        let ganhouTodos = true;
-
-        const grupos = {};
-
-        // Agrupar jogos por campeonato
-        selecoes.forEach(s => {
-          const grupo = s.campeonato || "Grupo Desconhecido";
-          if (!grupos[grupo]) grupos[grupo] = [];
-          grupos[grupo].push(s);
-        });
-
-        // Exibir jogos agrupados
-        for (const grupoNome in grupos) {
-          html += `<div class="grupo"><h2>${grupoNome}</h2>`;
-
-          grupos[grupoNome].forEach((jogo, index) => {
-            const status = jogo.statusManual || jogo.status || "Aguardando";
-            const dataHora = jogo.dataHora || "Não informada";
-
-            if (status.toLowerCase() === "perdeu") perdeuAlgum = true;
-            if (status.toLowerCase() !== "ganhou") ganhouTodos = false;
-
-            html += `
-              <div class="duelo">
-                <div class="info"><strong>Duelo ${index + 1}:</strong><br><b>${jogo.timeA} x ${jogo.timeB}</b></div>
-                <div class="info"><strong>Escolha:</strong> ${jogo.escolha || "Não informada"}</div>
-                <div class="info"><strong>Cotação:</strong> ${jogo.valor || "-"}</div>
-                <div class="info"><strong>🕒 Data/Hora do Jogo:</strong> ${dataHora}</div>
-                <div class="info"><strong>Status:</strong> <span class="status-${status.toLowerCase()}">${status}</span></div>
-              </div>
-            `;
-          });
-
-          html += `</div>`;
-        }
-
-        // Determinar status final
-        if (perdeuAlgum) {
-          statusFinal = "Perdeu";
-        } else if (ganhouTodos) {
-          statusFinal = "Ganhou";
-        }
+      aposta.selecoes.forEach((s, i) => {
+        let status = s.status || "aguardando";
+        let cor = "#888", label = "⏳ Aguardando";
+        if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
+        else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
 
         html += `
-          <div class="final-status">
-            <strong>Status Final:</strong> 
-            <span class="status-${statusFinal.toLowerCase()}">${statusFinal}</span>
+          <div class="duelo-box">
+            <p><strong>Duelo ${i + 1}:</strong> ${s.timeA} x ${s.timeB}</p>
+            <p><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</p>
+            <p><strong>Escolha:</strong> ${s.escolha}</p>
+            <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
+            <p><strong>🕒 Data/Hora:</strong> ${s.dataHora}</p>
+            <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
           </div>
         `;
-
-        container.innerHTML = html;
       });
+
+      resultadoDiv.innerHTML = html;
+    }
+
+    const params = new URLSearchParams(location.search);
+    if (params.has("id")) {
+      carregarAposta(params.get("id"));
+    } else {
+      resultadoDiv.innerHTML = "<p style='color:red;'>Código não fornecido na URL (?id=)</p>";
     }
   </script>
 </body>
