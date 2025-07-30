@@ -86,7 +86,7 @@
           <p style="color:$green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
           <p style="color:blue;"><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
           <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
-          <hr>
+          
           <hr>
         `;
 
@@ -103,8 +103,8 @@
           }
 
           html += `
-            <div class="duelo-box">
-                <h3><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}<hr></h3>
+            <div class="duelo-box"><hr>
+                <h3><strong>Campeonato:</strong> ${s.campeonato || 'N/A'}</h3>
               <p><strong>Duelo ${i + 1}:</strong><br> ${s.timeA} x ${s.timeB}</p>
               
               <p><strong>Escolha:</strong> ${s.escolha}</p>
