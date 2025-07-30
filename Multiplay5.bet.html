@@ -10,8 +10,8 @@
   text-align: center;  
   margin: 0;  
   padding-top: 80px;  
-  background: #000000;  
-  color: #ffffff;  
+  transition: background-color 0.5s ease;
+  color: black;  
 }  
 h1 {
 
@@ -34,7 +34,8 @@ position: fixed;
 top: 0;
 left: 0;
 width: 100%;
-background: #000000;
+background: black;
+color:white;
 padding: 8px 12px;
 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 z-index: 999;
@@ -82,7 +83,7 @@ background: #009900;
 }
 
 .serie-container {
-margin: 4px auto 2px;
+margin: 8px auto 4px;
 max-width: 600px;
 background: #a3a3a3;
 border-radius: 8px;
@@ -167,13 +168,13 @@ font-weight: bold;
 display: flex;
 flex-direction: column;
 align-items: center;
-width: 70px;
+width: 80px;
 }
 .time-nome-img img {
-width: 40px;
-height: 40px;
+width: 50px;
+height: 50px;
 
-margin-bottom: 0px;
+margin-bottom: 2px;
 border-radius: 6px;
 background: #fff;
 }
@@ -192,11 +193,10 @@ max-width: 80%;
   font-size: 11px;
   font-weight: bold;
   color: black;
-  margin:0;
   text-align: center;
   white-space: normal;     /* permite quebra de linha */
   overflow-wrap: break-word;
-  max-width: 100px;         /* limite para não ultrapassar a imagem */
+  max-width: 80px;         /* limite para não ultrapassar a imagem */
 }
 
 .linha-duelo {
@@ -217,8 +217,8 @@ align-items: center;
 font-size: 13px;
 padding: 5px;
 border-radius: 6px;
-background: #000000;
-color: #ffffff;
+background: #008cff;
+color: white;
 min-width: 55px;
 border: none;
 }
@@ -247,7 +247,7 @@ max-width: 600px;
 overflow: hidden;
 border-radius: 5px;
 box-shadow: 0 0 10px rgba(0,0,0,0.3);
-margin: 0px;
+margin:0px;
 }
 .carrossel {
 display: flex;
@@ -311,7 +311,7 @@ color: green;
   flex-wrap: wrap;
   justify-content: center;
   gap: 4px;
-  margin-bottom: 0px;
+  margin-bottom: 2px;
 
 }
 
@@ -350,7 +350,7 @@ color: green;
   display: none;
   position: fixed;
   z-index: 9999;
-  left: -30; top: 0;
+  left: 0; top: 0;
   width: 80%; height: 100%;
   background-color: rgba(0,0,0,0.7);
   justify-content: center;
@@ -367,23 +367,69 @@ color: green;
 }
 
 .modal-carregando .modal-conteudo img.animacao {
-  width: 180px;
+  width: 100px;
   height: auto;
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
+   .hamburger {
+      font-size: 18px;
+      border-radius:10px;
+      cursor: pointer;
+      border: 1px solid #999;
+      margin-right: 0px;
+    }
+
+    #menuEsportes {
+      display: none;
+      background: #333;
+      color: white;
+      padding: 10px;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      z-index: 999;
+      width: 150px;
+    }
+
+    #menuEsportes ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #menuEsportes li {
+      padding: 5px;
+      margin:10px;
+      border-bottom: 5px solid #000;
+      cursor: pointer;
+    }
+
+    #menuEsportes li:hover {
+      background: #444;
+    }
+    .paginaTitulo{
+        background:Green;
+        margin-top:10px;
+        color:white;
+    }
   </style>  
 </head>
 <body>
-  <div class="contadorTime">
+
     <h1>MULTI PLAY.BET</h1> 
-  </div>
+  
 
   <div class="topo-fixo">
-    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />
+      <div class="hamburger" id="hamburger">☰ <br>Menu</div>
+    <input type="number" id="valorUnico" placeholder="Valor " min="1" />
     <div id="totalFinal">Total: R$ 0,00</div>
-    <button id="apostarBtn">Apostar <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
+    <button id="apostarBtn">Apostar <div class="contadorTime" id="contadorMarcados">Times 0</div></b<button>
+ </div>
+  
+<div id="menuEsportes">
+    <ul id="listaEsportes"></ul>
   </div>
-
+  
   <div class="carrossel-container">
     <div class="carrossel" id="carrossel">
       <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />
@@ -392,16 +438,15 @@ color: green;
       <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />
     </div>
   </div>
-
+<div class="paginaTitulo" id="tituloPagina"></div>
   <div class="dias">
-   
+    <button onclick="mostrarDia('domingo')">Domingo</button>
     <button onclick="mostrarDia('segunda')">Segunda</button>
     <button onclick="mostrarDia('terca')">Terça</button>
     <button onclick="mostrarDia('quarta')">Quarta</button>
     <button onclick="mostrarDia('quinta')">Quinta</button>
     <button onclick="mostrarDia('sexta')">Sexta</button>
-    <button onclick="mostrarDia('sabado')">Sábado</button> 
-    <button onclick="mostrarDia('domingo')">Domingo</button>
+    <button onclick="mostrarDia('sabado')">Sábado</button> <br/>
   </div>
 
   <div id="conteudo-domingo" class="conteudo-dia"></div>
@@ -411,7 +456,6 @@ color: green;
   <div id="conteudo-quinta" class="conteudo-dia"></div>
   <div id="conteudo-sexta" class="conteudo-dia"></div>
   <div id="conteudo-sabado" class="conteudo-dia"></div>
-  
 
   <!-- Modal de código da aposta -->
   <div id="codigoModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; flex-direction: column;">
@@ -449,13 +493,45 @@ color: green;
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    
 
+    // Array de esportes
+    const esportes = ['Boxe', 'Corrida', 'Futebol', 'Basquete', 'Tênis','Play Game', 'Combate'
+    ,'Fut Americano', 'Hoquei','Handebol', 'x5','Mjb'];
+
+    // Referências
+    const hamburger = document.getElementById('hamburger');
+    const menuEsportes = document.getElementById('menuEsportes');
+    const listaEsportes = document.getElementById('listaEsportes');
+    const tituloPagina = document.getElementById('tituloPagina');
+
+    // Preenche o menu dinamicamente
+    esportes.forEach(esporte => {
+      const li = document.createElement('li');
+      li.textContent = esporte;
+      li.onclick = () => {
+        tituloPagina.textContent = `Esporte : ${esporte}`;
+        menuEsportes.style.display = 'none';
+      };
+      listaEsportes.appendChild(li);
+    });
+
+    // Mostra/oculta menu
+    hamburger.addEventListener('click', () => {
+      const visivel = menuEsportes.style.display === 'block';
+      menuEsportes.style.display = visivel ? 'none' : 'block';
+    });
+
+    // Fecha menu ao clicar fora
+    document.addEventListener('click', (event) => {
+      if (!menuEsportes.contains(event.target) && !hamburger.contains(event.target)) {
+        menuEsportes.style.display = 'none';
+      }
+    });
+  
     // Dados do usuário fornecidos por você na parte 2 e 3:
     const series = {
       
-  
-      
-    
   domingo: {
     ladoAImagens: [
       "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",
@@ -767,199 +843,50 @@ quarta: {
     ]
   }
 };
+ 
     const distribuicaoGrupos = {
-      
-      segunda: [1,3],
+      domingo: [3,3],
+      segunda: [1,3,2],
       terca: [1,3,2],
-      quarta: [3,6,4,1,2,9,20],
-      quinta: [2,1,2,30,],
+      quarta: [2,3,3,11],
+      quinta: [1,2,2,12,22,8,2,1,1,3,1,1,1,1,1,1],
       sexta: [1,1,2,2,1,1,1,1,2,2,2,1,1,1,4,1,2],
-      sabado: [1,4,3,4],
-      domingo: [1,3],
+      sabado: [1,4,3,4]
     };
 
     const nomesGrupos = {
-      
-   
-
-      segunda: ["Campeonato Inglês", "Outro Grupo", "Mais um Grupo"],
-      
-      terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
-      
-      quarta: ["Copa Sul Americana ", "Brasileirao-Serie A", "Brasileirao-Serie B", "Eurocopa Feminina","Liga dos  Campeao UEFA","Brasileiro SUB-20","Uefa Europa Conference League",],
-      
-      quinta: ["Copa Sul Americana", "Brasileirao-Serie B", "Euro Liga conferencia UEFA","Campeonato Equatoriano 1 div","Africa Cup of Nations, Women", "Jogos Amistosos de Clube", "Uefa Europa Conference League", "Liga Europa UEFA", "Copa do Chile", "Copa Equador", "Copa Paraguay", "Copa Division Profesional", "Usl League Two", "Kakkonen Grupo B", "Finlândia Kakkonen Grupo C", "Finlândia 3ª Divisão Grupo 2", "Noruega 3ª Divisão Grupo 2", "Venezuela Copa Venezuela"],
-      sexta: ["Serie B", "Copa America women", "Euro Liga Conferencia UEFA", "Campeonato Colombiano 1 div", "Campeonato Paraguaio", "Campeonato Mexicano", "Campeonato Equatoriano", "Campeonato Peruano", "Campeonato Boliviano", "Usl Estados Unidos", "Campeonato irlandes 1 div", "Campeonato Romano", "Campeonato Estonia", "Liga Escocesa", "Campeonato Agentino", "Campeonato irlandes 2 div", "Amistoso Internacional de Clubes", "Euro Copa Femenina"],
-      sabado: ["Copa America Feminina", "Brasileirao Serie A", "Brasileirao Serie B", "Brasileirao Serie C"],
       domingo: ["Brasileirão Série B"],
-      };
-      
+      segunda: ["Campeonato Inglês", "Outro Grupo", "Mais um Grupo"],
+      terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
+      quarta: ["Mundial de Clubes", "Copa do Nordeste", "Liga dos Campeões UEFA", "Brasileirão Sub20"],
+      quinta: ["Brasileirão Série B", "European Championship, Women", "Africa Cup of Nations, Women", "Jogos Amistosos de Clube", "Uefa Europa Conference League", "Liga Europa UEFA", "Copa do Chile", "Copa Equador", "Copa Paraguay", "Copa Division Profesional", "Usl League Two", "Kakkonen Grupo B", "Finlândia Kakkonen Grupo C", "Finlândia 3ª Divisão Grupo 2", "Noruega 3ª Divisão Grupo 2", "Venezuela Copa Venezuela"],
+      sexta: ["Serie B", "Copa America women", "Euro Liga Conferencia UEFA", "Campeonato Colombiano 1 div", "Campeonato Paraguaio", "Campeonato Mexicano", "Campeonato Equatoriano", "Campeonato Peruano", "Campeonato Boliviano", "Usl Estados Unidos", "Campeonato irlandes 1 div", "Campeonato Romano", "Campeonato Estonia", "Liga Escocesa", "Campeonato Agentino", "Campeonato irlandes 2 div", "Amistoso Internacional de Clubes", "Euro Copa Femenina"],
+      sabado: ["Copa America Feminina", "Brasileirao Serie A", "Brasileirao Serie B", "Brasileirao Serie C"]
+    };
+
     const cotacoesPadrao = {
       casa: 1.50,
       empate: 3.0,
-      fora: 1.75,
+      fora: 2.5,
       ambasMarcam: 2.5,
-      acima2: 1.30,
-      abaixo2: 1.58,
+      acima2: 2.0,
+      abaixo2: 2.8,
       casaFora: 1.5,
       casaEmpate: 2.0,
-      empateFora: 1.50,
+      empateFora: 1.8,
     };
 
-    
-      const cotacoesIndividuais = {
-       
-  segunda: {
-    0: { casa: 2.10, empate: 2.60, fora: 3.10, ambasMarcam: 1.20, acima2: 2.2, abaixo2: 1.8, casaFora: 1.4, casaEmpate: 1.12, empateFora: 1.9 },
-    1: { casa: 1.75, empate: 3.30, fora: 4.00, ambasMarcam: 1.95, acima2: 2.1, abaixo2: 1.7, casaFora: 1.5, casaEmpate: 1.1, empateFora: 1.55},
-    2: { casa: 1.60, empate: 3.50, fora: 3.20, ambasMarcam: 1.45, acima2: 2.0, abaixo2: 1.9, casaFora: 1.3, casaEmpate: 1.3, empateFora: 1.8 },
-    3: { casa: 2.85, empate: 3.10, fora: 2.75, ambasMarcam: 1.605, acima2: 1.75, abaixo2: 1.6, casaFora: 1.20, casaEmpate: 1.125, empateFora: 2.1 },
-    4: { casa: 3.25, empate: 3.25, fora: 2.00, ambasMarcam: 1.45, acima2: 2.4, abaixo2: 1.7, casaFora: 1.5, casaEmpate: 1.12, empateFora: 2.2 },
-  },
-  
-  terca: {
-    0: { casa: 1.95, empate: 3.50, fora: 3.40, ambasMarcam: 1.85, acima2: 2.0, abaixo2: 1.7, casaFora: 1.3, casaEmpate: 1.15, empateFora: 1.95 },
-    1: { casa: 2.25, empate: 3.20, fora: 2.85, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.12, empateFora: 1.55},
-    2: { casa: 2.55, empate: 3.10, fora: 2.10, ambasMarcam: 1.20, acima2: 2.4, abaixo2: 1.8, casaFora: 1.4, casaEmpate: 1.12, empateFora: 1.85 },
-    3: { casa: 3.05, empate: 3.40, fora: 1.95, ambasMarcam: 2.3, acima2: 2.5, abaixo2: 1.9, casaFora: 1.6, casaEmpate: 1.3, empateFora: 2.2 },
-    4: { casa: 1.50, empate: 3.60, fora: 4.50, ambasMarcam: 1.9, acima2: 2.0, abaixo2: 1.5, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.7 },
-  },
-  
-  quarta:{
-  0: { casa: 1.80, empate: 3.0, fora: 3.61, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  1: { casa: 1.20, empate: 3.2, fora: 10.92, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  2: { casa: 1.50, empate: 3.7, fora: 5.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  3: { casa: 2.10, empate: 3.5, fora: 2.56, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  4: { casa: 2.65, empate: 2.33, fora: 3.70, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  5: { casa: 3.45, empate: 5.52, fora: 1.81, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  6: { casa: 2.15, empate: 6.80, fora: 2.73, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  7: { casa: 1.65, empate: 3.80, fora: 3.43, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  8: { casa: 2.15, empate: 3.90, fora: 3.20, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  9: { casa: 2.05, empate: 3.60, fora: 3.13, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  11: { casa: 2.25, empate: 3.2, fora: 3.22, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  12: { casa: 2.35, empate: 3.70, fora: 3.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  13: { casa: 5.35, empate: 5.5, fora: 1.40, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  14: { casa: 2.65, empate: 3.33, fora: 2.12, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  15: { casa: 4.65, empate: 3.52, fora: 1.51, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  16: { casa: 2.55, empate: 3.80, fora: 2.03, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  18: { casa: 1.15, empate: 3.20, fora: 9.70, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.9 },
-  
-  20: { casa: 1.85, empate: 3.52, fora: 4.95, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 2.5 },
-  
-  21: { casa: 2.25, empate: 3.2, fora: 2.92, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  22: { casa: 1.95, empate: 3.7, fora: 3.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  23: { casa: 1.25, empate: 3.5, fora: 3.56, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  24: { casa: 1.65, empate: 3.33, fora: 7.02, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  25: { casa: 2.05, empate: 3.52, fora: 3.81, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-},
-  
-  quinta: {
-    0: { casa: 1.80, empate: 3.0, fora: 2.61, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  1: { casa: 1.20, empate: 3.2, fora: 2.92, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  2: { casa: 1.50, empate: 3.7, fora: 1.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  3: { casa: 2.10, empate: 3.5, fora: 2.56, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  4: { casa: 2.65, empate: 2.33, fora: 2.70, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  5: { casa: 3.45, empate: 2.52, fora: 1.81, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  6: { casa: 2.15, empate: 2.80, fora: 2.73, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  7: { casa: 1.65, empate: 3.10, fora: 2.43, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  8: { casa: 2.15, empate: 3.00, fora: 3.20, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  9: { casa: 2.05, empate: 3.60, fora: 2.13, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  10: { casa: 2.85, empate: 3.52, fora: 1.95, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  11: { casa: 2.25, empate: 3.2, fora: 2.22, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  12: { casa: 2.35, empate: 3.70, fora: 2.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  13: { casa: 2.35, empate: 3.5, fora: 1.40, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  14: { casa: 2.65, empate: 3.33, fora: 2.12, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  15: { casa: 1.65, empate: 2.52, fora: 1.51, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  16: { casa: 2.55, empate: 2.80, fora: 2.03, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  17: { casa: 2.65, empate: 2.90, fora: 2.23, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  18: { casa: 1.15, empate: 3.20, fora: 2.70, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  19: { casa: 1.98, empate: 3.07, fora: 3.13, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.9 },
-  
-  20: { casa: 1.85, empate: 3.52, fora: 2.95, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 2.5 },
-  
-  21: { casa: 2.25, empate: 3.2, fora: 2.92, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  22: { casa: 1.95, empate: 3.7, fora: 3.84, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  23: { casa: 1.25, empate: 3.5, fora: 3.56, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  24: { casa: 1.65, empate: 3.33, fora: 7.02, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  
-  25: { casa: 2.05, empate: 3.52, fora: 3.81, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
+    const cotacoesIndividuais = {
+      domingo: {
+        0: { casa: 1.50, empate: 2.5, fora: 3.0, ambasMarcam: 2.5, acima2: 2.0, abaixo2: 2.8, casaFora: 1.5, casaEmpate: 2.0, empateFora: 1.8 },
+        1: { casa: 1.55, empate: 3.0, fora: 2.7, ambasMarcam: 2.2, acima2: 2.1, abaixo2: 2.5, casaFora: 1.4, casaEmpate: 1.9, empateFora: 1.9 }
+      },
+      segunda: {
+        0: { casa: 1.60, empate: 2.7, fora: 2.8, ambasMarcam: 2.4, acima2: 2.2, abaixo2: 2.6, casaFora: 1.6, casaEmpate: 2.1, empateFora: 1.9 }
+      }
+    };
 
-  },
-  
-  sexta: {
-    0: { casa: 2.50, empate: 2.0, fora: 2.65, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
-    1: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 1.20, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.12, empateFora: 1.9 },
-    2: { casa: 1.55, empate: 3.0, fora: 3.1, ambasMarcam: 1.85, acima2: 1.95, abaixo2: 1.55, casaFora: 1.35, casaEmpate: 1.15, empateFora: 1.75 },
-    3: { casa: 1.30, empate: 3.0, fora: 3.5, ambasMarcam: 1.9, acima2: 1.9, abaixo2: 1.5, casaFora: 1.3, casaEmpate: 1.1, empateFora: 1.8 },
-    4: { casa: 1.60, empate: 3.1, fora: 3.2, ambasMarcam: 1.20, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.12, empateFora: 1.9 },
-  },
-  
-  sabado: {
-    0: { casa: 24.05, empate: 3.2, fora: 1.2, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-    1: { casa: 1.98, empate: 3.07, fora: 7.13, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.9 },
-    2: { casa: 1.65, empate: 3.52, fora: 4.95, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 2.5 },
-    3: { casa: 3.55, empate: 3.2, fora: 1.92, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-    4: { casa: 2.19, empate: 3.7, fora: 3.33, ambasMarcam: 1.60, acima2: 1.75, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 1.55},
-  },
-  
-  domingo: {
-    0: { casa: 2.80, empate: 3.10, fora: 2.50, ambasMarcam: 1.20, acima2: 2.2, abaixo2: 1.8, casaFora: 1.5, casaEmpate: 1.3, empateFora: 2.1 },
-    1: { casa: 1.95, empate: 3.60, fora: 3.40, ambasMarcam: 1.45, acima2: 1.75, abaixo2: 1.7, casaFora: 1.4, casaEmpate: 1.12, empateFora: 1.55},
-    2: { casa: 2.10, empate: 3.25, fora: 3.05, ambasMarcam: 1.60, acima2: 2.4, abaixo2: 1.9, casaFora: 1.20, casaEmpate: 1.125, empateFora: 2.2 },
-    3: { casa: 3.50, empate: 3.20, fora: 1.80, ambasMarcam: 1.45, acima2: 2.5, abaixo2: 1.8, casaFora: 1.6, casaEmpate: 1.3, empateFora: 2.3 },
-    4: { casa: 1.65, empate: 3.55, fora: 4.10, ambasMarcam: 1.20, acima2: 1.75, abaixo2: 1.7, casaFora: 1.45, casaEmpate: 1.12, empateFora: 1.55},
-  },
-};
-
-  // Funções reutilizáveis
+    // Funções reutilizáveis
     function extrairNomeDoTime(url) {
       if (!url || typeof url !== "string") return "";
       let nome = url.split("/").pop();
@@ -1045,8 +972,7 @@ quarta: {
           div.innerHTML = `
   <div class="linha-duelo">
     <div class="time-nome-img">
-    <img src="${jogo.ladoA || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
-     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
+      <img src="${jogo.ladoA}" />
       <div class="nome-time">${nomeA}</div>
     </div>
 
@@ -1055,8 +981,7 @@ quarta: {
     <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.fora}">Fora<br><span class="valor-cotacao">${c.fora.toFixed(2)}</span></button>
 
     <div class="time-nome-img">
-   <img src="${jogo.ladoB || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
-     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
+      <img src="${jogo.ladoB}" />
       <div class="nome-time">${nomeB}</div>
     </div>
 
@@ -1232,7 +1157,9 @@ quarta: {
 
       const btnCopiar = document.getElementById('btnCopiar');
       btnCopiar.onclick = () => {
-        q      };
+        navigator.clipboard.writeText(linkViewer);
+        alert("🔗 Link copiado!\n\n" + linkViewer);
+      };
 
       const btnWhatsapp = document.getElementById('btnWhatsapp');
       btnWhatsapp.onclick = () => {
@@ -1262,14 +1189,13 @@ quarta: {
     function esconderDiasPassados() {
       const hoje = new Date();
       const diasSemana = [
-          { nome: 'domingo', data: new Date("2025-07-13") },
+        { nome: 'domingo', data: new Date("2025-07-13") },
         { nome: 'segunda', data: new Date("2025-07-14") },
         { nome: 'terca', data: new Date("2025-07-15") },
         { nome: 'quarta', data: new Date("2025-07-16") },
         { nome: 'quinta', data: new Date("2025-07-17") },
-        { nome: 'sexta', data: new Date("2025-07-11") },
-        { nome: 'sabado', data: new Date("2025-07-12") },
-      
+        { nome: 'sexta', data: new Date("2025-07-18") },
+        { nome: 'sabado', data: new Date("2025-07-19") },
       ];
 
       diasSemana.forEach(dia => {
@@ -1282,7 +1208,7 @@ quarta: {
 
     // Exibe hoje + 2 dias seguintes automaticamente
     function mostrarHojeMais2Dias() {
-      const nomesDias = [ 'domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+      const nomesDias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
       const hoje = new Date();
       const indiceHoje = hoje.getDay(); // domingo=0
 
@@ -1313,21 +1239,22 @@ quarta: {
 
     // Ativa eventos nos botões de dias
     function ativarEventosBotoesDias() {
-  document.querySelectorAll('.dias button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
-      if (!dia) return;
+      document.querySelectorAll('.dias button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
+          if (!dia) return;
 
-      // mostrarModalCarregando(); // ❌ Comentado para desativar o modal de carregamento
+         // mostrarModalCarregando();
 
-      // setTimeout(() => {
-        criarJogos(dia);
-        mostrarDia(dia);
-        // esconderModalCarregando(); // ❌ Comentado para desativar o fechamento do modal
-      // }, 1000);
-    });
-  });
-}
+          //setTimeout(() => {
+            criarJogos(dia);
+            mostrarDia(dia);
+           // esconderModalCarregando();
+        // }, 1000);
+        });
+      });
+    }
+
     // Carrossel simples automático
     const carrossel = document.getElementById('carrossel');
     let indiceAtual = 0;
@@ -1365,7 +1292,19 @@ quarta: {
     document.getElementById('valorUnico').addEventListener('input', () => {
       atualizarTotal();
     });
-    
+    // Gera uma cor hexadecimal aleatória
+    function gerarCorAleatoria() {
+      const letras = '0123456789ABCDEF';
+      let cor = '#';
+      for (let i = 0; i < 6; i++) {
+        cor += letras[Math.floor(Math.random() * 16)];
+      }
+      return cor;
+    }
+
+    // Aplica a cor ao background do body
+    document.body.style.backgroundColor = gerarCorAleatoria();
+ 
   </script>
 </body>
 </html>
