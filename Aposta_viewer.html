@@ -13,7 +13,7 @@
         transition: background-color 0.5s ease;
     }
     #resultado {
-     background:#ffd26a;
+      background:#ffd26a;
       border-radius: 10px;
       padding: 10px;
       margin-top: 20px;
@@ -81,11 +81,12 @@
 
         let html = `
           <h2>🎫 CÓDIGO: ${codigo}</h2>
-          //<p><strong>👤 Jogador:</strong> ${aposta.nome}</p>
+          <!--<p><strong>👤 Jogador:</strong> ${aposta.nome}</p>-->
           <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
-          <p style="color:green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
-          <p><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
+          <p style="color:$green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
+          <p style="color:blue;"><strong>📊 Multiplicador:</strong> ${multiplicador.toFixed(2)}</p>
           <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
+          <hr>
           <hr>
         `;
 
