@@ -83,7 +83,7 @@
 
       let html = `
         <h2>🎫 CÓDIGO: ${codigo}</h2>
-        <p><strong>📅 Data:</strong> ${aposta.dataHora}</p>
+        <p><strong>📅 Data:</strong> ${formatarDataHoraAtual()}</p>
         <p style="color:green; font-weight:bold;"><strong>💸 Valor Apostado:</strong> R$ ${valorApostado.toFixed(2)}</p>
         <p style="color:blue;"><strong>📊 Cotação:</strong> ${multiplicador.toFixed(2)}</p>
         <p style="color:green;"><strong>💰 Valor a Receber:</strong> R$ ${valorReceber.toFixed(2)}</p>
@@ -123,7 +123,7 @@
               <p><strong>Cotação:</strong> ${parseFloat(s.valor).toFixed(2)}</p>
               <p><strong>🕒 Data/Hora:</strong> ${s.dataHora}</p>
               <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
-           <hr>
+          <hr>
             </div>
           `;
         });
@@ -160,6 +160,15 @@
   }
 
   document.body.style.backgroundColor = gerarCorAleatoria();
+  function formatarDataHoraAtual() {
+  const agora = new Date();
+  const dia = String(agora.getDate()).padStart(2, '0');
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const ano = agora.getFullYear();
+  const horas = String(agora.getHours()).padStart(2, '0');
+  const minutos = String(agora.getMinutes()).padStart(2, '0');
+  return `${dia}/${mes}/${ano} - ${horas}:${minutos}`;
+}
 </script>
 </body>
 </html>
