@@ -4,27 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MULTI PLAY.BET</title>
-    <style>
+  <style>
     body {
-    background:Black;
-    color:white;
-    font-size:16px;
+      background: black;
+      color: white;
+      font-size: 16px;
       font-family: Arial, sans-serif;
       padding: 10px;
     }
-    textarea, input {
+
+    textarea, input[type="text"] {
       width: 100%;
-      margin-bottom: 10px;
+      font-size: 14px;
       padding: 10px;
-      font-size: 16px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+      resize: vertical;
     }
+
     button {
-      padding: 10px 10px;
-      font-size: 12px;
+      padding: 10px 15px;
+      font-size: 14px;
       margin-right: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    h2{
-        font-size:18px;
+
+    button:hover {
+      background-color: #555;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 30px;
+    }
+
+    hr {
+      margin: 30px 0;
+      border: 1px solid #555;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -46,7 +75,7 @@
 
   <hr>
 
-  <h2>📅 Extrator de Datas e Horários </h2>
+  <h2>📅 Extrator de Datas e Horários</h2>
 
   <label>📋 Cole o texto/código aqui:</label>
   <textarea id="inputTexto" rows="8" placeholder="Cole o conteúdo com datas tipo 01/ago 14:00..."></textarea>
@@ -57,7 +86,17 @@
   <label>🕒 Datas Extraídas (ordenadas):</label>
   <textarea id="datasExtraidas" rows="10" readonly></textarea>
 
+  <hr>
+
+  <h2>⚙️ Gerador de Cotações</h2>
+
+  <button id="gerarBtn">🌀 Gerar Cotações</button>
+  <button id="copiarBtn">📋 Copiar Cotações</button>
+
+  <textarea id="cotacoesResultado" rows="15" readonly></textarea>
+
   <script>
+    // Gera links das imagens
     function gerarLinks() {
       const baseUrl = document.getElementById("baseUrl").value.trim();
       const nomesTexto = document.getElementById("nomesImagens").value.trim();
@@ -70,37 +109,97 @@
       const resultado = document.getElementById("resultado");
       resultado.select();
       document.execCommand("copy");
-      alert("Links copiados com sucesso!");
+      alert("✅ Links copiados com sucesso!");
     }
 
+    // Extrai datas no formato 01/ago 14:00
     function extrairDatas() {
-      const texto = document.getElementById("inputTexto").value;
-      const regex = /\b(\d{2}\/[a-z]{3}) (\d{2}:\d{2})\b/gi;
-      const datasEncontradas = [...texto.matchAll(regex)].map(match => `${match[1]} ${match[2]}`);
+  const texto = document.getElementById("inputTexto").value;
+  const regex = /\b(\d{2})\/([a-z]{3}) (\d{2}):(\d{2})\b/gi;
 
-      // Função para ordenar
-      const meses = {
-        jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5,
-        jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11
-      };
+  const meses = {
+    jan: "01", fev: "02", mar: "03", abr: "04", mai: "05", jun: "06",
+    jul: "07", ago: "08", set: "09", out: "10", nov: "11", dez: "12"
+  };
 
-      const ordenadas = datasEncontradas.sort((a, b) => {
-        const [diaA, mesA, horaA] = a.replace('/', ' ').split(/[\s:]/);
-        const [diaB, mesB, horaB] = b.replace('/', ' ').split(/[\s:]/);
-        const dataA = new Date(2025, meses[mesA], parseInt(diaA), parseInt(horaA), parseInt(a.split(':')[1]));
-        const dataB = new Date(2025, meses[mesB], parseInt(diaB), parseInt(horaB), parseInt(b.split(':')[1]));
-        return dataA - dataB;
-      });
+  const datas = [];
 
-      document.getElementById("datasExtraidas").value = ordenadas.join("\n");
-    }
+  for (const match of texto.matchAll(regex)) {
+    const dia = match[1];
+    const mesAbrev = match[2].toLowerCase();
+    const hora = match[3];
+    const minuto = match[4];
+    const mesNum = meses[mesAbrev] || "01"; // fallback
 
+    // Monta a string no formato desejado
+    const dataFormatada = `2025-${mesNum}-${dia}T${hora}:${minuto}`;
+
+    const dataObj = new Date(`${dataFormatada}:00`);
+    datas.push({ texto: dataFormatada, ordem: dataObj });
+  }
+
+  // Ordena por data/hora
+  datas.sort((a, b) => a.ordem - b.ordem);
+
+  // Exibe no textarea
+  document.getElementById("datasExtraidas").value = datas.map(d => d.texto).join("\n");
+}
     function copiarDatas() {
       const datas = document.getElementById("datasExtraidas");
       datas.select();
       document.execCommand("copy");
-      alert("Datas copiadas com sucesso!");
+      alert("✅ Datas copiadas com sucesso!");
     }
+
+    // Gera cotações automáticas por dia e duelo
+    function aleatorio(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(2);
+    }
+
+    function gerarCotacoes() {
+      const dias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+      const output = {};
+
+      dias.forEach(dia => {
+        output[dia] = {};
+        for (let i = 0; i < 20; i++) {
+          output[dia][i] = {
+            casa: parseFloat(aleatorio(1.00, 1.80)),
+            empate: parseFloat(aleatorio(2.50, 4.00)),
+            fora: parseFloat(aleatorio(2.50, 3.80)),
+            ambasMarcam: parseFloat(aleatorio(1.70, 2.50)),
+            acima2: parseFloat(aleatorio(1.50, 3.00)),
+            abaixo2: parseFloat(aleatorio(2.00, 3.00)),
+            casaFora: parseFloat(aleatorio(1.50, 2.50)),
+            casaEmpate: parseFloat(aleatorio(1.90, 3.00)),
+            empateFora: parseFloat(aleatorio(1.80, 2.50))
+          };
+        }
+      });
+
+      let resultadoTexto = '';
+      for (const dia in output) {
+        resultadoTexto += `${dia}: {\n`;
+        for (const i in output[dia]) {
+          const c = output[dia][i];
+          resultadoTexto += `  ${i}: { casa: ${c.casa}, empate: ${c.empate}, fora: ${c.fora}, ambasMarcam: ${c.ambasMarcam}, acima2: ${c.acima2}, abaixo2: ${c.abaixo2}, casaFora: ${c.casaFora}, casaEmpate: ${c.casaEmpate}, empateFora: ${c.empateFora} },\n`;
+        }
+        resultadoTexto += `},\n\n`;
+      }
+
+      document.getElementById("cotacoesResultado").value = resultadoTexto;
+    }
+
+    function copiarCotacoes() {
+      const textarea = document.getElementById("cotacoesResultado");
+      textarea.select();
+      document.execCommand("copy");
+      alert("✅ Cotações copiadas com sucesso!");
+    }
+
+    // Liga os botões
+    document.getElementById("gerarBtn").addEventListener("click", gerarCotacoes);
+    document.getElementById("copiarBtn").addEventListener("click", copiarCotacoes);
   </script>
 
 </body>
