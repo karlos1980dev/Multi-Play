@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MULTI PLAY.BET</title>
+    <style>
+    body {
+    background:Black;
+    color:white;
+    font-size:16px;
+      font-family: Arial, sans-serif;
+      padding: 10px;
+    }
+    textarea, input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 10px;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+    h2{
+        font-size:18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🔗 Criador de Links</h2>
+
+  <label>🔗 Link base do GitHub:</label>
+  <input type="text" id="baseUrl" placeholder="https://raw.githubusercontent.com/usuario/repositorio/main/" />
+
+  <label>🖼️ Nomes das imagens (sem .jpeg):</label>
+  <textarea id="nomesImagens" rows="6" placeholder="imagem1\nimagem2"></textarea>
+
+  <button onclick="gerarLinks()">🔄 Gerar Links</button>
+  <button onclick="copiarLinks()">📋 Copiar Links</button>
+
+  <label>📎 Links Gerados:</label>
+  <textarea id="resultado" rows="10" readonly></textarea>
+
+  <hr>
+
+  <h2>📅 Extrator de Datas e Horários </h2>
+
+  <label>📋 Cole o texto/código aqui:</label>
+  <textarea id="inputTexto" rows="8" placeholder="Cole o conteúdo com datas tipo 01/ago 14:00..."></textarea>
+
+  <button onclick="extrairDatas()">📆 Extrair Datas e Horas</button>
+  <button onclick="copiarDatas()">📋 Copiar Datas</button>
+
+  <label>🕒 Datas Extraídas (ordenadas):</label>
+  <textarea id="datasExtraidas" rows="10" readonly></textarea>
+
+  <script>
+    function gerarLinks() {
+      const baseUrl = document.getElementById("baseUrl").value.trim();
+      const nomesTexto = document.getElementById("nomesImagens").value.trim();
+      const nomes = nomesTexto.split('\n').map(nome => nome.trim()).filter(nome => nome !== "");
+      const links = nomes.map(nome => `${baseUrl}${nome}.jpeg`);
+      document.getElementById("resultado").value = links.join("\n");
+    }
+
+    function copiarLinks() {
+      const resultado = document.getElementById("resultado");
+      resultado.select();
+      document.execCommand("copy");
+      alert("Links copiados com sucesso!");
+    }
+
+    function extrairDatas() {
+      const texto = document.getElementById("inputTexto").value;
+      const regex = /\b(\d{2}\/[a-z]{3}) (\d{2}:\d{2})\b/gi;
+      const datasEncontradas = [...texto.matchAll(regex)].map(match => `${match[1]} ${match[2]}`);
+
+      // Função para ordenar
+      const meses = {
+        jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5,
+        jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11
+      };
+
+      const ordenadas = datasEncontradas.sort((a, b) => {
+        const [diaA, mesA, horaA] = a.replace('/', ' ').split(/[\s:]/);
+        const [diaB, mesB, horaB] = b.replace('/', ' ').split(/[\s:]/);
+        const dataA = new Date(2025, meses[mesA], parseInt(diaA), parseInt(horaA), parseInt(a.split(':')[1]));
+        const dataB = new Date(2025, meses[mesB], parseInt(diaB), parseInt(horaB), parseInt(b.split(':')[1]));
+        return dataA - dataB;
+      });
+
+      document.getElementById("datasExtraidas").value = ordenadas.join("\n");
+    }
+
+    function copiarDatas() {
+      const datas = document.getElementById("datasExtraidas");
+      datas.select();
+      document.execCommand("copy");
+      alert("Datas copiadas com sucesso!");
+    }
+  </script>
+
+</body>
+</html>
