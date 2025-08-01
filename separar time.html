@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <title>Separador de Times e Datas</title>
+  <style>
+    body        { background:#111; color:#fff; font-family:sans-serif; padding:20px; }
+    textarea    { width:100%; height:100px; margin-bottom:15px; font-size:16px; padding:10px; resize:none; }
+    .input-text { background:#222; color:#fff; }
+    .impar-text { background:#388e3c; color:#fff; }
+    .par-text   { background:#1976d2; color:#fff; }
+    .data-text  { background:#fbc02d; color:#000; font-weight:bold; }
+    button      { padding:10px 20px; background:#ff5722; color:#fff; font-weight:bold; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <h2>Cole abaixo os dados brutos:</h2>
+  <textarea id="entrada" class="input-text" placeholder="Cole aqui..."></textarea>
+
+  <button onclick="limparSeparar()">Limpar e Separar</button>
+
+  <h3>Times ímpares:</h3>
+  <textarea id="saidaImpar" class="impar-text" readonly></textarea>
+
+  <h3>Times pares:</h3>
+  <textarea id="saidaPar" class="par-text" readonly></textarea>
+
+  <h3>Datas e horários:</h3>
+  <textarea id="saidaDatas" class="data-text" readonly></textarea>
+
+  <script>
+    function limparSeparar() {
+      const entrada = document.getElementById("entrada").value.trim();
+      const linhasBrutas = entrada.split(/\r?\n/).filter(l => l.trim() !== "");
+
+      const regexDataHora = /^(\d{1,2}\/\d{1,2}|[0-9]{1,2}\/[a-z]{3})(\s+\d{2}:\d{2})?$/i;
+      const regexIgnorar  = /(\+)|casa|empate|fora|img|imagem|\.jpg|\.png|<img|[0-9]+|[.,]/i;
+
+      const impares = [];
+      const pares   = [];
+      const datas   = [];
+      let posicao   = 0;
+
+      for (let linha of linhasBrutas) {
+        // REMOVE caracteres invisíveis: U+200B-U+200D (ZW), U+FEFF (BOM), U+FFFC (obj-replacement)
+        linha = linha.replace(/[\u200B-\u200D\uFEFF\uFFFC]/g, '').trim();
+        if (!linha) continue;
+
+        if (regexDataHora.test(linha)) {
+          datas.push(linha);
+        } else if (regexIgnorar.test(linha)) {
+          continue;                    // ignora o que não deve ficar
+        } else {
+          (posicao % 2 ? pares : impares).push(linha);
+          posicao++;
+        }
+      }
+
+      document.getElementById("saidaImpar").value = impares.join("\n");
+      document.getElementById("saidaPar"  ).value = pares.join("\n");
+      document.getElementById("saidaDatas").value = datas.join("\n");
+    }
+  </script>
+
+</body>
+  </html>
