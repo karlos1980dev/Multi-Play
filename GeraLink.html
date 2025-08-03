@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MULTI PLAY.BET</title>
+  <title>Gerar Link</title></title>
   <style>
     body {
       background: black;
@@ -96,15 +96,13 @@
   <textarea id="cotacoesResultado" rows="15" readonly></textarea>
 
   <script>
-    // Gera links das imagens
-    function gerarLinks() {
-      const baseUrl = document.getElementById("baseUrl").value.trim();
-      const nomesTexto = document.getElementById("nomesImagens").value.trim();
-      const nomes = nomesTexto.split('\n').map(nome => nome.trim()).filter(nome => nome !== "");
-      const links = nomes.map(nome => `${baseUrl}${nome}.jpeg",`);
-      document.getElementById("resultado").value = links.join("\n");
-    }
-
+   function gerarLinks() {
+  const baseUrl = document.getElementById("baseUrl").value.trim();
+  const nomesTexto = document.getElementById("nomesImagens").value.trim();
+  const nomes = nomesTexto.split('\n').map(nome => nome.trim()).filter(nome => nome !== "");
+  const links = nomes.map((nome, index) => `"${baseUrl}${nome}.jpeg" //${index + 1}`);
+  document.getElementById("resultado").value = links.join("\n");
+}
     function copiarLinks() {
       const resultado = document.getElementById("resultado");
       resultado.select();
