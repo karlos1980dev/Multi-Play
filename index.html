@@ -10,7 +10,7 @@
   text-align: center;  
   margin: 0;  
   padding-top: 80px;  
-  background: #ff1515;  
+  transition: background-color 0.5s ease;
   color: black;  
 }  
 h1 {
@@ -34,7 +34,8 @@ position: fixed;
 top: 0;
 left: 0;
 width: 100%;
-background: white;
+background: black;
+color:white;
 padding: 8px 12px;
 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 z-index: 999;
@@ -246,7 +247,7 @@ max-width: 600px;
 overflow: hidden;
 border-radius: 5px;
 box-shadow: 0 0 10px rgba(0,0,0,0.3);
-margin: 0px;
+margin:0px;
 }
 .carrossel {
 display: flex;
@@ -370,19 +371,65 @@ color: green;
   height: auto;
   margin-bottom: 10px;
 }
+   .hamburger {
+      font-size: 18px;
+      border-radius:10px;
+      cursor: pointer;
+      border: 1px solid #999;
+      margin-right: 0px;
+    }
+
+    #menuEsportes {
+      display: none;
+      background: #333;
+      color: white;
+      padding: 10px;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      z-index: 999;
+      width: 150px;
+    }
+
+    #menuEsportes ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #menuEsportes li {
+      padding: 5px;
+      margin:10px;
+      border-bottom: 5px solid #000;
+      cursor: pointer;
+    }
+
+    #menuEsportes li:hover {
+      background: #444;
+    }
+    .paginaTitulo{
+        background:Green;
+        margin-top:10px;
+        color:white;
+    }
   </style>  
 </head>
 <body>
-  <div class="contadorTime">
+
     <h1>MULTI PLAY.BET</h1> 
-  </div>
+  
 
   <div class="topo-fixo">
-    <input type="number" id="valorUnico" placeholder="Valor por aposta (R$)" min="1" />
+      <div class="hamburger" id="hamburger">☰ <br>Menu</div>
+    <input type="number" id="valorUnico" placeholder="Valor " min="1" />
     <div id="totalFinal">Total: R$ 0,00</div>
-    <button id="apostarBtn">Apostar <div class="contadorTime" id="contadorMarcados">Times 0</div></button>
+    <button id="apostarBtn">Apostar <div class="contadorTime" id="contadorMarcados">Times 0</div></b<button>
+ </div>
+  
+<div id="menuEsportes">
+    <ul id="listaEsportes"></ul>
   </div>
-
+  
   <div class="carrossel-container">
     <div class="carrossel" id="carrossel">
       <img src="https://raw.githubusercontent.com/Savanty/AE/main/Remo.jpeg" alt="Remo" />
@@ -391,7 +438,7 @@ color: green;
       <img src="https://raw.githubusercontent.com/Savanty/AE/main/images%20(3).jpeg" alt="Imagem 4" />
     </div>
   </div>
-
+<div class="paginaTitulo" id="tituloPagina"></div>
   <div class="dias">
     <button onclick="mostrarDia('domingo')">Domingo</button>
     <button onclick="mostrarDia('segunda')">Segunda</button>
@@ -446,1126 +493,643 @@ color: green;
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    
 
+    // Array de esportes
+    const esportes = ['Boxe', 'Corrida', 'Futebol', 'Basquete', 'Tênis','Play Game', 'Combate'
+    ,'Fut Americano', 'Hoquei','Handebol', 'x5','Mjb'];
+
+    // Referências
+    const hamburger = document.getElementById('hamburger');
+    const menuEsportes = document.getElementById('menuEsportes');
+    const listaEsportes = document.getElementById('listaEsportes');
+    const tituloPagina = document.getElementById('tituloPagina');
+
+    // Preenche o menu dinamicamente
+    esportes.forEach(esporte => {
+      const li = document.createElement('li');
+      li.textContent = esporte;
+      li.onclick = () => {
+        tituloPagina.textContent = `Esporte : ${esporte}`;
+        menuEsportes.style.display = 'none';
+      };
+      listaEsportes.appendChild(li);
+    });
+
+    // Mostra/oculta menu
+    hamburger.addEventListener('click', () => {
+      const visivel = menuEsportes.style.display === 'block';
+      menuEsportes.style.display = visivel ? 'none' : 'block';
+    });
+
+    // Fecha menu ao clicar fora
+    document.addEventListener('click', (event) => {
+      if (!menuEsportes.contains(event.target) && !hamburger.contains(event.target)) {
+        menuEsportes.style.display = 'none';
+      }
+    });
+  
     // Dados do usuário fornecidos por você na parte 2 e 3:
     const series = {
       
-  domingo: {  
-      ladoAImagens: [  
-        "https://raw.githubusercontent.com/Savanty/AE/main/Drogheda United FC.png",  
-          "https://upload.wikimedia.org/wikipedia/en/a/ae/coritiba.jpeg",  
-            
-        
-      ],  
-      ladoBImagens: [  
-        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
-      ],  
-      
-      
-      horarios: [ ]  
-    },  
-      
-    segunda: {  
-      ladoAImagens: [  
-          "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",  
-      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona sc.png",  
-      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg"  
-      ],  
-      ladoBImagens: [  
-        "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",  
-        "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",  
-        "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png"  
-      ],  
-     horarios: [" " ]  
-    },  
-  
-    terca: {  
-      ladoAImagens: [  
-        "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
-      ],  
-      ladoBImagens: [  
-"https://upload.wikimedia.org/wikipedia/en/f/fc/Manchester_United_FC_crest.svg", 
- 
-"https://upload.wikimedia.org/wikipedia/en/7/7a/Chelsea_FC.svg" , 
-  "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg"  
-      ],  
-      horarios: ["" ]  
-    },  
-    quarta: {  
-      ladoAImagens: [  
-        "https://upload.wikimedia.org/wikipedia/en/a/ae/Bayern_Munich_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/c/cd/Paris_Saint-Germain_F.C..svg",
-          "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
-            "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
-            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg" 
-        
-      ],  
-      ladoBImagens: [  
-        "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
-            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg",
-            "https://upload.wikimedia.org/wikipedia/en/5/5a/FC_Barcelona_logo.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/0/0c/Real_Madrid_CF.svg", 
-           "https://upload.wikimedia.org/wikipedia/en/5/5c/Liverpool_FC.svg",  
-        "https://upload.wikimedia.org/wikipedia/en/d/d1/Arsenal_FC.svg" 
-      ],  
-      horarios: [""    ]  
-    },  
-    quinta: {  
-    
+  domingo: {
+    ladoAImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Real-Madrid.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Barcelona%20sc.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Man-City.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Bayern.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/PSG.jpeg"
+    ],
+    ladoBImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/shelbourne.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians%20FC.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Shamrock%20Rovers%20FC.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Sporting.png",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Benfica.jpeg"
+    ],
+    horarios: [
+      "2025-07-02T14:00",
+      "2025-07-02T16:30",
+      "2025-07-02T19:00",
+      "2025-07-02T20:45",
+      "2025-07-02T22:15"
+    ]
+  },
+  segunda: {
+    ladoAImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Flamengo.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Palmeiras.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/SaoPaulo.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Santos.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Cruzeiro.jpeg"
+    ],
+    ladoBImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Gremio.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Internacional.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Corinthians.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Vasco.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Bahia.jpeg"
+    ],
+    horarios: [
+      "2025-07-02T15:00",
+      "2025-07-02T17:30",
+      "2025-07-02T19:45",
+      "2025-07-02T21:00",
+      "2025-07-02T22:30"
+    ]
+  },
+  terca: {
   ladoAImagens: [
-  
-    "https://raw.githubusercontent.com/Savanty/AE/main/CRB.jpeg",//1
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Finlândia.png",//2
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Noruega.png",//3
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tunisia.png",//4
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Botswana.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KS Widzew Lodz.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Stade Rennais FC.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/TSV Hartberg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Dinamo Kiev.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/AC Sparta Praga.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Widzew Lodz.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/DAC 1904 Dunajska Streda.png",
-    
-  
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Arminia Bielefeld.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Rapperswil-Jona.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KS SKN St. Polten.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/ NAC Breda.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Crusaders FC.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Atletic Club d'Escaldes.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FCB Magpies.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Torpedo .png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Kauno Zalgiris.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Seinajoen JK.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/urartu.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KS Racing FC União Luxe.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Nomme Kalju.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Decic Tuzi.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FKF Vllaznia Shkoder.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Birkirkara FC.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Torpedo Belaz Zhodino.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KF Malisheva.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Vardar Skopje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sutjeska Niksic.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Zeljeznicar Sarajevo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NSI Runavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Saint Patrick´s Atlético.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Borac Banja Luka.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/SP Tre Fiori.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Larne FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Valur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Sabah Masazir.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/AEK Larnaca FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KS Paksi SE.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Sheriff Tiraspol.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Levski Sófia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Shakhtar Donetsk.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Spartak Trnava.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/KP Legia Varsóvia.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Huachipato.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Limache.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CD Santo Domingo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Juventud.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/San Antonio Bulo Bulo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Bolivar La Paz.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Club Jorge Wilstermann.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Rochester FC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Ppj Helsinki.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Narpes Kraft.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Ranheim II.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Mineros de Guayana.png",
-    
+    "https://raw.githubusercontent.com/Savanty/AE/main/República do Congo.jpeg", //1
+"https://raw.githubusercontent.com/Savanty/AE/main/Senegal.jpeg", //2
+"https://raw.githubusercontent.com/Savanty/AE/main/Malmo FF.jpeg", //3
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Dynamo Kyiv.jpeg", //4
+"https://raw.githubusercontent.com/Savanty/AE/main/Shkendija Tetovo.jpeg", //5
+"https://raw.githubusercontent.com/Savanty/AE/main/Glasgow Rangers.jpeg", //6
+"https://raw.githubusercontent.com/Savanty/AE/main/Bayer Leverkusen.jpeg", //7
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Empoli.jpeg", //8
+"https://raw.githubusercontent.com/Savanty/AE/main/Caudal Deportivo.jpeg", //9
+"https://raw.githubusercontent.com/Savanty/AE/main/Nottingham Forest.jpeg", //10
+"https://raw.githubusercontent.com/Savanty/AE/main/KI Klaksvik.jpeg", //11
+"https://raw.githubusercontent.com/Savanty/AE/main/Hamrun Spartans FC.jpeg", //12
+"https://raw.githubusercontent.com/Savanty/AE/main/Deportivo Toluca FC.jpeg", //13
+"https://raw.githubusercontent.com/Savanty/AE/main/Columbus Crew.jpeg", //14
+"https://raw.githubusercontent.com/Savanty/AE/main/CF Montreal.jpeg", //15
+"https://raw.githubusercontent.com/Savanty/AE/main/Houston Dinamo.jpeg", //16
+"https://raw.githubusercontent.com/Savanty/AE/main/Mazatlan FC.jpeg", //17
+"https://raw.githubusercontent.com/Savanty/AE/main/Tigres UANL.jpeg", //18
+"https://raw.githubusercontent.com/Savanty/AE/main/Accrington Stanley.jpeg", //19
+"https://raw.githubusercontent.com/Savanty/AE/main/Quilmes AC.jpeg", //20
+"https://raw.githubusercontent.com/Savanty/AE/main/Cucuta Desportivo.jpeg", //21
+"https://raw.githubusercontent.com/Savanty/AE/main/Tigres FC.jpeg", //22
+"https://raw.githubusercontent.com/Savanty/AE/main/CD Cortulua.jpeg", //23
+"https://raw.githubusercontent.com/Savanty/AE/main/CD Espuce (F).jpeg", //24
+"https://raw.githubusercontent.com/Savanty/AE/main/CA Tembetary Ypane.jpeg", //25
+"https://raw.githubusercontent.com/Savanty/AE/main/Martin Ledesma.jpeg", //26
+"https://raw.githubusercontent.com/Savanty/AE/main/Eastern Suburbs FC.jpeg", //27
+"https://raw.githubusercontent.com/Savanty/AE/main/Sunshine Coast Wanderers FC (F).jpeg", //28
+"https://raw.githubusercontent.com/Savanty/AE/main/Brisbane City FC (F).jpeg", //29
+"https://raw.githubusercontent.com/Savanty/AE/main/South Adelaide FC.jpeg", //30
+"https://raw.githubusercontent.com/Savanty/AE/main/Uruguai de Coronado.jpeg", //31
+"https://raw.githubusercontent.com/Savanty/AE/main/Lyngby BK.jpeg", //32
+"https://raw.githubusercontent.com/Savanty/AE/main/Skive IK.jpeg", //33
+"https://raw.githubusercontent.com/Savanty/AE/main/IF Lyseng.jpeg", //34
+"https://raw.githubusercontent.com/Savanty/AE/main/Spisska Nova Ves.jpeg", //35
+"https://raw.githubusercontent.com/Savanty/AE/main/OSK Trencianske Stankovce.jpeg", //36
+"https://raw.githubusercontent.com/Savanty/AE/main/Parnu JK Vaprus.jpeg", //37
+"https://raw.githubusercontent.com/Savanty/AE/main/Valur Reykjavik.jpeg", //38
+"https://raw.githubusercontent.com/Savanty/AE/main/Stabaek Fotball (F).jpeg", //39
+"https://raw.githubusercontent.com/Savanty/AE/main/Vaalerenga Oslo (F).jpeg", //40
+"https://raw.githubusercontent.com/Savanty/AE/main/Kolbotn Futebol (F).jpeg", //41
+"https://raw.githubusercontent.com/Savanty/AE/main/Lillestrom SK Kvinner (F).jpeg", //42
+"https://raw.githubusercontent.com/Savanty/AE/main/IL Sandviken (F).jpeg", //43
+"https://raw.githubusercontent.com/Savanty/AE/main/Universitario de Desportos.jpeg", //44
+"https://raw.githubusercontent.com/Savanty/AE/main/Juan Pablo II.jpeg", //45
+"https://raw.githubusercontent.com/Savanty/AE/main/Sporting Cristal.jpeg", //46
+"https://raw.githubusercontent.com/Savanty/AE/main/Zaglebie Sosnowiec.jpeg", //47
+"https://raw.githubusercontent.com/Savanty/AE/main/Zaglebie Lubin II.jpeg", //48
+"https://raw.githubusercontent.com/Savanty/AE/main/CWKS Resovia.jpeg", //49
+"https://raw.githubusercontent.com/Savanty/AE/main/Skra Czestochowa.jpeg", //50
+"https://raw.githubusercontent.com/Savanty/AE/main/Csm Satu Mare.jpeg", //51
+"https://raw.githubusercontent.com/Savanty/AE/main/FK Agmk Olmaliq.jpeg", //52
+  ],
+  ladoBImagens: [
+    "https://raw.githubusercontent.com/Savanty/AE/main/Sudão.jpeg", //1
+"https://raw.githubusercontent.com/Savanty/AE/main/Nigéria.jpeg", //2
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Copenhage.jpeg", //3
+"https://raw.githubusercontent.com/Savanty/AE/main/Pafos FC.jpeg", //4
+"https://raw.githubusercontent.com/Savanty/AE/main/Qarabag FK.jpeg", //5
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Viktoria Plzen.jpeg", //6
+"https://raw.githubusercontent.com/Savanty/AE/main/SC Pisa.jpeg", //7
+"https://raw.githubusercontent.com/Savanty/AE/main/Sassuolo Calcio.jpeg", //8
+"https://raw.githubusercontent.com/Savanty/AE/main/Club Marino de Luanco.jpeg", //9
+"https://raw.githubusercontent.com/Savanty/AE/main/Fiorentina.jpeg", //10
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Neman Grodno.jpeg", //11
+"https://raw.githubusercontent.com/Savanty/AE/main/Maccabi Tel Aviv FC.jpeg", //12
+"https://raw.githubusercontent.com/Savanty/AE/main/New York City FC.jpeg", //13
+"https://raw.githubusercontent.com/Savanty/AE/main/Club Leon.jpeg", //14
+"https://raw.githubusercontent.com/Savanty/AE/main/Puebla FC.jpeg", //15
+"https://raw.githubusercontent.com/Savanty/AE/main/CF Pachuca.jpeg", //16
+"https://raw.githubusercontent.com/Savanty/AE/main/San Diego FC.jpeg", //17
+"https://raw.githubusercontent.com/Savanty/AE/main/Los Angeles FC.jpeg", //18
+"https://raw.githubusercontent.com/Savanty/AE/main/Oldham Athletic.jpeg", //19
+"https://raw.githubusercontent.com/Savanty/AE/main/Club Atletico Atlanta.jpeg", //20
+"https://raw.githubusercontent.com/Savanty/AE/main/Atletico Nacional Medellin.jpeg", //21
+"https://raw.githubusercontent.com/Savanty/AE/main/América de Cali.jpeg", //22
+"https://raw.githubusercontent.com/Savanty/AE/main/Independiente Santa Fe.jpeg", //23
+"https://raw.githubusercontent.com/Savanty/AE/main/CS Emelec (F).jpeg", //24
+"https://raw.githubusercontent.com/Savanty/AE/main/Club General Caballero Jlm.jpeg", //25
+"https://raw.githubusercontent.com/Savanty/AE/main/Sunshine Coast Wanderers.jpeg", //26
+"https://raw.githubusercontent.com/Savanty/AE/main/Gold Coast Knights (F).jpeg", //27
+"https://raw.githubusercontent.com/Savanty/AE/main/Mitchelton FC (F).jpeg", //28
+"https://raw.githubusercontent.com/Savanty/AE/main/The Cove FC.jpeg", //29
+"https://raw.githubusercontent.com/Savanty/AE/main/Sporting FC.jpeg", //30
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Helsingoer.jpeg", //31
+"https://raw.githubusercontent.com/Savanty/AE/main/Brabrand IF.jpeg", //32
+"https://raw.githubusercontent.com/Savanty/AE/main/Asa Aarhus.jpeg", //33
+"https://raw.githubusercontent.com/Savanty/AE/main/Taarnby FF.jpeg", //34
+"https://raw.githubusercontent.com/Savanty/AE/main/Tj Druzstevnik Opatova Nad Vahom.jpeg", //35
+"https://raw.githubusercontent.com/Savanty/AE/main/JK Tallinna Kalev.jpeg", //36
+"https://raw.githubusercontent.com/Savanty/AE/main/IA Akranes.jpeg", //37
+"https://raw.githubusercontent.com/Savanty/AE/main/Roa (F).jpeg", //38
+"https://raw.githubusercontent.com/Savanty/AE/main/Lyn Oslo (F).jpeg", //39
+"https://raw.githubusercontent.com/Savanty/AE/main/Hoenefoss BK (F).jpeg", //40
+"https://raw.githubusercontent.com/Savanty/AE/main/Rosenborg BK Kvinner (F).jpeg", //41
+"https://raw.githubusercontent.com/Savanty/AE/main/Bodoe/Glimt (F).jpeg", //42
+"https://raw.githubusercontent.com/Savanty/AE/main/Alianza Universidad de Huanuco.jpeg", //43
+"https://raw.githubusercontent.com/Savanty/AE/main/FBC Melgar.jpeg", //44
+"https://raw.githubusercontent.com/Savanty/AE/main/Alianza Lima.jpeg", //45
+"https://raw.githubusercontent.com/Savanty/AE/main/Hutnik Cracóvia.jpeg", //46
+"https://raw.githubusercontent.com/Savanty/AE/main/KS Polonia Bytom SA.jpeg", //47
+"https://raw.githubusercontent.com/Savanty/AE/main/Podbeskidzie Bielsko Biala.jpeg", //48
+"https://raw.githubusercontent.com/Savanty/AE/main/Stal Salowa Wola.jpeg", //49
+"https://raw.githubusercontent.com/Savanty/AE/main/CS Lotus Baile Felix.jpeg", //50
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Pakhtakor Tashkent.jpeg", //51
 
-      ],  
-      ladoBImagens: [  
+  ],
+    horarios: [  
+"2025-08-05T11:00",
+"2025-08-05T14:00",
+"2025-08-05T14:00",
+"2025-08-05T15:00",
+"2025-08-05T15:00",
+"2025-08-05T15:45",
+"2025-08-05T14:00",
+"2025-08-05T14:00",
+"2025-08-05T15:00",
+"2025-08-05T15:00",
+"2025-08-05T15:45",
+"2025-08-05T13:00",
+"2025-08-05T13:30",
+"2025-08-05T14:00",
+"2025-08-05T15:45",
+"2025-08-05T15:45",
+"2025-08-05T14:00",
+"2025-08-05T20:30",
+"2025-08-05T20:30",
+"2025-08-05T21:00",
+"2025-08-05T21:30",
+"2025-08-05T23:00",
+"2025-08-05T23:30",
+"2025-08-05T15:45",
+"2025-08-05T21:10",
+"2025-08-05T18:00",
+"2025-08-05T22:00",
+"2025-08-05T22:00",
+"2025-08-05T19:00",
+"2025-08-05T18:30",
+"2025-08-05T18:30",
+"2025-08-05T06:45",
+"2025-08-05T06:45",
+"2025-08-05T07:30",
+"2025-08-05T07:40",
+"2025-08-05T23:00",
+"2025-08-05T13:00",
+"2025-08-05T13:00",
+"2025-08-05T13:00",
+"2025-08-05T13:30",
+"2025-08-05T12:00",
+"2025-08-05T12:30",
+"2025-08-05T16:15",
+"2025-08-05T13:00",
+"2025-08-05T13:00",
+"2025-08-05T13:30",
+"2025-08-05T13:00",
+"2025-08-05T13:00",
+"2025-08-05T14:00",
+"2025-08-05T17:30",
+"2025-08-05T22:00",
+"2025-08-05T11:30",
+"2025-08-05T13:00",
+"2025-08-05T13:00",
+"2025-08-05T14:38",
+"2025-08-05T11:30",
+"2025-08-05T12:00",
+  ]
+},
+quarta: {
+  ladoAImagens: [
+"https://raw.githubusercontent.com/Savanty/AE/main/Red Bull Bragantino SP.jpeg", //1
+"https://raw.githubusercontent.com/Savanty/AE/main/Atletico Mineiro MG.jpeg", //2
+"https://raw.githubusercontent.com/Savanty/AE/main/Retro FC PE.jpeg", //3
+"https://raw.githubusercontent.com/Savanty/AE/main/CA Paranaense PR.jpeg", //4
+"https://raw.githubusercontent.com/Savanty/AE/main/Fluminense RJ.jpeg", //5
+"https://raw.githubusercontent.com/Savanty/AE/main/Palmeiras SP.jpeg", //6
+"https://raw.githubusercontent.com/Savanty/AE/main/Burkina Faso.jpeg", //7
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Kairat Almaty.jpeg", //8
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Salzburgo.jpeg", //9
+"https://raw.githubusercontent.com/Savanty/AE/main/Ferencvarosi TC.jpeg", //10
+"https://raw.githubusercontent.com/Savanty/AE/main/Estrela Vermelha.jpeg", //11
+"https://raw.githubusercontent.com/Savanty/AE/main/Fenerbahce SC.jpeg", //12
+"https://raw.githubusercontent.com/Savanty/AE/main/SL Benfica.jpeg", //13
+"https://raw.githubusercontent.com/Savanty/AE/main/Venezia FC.jpeg", //14
+"https://raw.githubusercontent.com/Savanty/AE/main/Villarreal CF.jpeg", //15
+"https://raw.githubusercontent.com/Savanty/AE/main/Rigas FS.jpeg", //16
+"https://raw.githubusercontent.com/Savanty/AE/main/HNK Rijeka.jpeg", //17
+"https://raw.githubusercontent.com/Savanty/AE/main/Orlando City SC.jpeg", //18
+"https://raw.githubusercontent.com/Savanty/AE/main/Inter Miami CF.jpeg", //19
+"https://raw.githubusercontent.com/Savanty/AE/main/Atlanta United FC.jpeg", //20
+"https://raw.githubusercontent.com/Savanty/AE/main/Minnesota United FC.jpeg", //21
+"https://raw.githubusercontent.com/Savanty/AE/main/CF America.jpeg", //22
+"https://raw.githubusercontent.com/Savanty/AE/main/Real Salt Lake.jpeg", //23
+"https://raw.githubusercontent.com/Savanty/AE/main/Tigres FC.jpeg", //24
+"https://raw.githubusercontent.com/Savanty/AE/main/Boyaca Patriotas.jpeg", //25
+"https://raw.githubusercontent.com/Savanty/AE/main/Atletico Huila.jpeg", //26
+"https://raw.githubusercontent.com/Savanty/AE/main/San Antonio Bulo Bulo.jpeg", //27
+"https://raw.githubusercontent.com/Savanty/AE/main/Rhode Island FC.jpeg", //28
+"https://raw.githubusercontent.com/Savanty/AE/main/Hartford Athletic.jpeg", //29
+"https://raw.githubusercontent.com/Savanty/AE/main/Monterey Bay FC.jpeg", //30
+"https://raw.githubusercontent.com/Savanty/AE/main/UMF Afturelding.jpeg", //31
+"https://raw.githubusercontent.com/Savanty/AE/main/Fram Reykjavik.jpeg", //32
+"https://raw.githubusercontent.com/Savanty/AE/main/Machida Zelvia.jpeg", //33
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Tokyo.jpeg", //34
+"https://raw.githubusercontent.com/Savanty/AE/main/Sanfrecce Hiroshima.jpeg", //35
+"https://raw.githubusercontent.com/Savanty/AE/main/SC Sagamihara.jpeg", //36
+"https://raw.githubusercontent.com/Savanty/AE/main/Montedio Yamagata.jpeg", //37
+"https://raw.githubusercontent.com/Savanty/AE/main/Kashima Antlers.jpeg", //38
+"https://raw.githubusercontent.com/Savanty/AE/main/Sogndal IL.jpeg", //39
+"https://raw.githubusercontent.com/Savanty/AE/main/Ranheim IL.jpeg", //40
+"https://raw.githubusercontent.com/Savanty/AE/main/Asane Fotball.jpeg", //41
+"https://raw.githubusercontent.com/Savanty/AE/main/Kongsvinger IL Fotball.jpeg", //42
+"https://raw.githubusercontent.com/Savanty/AE/main/Mjondalen IF.jpeg", //43
+"https://raw.githubusercontent.com/Savanty/AE/main/Odd.jpeg", //44
+"https://raw.githubusercontent.com/Savanty/AE/main/Lillestrom SC.jpeg", //45
+"https://raw.githubusercontent.com/Savanty/AE/main/Aalesunds FC.jpeg", //46
+"https://raw.githubusercontent.com/Savanty/AE/main/Deportivo Garcilaso.jpeg", //47
+"https://raw.githubusercontent.com/Savanty/AE/main/Alianza Atletico.jpeg", //48
+"https://raw.githubusercontent.com/Savanty/AE/main/Spartak Police Nad Metuji.jpeg", //49
+"https://raw.githubusercontent.com/Savanty/AE/main/Deportivo Tachira.jpeg", //50
+  ],
+  ladoBImagens: [
+"https://raw.githubusercontent.com/Savanty/AE/main/Botafogo FR RJ.jpeg", //1
+"https://raw.githubusercontent.com/Savanty/AE/main/CR Flamengo RJ.jpeg", //2
+"https://raw.githubusercontent.com/Savanty/AE/main/EC Bahia BA.jpeg", //3
+"https://raw.githubusercontent.com/Savanty/AE/main/São Paulo FC SP.jpeg", //4
+"https://raw.githubusercontent.com/Savanty/AE/main/Internacional RS.jpeg", //5
+"https://raw.githubusercontent.com/Savanty/AE/main/Corinthians SP.jpeg", //6
+"https://raw.githubusercontent.com/Savanty/AE/main/Mauritânia.jpeg", //7
+"https://raw.githubusercontent.com/Savanty/AE/main/SK Slovan Bratislava.jpeg", //8
+"https://raw.githubusercontent.com/Savanty/AE/main/Clube Brugge.jpeg", //9
+"https://raw.githubusercontent.com/Savanty/AE/main/KKS Lech Poznan.jpeg", //10
+"https://raw.githubusercontent.com/Savanty/AE/main/Feyenoord Roterdão.jpeg", //11
+"https://raw.githubusercontent.com/Savanty/AE/main/OGC Nice.jpeg", //12
+"https://raw.githubusercontent.com/Savanty/AE/main/LOSC Lille.jpeg", //13
+"https://raw.githubusercontent.com/Savanty/AE/main/Arsenal FC.jpeg", //14
+"https://raw.githubusercontent.com/Savanty/AE/main/Real Bétis Balompié.jpeg", //15
+"https://raw.githubusercontent.com/Savanty/AE/main/Kuopian Palloseura.jpeg", //16
+"https://raw.githubusercontent.com/Savanty/AE/main/Shelbourne FC.jpeg", //17
+"https://raw.githubusercontent.com/Savanty/AE/main/Necaxa.jpeg", //18
+"https://raw.githubusercontent.com/Savanty/AE/main/Pumas UNAM.jpeg", //19
+"https://raw.githubusercontent.com/Savanty/AE/main/Atlas FC.jpeg", //20
+"https://raw.githubusercontent.com/Savanty/AE/main/Atlético São Luis.jpeg", //21
+"https://raw.githubusercontent.com/Savanty/AE/main/Portland Timbers.jpeg", //22
+"https://raw.githubusercontent.com/Savanty/AE/main/Queretaro FC.jpeg", //23
+"https://raw.githubusercontent.com/Savanty/AE/main/América de Cali.jpeg", //24
+"https://raw.githubusercontent.com/Savanty/AE/main/CD Once Caldas.jpeg", //25
+"https://raw.githubusercontent.com/Savanty/AE/main/CD Junior FC.jpeg", //26
+"https://raw.githubusercontent.com/Savanty/AE/main/Bolivar La Paz.jpeg", //27
+"https://raw.githubusercontent.com/Savanty/AE/main/Detroit City FC.jpeg", //28
+"https://raw.githubusercontent.com/Savanty/AE/main/Miami FC.jpeg", //29
+"https://raw.githubusercontent.com/Savanty/AE/main/FC Tulsa.jpeg", //30
+"https://raw.githubusercontent.com/Savanty/AE/main/IF Vestri.jpeg", //31
+"https://raw.githubusercontent.com/Savanty/AE/main/Stjarnan Gardabae.jpeg", //32
+"https://raw.githubusercontent.com/Savanty/AE/main/Kyoto Sanga FC.jpeg", //33
+"https://raw.githubusercontent.com/Savanty/AE/main/Cerezo Osaka.jpeg", //34
+"https://raw.githubusercontent.com/Savanty/AE/main/Shimizu S-Pulse.jpeg", //35
+"https://raw.githubusercontent.com/Savanty/AE/main/Blaublitz Akita.jpeg", //36
+"https://raw.githubusercontent.com/Savanty/AE/main/Urawa Red Diamonds.jpeg", //37
+"https://raw.githubusercontent.com/Savanty/AE/main/Avispa Fukuoka.jpeg", //38
+"https://raw.githubusercontent.com/Savanty/AE/main/Hodd.jpeg", //39
+"https://raw.githubusercontent.com/Savanty/AE/main/Moss FK.jpeg", //40
+"https://raw.githubusercontent.com/Savanty/AE/main/Raufoss IL.jpeg", //41
+"https://raw.githubusercontent.com/Savanty/AE/main/Skeid Futebol.jpeg", //42
+"https://raw.githubusercontent.com/Savanty/AE/main/IK Start.jpeg", //43
+"https://raw.githubusercontent.com/Savanty/AE/main/Egersunds IK.jpeg", //44
+"https://raw.githubusercontent.com/Savanty/AE/main/Stabaek IF.jpeg", //45
+"https://raw.githubusercontent.com/Savanty/AE/main/Atletico Grau.jpeg", //46
+"https://raw.githubusercontent.com/Savanty/AE/main/Em Deportivo Binacional.jpeg", //47
+"https://raw.githubusercontent.com/Savanty/AE/main/SK Libchany.jpeg", //48
+"https://raw.githubusercontent.com/Savanty/AE/main/BSC Young Boys.jpeg", //49
+"https://raw.githubusercontent.com/Savanty/AE/main/Rayo Zuliano.jpeg", //50
+  ],
+  horarios: [
+    "2025-08-06T19:00",
+"2025-08-06T19:00",
+"2025-08-06T19:30",
+"2025-08-06T19:30",
+"2025-08-06T21:30",
+"2025-08-06T21:30",
+"2025-08-06T11:00",
+"2025-08-06T14:00",
+"2025-08-06T12:00",
+"2025-08-06T14:00",
+"2025-08-06T14:30",
+"2025-08-06T15:30",
+"2025-08-06T16:00",
+"2025-08-06T16:00",
+"2025-08-06T10:00",
+"2025-08-06T14:00",
+"2025-08-06T15:30",
+"2025-08-06T14:00",
+"2025-08-06T15:45",
+"2025-08-06T20:00",
+"2025-08-06T20:30",
+"2025-08-06T20:30",
+"2025-08-06T21:30",
+"2025-08-06T22:30",
+"2025-08-06T22:30",
+"2025-08-06T19:00",
+"2025-08-06T20:00",
+"2025-08-06T21:30",
+"2025-08-06T16:00",
+"2025-08-06T20:00",
+"2025-08-06T20:30",
+"2025-08-06T23:00",
+"2025-08-06T15:00",
+"2025-08-06T16:15",
+"2025-08-06T06:30",
+"2025-08-06T06:30",
+"2025-08-06T06:30",
+"2025-08-06T07:00",
+"2025-08-06T07:00",
+"2025-08-06T07:00",
+"2025-08-06T13:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T14:00",
+"2025-08-06T17:00",
+"2025-08-06T19:30",
+"2025-08-06T12:30",
+"2025-08-06T15:30",
+"2025-08-06T16:00",
+  ]
+},
+  quinta: {
+    ladoAImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/clube guarani Assuncao",//1
+      "https://raw.githubusercontent.com/Savanty/AE/main/atletico-mg.jpeg",//2
+        "https://raw.githubusercontent.com/Savanty/AE/main/Juventude.jpeg",//extra
+      "https://raw.githubusercontent.com/Savanty/AE/main/Botafogo_FC_SP.png",//3
+      "https://raw.githubusercontent.com/Savanty/AE/main/Clube do Remo PA.png",//4
+      "https://raw.githubusercontent.com/Savanty/AE/main/Atletic club escaldes.jpeg",//5
+        "https://raw.githubusercontent.com/Savanty/AE/main/Fc Astana.png",//6
+      "https://raw.githubusercontent.com/Savanty/AE/main/paide.jpeg",//7
+      "https://raw.githubusercontent.com/Savanty/AE/main/araz.png",//8
+      "https://raw.githubusercontent.com/Savanty/AE/main/aris Limassol.png",//9
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Aktobe.jpeg",//10
+        "https://raw.githubusercontent.com/Savanty/AE/main/Fc ararat-Armenia",//11
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Arda Kardz.jpeg",//12
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Pyunik.png",//13
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fk Kauno Zalgiris.png",//14
+      "https://raw.githubusercontent.com/Savanty/AE/main/Hobernians.jpeg",//15
+        "https://raw.githubusercontent.com/Savanty/AE/main/Rosenborg.png",//16
+      "https://raw.githubusercontent.com/Savanty/AE/main/St Josephs Fc.jpeg",//17
+      "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen.png",//18
+      "https://raw.githubusercontent.com/Savanty/AE/main/Vilnius Fk Zalgiris.png",//19
+      "https://raw.githubusercontent.com/Savanty/AE/main/Ac Omonia.jpeg",//20
+       "https://raw.githubusercontent.com/Savanty/AE/main/cherno.png",//21
+      "https://raw.githubusercontent.com/Savanty/AE/main/Cs petrocub.jpeg",//22
+      "https://raw.githubusercontent.com/Savanty/AE/main/Oleksandriya.png",//23
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fk Novi Pazar.png",//24
+      "https://raw.githubusercontent.com/Savanty/AE/main/hammarby lf.jpeg",//25
+        "https://raw.githubusercontent.com/Savanty/AE/main/Polissya.png",//26
+      "https://raw.githubusercontent.com/Savanty/AE/main/Riga Fc.jpeg",//27
+      "https://raw.githubusercontent.com/Savanty/AE/main/Viking If.png",//28
+      "https://raw.githubusercontent.com/Savanty/AE/main/aris Fc Vaduz.png",//29
+      "https://raw.githubusercontent.com/Savanty/AE/main/Aek Atenas Fc.jpeg",//30
         
-   "https://raw.githubusercontent.com/Savanty/AE/main/Coritiba PR.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Suica.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Islândia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Argélia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Nigéria.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Piast Cliwice.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Stade Briochin.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Estrela Vermelha.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Midtjylland.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BSC Young Boys.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Miedz Legnica.jpeg",
- 
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Oleksandriya.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/TSV Havelse.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC FC Basel 1893.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Besiktas JC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KSC Lokeren Temse.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Limavady United FC.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/F91 Dudelange.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Paide Linnameeskond.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Ordabasy.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pen-y-Bont FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/KI Klaksvik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fc neman Grodno.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Dila Gori",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Partizani Tirana.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sileks Kratovo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
-    
-
-
-      ],  
-      horarios: [ 
+    ],
+    ladoBImagens: [
+       "https://raw.githubusercontent.com/Savanty/AE/main/Universidade do chile.png",//1
+      "https://raw.githubusercontent.com/Savanty/AE/main/Atletico Bucaramanga.jpeg",//2
+        "https://raw.githubusercontent.com/Savanty/AE/main/Sao-Paulo.jpeg",//extra
+      "https://raw.githubusercontent.com/Savanty/AE/main/criciuma.png",//3
      
-       "2025-07-10T21:35", //1 
-     
-       "2025-07-10T16:00",//2
+      "https://raw.githubusercontent.com/Savanty/AE/main/Avai.jpeg",//4
+      "https://raw.githubusercontent.com/Savanty/AE/main/Dinamo Tirana.jpeg",//5
+        "https://raw.githubusercontent.com/Savanty/AE/main/zimbru.png",//6
+      "https://raw.githubusercontent.com/Savanty/AE/main/Aik.jpeg",//7
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Aris Salonica.png",//8
+      "https://raw.githubusercontent.com/Savanty/AE/main/Puscas Akademia Fc.png",//9
+      "https://raw.githubusercontent.com/Savanty/AE/main/Ac Sparta Praga.jpeg",//10
+        "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade Cluj",//11
+      "https://raw.githubusercontent.com/Savanty/AE/main/Hjk Helsinquis.jpeg",//12
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Elto Fc gyor.png",//13
+      "https://raw.githubusercontent.com/Savanty/AE/main/Valur Reykjavik.png",//14
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Spartak Trnava.jpeg",//15
+        "https://raw.githubusercontent.com/Savanty/AE/main/Fk Banga Gargzdai.png",//16
+      "https://raw.githubusercontent.com/Savanty/AE/main/shamrock Rover Fc.jpeg",//17
+      "https://raw.githubusercontent.com/Savanty/AE/main/Az Alkmaar.png",//18
+      "https://raw.githubusercontent.com/Savanty/AE/main/Linfield.png",//19
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Torpedo 2008 kutaisi.jpeg",//20
+       "https://raw.githubusercontent.com/Savanty/AE/main/instambul basaksehir Fk.png",//21
+      "https://raw.githubusercontent.com/Savanty/AE/main/sabah Fc.jpeg",//22
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc partizan.png",//23
+      "https://raw.githubusercontent.com/Savanty/AE/main/jagiellonia Bialystok.png",//24
+      "https://raw.githubusercontent.com/Savanty/AE/main/Royal Charlero.jpeg",//25
+        "https://raw.githubusercontent.com/Savanty/AE/main/Fc Santa Coloma.png",//26
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Dila Gori.jpeg",//27
+      "https://raw.githubusercontent.com/Savanty/AE/main/Fc Koper.png",//28
+      "https://raw.githubusercontent.com/Savanty/AE/main/Dungannon Swifts Fc.png",//29
+      "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva Fc.jpeg",//30
       
-       "2025-07-10T16:00", //3
       
-       "2025-07-10T13:00" , //4
-       
-       "2025-07-10T16:00",  //5
-     
-       "2025-07-10T06:00" ,  //6  
       
-       "2025-07-10T06:00",    //7
-       
-       "2025-07-10T11:00",//8 
-     
-       "2025-07-10T11:00",      //9
       
-       "2025-07-10T11:30",  //10
         
-       "2025-07-10T11:30", //11
-       
-       "2025-07-10T12:30", //12
-       
-       "2025-07-10T13:00", //13
-      
-       "2025-07-10T13:30" , //14
-      
-       "2025-07-10T14:00",   //15
-        
-       "2025-07-10T14:30" , //16
-      
-       "2025-07-10T15:45",    //17
-        
-       
-       
-       
-       
-       "2025-07-10T11:00",//18
-     
-       "2025-07-10T12:00",      //19
-       //20
-       "2025-07-10T13:00", 
-        //21
-       "2025-07-10T13:00",   
-       //22
-       "2025-07-10T13:00",
-       //23
-       "2025-07-10T13:30",   
-       //24
-       "2025-07-10T13:30" ,
-       //25
-       "2025-07-10T13:45",  
-       //26  
-       "2025-07-10T15:00" ,
-       //27
-       "2025-07-10T15:00",   
-       //28 
-       "2025-07-10T15:00",
-       //29
-       "2025-07-10T15:00",    
-       //30
-       "2025-07-10T15:15", 
-        //31
-       "2025-07-10T15:30",   
-       //32
-       "2025-07-10T15:30",
-       //33
-       "2025-07-10T15:30",   
-       //34
-       "2025-07-10T15:45" ,
-       //35
-       "2025-07-10T15:45",  
-       //36  
-       "2025-07-10T16:00" ,
-       //37
-       "2025-07-10T16:00",   
-       //38 
-       "2025-07-10T16:00",
-       //39
-       "2025-07-10T17:00",    
-      
-       
-       
-       
-      //40
-       "2025-07-10T13:00", 
-        //41
-       "2025-07-10T13:30",   
-       //42
-       "2025-07-10T14:00",
-       //43
-       "2025-07-10T14:00",   
-       //44
-       "2025-07-10T14:30" ,
-       //45
-       "2025-07-10T15:00",  
-       //46  
-       "2025-07-10T15:15" ,
-       //47
-       "2025-07-10T16:00",   
-       
-       
-       
-       //48 
-       "2025-07-10T19:00",
-       //49
-       "2025-07-10T21:30",    
-       //50
-       "2025-07-10T20:00", 
-        //51
-       "2025-07-10T13:00",   
-       //52
-       "2025-07-10T16:00",
-       //53
-       "2025-07-10T19:00",   
-       //54
-       "2025-07-10T21:30" ,
-       //55
-       "2025-07-10T21:00",  
-       //56  
-       "2025-07-10T12:00" ,
-       //57
-       "2025-07-10T12:30",   
-       //58 
-       "2025-07-10T14:00",
-       //59
-       "2025-07-10T17:00",  
-       
-       
-       
-       
-         
-       //60
-       "2025-07-10T20:00", 
-        //61
-       "2025-07-10T17:00",   
-       //62
-       "2025-07-10T20:00",
-       //63
-       "2025-07-10T17:00",   
-       //64
-       "2025-07-10T20:00" ,
-       //65
-       "2025-07-10T17:00",  
-       //66  
-       "2025-07-10T20:00" ,
-       //67
-       "2025-07-10T17:00",   
-       //68 
-       "2025-07-10T20:00",
-       //69
-       "2025-07-10T17:00",    
-       //70
-       "2025-07-10T20:00", 
-        //71
-       "2025-07-10T17:00",   
-       //72
-       "2025-07-10T20:00",
-       //73
-       "2025-07-10T17:00",   
-       //74
-       "2025-07-10T20:00" ,
-       //75
-       "2025-07-10T17:00",  
-       //76  
-       "2025-07-10T20:00" ,
-       //77
-       "2025-07-10T17:00",   
-       //78 
-       "2025-07-10T20:00",
-       //79
-       "2025-07-10T17:00",    
-       //80
-       "2025-07-10T20:00", 
-       
-            ]  
-    },  
-   
-    sexta: {  
-      ladoAImagens: [  
-        "https://raw.githubusercontent.com/Savanty/AE/main/Equador",
-     "https://raw.githubusercontent.com/Savanty/AE/main/Vila Nova.png",
-     
-    "https://raw.githubusercontent.com/Savanty/AE/main/LIaneros Fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CD Once Caldas.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Clube Desportivo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Puebla Fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Csd Macara.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Asociacion Deportiva.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Guabira Monteiro.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/North Carolina.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monterey Bay.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Bohemians Dublin.jpeg",
- 
-    "https://raw.githubusercontent.com/Savanty/AE/main/waterford fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Metaloglobus.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Acs Champions",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fc kuressares.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cidade De.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Gimnasia y tyro De.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Bray.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Colegio Univesitario.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/treaty.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Wexford.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Mfk Skalica.png",
-    
-     "https://raw.githubusercontent.com/Savanty/AE/main/Sku Amstetten",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Italia",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Portugal.png",
-   //fim
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Sileks Kratovo.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
+    ],
+    horarios: [
+      "2025-07-24T19:00",//1
+      "2025-07-24T21:30",//2
+      "2025-07-24T19:00",//extra
+      "2025-07-24T11:00",//3
+      "2025-07-24T12:30",//4
+      "2025-07-24T13:00",//5
+      "2025-07-24T13:00",//6
+      "2025-07-24T13:00",//7
+      "2025-07-24T13:00",//8
+      "2025-07-24T13:00",//9
+      "2025-07-24T13:00",//10
+      "2025-07-24T13:00",//11
+      "2025-07-24T13:00",//12
+      "2025-07-24T13:00",//13
+      "2025-07-24T13:00",//14
+      "2025-07-24T13:00",//15
+      "2025-07-24T13:00",//16
+      "2025-07-24T13:00",//17
+      "2025-07-24T13:00",//18
+      "2025-07-24T13:00",//19
+      "2025-07-24T14:00",//20
+      "2025-07-24T14:00",//21
+      "2025-07-24T14:00",//22
+      "2025-07-24T14:00",//23
+      "2025-07-24T14:00",//24
+      "2025-07-24T14:00",//25
+      "2025-07-24T14:00",//26
+      "2025-07-24T14:00",//27
+      "2025-07-24T14:00",//28
+      "2025-07-24T14:30",//29
+      "2025-07-24T15:00",//30
+    ]
+  },
+  sexta: {
+    ladoAImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Celtic.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Rangers.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Hibernian.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Aberdeen.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Hearts.jpeg",
+    ],
+    ladoBImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Motherwell.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/StJohnstone.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Livingston.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Kilmarnock.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Dundee.jpeg",
+    ],
+    horarios: [
+      "2025-07-01T14:15",
+      "2025-07-01T16:15",
+      "2025-07-01T18:15",
+      "2025-07-01T20:15",
+      "2025-07-01T22:15",
+    ]
+  },
+  sabado: {
+    ladoAImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Newcastle.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Tottenham.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/WestHam.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/AstonVilla.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Wolves.jpeg"
+    ],
+    ladoBImagens: [
+      "https://raw.githubusercontent.com/Savanty/AE/main/Everton.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Bournemouth.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Brighton.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Leeds.jpeg",
+      "https://raw.githubusercontent.com/Savanty/AE/main/Nottingham.jpeg"
+    ],
+    horarios: [
+      "2025-07-02T13:00",
+      "2025-07-02T15:00",
+      "2025-07-02T17:00",
+      "2025-07-02T19:00",
+      "2025-07-02T21:00"
+    ]
+  }
+};
  
     
-    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
-    
- 
-      ],  
-      ladoBImagens: [  
-           "https://raw.githubusercontent.com/Savanty/AE/main/Uruguai.jpeg",
-     "https://raw.githubusercontent.com/Savanty/AE/main/Operario Ferroviaro.png",
-    "https://raw.githubusercontent.com/Savanty/AE/main/America de Cali.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athetico Naxional.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Club General.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Clube Libertade.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Altas.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Csd Indepedente.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Comerciante.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Alway Ready.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Birmighan.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Orange County.jpeg",
- 
-    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
-    //fim
-    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
-    
-
-      ],  
-      horarios: [ "2025-07-11T21:00", //1 
-     
-       "2025-07-11T19:00",//2
-      
-       "2025-07-11T20:00", //3
-      
-       "2025-07-11T22:10" , //4
-       
-       "2025-07-11T16:00",  //5
-     "2025-07-11T18:30" , 
-       "2025-07-11T22:00" ,  //6  
-      
-       "2025-07-11T21:00",  //7
-       
-       "2025-07-11T17:00", //8 
-     
-       "2025-07-11T20:00", //9
-       "2025-07-11T20:30",
-       "2025-07-11T15:45",  //10
-        
-       "2025-07-11T15:45", //11
-       
-       "2025-07-11T13:00", //12
-       
-       "2025-07-11T15:30", //13
-      
-       "2025-07-11T13:00" , //14
-      
-       "2025-07-11T15:45",   //15
-         "2025-07-11T22:00",
-       "2025-07-11T15:45" , //16
-       "2025-07-11T15:45",
-       "2025-07-11T15:45",  //17
-       
-       "2025-07-11T15:45",//18
-      "2025-07-11T06:00",  
-       "2025-07-11T06:00",  
-           //19
-       
-        "2025-07-11T16:00",//20
-     
-       "2025-07-11T16:00",      //21
-        "2025-07-11T15:45",   //15
-        
-       "2025-07-11T15:45" , //16
-      
-       "2025-07-11T15:45",  //17
-       
-       "2025-07-11T15:45",//18
-     
-       "2025-07-11T06:00",      //19
-       
-        "2025-07-11T16:00",//20
-     
-       "2025-07-11T16:00",      //21
-       ]  
-      
-    },  
-    sabado: {  
-      ladoAImagens: [  
-         "https://raw.githubusercontent.com/Savanty/AE/main/peru.jpeg",
-         
-     "https://raw.githubusercontent.com/Savanty/AE/main/Flamengo%20(1).jpeg",
-     
-    "https://raw.githubusercontent.com/Savanty/AE/main/Internacional.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/vasco.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/bahia.jpg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Novorizontino.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Paysandu SC PA.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athletico.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Itabaiana SE.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Sao_Bernardo.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Floresta.jpeg",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/Tombense.jpeg",
- 
-    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
-    //fim
-    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
-      ],  
-      ladoBImagens: [  
-     "https://raw.githubusercontent.com/Savanty/AE/main/Chile.jpeg",
-     
-     "https://raw.githubusercontent.com/Savanty/AE/main/Sao-Paulo.jpeg",
-     
-    "https://raw.githubusercontent.com/Savanty/AE/main/vitoria.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Botafogo_Rio.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athletic-MG_serieC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/America-MG.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Atletico Goianiense.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Goiás.jpeg",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Confianca.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Ponte_Preta.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Ypiranga Fc Rs.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/ABC.jpeg",
- 
-    "https://raw.githubusercontent.com/Savanty/AE/main/Galway United.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cork city.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/As Fc Universidade.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fc Rapid 1923.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/tartu jk.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Partick thistle.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/Ca Patronato.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Dundalk fc.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/finn harps.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Cobh Ramblers.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Athlone town.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Fk Mas Taborsko.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/1860 Munique.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Espanha.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Belgica.png",
-    //fim
-    "https://raw.githubusercontent.com/Savanty/AE/main/BFC Daugava.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Petrocub Hincesti.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FK Rabotnicki Skopje.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Vikingur Reykjavik.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/La Fiorita.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Brest.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Koper.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HJK Helsinquia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Hegelmann Litaue.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Santa Coloma.png",
-  
-     "https://raw.githubusercontent.com/Savanty/AE/main/FC Pyunik.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FK Auda.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Flora Tallinn.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/NK Celje.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Partizan.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC CFR 1907 Cluj.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/FC Prishtina.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Haoel Beer Sheva FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Tampereen Ilves.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/BK Hacken.png",
-  
-  "https://raw.githubusercontent.com/Savanty/AE/main/FC Aktobe.jpeg",
- 
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Deportes Concepción.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Coquimbo Unido.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Delfin SC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Pastoreo FC.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Academia del Balompie.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/CA Nacional Potosi.png",
-   
-    "https://raw.githubusercontent.com/Savanty/AE/main/Blooming.png",
-    
- "https://raw.githubusercontent.com/Savanty/AE/main/St. Croix SC.jpeg",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/HPS Academia.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Jakobstads Bollklubb.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Melhus IL.png",
-    
-    "https://raw.githubusercontent.com/Savanty/AE/main/Monagas SC",
-      ],  
-      horarios: [
-        "2025-07-12T16:00", //1 
-     
-       "2025-07-12T16:30",//2
-      
-       "2025-07-12T16:30", //3
-      
-       "2025-07-12T18:30" , //4
-       
-       "2025-07-12T21:00",  //5
-    
-       "2025-07-12T16:00" ,  //6  
-      
-       "2025-07-12T18:30",  //7
-       
-       "2025-07-12T20:30", //8 
-     
-       "2025-07-12T17:00", //9
-     
-       "2025-07-12T17:00",  //10
-       
-         "2025-07-12T19:30", //11
-     
-       "2025-07-12T19:30",  //12
-        ]  
-    }  
-      
-  };  
-
-    const distribuicaoGrupos = {
-      domingo: [3,3],
-      segunda: [1,3,2],
-      terca: [1,3,2],
-      quarta: [2,3,3,11],
-      quinta: [1,2,2,12,22,8,2,1,1,3,1,1,1,1,1,1],
-      sexta: [1,1,2,2,1,1,1,1,2,2,2,1,1,1,4,1,2],
-      sabado: [1,4,3,4]
-    };
-
     const nomesGrupos = {
       domingo: ["Brasileirão Série B"],
       segunda: ["Campeonato Inglês", "Outro Grupo", "Mais um Grupo"],
-      terca: ["Libertadores", "Amistoso", "Copa do Brasil"],
-      quarta: ["Mundial de Clubes", "Copa do Nordeste", "Liga dos Campeões UEFA", "Brasileirão Sub20"],
+      terca: ["Internacional African Nations Ch.ship", //1
+"Clubes Internacionais Liga dos Campeões UEFA", //2
+"Jogos Amistosos de Clube", //3
+"Uefa Europa Conference League", //4
+"Liga Europa UEFA", //5
+"Leagues Cup", //6
+"CONCACAF Central American Cup", //7
+"Copa EFL", //8
+"Argentina Primeira Nacional", //9
+"Colômbia Copa Colômbia", //10
+"Equador Superliga, Women", //11
+"Paraguai Primeira Divisão, Encerramento", //12
+"Copa Paraguay", //13
+"Austrália NPL,  Queensland", //14
+"NPL Queensland, Feminino", //15
+"South Australia State League 1", //16
+"Costa Rica Copa Costa Rica", //17
+"Dinamarca Copa Ekstra Bladet", //18
+"Eslováquia Copa da Eslováquia", //19
+"Tj Druzstevnik Opatova Nad Vahom", //20
+"Estônia Liga Premium", //21
+"Islândia Urvalsdeild", //22
+"Noruega Toppserien Feminino", //23
+"Peru Primeira Divisão", //24
+"Polônia Puchar Polski", //25
+"Romênia Copa da Romênia", //26
+"Uzbequistão PFL", //27
+],
+
+      quarta: ["Copa do Brasil", //1
+"Internacional African Nations Ch.ship", //2
+"Clubes Internacionais Liga dos Campeões UEFA", //3
+"Jogos Amistosos de Clube", //4
+"Liga Europa UEFA", //5
+"Leagues Cup", //6
+"Colômbia  Copa Colômbia", //7
+"Bolívia Divisão Profissional", //8
+"Estados Unidos Usl Championship", //9
+"Islândia Urvalsdeild", //10
+"Japão  Copa Emperor", //11
+"Noruega  1. Divisão", //12
+"Peru  Primeira Divisão", //13
+"Rep. Checa  Copa da Rep. Checa", //14
+"Suíça  Super League", //15
+"Venezuela  Copa Venezuela", //16
+],
       quinta: ["Brasileirão Série B", "European Championship, Women", "Africa Cup of Nations, Women", "Jogos Amistosos de Clube", "Uefa Europa Conference League", "Liga Europa UEFA", "Copa do Chile", "Copa Equador", "Copa Paraguay", "Copa Division Profesional", "Usl League Two", "Kakkonen Grupo B", "Finlândia Kakkonen Grupo C", "Finlândia 3ª Divisão Grupo 2", "Noruega 3ª Divisão Grupo 2", "Venezuela Copa Venezuela"],
       sexta: ["Serie B", "Copa America women", "Euro Liga Conferencia UEFA", "Campeonato Colombiano 1 div", "Campeonato Paraguaio", "Campeonato Mexicano", "Campeonato Equatoriano", "Campeonato Peruano", "Campeonato Boliviano", "Usl Estados Unidos", "Campeonato irlandes 1 div", "Campeonato Romano", "Campeonato Estonia", "Liga Escocesa", "Campeonato Agentino", "Campeonato irlandes 2 div", "Amistoso Internacional de Clubes", "Euro Copa Femenina"],
       sabado: ["Copa America Feminina", "Brasileirao Serie A", "Brasileirao Serie B", "Brasileirao Serie C"]
     };
 
+    const distribuicaoGrupos = {
+      domingo: [3,3],
+      segunda: [1,3,2],
+      terca: [2,4,4,1,1,6,3,1,1,2,1,1,1,1,2,1,1,4,2,1,1,5,3,4,1,1],
+      quarta: [6,2,6,3,2,6,3,1,3,2,6,8,2,1,1,1],
+      quinta: [1,2,2,12,22,8,2,1,1,3,1,1,1,1,1,1],
+      sexta: [1,1,2,2,1,1,1,1,2,2,2,1,1,1,4,1,2],
+      sabado: [1,4,3,4]
+    };
+
+    
     const cotacoesPadrao = {
       casa: 1.50,
       empate: 3.0,
@@ -1579,14 +1143,167 @@ color: green;
     };
 
     const cotacoesIndividuais = {
-      domingo: {
-        0: { casa: 1.50, empate: 2.5, fora: 3.0, ambasMarcam: 2.5, acima2: 2.0, abaixo2: 2.8, casaFora: 1.5, casaEmpate: 2.0, empateFora: 1.8 },
-        1: { casa: 1.55, empate: 3.0, fora: 2.7, ambasMarcam: 2.2, acima2: 2.1, abaixo2: 2.5, casaFora: 1.4, casaEmpate: 1.9, empateFora: 1.9 }
-      },
-      segunda: {
-        0: { casa: 1.60, empate: 2.7, fora: 2.8, ambasMarcam: 2.4, acima2: 2.2, abaixo2: 2.6, casaFora: 1.6, casaEmpate: 2.1, empateFora: 1.9 }
-      }
-    };
+    domingo: {
+  0: { casa: 1.65, empate: 3.6, fora: 3.43, ambasMarcam: 2.06, acima2: 2.66, abaixo2: 2.46, casaFora: 2.17, casaEmpate: 2.65, empateFora: 1.93 },
+  1: { casa: 1.1, empate: 3.13, fora: 3.27, ambasMarcam: 2.22, acima2: 2.28, abaixo2: 2, casaFora: 1.87, casaEmpate: 2.29, empateFora: 2.32 },
+  2: { casa: 1.34, empate: 3.85, fora: 3.24, ambasMarcam: 1.92, acima2: 2.49, abaixo2: 2.78, casaFora: 1.55, casaEmpate: 2.09, empateFora: 1.88 },
+  3: { casa: 1.79, empate: 2.61, fora: 3.04, ambasMarcam: 1.96, acima2: 2.37, abaixo2: 2.22, casaFora: 1.88, casaEmpate: 2.03, empateFora: 2.33 },
+  4: { casa: 1.79, empate: 3.88, fora: 2.57, ambasMarcam: 2.31, acima2: 2.28, abaixo2: 2.43, casaFora: 2.32, casaEmpate: 2.3, empateFora: 2.37 },
+  5: { casa: 1.47, empate: 3.14, fora: 3.3, ambasMarcam: 1.74, acima2: 2.07, abaixo2: 2.13, casaFora: 2.17, casaEmpate: 2.34, empateFora: 2.08 },
+  6: { casa: 1.32, empate: 3.07, fora: 3.58, ambasMarcam: 2.09, acima2: 2.16, abaixo2: 2.21, casaFora: 1.8, casaEmpate: 2.12, empateFora: 2.43 },
+  7: { casa: 1.25, empate: 2.75, fora: 2.62, ambasMarcam: 1.81, acima2: 2.16, abaixo2: 2.34, casaFora: 1.84, casaEmpate: 1.91, empateFora: 2.15 },
+  8: { casa: 1.33, empate: 2.66, fora: 2.94, ambasMarcam: 2.39, acima2: 2.27, abaixo2: 2.18, casaFora: 2.31, casaEmpate: 1.97, empateFora: 1.81 },
+  9: { casa: 1.73, empate: 3.74, fora: 2.78, ambasMarcam: 2.14, acima2: 2.17, abaixo2: 2.09, casaFora: 2.24, casaEmpate: 2.91, empateFora: 2.33 },
+  10: { casa: 1.24, empate: 3.36, fora: 2.97, ambasMarcam: 1.74, acima2: 2.19, abaixo2: 2.86, casaFora: 1.76, casaEmpate: 1.93, empateFora: 1.82 },
+  11: { casa: 1.72, empate: 2.92, fora: 3.63, ambasMarcam: 2.38, acima2: 2.84, abaixo2: 2.12, casaFora: 1.62, casaEmpate: 1.9, empateFora: 1.99 },
+  12: { casa: 1.72, empate: 3.25, fora: 3.38, ambasMarcam: 2.05, acima2: 1.95, abaixo2: 2.47, casaFora: 2, casaEmpate: 2.98, empateFora: 2.4 },
+  13: { casa: 1.63, empate: 3.34, fora: 3.1, ambasMarcam: 1.81, acima2: 2.09, abaixo2: 2.62, casaFora: 1.89, casaEmpate: 2.3, empateFora: 2.25 },
+  14: { casa: 1.54, empate: 2.72, fora: 3.23, ambasMarcam: 1.95, acima2: 1.95, abaixo2: 2.14, casaFora: 2.25, casaEmpate: 2.26, empateFora: 2.36 },
+  15: { casa: 1.49, empate: 3.01, fora: 3.47, ambasMarcam: 2.46, acima2: 2.56, abaixo2: 2.29, casaFora: 1.55, casaEmpate: 2.47, empateFora: 2.4 },
+  16: { casa: 1.2, empate: 3.64, fora: 3.37, ambasMarcam: 1.94, acima2: 2.96, abaixo2: 2.07, casaFora: 1.86, casaEmpate: 2.87, empateFora: 2.31 },
+  17: { casa: 1.11, empate: 2.64, fora: 3.22, ambasMarcam: 2.26, acima2: 1.64, abaixo2: 2.69, casaFora: 1.86, casaEmpate: 2.27, empateFora: 2.06 },
+  18: { casa: 1.06, empate: 3.56, fora: 3.48, ambasMarcam: 1.89, acima2: 1.67, abaixo2: 2.2, casaFora: 1.92, casaEmpate: 2.23, empateFora: 2.2 },
+  19: { casa: 1.58, empate: 3.58, fora: 2.55, ambasMarcam: 2.42, acima2: 1.81, abaixo2: 2.76, casaFora: 2.37, casaEmpate: 2.04, empateFora: 1.92 },
+},
+
+segunda: {
+  0: { casa: 1.42, empate: 3.05, fora: 3.26, ambasMarcam: 1.97, acima2: 2.78, abaixo2: 2.41, casaFora: 2.28, casaEmpate: 2.73, empateFora: 2.26 },
+  1: { casa: 1.45, empate: 2.63, fora: 3.01, ambasMarcam: 2.1, acima2: 2.64, abaixo2: 2.85, casaFora: 2.22, casaEmpate: 2, empateFora: 1.98 },
+  2: { casa: 1.02, empate: 3.78, fora: 2.98, ambasMarcam: 2.17, acima2: 1.91, abaixo2: 2.2, casaFora: 1.84, casaEmpate: 2.63, empateFora: 2.07 },
+  3: { casa: 1.25, empate: 3.2, fora: 2.52, ambasMarcam: 2.18, acima2: 1.59, abaixo2: 2.13, casaFora: 1.7, casaEmpate: 2.38, empateFora: 2.13 },
+  4: { casa: 1.67, empate: 3.35, fora: 2.81, ambasMarcam: 2.38, acima2: 2.72, abaixo2: 2.91, casaFora: 2.43, casaEmpate: 2.45, empateFora: 1.88 },
+  5: { casa: 1.27, empate: 3.86, fora: 3.52, ambasMarcam: 1.98, acima2: 2.57, abaixo2: 2.72, casaFora: 2.45, casaEmpate: 2.73, empateFora: 2.12 },
+  6: { casa: 1.14, empate: 3.88, fora: 2.7, ambasMarcam: 1.84, acima2: 2.77, abaixo2: 2.32, casaFora: 1.59, casaEmpate: 2.63, empateFora: 2.45 },
+  7: { casa: 1.64, empate: 3.72, fora: 3.62, ambasMarcam: 1.93, acima2: 2.22, abaixo2: 2.83, casaFora: 1.8, casaEmpate: 2.46, empateFora: 2.18 },
+  8: { casa: 1.38, empate: 3.24, fora: 3.28, ambasMarcam: 2.49, acima2: 2.39, abaixo2: 2.38, casaFora: 1.62, casaEmpate: 1.92, empateFora: 1.99 },
+  9: { casa: 1.62, empate: 2.63, fora: 3.27, ambasMarcam: 1.86, acima2: 2.05, abaixo2: 2.26, casaFora: 2.34, casaEmpate: 1.99, empateFora: 2.43 },
+  10: { casa: 1.52, empate: 3.92, fora: 3.36, ambasMarcam: 2.5, acima2: 2.07, abaixo2: 2.16, casaFora: 2.31, casaEmpate: 2.09, empateFora: 2.29 },
+  11: { casa: 1.67, empate: 3.61, fora: 2.72, ambasMarcam: 2.46, acima2: 2.01, abaixo2: 2.6, casaFora: 1.96, casaEmpate: 2.58, empateFora: 2.22 },
+  12: { casa: 1.01, empate: 3.11, fora: 2.73, ambasMarcam: 2.04, acima2: 1.88, abaixo2: 2.46, casaFora: 1.54, casaEmpate: 2.82, empateFora: 2.11 },
+  13: { casa: 1.37, empate: 3.9, fora: 2.75, ambasMarcam: 1.84, acima2: 2.18, abaixo2: 2.63, casaFora: 1.67, casaEmpate: 2.77, empateFora: 2.41 },
+  14: { casa: 1.12, empate: 2.79, fora: 3.4, ambasMarcam: 2.12, acima2: 2.58, abaixo2: 2.33, casaFora: 2.47, casaEmpate: 2.44, empateFora: 2.19 },
+  15: { casa: 1.1, empate: 3.46, fora: 3.68, ambasMarcam: 2.48, acima2: 1.61, abaixo2: 2.87, casaFora: 1.91, casaEmpate: 2.43, empateFora: 2.18 },
+  16: { casa: 1.71, empate: 2.66, fora: 2.89, ambasMarcam: 2.47, acima2: 2.64, abaixo2: 2.22, casaFora: 2.42, casaEmpate: 2.3, empateFora: 2.42 },
+  17: { casa: 1.72, empate: 3.09, fora: 3.8, ambasMarcam: 1.8, acima2: 1.7, abaixo2: 2.81, casaFora: 1.61, casaEmpate: 2.29, empateFora: 1.95 },
+  18: { casa: 1.77, empate: 3.54, fora: 3.78, ambasMarcam: 2.33, acima2: 2.32, abaixo2: 2.23, casaFora: 2.49, casaEmpate: 2.55, empateFora: 1.87 },
+  19: { casa: 1.17, empate: 3.1, fora: 3.79, ambasMarcam: 2.33, acima2: 2.8, abaixo2: 2.84, casaFora: 1.6, casaEmpate: 2.98, empateFora: 2.18 },
+},
+
+terca: {
+  0: { casa: 1.03, empate: 3.25, fora: 2.6, ambasMarcam: 2.16, acima2: 2.68, abaixo2: 2.64, casaFora: 1.7, casaEmpate: 2.55, empateFora: 1.85 },
+  1: { casa: 1.17, empate: 3.18, fora: 2.77, ambasMarcam: 1.78, acima2: 2.69, abaixo2: 2.07, casaFora: 2.19, casaEmpate: 2.07, empateFora: 1.95 },
+  2: { casa: 1.28, empate: 3.06, fora: 3.55, ambasMarcam: 1.89, acima2: 1.52, abaixo2: 2.9, casaFora: 1.67, casaEmpate: 2.13, empateFora: 2.37 },
+  3: { casa: 1.44, empate: 2.76, fora: 3.02, ambasMarcam: 2.4, acima2: 2.87, abaixo2: 2.57, casaFora: 1.77, casaEmpate: 2.07, empateFora: 2 },
+  4: { casa: 1.64, empate: 3.25, fora: 2.54, ambasMarcam: 2.22, acima2: 2.3, abaixo2: 2.81, casaFora: 2.14, casaEmpate: 2.58, empateFora: 2.33 },
+  5: { casa: 1.19, empate: 2.97, fora: 3.36, ambasMarcam: 1.84, acima2: 2.2, abaixo2: 2.65, casaFora: 2.36, casaEmpate: 1.96, empateFora: 2.38 },
+  6: { casa: 1.72, empate: 3.76, fora: 3.45, ambasMarcam: 2.41, acima2: 2.41, abaixo2: 2.28, casaFora: 2.26, casaEmpate: 2.63, empateFora: 1.95 },
+  7: { casa: 1.29, empate: 3.61, fora: 3.8, ambasMarcam: 1.81, acima2: 1.81, abaixo2: 2.69, casaFora: 1.72, casaEmpate: 2.89, empateFora: 1.93 },
+  8: { casa: 1.48, empate: 2.73, fora: 3.26, ambasMarcam: 2.49, acima2: 2.16, abaixo2: 2.27, casaFora: 2.23, casaEmpate: 2.26, empateFora: 2.1 },
+  9: { casa: 1.06, empate: 2.98, fora: 2.65, ambasMarcam: 2, acima2: 1.87, abaixo2: 2.16, casaFora: 1.67, casaEmpate: 2.56, empateFora: 2.29 },
+  10: { casa: 1.57, empate: 3.72, fora: 3.72, ambasMarcam: 1.71, acima2: 2.18, abaixo2: 2.88, casaFora: 1.6, casaEmpate: 2.2, empateFora: 1.93 },
+  11: { casa: 1.68, empate: 2.9, fora: 3.36, ambasMarcam: 2.3, acima2: 2.62, abaixo2: 2.59, casaFora: 2.15, casaEmpate: 2.24, empateFora: 2.18 },
+  12: { casa: 1.06, empate: 2.85, fora: 3.27, ambasMarcam: 1.99, acima2: 2.69, abaixo2: 2.25, casaFora: 1.58, casaEmpate: 2.91, empateFora: 2.39 },
+  13: { casa: 1.41, empate: 2.69, fora: 3.14, ambasMarcam: 1.86, acima2: 2.3, abaixo2: 2.44, casaFora: 2.38, casaEmpate: 2.45, empateFora: 2.39 },
+  14: { casa: 1.65, empate: 3.96, fora: 3.55, ambasMarcam: 2.41, acima2: 1.74, abaixo2: 2.04, casaFora: 1.73, casaEmpate: 2.46, empateFora: 2.05 },
+  15: { casa: 1.17, empate: 4, fora: 2.6, ambasMarcam: 2.27, acima2: 1.84, abaixo2: 2.15, casaFora: 2.05, casaEmpate: 1.93, empateFora: 2.17 },
+  16: { casa: 1.76, empate: 2.82, fora: 3.1, ambasMarcam: 1.72, acima2: 2.11, abaixo2: 2.71, casaFora: 1.76, casaEmpate: 2.44, empateFora: 1.83 },
+  17: { casa: 1.33, empate: 3.58, fora: 3.04, ambasMarcam: 2.22, acima2: 2.21, abaixo2: 2.48, casaFora: 1.66, casaEmpate: 2.47, empateFora: 2.4 },
+  18: { casa: 1.1, empate: 3.82, fora: 3.15, ambasMarcam: 2.23, acima2: 1.75, abaixo2: 2.98, casaFora: 2.31, casaEmpate: 1.95, empateFora: 2.29 },
+  19: { casa: 1.02, empate: 3.06, fora: 3.2, ambasMarcam: 2.22, acima2: 2.76, abaixo2: 2.22, casaFora: 1.77, casaEmpate: 2.33, empateFora: 1.81 },
+},
+
+quarta: {
+  0: { casa: 1.13, empate: 3.52, fora: 2.72, ambasMarcam: 2.27, acima2: 2.96, abaixo2: 2.07, casaFora: 2.14, casaEmpate: 2.49, empateFora: 1.8 },
+  1: { casa: 1.6, empate: 3.25, fora: 2.94, ambasMarcam: 2.32, acima2: 2.06, abaixo2: 2.44, casaFora: 1.81, casaEmpate: 2.09, empateFora: 2.14 },
+  2: { casa: 1.46, empate: 3.01, fora: 3.18, ambasMarcam: 2.14, acima2: 1.71, abaixo2: 2.05, casaFora: 2.38, casaEmpate: 2.16, empateFora: 2.34 },
+  3: { casa: 1.07, empate: 3.2, fora: 3.05, ambasMarcam: 2.11, acima2: 2.7, abaixo2: 2.88, casaFora: 1.99, casaEmpate: 2.91, empateFora: 2.28 },
+  4: { casa: 1.2, empate: 2.54, fora: 3.41, ambasMarcam: 1.99, acima2: 2.56, abaixo2: 2.43, casaFora: 1.68, casaEmpate: 2.66, empateFora: 2.28 },
+  5: { casa: 1.09, empate: 2.62, fora: 3.72, ambasMarcam: 2.39, acima2: 1.7, abaixo2: 2.02, casaFora: 2.28, casaEmpate: 2.75, empateFora: 2.44 },
+  6: { casa: 1.02, empate: 3.06, fora: 3.78, ambasMarcam: 1.71, acima2: 2.08, abaixo2: 2.5, casaFora: 1.8, casaEmpate: 2.49, empateFora: 1.97 },
+  7: { casa: 1.46, empate: 3.75, fora: 3.73, ambasMarcam: 2.45, acima2: 2.7, abaixo2: 2.98, casaFora: 1.51, casaEmpate: 2.87, empateFora: 1.82 },
+  8: { casa: 1, empate: 3.46, fora: 3.26, ambasMarcam: 2.19, acima2: 2.66, abaixo2: 2.38, casaFora: 2.32, casaEmpate: 2.98, empateFora: 2.4 },
+  9: { casa: 1.06, empate: 2.55, fora: 2.69, ambasMarcam: 2.15, acima2: 2.78, abaixo2: 2.78, casaFora: 1.95, casaEmpate: 2, empateFora: 1.82 },
+  10: { casa: 1.33, empate: 2.87, fora: 2.79, ambasMarcam: 2.01, acima2: 2.15, abaixo2: 2.47, casaFora: 2.12, casaEmpate: 2.61, empateFora: 2.46 },
+  11: { casa: 1.68, empate: 3.58, fora: 2.69, ambasMarcam: 2.42, acima2: 2.04, abaixo2: 2.35, casaFora: 1.69, casaEmpate: 1.95, empateFora: 2 },
+  12: { casa: 1.33, empate: 3.53, fora: 3.43, ambasMarcam: 2, acima2: 2.77, abaixo2: 2.25, casaFora: 2.22, casaEmpate: 2.71, empateFora: 1.9 },
+  13: { casa: 1.35, empate: 3.62, fora: 2.97, ambasMarcam: 2.07, acima2: 1.94, abaixo2: 2.8, casaFora: 2.1, casaEmpate: 2.63, empateFora: 2.02 },
+  14: { casa: 1.06, empate: 3.2, fora: 3.15, ambasMarcam: 2.41, acima2: 1.96, abaixo2: 2.11, casaFora: 2.2, casaEmpate: 2.11, empateFora: 2.03 },
+  15: { casa: 1.53, empate: 3.59, fora: 3.65, ambasMarcam: 2.01, acima2: 2.3, abaixo2: 2.56, casaFora: 1.84, casaEmpate: 2.65, empateFora: 1.94 },
+  16: { casa: 1.73, empate: 3.37, fora: 3.58, ambasMarcam: 1.9, acima2: 2.83, abaixo2: 2.45, casaFora: 1.53, casaEmpate: 2.72, empateFora: 2.16 },
+  17: { casa: 1.09, empate: 2.56, fora: 3.06, ambasMarcam: 2.24, acima2: 1.99, abaixo2: 2.34, casaFora: 1.79, casaEmpate: 2.83, empateFora: 2.11 },
+  18: { casa: 1.76, empate: 2.96, fora: 2.51, ambasMarcam: 2.03, acima2: 2.19, abaixo2: 2.49, casaFora: 2.32, casaEmpate: 2.14, empateFora: 2.26 },
+  19: { casa: 1.25, empate: 3.06, fora: 3.31, ambasMarcam: 1.99, acima2: 2.47, abaixo2: 2.41, casaFora: 2.21, casaEmpate: 2.53, empateFora: 1.9 },
+},
+
+quinta: {
+  0: { casa: 1.03, empate: 2.54, fora: 2.54, ambasMarcam: 1.78, acima2: 2.29, abaixo2: 2.61, casaFora: 2.09, casaEmpate: 2.42, empateFora: 2.1 },
+  1: { casa: 1.07, empate: 3.22, fora: 2.8, ambasMarcam: 2.42, acima2: 2.88, abaixo2: 2.02, casaFora: 1.97, casaEmpate: 2.48, empateFora: 1.97 },
+  2: { casa: 1.13, empate: 3.63, fora: 2.91, ambasMarcam: 2.23, acima2: 2.18, abaixo2: 2.8, casaFora: 2.45, casaEmpate: 2.92, empateFora: 1.94 },
+  3: { casa: 1.24, empate: 2.76, fora: 3.76, ambasMarcam: 2.46, acima2: 2.85, abaixo2: 2.38, casaFora: 2.18, casaEmpate: 2.88, empateFora: 1.95 },
+  4: { casa: 1.21, empate: 3.37, fora: 2.63, ambasMarcam: 2.24, acima2: 1.95, abaixo2: 2.76, casaFora: 2.38, casaEmpate: 2.53, empateFora: 1.81 },
+  5: { casa: 1.47, empate: 3.18, fora: 3.21, ambasMarcam: 1.99, acima2: 2.81, abaixo2: 2.62, casaFora: 2.49, casaEmpate: 2.05, empateFora: 1.96 },
+  6: { casa: 1.31, empate: 3.31, fora: 2.54, ambasMarcam: 2.45, acima2: 1.6, abaixo2: 2.72, casaFora: 1.98, casaEmpate: 2.14, empateFora: 2.19 },
+  7: { casa: 1.01, empate: 2.58, fora: 3.25, ambasMarcam: 1.99, acima2: 2.22, abaixo2: 2.49, casaFora: 2.35, casaEmpate: 2.26, empateFora: 2.41 },
+  8: { casa: 1.78, empate: 3.58, fora: 3.2, ambasMarcam: 1.92, acima2: 1.91, abaixo2: 2.23, casaFora: 1.61, casaEmpate: 2.86, empateFora: 2.42 },
+  9: { casa: 1.06, empate: 3.75, fora: 2.91, ambasMarcam: 2.36, acima2: 2.34, abaixo2: 2.44, casaFora: 2.49, casaEmpate: 2.18, empateFora: 2.42 },
+  10: { casa: 1.73, empate: 2.6, fora: 2.69, ambasMarcam: 1.99, acima2: 2.99, abaixo2: 2.8, casaFora: 2.27, casaEmpate: 2.77, empateFora: 1.83 },
+  11: { casa: 1.7, empate: 3.17, fora: 3.4, ambasMarcam: 2.15, acima2: 1.87, abaixo2: 2.32, casaFora: 1.62, casaEmpate: 1.99, empateFora: 2.19 },
+  12: { casa: 1.6, empate: 3.86, fora: 3.16, ambasMarcam: 2.27, acima2: 2.54, abaixo2: 2.38, casaFora: 2.07, casaEmpate: 2.48, empateFora: 2 },
+  13: { casa: 1.01, empate: 2.8, fora: 3.17, ambasMarcam: 2.44, acima2: 1.81, abaixo2: 2.15, casaFora: 1.61, casaEmpate: 2.04, empateFora: 1.92 },
+  14: { casa: 1.78, empate: 2.64, fora: 3.2, ambasMarcam: 2.38, acima2: 1.69, abaixo2: 2.5, casaFora: 2.5, casaEmpate: 2.6, empateFora: 2.15 },
+  15: { casa: 1.4, empate: 2.89, fora: 2.71, ambasMarcam: 2.33, acima2: 1.65, abaixo2: 2.94, casaFora: 2.03, casaEmpate: 2.76, empateFora: 2.48 },
+  16: { casa: 1.44, empate: 2.74, fora: 3.03, ambasMarcam: 2.17, acima2: 2.17, abaixo2: 2.51, casaFora: 1.54, casaEmpate: 2.87, empateFora: 1.98 },
+  17: { casa: 1.2, empate: 3.57, fora: 3.69, ambasMarcam: 2.28, acima2: 2.97, abaixo2: 2.95, casaFora: 1.6, casaEmpate: 2.49, empateFora: 2.19 },
+  18: { casa: 1.5, empate: 3.44, fora: 3.76, ambasMarcam: 1.92, acima2: 1.97, abaixo2: 2.78, casaFora: 1.94, casaEmpate: 2.37, empateFora: 1.96 },
+  19: { casa: 1.53, empate: 3.74, fora: 3.33, ambasMarcam: 1.91, acima2: 2.7, abaixo2: 2.41, casaFora: 1.66, casaEmpate: 2.73, empateFora: 2.35 },
+},
+
+sexta: {
+  0: { casa: 1.75, empate: 3.34, fora: 2.53, ambasMarcam: 2.27, acima2: 1.81, abaixo2: 2.55, casaFora: 1.78, casaEmpate: 2.72, empateFora: 1.84 },
+  1: { casa: 1.74, empate: 2.84, fora: 2.64, ambasMarcam: 2.01, acima2: 1.58, abaixo2: 2.86, casaFora: 1.56, casaEmpate: 2.6, empateFora: 2.07 },
+  2: { casa: 1.37, empate: 3.41, fora: 3.32, ambasMarcam: 2.28, acima2: 2.07, abaixo2: 2.22, casaFora: 2.25, casaEmpate: 1.93, empateFora: 2.02 },
+  3: { casa: 1.16, empate: 2.7, fora: 3.7, ambasMarcam: 2.4, acima2: 2.63, abaixo2: 2.8, casaFora: 1.94, casaEmpate: 2, empateFora: 2.38 },
+  4: { casa: 1.05, empate: 3.05, fora: 2.56, ambasMarcam: 2.18, acima2: 2.92, abaixo2: 2.63, casaFora: 1.92, casaEmpate: 2.49, empateFora: 2.06 },
+  5: { casa: 1.05, empate: 3.58, fora: 3.09, ambasMarcam: 2.41, acima2: 2.98, abaixo2: 2.89, casaFora: 1.95, casaEmpate: 2.2, empateFora: 2.39 },
+  6: { casa: 1.65, empate: 3.7, fora: 3.52, ambasMarcam: 2, acima2: 1.73, abaixo2: 2.86, casaFora: 1.67, casaEmpate: 2.03, empateFora: 2.45 },
+  7: { casa: 1.58, empate: 3.56, fora: 2.74, ambasMarcam: 1.79, acima2: 2.7, abaixo2: 2.78, casaFora: 2.4, casaEmpate: 2.11, empateFora: 2.24 },
+  8: { casa: 1.04, empate: 2.55, fora: 2.84, ambasMarcam: 2.23, acima2: 2.64, abaixo2: 2.09, casaFora: 2.43, casaEmpate: 2.53, empateFora: 2.17 },
+  9: { casa: 1.33, empate: 3.37, fora: 3.16, ambasMarcam: 1.93, acima2: 2.25, abaixo2: 2.99, casaFora: 2.04, casaEmpate: 2.11, empateFora: 2.14 },
+  10: { casa: 1.31, empate: 3.84, fora: 2.82, ambasMarcam: 1.82, acima2: 2.69, abaixo2: 2.99, casaFora: 2.43, casaEmpate: 2.77, empateFora: 2.31 },
+  11: { casa: 1.73, empate: 3.27, fora: 3.18, ambasMarcam: 2.09, acima2: 2.28, abaixo2: 2.78, casaFora: 2.3, casaEmpate: 1.94, empateFora: 2.36 },
+  12: { casa: 1.6, empate: 3.36, fora: 3.1, ambasMarcam: 2.15, acima2: 2.03, abaixo2: 2.33, casaFora: 1.51, casaEmpate: 2.63, empateFora: 2.47 },
+  13: { casa: 1.18, empate: 2.92, fora: 3.25, ambasMarcam: 1.71, acima2: 1.6, abaixo2: 2.95, casaFora: 1.68, casaEmpate: 2.18, empateFora: 2.27 },
+  14: { casa: 1.2, empate: 3.5, fora: 3.39, ambasMarcam: 2.04, acima2: 2.07, abaixo2: 2.72, casaFora: 1.56, casaEmpate: 2.25, empateFora: 2.06 },
+  15: { casa: 1.61, empate: 3.29, fora: 3.71, ambasMarcam: 1.71, acima2: 2.08, abaixo2: 2.55, casaFora: 2.48, casaEmpate: 2.68, empateFora: 1.82 },
+  16: { casa: 1.09, empate: 3.27, fora: 3.2, ambasMarcam: 1.9, acima2: 2.66, abaixo2: 2.45, casaFora: 1.6, casaEmpate: 2.53, empateFora: 2.41 },
+  17: { casa: 1.28, empate: 3.6, fora: 2.55, ambasMarcam: 1.86, acima2: 2.14, abaixo2: 2.42, casaFora: 2.07, casaEmpate: 2.86, empateFora: 1.84 },
+  18: { casa: 1.01, empate: 3.07, fora: 2.93, ambasMarcam: 2.38, acima2: 1.85, abaixo2: 2.44, casaFora: 1.6, casaEmpate: 2.84, empateFora: 1.87 },
+  19: { casa: 1.16, empate: 2.9, fora: 2.79, ambasMarcam: 1.77, acima2: 1.54, abaixo2: 2.79, casaFora: 2.21, casaEmpate: 2.81, empateFora: 2.44 },
+},
+
+sabado: {
+  0: { casa: 1.3, empate: 3.34, fora: 3.79, ambasMarcam: 2.45, acima2: 2.19, abaixo2: 2.99, casaFora: 1.63, casaEmpate: 2.33, empateFora: 2.12 },
+  1: { casa: 1.38, empate: 2.92, fora: 2.76, ambasMarcam: 1.77, acima2: 1.85, abaixo2: 2.79, casaFora: 1.93, casaEmpate: 2.42, empateFora: 2.13 },
+  2: { casa: 1.38, empate: 3.53, fora: 2.9, ambasMarcam: 2.3, acima2: 1.96, abaixo2: 2.47, casaFora: 1.58, casaEmpate: 2.47, empateFora: 1.98 },
+  3: { casa: 1.43, empate: 3.91, fora: 2.61, ambasMarcam: 2.08, acima2: 2.87, abaixo2: 2, casaFora: 1.93, casaEmpate: 2.95, empateFora: 2.12 },
+  4: { casa: 1.21, empate: 3.29, fora: 3.16, ambasMarcam: 2.25, acima2: 2.29, abaixo2: 2.17, casaFora: 1.84, casaEmpate: 2.51, empateFora: 2.46 },
+  5: { casa: 1.76, empate: 2.91, fora: 3.38, ambasMarcam: 2.1, acima2: 2.26, abaixo2: 2.92, casaFora: 1.7, casaEmpate: 2.16, empateFora: 2.19 },
+  6: { casa: 1.18, empate: 3.52, fora: 2.59, ambasMarcam: 1.8, acima2: 2.81, abaixo2: 2.78, casaFora: 1.92, casaEmpate: 2.44, empateFora: 2.33 },
+  7: { casa: 1.75, empate: 2.94, fora: 2.86, ambasMarcam: 2.22, acima2: 2.07, abaixo2: 2.88, casaFora: 1.71, casaEmpate: 2.57, empateFora: 2.31 },
+  8: { casa: 1.18, empate: 2.63, fora: 3.3, ambasMarcam: 2.38, acima2: 1.96, abaixo2: 2.82, casaFora: 2.28, casaEmpate: 2.1, empateFora: 1.84 },
+  9: { casa: 1.45, empate: 3.4, fora: 2.54, ambasMarcam: 1.9, acima2: 2.49, abaixo2: 2.37, casaFora: 1.89, casaEmpate: 2.05, empateFora: 2.32 },
+  10: { casa: 1.55, empate: 3.25, fora: 3.32, ambasMarcam: 2.15, acima2: 2.94, abaixo2: 2.49, casaFora: 2.4, casaEmpate: 2.9, empateFora: 2.14 },
+  11: { casa: 1.29, empate: 2.84, fora: 2.68, ambasMarcam: 1.73, acima2: 1.89, abaixo2: 2.78, casaFora: 1.66, casaEmpate: 2.7, empateFora: 2.3 },
+  12: { casa: 1.5, empate: 3.76, fora: 3.15, ambasMarcam: 1.95, acima2: 2.55, abaixo2: 2.67, casaFora: 1.89, casaEmpate: 2.6, empateFora: 2.04 },
+  13: { casa: 1.12, empate: 3.53, fora: 3.37, ambasMarcam: 1.88, acima2: 1.81, abaixo2: 2.15, casaFora: 2.2, casaEmpate: 2.46, empateFora: 1.86 },
+  14: { casa: 1.54, empate: 3.19, fora: 2.88, ambasMarcam: 1.86, acima2: 1.77, abaixo2: 2.89, casaFora: 2.43, casaEmpate: 2.14, empateFora: 2.21 },
+  15: { casa: 1.41, empate: 3.19, fora: 3.62, ambasMarcam: 1.86, acima2: 2.2, abaixo2: 2.96, casaFora: 1.97, casaEmpate: 2.65, empateFora: 2.31 },
+  16: { casa: 1.4, empate: 3.33, fora: 2.84, ambasMarcam: 1.86, acima2: 2.32, abaixo2: 2.48, casaFora: 2.28, casaEmpate: 2.46, empateFora: 1.82 },
+  17: { casa: 1.36, empate: 2.98, fora: 3.74, ambasMarcam: 1.7, acima2: 1.57, abaixo2: 2.62, casaFora: 2.16, casaEmpate: 2.18, empateFora: 2.23 },
+  18: { casa: 1.29, empate: 2.82, fora: 2.69, ambasMarcam: 2.09, acima2: 2.24, abaixo2: 2.82, casaFora: 2.37, casaEmpate: 2.37, empateFora: 2.16 },
+  19: { casa: 1.42, empate: 3.52, fora: 2.9, ambasMarcam: 2.42, acima2: 2.75, abaixo2: 2.6, casaFora: 1.68, casaEmpate: 2.8, empateFora: 1.97 },
+   },
+};
 
     // Funções reutilizáveis
     function extrairNomeDoTime(url) {
@@ -1672,9 +1389,10 @@ color: green;
           div.dataset.nomeGrupo = nomeGrupo;
 
           div.innerHTML = `
-  <div class="linha-duelo">
+    <div class="linha-duelo">
     <div class="time-nome-img">
-      <img src="${jogo.ladoA}" />
+    <img src="${jogo.ladoA || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
+     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
       <div class="nome-time">${nomeA}</div>
     </div>
 
@@ -1683,12 +1401,14 @@ color: green;
     <button class="btn" data-grupo="grupo-${atual}" data-valor="${c.fora}">Fora<br><span class="valor-cotacao">${c.fora.toFixed(2)}</span></button>
 
     <div class="time-nome-img">
-      <img src="${jogo.ladoB}" />
+   <img src="${jogo.ladoB || 'https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg'}"
+     onerror="this.src='https://raw.githubusercontent.com/Savanty/AE/main/bola.jpeg';" />
       <div class="nome-time">${nomeB}</div>
     </div>
 
     <button class="toggleExtras">+</button>
   </div>
+
 
   <div class="extras">
     <div class="coluna-botao"><button class="btn" data-grupo="grupo-${atual}" data-valor="${c.ambasMarcam}">Ambas</button><span class="valor-cotacao">${c.ambasMarcam.toFixed(2)}</span></div>
@@ -1852,7 +1572,7 @@ color: green;
       modal.style.display = 'flex';
       document.getElementById('codigoAposta').textContent = codigo;
 
-      const linkViewer = `https://SEUSITE.netlify.app/aposta_viewer.html?id=${codigo}`;
+      const linkViewer = `${codigo}`;
 
       const qrPixDiv = document.getElementById('qrPix');
       qrPixDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?data=pix:${chavePix}&size=150x150" alt="QR Pix" />`;
@@ -1946,13 +1666,13 @@ color: green;
           const dia = btn.getAttribute('onclick')?.match(/mostrarDia\('([^']+)'\)/)?.[1];
           if (!dia) return;
 
-          mostrarModalCarregando();
+         // mostrarModalCarregando();
 
-          setTimeout(() => {
+          //setTimeout(() => {
             criarJogos(dia);
             mostrarDia(dia);
-            esconderModalCarregando();
-          }, 1000);
+           // esconderModalCarregando();
+        // }, 1000);
         });
       });
     }
@@ -1994,6 +1714,44 @@ color: green;
     document.getElementById('valorUnico').addEventListener('input', () => {
       atualizarTotal();
     });
+
+  // Gera uma cor hexadecimal aleatória
+  function gerarCorAleatoria() {
+    const letras = '0123456789ABCDEF';
+    let cor = '#';
+    for (let i = 0; i < 6; i++) {
+      cor += letras[Math.floor(Math.random() * 16)];
+    }
+    return cor;
+  }
+
+  // Converte cor hexadecimal para RGB
+  function hexParaRGB(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return { r, g, b };
+  }
+
+  // Calcula o brilho da cor (fórmula de luminância perceptiva)
+  function calcularBrilho({ r, g, b }) {
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+
+  // Aplica a cor ao background e define a cor do texto
+  function aplicarCorFundo() {
+    const cor = gerarCorAleatoria();
+    document.body.style.backgroundColor = cor;
+
+    const rgb = hexParaRGB(cor);
+    const brilho = calcularBrilho(rgb);
+
+    // Se brilho for baixo, usa texto branco; senão, preto
+    document.body.style.color = brilho < 128 ? '#FFFFFF' : '#000000';
+  }
+
+  // Chama a função ao carregar a página
+  aplicarCorFundo();
   </script>
 </body>
 </html>
