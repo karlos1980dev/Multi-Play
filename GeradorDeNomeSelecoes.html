@@ -36,7 +36,7 @@
       const entrada = document.getElementById("entrada").value;
       const linhas = entrada.split('\n').map(l => l.trim()).filter(Boolean);
 
-      const resultado = linhas.map((linha, index) => `"${linha}," //${index + 1}`);
+      const resultado = linhas.map((linha, index) => `"${linha}", //${index + 1}`);
 
       document.getElementById("saida").value = resultado.join('\n');
     }
