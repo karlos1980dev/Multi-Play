@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador de Strings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 250px;
+      margin-bottom: 10px;
+      font-family: monospace;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Entrada (cole os nomes, um por linha)</h2>
+  <textarea id="entrada" placeholder="Cole aqui os nomes..."></textarea>
+
+  <button onclick="gerar()">Gerar</button>
+
+  <h2>Saída (com aspas e //numeração)</h2>
+  <textarea id="saida" readonly></textarea>
+
+  <script>
+    function gerar() {
+      const entrada = document.getElementById("entrada").value;
+      const linhas = entrada.split('\n').map(l => l.trim()).filter(Boolean);
+
+      const resultado = linhas.map((linha, index) => `Sueli: "${linha}" //${index + 1}`);
+
+      document.getElementById("saida").value = resultado.join('\n');
+    }
+  </script>
+
+</body>
+  </html>
