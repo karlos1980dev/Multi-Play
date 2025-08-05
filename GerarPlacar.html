@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Imagem do Dia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .linha {
+      border: 1px solid #444;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background: #222;
+    }
+
+    .linha-topo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    input[type="text"], input[type="file"] {
+      padding: 6px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    input[type="file"] {
+      background: #333;
+      color: white;
+      cursor: pointer;
+      width: 70px;
+    }
+
+    canvas {
+      margin-top: 20px;
+      border-radius: 10px;
+      max-width: 100%;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Gerador de Imagem do Dia</h2>
+
+  <label>Texto no topo da imagem:</label>
+  <input type="text" id="textoTopo" placeholder="Ex: JOGOS DE HOJE - 05/08/2025" style="width: 90%; max-width: 500px;" />
+
+  <label>Imagem de fundo: <input type="file" id="imagemFundoInput" accept="image/*" /></label>
+
+  <div id="jogosContainer"></div>
+
+  <button onclick="adicionarLinha()">+ Adicionar Confronto</button>
+  <button onclick="gerarImagem()">🎨 Gerar Imagem</button>
+  <button onclick="baixarImagem()">💾 Salvar</button>
+
+  <canvas id="canvasResultado" width="1080" height="1350" style="display:none;"></canvas>
+
+  <script>
+    let jogoIndex = 0;
+
+    function adicionarLinha() {
+      const container = document.getElementById("jogosContainer");
+      const div = document.createElement("div");
+      div.className = "linha";
+      div.innerHTML = `
+        <div class="linha-topo">
+          <input type="file" id="escudoA${jogoIndex}" accept="image/*" />
+          <input type="text" id="timeA${jogoIndex}" placeholder="Time A" style="width: 100px;" />
+          <span style="font-weight: bold;">X</span>
+          <input type="text" id="timeB${jogoIndex}" placeholder="Time B" style="width: 100px;" />
+          <input type="file" id="escudoB${jogoIndex}" accept="image/*" />
+        </div>
+        <div style="margin-top: 10px;">
+          <input type="text" id="hora${jogoIndex}" placeholder="Hora (ex: 18:00)" style="width: 100px;" />
+          <input type="text" id="placar${jogoIndex}" placeholder="Placar (ex: 2 x 1)" style="width: 100px;" />
+        </div>
+      `;
+      container.appendChild(div);
+      jogoIndex++;
+    }
+
+    adicionarLinha(); // Primeiro confronto
+
+    async function gerarImagem() {
+      const canvas = document.getElementById("canvasResultado");
+      const ctx = canvas.getContext("2d");
+
+      const fundoFile = document.getElementById("imagemFundoInput").files[0];
+      const textoTopo = document.getElementById("textoTopo").value;
+
+      if (!fundoFile) {
+        alert("Selecione uma imagem de fundo.");
+        return;
+      }
+
+      const fundoDataURL = await fileToDataURL(fundoFile);
+      const imgFundo = await loadImage(fundoDataURL);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(imgFundo, 0, 0, canvas.width, canvas.height);
+
+      // Texto do topo
+      ctx.font = "48px Arial Black";
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.shadowColor = "black";
+      ctx.shadowBlur = 10;
+      ctx.fillText(textoTopo, canvas.width / 2, 60);
+
+      ctx.font = "32px Arial";
+      ctx.shadowBlur = 8;
+
+      let y = 140;
+      for (let i = 0; i < jogoIndex; i++) {
+        const timeA = document.getElementById(`timeA${i}`).value;
+        const timeB = document.getElementById(`timeB${i}`).value;
+        const hora = document.getElementById(`hora${i}`).value;
+        const placar = document.getElementById(`placar${i}`).value;
+
+        const escudoAFile = document.getElementById(`escudoA${i}`).files[0];
+        const escudoBFile = document.getElementById(`escudoB${i}`).files[0];
+
+        const escudoA = escudoAFile ? await loadImage(await fileToDataURL(escudoAFile)) : null;
+        const escudoB = escudoBFile ? await loadImage(await fileToDataURL(escudoBFile)) : null;
+
+        const centerX = canvas.width / 2;
+
+        // Escudos
+        if (escudoA) ctx.drawImage(escudoA, centerX - 280, y - 30, 60, 60);
+        if (escudoB) ctx.drawImage(escudoB, centerX + 220, y - 30, 60, 60);
+
+        // Times
+        ctx.fillText(`${timeA} x ${timeB}`, centerX, y);
+        y += 40;
+
+        // Hora e Placar
+        ctx.font = "28px Arial";
+        ctx.fillText(`${hora} - ${placar}`, centerX, y);
+        y += 90;
+
+        ctx.font = "32px Arial";
+      }
+
+      canvas.style.display = "block";
+    }
+
+    function baixarImagem() {
+      const canvas = document.getElementById("canvasResultado");
+      const link = document.createElement("a");
+      link.download = "imagem_do_dia.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    function fileToDataURL(file) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(src) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = src;
+      });
+    }
+  </script>
+
+</body>
+  </html>
