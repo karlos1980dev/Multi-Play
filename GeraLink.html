@@ -160,11 +160,11 @@
 
       dias.forEach(dia => {
         output[dia] = {};
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 50; i++) {
           output[dia][i] = {
             casa: parseFloat(aleatorio(1.00, 1.50)),
             empate: parseFloat(aleatorio(2.50, 3.00)),
-            fora: parseFloat(aleatorio(2.50, 2.50)),
+            fora: parseFloat(aleatorio(1.50, 2.50)),
             ambasMarcam: parseFloat(aleatorio(1.70, 2.50)),
             acima2: parseFloat(aleatorio(1.50, 3.00)),
             abaixo2: parseFloat(aleatorio(2.00, 3.00)),
