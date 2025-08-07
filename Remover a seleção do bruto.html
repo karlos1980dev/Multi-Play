@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remover Nomes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #000;
+      color:#666
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .textarea-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      resize: vertical;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Ferramenta de Remoção de Nomes</h1>
+
+  <div class="textarea-container">
+    <label for="bruto">Nomes Brutos:</label>
+    <textarea id="bruto" placeholder="Digite os nomes brutos aqui, separados por vírgula ou linha"></textarea>
+  </div>
+
+  <div class="textarea-container">
+    <label for="remover">Nomes a Remover:</label>
+    <textarea id="remover" placeholder="Digite os nomes que deseja remover, separados por vírgula ou linha"></textarea>
+  </div>
+
+  <button onclick="removerNomes()">Remover Nomes</button>
+
+  <div id="result">
+    <h3>Resultado:</h3>
+    <p id="resultadoNomes">Os nomes removidos aparecerão aqui.</p>
+  </div>
+
+  <!-- Botão de cópia -->
+  <button onclick="copiarResultado()">Copiar Resultado</button>
+</div>
+
+<script>
+  function removerNomes() {
+    const bruto = document.getElementById('bruto').value.trim();
+    const remover = document.getElementById('remover').value.trim();
+
+    if (bruto === '' || remover === '') {
+      alert('Por favor, preencha ambos os campos!');
+      return;
+    }
+
+    const nomesBrutos = bruto.split(/[\n,;]/).map(nome => nome.trim()).filter(nome => nome !== '');
+    const nomesRemover = remover.split(/[\n,;]/).map(nome => nome.trim()).filter(nome => nome !== '');
+
+    const resultado = nomesBrutos.filter(nome => !nomesRemover.includes(nome));
+
+    document.getElementById('resultadoNomes').textContent = resultado.join('\n');
+  }
+
+  function copiarResultado() {
+    const resultadoTexto = document.getElementById('resultadoNomes').textContent;
+
+    if (!resultadoTexto.trim()) {
+      alert('Nenhum resultado para copiar.');
+      return;
+    }
+
+    // Cria um elemento de texto temporário
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = resultadoTexto;
+    document.body.appendChild(tempTextarea);
+    tempTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextarea);
+
+    alert('Resultado copiado para a área de transferência!');
+  }
+</script>
+
+</body>
+</html>
