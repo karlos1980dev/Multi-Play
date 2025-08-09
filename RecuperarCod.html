@@ -53,7 +53,16 @@
   <div id="acoes" style="display:none;">
     <button onclick="baixarPDF()">📥 Baixar PDF</button>
     <button onclick="compartilharLink()">🔗 Compartilhar Link</button>
-    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button>
+    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button><!DOCTYPE html>
+    <html lang="pt">
+    <head>
+        <meta charset="UTF-8">
+        <title>Título da página</title>
+    </head>
+    <body>
+        
+    </body>
+    </html>
   </div>
 
   <script type="module">
@@ -74,93 +83,98 @@
     const db = getDatabase(app);
 
     window.consultarAposta = async function () {
-      const codigo = document.getElementById('codigoInput').value.trim();
-      const resultadoDiv = document.getElementById('resultado');
-      const acoes = document.getElementById('acoes');
-      resultadoDiv.innerHTML = "";
-      acoes.style.display = "none";
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const resultadoDiv = document.getElementById('resultado');
+  const acoes = document.getElementById('acoes');
+  resultadoDiv.innerHTML = "";
+  acoes.style.display = "none";
 
-      if (!codigo) return alert("Digite o código");
+  if (!codigo) return alert("Digite o código");
 
-      const snapshot = await get(child(ref(db), 'apostas/' + codigo));
-      if (!snapshot.exists()) {
-        resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
-        return;
-      }
+  const snapshot = await get(child(ref(db), 'apostas/' + codigo));
+  if (!snapshot.exists()) {
+    resultadoDiv.innerHTML = "<p style='color:red;'>❌ Aposta não encontrada.</p>";
+    return;
+  }
 
-      const aposta = snapshot.val();
-      window.apostaGlobal = aposta;
+  const aposta = snapshot.val();
+  window.apostaGlobal = aposta;
 
-      let multiplicador = 1;
-      aposta.selecoes.forEach(sel => multiplicador *= sel.valor);
-      const totalReceber = aposta.valorUnico * multiplicador;
+  // Calcula multiplicador e total a receber
+  let multiplicador = 1;
+  aposta.selecoes.forEach(sel => multiplicador *= sel.valor);
+  const totalReceber = aposta.valorUnico * multiplicador;
 
-      let html = `
-        <h3>🔢 Código: <b>${aposta.codigo}</b></h3>
-        <h3>💸 Valor por aposta: R$ ${aposta.valorUnico.toFixed(2)}</h3>
-        <h3>📊 Cotacao: ${multiplicador.toFixed(2)}</h3>
-        <h3 style="color:green;">💰 Valor a receber: R$ ${totalReceber.toFixed(2)}</h3>
-      `;
+  let html = `
+    <h3>🔢 Código: <b>${aposta.codigo}</b></h3>
+    <h3>💸 Valor por aposta: R$ ${aposta.valorUnico.toFixed(2)}</h3>
+    <h3>📊 Cotação total: ${multiplicador.toFixed(2)}</h3>
+    <h3 style="color:green;">💰 Valor a receber: R$ ${totalReceber.toFixed(2)}</h3>
+  `;
 
-      const ganhou = aposta.selecoes.filter(s => s.status === "ganhou").length;
-      const perdeu = aposta.selecoes.filter(s => s.status === "perdeu").length;
-      const aguardando = aposta.selecoes.filter(s => !s.status || s.status === "aguardando").length;
+  // Contagem status
+  const ganhou = aposta.selecoes.filter(s => s.status === "ganhou").length;
+  const perdeu = aposta.selecoes.filter(s => s.status === "perdeu").length;
+  const aguardando = aposta.selecoes.filter(s => !s.status || s.status === "aguardando").length;
 
-      html += `
-        <p><strong style="color:green;">✅ Ganhou:</strong> ${ganhou} |
-        <strong style="color:red;">❌ Perdeu:</strong> ${perdeu} |
-        </br><strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
-      `;
+  html += `
+    <p><strong style="color:green;">✅ Ganhou:</strong> ${ganhou} |
+    <strong style="color:red;">❌ Perdeu:</strong> ${perdeu} |
+    <strong style="color:#888;">⏳ Aguardando:</strong> ${aguardando}</p>
+  `;
 
-      // Agrupar por data
-      const agrupadoPorData = {};
-      aposta.selecoes.forEach((sel, i) => {
-        const data = sel.dataHora.split(" ")[0];
-        if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
-        agrupadoPorData[data].push({ ...sel, index: i });
+  // Agrupar seleções por data
+  const agrupadoPorData = {};
+  aposta.selecoes.forEach((sel, i) => {
+    const data = sel.dataHora.split(" ")[0];
+    if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
+    agrupadoPorData[data].push({ ...sel, index: i });
+  });
+
+  const datasOrdenadas = Object.keys(agrupadoPorData).sort((a, b) => {
+    const [d1, m1, y1] = a.split('/').map(Number);
+    const [d2, m2, y2] = b.split('/').map(Number);
+    return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
+  });
+
+  // Monta o HTML para cada data, campeonato e seleção
+  datasOrdenadas.forEach(data => {
+    html += `<h2>📅 ${data}</h2>`;
+    const campeonatos = {};
+    agrupadoPorData[data].forEach(sel => {
+      const camp = sel.campeonato || "Outros";
+      if (!campeonatos[camp]) campeonatos[camp] = [];
+      campeonatos[camp].push(sel);
+    });
+
+    for (let camp in campeonatos) {
+      html += `<h3>🏆 ${camp}</h3>`;
+      const jogosOrdenados = campeonatos[camp].sort((a, b) => a.valor - b.valor);
+
+      jogosOrdenados.forEach(sel => {
+        // Determina status para exibir
+        const status = sel.status || "aguardando";
+        let cor = "#888", label = "⏳ Aguardando";
+        if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
+        else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
+
+        // Exibição clara da escolha
+        html += `
+          <div class="duelo-box" style="border:1px solid #ccc; padding:8px; margin-bottom:8px; border-radius:6px;">
+            <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
+            <p><strong>Escolha marcada:</strong> <span style="color:blue;">${sel.escolha || "Não informada"}</span></p>
+            <p><strong>Cotação:</strong> R$ ${sel.valor.toFixed(2)}</p>
+            <p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
+            <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
+          </div>
+        `;
       });
+    }
+  });
 
-      const datasOrdenadas = Object.keys(agrupadoPorData).sort((a, b) => {
-        const [d1, m1, y1] = a.split('/').map(Number);
-        const [d2, m2, y2] = b.split('/').map(Number);
-        return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
-      });
-
-      datasOrdenadas.forEach(data => {
-        html += `<h2>📅 ${data}</h2>`;
-        const campeonatos = {};
-        agrupadoPorData[data].forEach(sel => {
-          const camp = sel.campeonato || "Outros";
-          if (!campeonatos[camp]) campeonatos[camp] = [];
-          campeonatos[camp].push(sel);
-        });
-
-        for (let camp in campeonatos) {
-          html += `<h3>🏆 ${camp}</h3>`;
-          const jogosOrdenados = campeonatos[camp].sort((a, b) => a.valor - b.valor);
-          jogosOrdenados.forEach(sel => {
-            const status = sel.status || "aguardando";
-            let cor = "#888", label = "⏳ Aguardando";
-            if (status === "ganhou") { cor = "green"; label = "✅ Ganhou"; }
-            else if (status === "perdeu") { cor = "red"; label = "❌ Perdeu"; }
-
-            html += `
-              <div class="duelo-box">
-                <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
-                <p><strong>Escolha:</strong> ${sel.escolha}</p>
-                <p><strong>Cotação:</strong> ${sel.valor}</p>
-                <p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
-                <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
-              </div>
-            `;
-          });
-        }
-      });
-
-      resultadoDiv.innerHTML = html;
-      acoes.style.display = "block";
-    };
-
+  resultadoDiv.innerHTML = html;
+  acoes.style.display = "block";
+};
     window.compartilharLink = () => {
       const codigo = document.getElementById('codigoInput').value.trim();
       const url = `${location.origin}/aposta_viewer.html?id=${codigo}`;
@@ -226,4 +240,5 @@
     }
   </script>
 </body>
-</html>
+      </html>
+  
