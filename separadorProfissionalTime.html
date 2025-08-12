@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Separador VEGAS PRIME (Sem Datas)</title>
+  <style>
+    body        { background:#111; color:#fff; font-family:sans-serif; padding:20px; }
+    textarea    { width:100%; height:120px; margin-bottom:15px; font-size:15px; padding:10px; resize:none; }
+    .input-text { background:#222; color:#fff; }
+    .camp-text  { background:#9c27b0; color:#fff; font-weight:bold; }
+    .impar-text { background:#388e3c; color:#fff; }
+    .par-text   { background:#1976d2; color:#fff; }
+    button      { padding:10px 20px; background:#ff5722; color:#fff; font-weight:bold; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <h2>Cole aqui os dados do VEGAS PRIME:</h2>
+  <textarea id="entrada" class="input-text" placeholder="Cole aqui..."></textarea>
+
+  <button onclick="processar()">Separar</button>
+
+  <h3>Campeonatos:</h3>
+  <textarea id="saidaCamp" class="camp-text" readonly></textarea>
+
+  <h3>Times ímpares:</h3>
+  <textarea id="saidaImpar" class="impar-text" readonly></textarea>
+
+  <h3>Times pares:</h3>
+  <textarea id="saidaPar" class="par-text" readonly></textarea>
+
+  <script>
+    function processar() {
+      const entrada = document.getElementById("entrada").value;
+      const linhas = entrada.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+
+      // Regex para detectar campeonatos (pode ser ajustado conforme necessidade)
+      const regexCampeonato = /\b(campeonato|liga|copa|supercopa|serie|premier|bundesliga|la liga|champions|sul-americana|libertadores|brasileirão|african|uefa|npl|us open|1ª divisão|argentina|méxico|colômbia|áfrica do sul|austrália|inglaterra|islândia|noruega|rússia|suíça)\b/i;
+
+      // Regex para ignorar linhas inúteis e odds
+      const regexIgnorar = /^(casa|emp\.?|fora|\+\d+|\d{1,2},\d{2}(,\d{1,2})?|\*\*|jogos disponíveis.*|possível retorno|r\$|cupom0)$/i;
+
+      // Regex para datas/hora no formato "**13/ago 11:00"
+      const regexDataHora = /^\**\d{1,2}\/[a-z]{3} \d{1,2}:\d{2}$/i;
+
+      let campeonatos = [];
+      let impares = [];
+      let pares = [];
+      let bufferDuelo = [];
+
+      for (let linha of linhas) {
+        linha = linha.replace(/\*+/g, "").trim(); // Remove asteriscos e espaços
+
+        if (!linha) continue;
+
+        // Ignorar datas e horários - não armazena nem exibe
+        if (regexDataHora.test(linha)) continue;
+
+        // Ignorar linhas inúteis e odds
+        if (regexIgnorar.test(linha)) continue;
+
+        // Detecta campeonato e salva na lista
+        if (regexCampeonato.test(linha)) {
+          campeonatos.push(linha);
+          continue;
+        }
+
+        // Acumula os duelos para separar pares e ímpares
+        bufferDuelo.push(linha);
+        if (bufferDuelo.length === 2) {
+          impares.push(bufferDuelo[0]);
+          pares.push(bufferDuelo[1]);
+          bufferDuelo = [];
+        }
+      }
+
+      document.getElementById("saidaCamp").value = campeonatos.join("\n");
+      document.getElementById("saidaImpar").value = impares.join("\n");
+      document.getElementById("saidaPar").value = pares.join("\n");
+    }
+  </script>
+
+</body>
+  </html>
