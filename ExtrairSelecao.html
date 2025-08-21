@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8">
   <title>Extrair Países e Competições</title>
 </head>
@@ -40,8 +39,8 @@
         }
       }
 
-      // numerar saída
-      const resultadoNumerado = resultados.map((c, i) => `${c} //${i+1}`);
+      // numerar saída no formato "nome" //N
+      const resultadoNumerado = resultados.map((c, i) => `"${c}" //${i+1}`);
 
       document.getElementById("saida").value = resultadoNumerado.join("\n");
     }
