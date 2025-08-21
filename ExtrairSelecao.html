@@ -1,98 +1,51 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Extrair Competição</title>
-<style>
-  textarea { width: 100%; height: 200px; margin-top: 10px; }
-  button { margin-top: 10px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Extrair Países e Competições</title>
 </head>
 <body>
+  <textarea id="entrada" rows="20" cols="80">
+Cole aqui o texto grande...
+  </textarea>
+  <br><br>
+  <button onclick="extrair()">Extrair Países e Competições</button>
+  <pre id="saida"></pre>
 
-<h2>Coloque o texto aqui:</h2>
-<textarea id="inputText" placeholder="Cole aqui o texto com jogos..."></textarea>
+  <script>
+    function extrair() {
+      const texto = document.getElementById("entrada").value;
+      const linhas = texto.split("\n").map(l => l.trim()).filter(l => l !== "");
 
-<button onclick="extrairCompeticoes()">Extrair Competições</button>
+      const ignorar = ["Casa", "Emp.", "Fora"]; 
+      const padraoCompeticao = /(Liga|League|Copa|Cup|Série|Serie|Divisão|Division|Superliga|National|Championship|Amistoso|Friendly|Ekstraklasa|Bundesliga|LaLiga|Premier|Pro)/i;
 
-<h2>Competições extraídas:</h2>
-<textarea id="outputText" readonly></textarea>
+      const resultados = [];
 
-<script>
-function extrairCompeticoes() {
-  const texto = document.getElementById('inputText').value;
-  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
+      for (let i = 0; i < linhas.length; i++) {
+        const linha = linhas[i];
 
-  // Palavras chave típicas para competições (case insensitive)
-  const palavrasChave = [
-    'copa', 'brasileirão', 'série', 'liga', 'championship', 'divisão',
-    'primeira', 'segunda', 'campeonato', 'feminino', 'superliga', 'premier',
-    'nacional', 'amistoso', 'npl', 'regional', 'primeira b', 'primeira a',
-    'segunda divisão', 'liga de expansão', 'league', 'cup', 'division', 'serie a2',
-    'champions', 'league', 'conference', 'conference', 'segunda', 'primeira liga',
-    'división', 'liga mx', 'liga femenina', 'segunda división', 'league', 'serie a'
-  ];
+        if (ignorar.includes(linha)) continue; // descarta colunas
+        if (/^\d/.test(linha)) continue; // descarta odds, datas
+        if (/ [A-Z]{2,3}$/.test(linha)) continue; // descarta times com siglas
+        if (linha === "") continue;
 
-  // Lista curta de países e seleções para ignorar
-  const paises = [
-    'argélia', 'áfrica do sul', 'guiné', 'uganda', 'inglaterra', 'alemanha',
-    'holanda', 'frança', 'bélgica', 'bielorrússia', 'bolívia', 'bósnia', 'china',
-    'coreia do sul', 'croácia', 'dinamarca', 'egito', 'escócia', 'estados unidos',
-    'finlândia', 'hungria', 'indonésia', 'irlanda', 'islândia', 'itália', 'japão',
-    'jordânia', 'lituânia', 'méxico', 'peru', 'polônia', 'rep. checa', 'romênia',
-    'rússia', 'sérvia', 'suíça', 'turquia', 'ucrânia', 'uruguai', 'uzbequistão',
-    'wales', 'país de gales', 'países baixos', 'austrália', 'austria', 'colômbia',
-    'paraguai', 'portugal', 'chile'
-  ];
+        // regra: se a linha for seguida de "Casa", é título (país ou competição)
+        if (linhas[i+1] && linhas[i+1] === "Casa") {
+          if (!resultados.includes(linha)) resultados.push(linha);
+        }
 
-  // Palavras que indicam time (siglas comuns)
-  const siglasTimes = ['sp', 'rj', 'am', 'fc', 'sc', 'ec', 'ce', 'pr', 'pa', 'mg', 'ba', 'rs', 'df', 'go'];
-
-  // Palavras a ignorar
-  const ignorarLinhas = ['casa', 'emp.', 'fora'];
-
-  const competicoes = [];
-
-  function contemPalavraChave(linha) {
-    return palavrasChave.some(palavra => linha.toLowerCase().includes(palavra));
-  }
-
-  function ePais(linha) {
-    // Linha é considerada país se for exata ou substring sem outras palavras
-    const linhaLower = linha.toLowerCase();
-    return paises.some(pais => linhaLower === pais);
-  }
-
-  function contemSiglaTime(linha) {
-    // Verifica se tem siglas de estado ou FC etc (exemplo: "Palmeiras SP" ou "Fortaleza EC")
-    const palavras = linha.toLowerCase().split(' ');
-    return palavras.some(p => siglasTimes.includes(p));
-  }
-
-  function ignorar(linha) {
-    return ignorarLinhas.includes(linha.toLowerCase());
-  }
-
-  for(let i = 0; i < linhas.length; i++) {
-    const linha = linhas[i];
-
-    if (
-      contemPalavraChave(linha) &&          // Tem palavra chave de competição
-      !ePais(linha) &&                      // Não é país/seleção
-      !contemSiglaTime(linha) &&            // Não tem sigla de time
-      !ignorar(linha) &&                    // Não é palavra ignorada tipo casa, emp., fora
-      linha.length > 3                      // Linha razoável (evita linhas muito curtas)
-    ) {
-      // Adiciona só se ainda não estiver na lista (evita duplicatas)
-      if (!competicoes.includes(linha)) {
-        competicoes.push(linha);
+        // ou se parecer nome de competição
+        else if (padraoCompeticao.test(linha)) {
+          if (!resultados.includes(linha)) resultados.push(linha);
+        }
       }
+
+      // numerar saída
+      const resultadoNumerado = resultados.map((c, i) => `${c} //${i+1}`);
+
+      document.getElementById("saida").textContent = resultadoNumerado.join("\n");
     }
-  }
-
-  document.getElementById('outputText').value = competicoes.join('\n');
-}
-</script>
-
+  </script>
 </body>
 </html>
