@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8">
   <title>Extrair Países e Competições</title>
 </head>
 <body>
-  <textarea id="entrada" rows="20" cols="80">
-Cole aqui o texto grande...
-  </textarea>
+  <textarea id="entrada" rows="20" cols="80" placeholder="Cole aqui o texto grande..."></textarea>
   <br><br>
   <button onclick="extrair()">Extrair Países e Competições</button>
-  <pre id="saida"></pre>
+  <br><br>
+  <textarea id="saida" rows="20" cols="80" readonly placeholder="Resultado aparecerá aqui..."></textarea>
 
   <script>
     function extrair() {
@@ -30,11 +30,10 @@ Cole aqui o texto grande...
         if (/ [A-Z]{2,3}$/.test(linha)) continue; // descarta times com siglas
         if (linha === "") continue;
 
-        // regra: se a linha for seguida de "Casa", é título (país ou competição)
+        // se a linha for seguida de "Casa", é título (país ou competição)
         if (linhas[i+1] && linhas[i+1] === "Casa") {
           if (!resultados.includes(linha)) resultados.push(linha);
         }
-
         // ou se parecer nome de competição
         else if (padraoCompeticao.test(linha)) {
           if (!resultados.includes(linha)) resultados.push(linha);
@@ -44,7 +43,7 @@ Cole aqui o texto grande...
       // numerar saída
       const resultadoNumerado = resultados.map((c, i) => `${c} //${i+1}`);
 
-      document.getElementById("saida").textContent = resultadoNumerado.join("\n");
+      document.getElementById("saida").value = resultadoNumerado.join("\n");
     }
   </script>
 </body>
