@@ -32,38 +32,51 @@
   <textarea id="saidaDatas" class="data-text" readonly></textarea>
 
   <script>
-    function limparSeparar() {
-      const entrada = document.getElementById("entrada").value.trim();
-      const linhasBrutas = entrada.split(/\r?\n/).filter(l => l.trim() !== "");
+  function limparSeparar() {
+    const entrada = document.getElementById("entrada").value.trim();
+    const linhasBrutas = entrada.split(/\r?\n/).filter(l => l.trim() !== "");
 
-      const regexDataHora = /^(\d{1,2}\/\d{1,2}|[0-9]{1,2}\/[a-z]{3})(\s+\d{2}:\d{2})?$/i;
-      const regexIgnorar  = /(\+)|casa|empate|fora|img|imagem|\.jpg|\.png|<img|[0-9]+|[.,]/i;
+    const regexDataHora = /^(\d{1,2}\/\d{1,2}|[0-9]{1,2}\/[a-z]{3})(\s+\d{2}:\d{2})?$/i;
+    const regexIgnorar  = /(\+)|casa|empate|fora|img|imagem|\.jpg|\.png|<img/i;
+    const regexNumeroIsolado = /^\d+$/;  
 
-      const impares = [];
-      const pares   = [];
-      const datas   = [];
-      let posicao   = 0;
+    const impares = [];
+    const pares   = [];
+    const datas   = [];
+    let posicao   = 0;
 
-      for (let linha of linhasBrutas) {
-        // REMOVE caracteres invisíveis: U+200B-U+200D (ZW), U+FEFF (BOM), U+FFFC (obj-replacement)
-        linha = linha.replace(/[\u200B-\u200D\uFEFF\uFFFC]/g, '').trim();
-        if (!linha) continue;
+    for (let linha of linhasBrutas) {
+      // Remove caracteres invisíveis
+      linha = linha.replace(/[\u200B-\u200D\uFEFF\uFFFC]/g, '').trim();
 
-        if (regexDataHora.test(linha)) {
-          datas.push(linha);
-        } else if (regexIgnorar.test(linha)) {
-          continue;                    // ignora o que não deve ficar
-        } else {
+      // 🔹 Remove vírgulas e pontos sozinhos ou no fim
+      linha = linha.replace(/[,.]\s*$/g, "").trim();
+      if (linha === "," || linha === ".") continue;
+
+      // 🔹 Remove vírgulas e pontos isolados no meio sem motivo
+      linha = linha.replace(/[,.]/g, "").trim();
+
+      if (!linha) continue;
+
+      if (regexDataHora.test(linha)) {
+        datas.push(linha);
+      } else if (regexIgnorar.test(linha) || regexNumeroIsolado.test(linha)) {
+        continue;
+      } else {
+        // Remove números que tenham vírgula ou ponto (ex: 2,5 - 3.75)
+        linha = linha.replace(/\b\d+[.,]\d+\b/g, "").trim();
+
+        if (linha) {
           (posicao % 2 ? pares : impares).push(linha);
           posicao++;
         }
       }
-
-      document.getElementById("saidaImpar").value = impares.join("\n");
-      document.getElementById("saidaPar"  ).value = pares.join("\n");
-      document.getElementById("saidaDatas").value = datas.join("\n");
     }
-  </script>
 
+    document.getElementById("saidaImpar").value = impares.join("\n");
+    document.getElementById("saidaPar"  ).value = pares.join("\n");
+    document.getElementById("saidaDatas").value = datas.join("\n");
+  }
+</script>
 </body>
 </html>
