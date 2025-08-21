@@ -61,16 +61,12 @@
 
   <!-- 🔗 Criador de Links -->
   <h2>🔗 Criador de Links</h2>
-
   <label>🔗 Link base do GitHub:</label>
   <input type="text" id="baseUrl" value="https://raw.githubusercontent.com/Savanty/AE/main/" />
-
   <label>🖼️ Nomes das imagens (sem .jpeg):</label>
   <textarea id="nomesImagens" rows="6" placeholder="imagem1\nimagem2"></textarea>
-
   <button onclick="gerarLinks()">🔄 Gerar Links</button>
   <button onclick="copiarLinks()">📋 Copiar Links</button>
-
   <label>📎 Links Gerados:</label>
   <textarea id="resultado" rows="10" readonly></textarea>
 
@@ -78,13 +74,10 @@
 
   <!-- 📅 Extrator de Datas -->
   <h2>📅 Extrator de Datas e Horários</h2>
-
   <label>📋 Cole o texto/código aqui:</label>
   <textarea id="inputTexto" rows="8" placeholder="Cole o conteúdo com datas tipo 01/ago 14:00..."></textarea>
-
   <button onclick="extrairDatas()">📆 Extrair Datas e Horas</button>
   <button onclick="copiarDatas()">📋 Copiar Datas</button>
-
   <label>🕒 Datas Extraídas (ordenadas):</label>
   <textarea id="datasExtraidas" rows="10" readonly></textarea>
 
@@ -92,22 +85,19 @@
 
   <!-- ⚙️ Gerador de Cotações -->
   <h2>⚙️ Gerador de Cotações</h2>
-
   <label>Quantidade de cotações por dia:</label>
   <input type="number" id="qtdCotacoes" value="50" min="1" />
-
   <button id="gerarBtn">🌀 Gerar Cotações</button>
   <button id="copiarBtn">📋 Copiar Cotações</button>
-
   <textarea id="cotacoesResultado" rows="20" readonly></textarea>
 
   <script>
-    // 🔗 Gerador de links
+    // ---------- FUNÇÕES DE LINKS ----------
     function gerarLinks() {
       const baseUrl = document.getElementById("baseUrl").value.trim();
       const nomesTexto = document.getElementById("nomesImagens").value.trim();
-      const nomes = nomesTexto.split('\n').map(nome => nome.trim()).filter(nome => nome !== "");
-      const links = nomes.map((nome, index) => `"${baseUrl}${nome}.jpeg", //${index + 1}`);
+      const nomes = nomesTexto.split('\n').map(n => n.trim()).filter(n => n);
+      const links = nomes.map((nome, i) => `"${baseUrl}${nome}.jpeg", //${i+1}`);
       document.getElementById("resultado").value = links.join("\n");
     }
 
@@ -115,96 +105,90 @@
       const resultado = document.getElementById("resultado");
       resultado.select();
       document.execCommand("copy");
-      alert("✅ Links copiados com sucesso!");
+      alert("✅ Links copiados!");
     }
 
-    // 📅 Extrator de datas
+    // ---------- FUNÇÕES DE DATAS ----------
     function extrairDatas() {
-      const texto = document.getElementById("inputTexto").value;
-      const regex = /\b(\d{2})\/([a-z]{3}) (\d{2}):(\d{2})\b/gi;
+  const texto = document.getElementById("inputTexto").value;
+  const regex = /\b(\d{2})\/([a-z]{3}) (\d{2}):(\d{2})\b/gi;
+  const meses = { jan:"01", fev:"02", mar:"03", abr:"04", mai:"05", jun:"06", jul:"07", ago:"08", set:"09", out:"10", nov:"11", dez:"12"};
+  const datas = [];
+  for (const match of texto.matchAll(regex)) {
+    const dia = match[1],
+          mesAbrev = match[2].toLowerCase(),
+          hora = match[3],
+          minuto = match[4];
+    const mesNum = meses[mesAbrev] || "01";
+    const dataFormatada = `"2025-${mesNum}-${dia}T${hora}:${minuto}",`;
+    const dataObj = new Date(`${dataFormatada}:00`);
+    datas.push({ texto: dataFormatada, ordem: dataObj });
+  }
 
-      const meses = {
-        jan: "01", fev: "02", mar: "03", abr: "04", mai: "05", jun: "06",
-        jul: "07", ago: "08", set: "09", out: "10", nov: "11", dez: "12"
-      };
+  datas.sort((a,b) => a.ordem - b.ordem);
 
-      const datas = [];
+  // Adiciona enumeração //1, //2, ...
+  const resultadoComNum = datas.map((d,i) => `${d.texto} //${i+1}`);
+  document.getElementById("datasExtraidas").value = resultadoComNum.join("\n");
+}
 
-      for (const match of texto.matchAll(regex)) {
-        const dia = match[1];
-        const mesAbrev = match[2].toLowerCase();
-        const hora = match[3];
-        const minuto = match[4];
-        const mesNum = meses[mesAbrev] || "01"; // fallback
+      // ---------- FUNÇÕES DE COTAÇÕES ----------
+    let resultadoFinal = "";
 
-        const dataFormatada = `"2025-${mesNum}-${dia}T${hora}:${minuto}",`;
-        const dataObj = new Date(`${dataFormatada}:00`);
-        datas.push({ texto: dataFormatada, ordem: dataObj });
-      }
-
-      datas.sort((a, b) => a.ordem - b.ordem);
-
-      document.getElementById("datasExtraidas").value = datas.map(d => d.texto).join("\n");
-    }
-
-    function copiarDatas() {
-      const datas = document.getElementById("datasExtraidas");
-      datas.select();
-      document.execCommand("copy");
-      alert("✅ Datas copiadas com sucesso!");
-    }
-
-    // ⚙️ Gerador de Cotações
-    function aleatorio(min, max) {
-      return (Math.random() * (max - min) + min).toFixed(2);
-    }
+    function aleatorio(min,max) { return (Math.random()*(max-min)+min).toFixed(2); }
 
     function gerarCotacoes() {
       const qtd = parseInt(document.getElementById("qtdCotacoes").value) || 50;
-      const dias = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+      const dias = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
       const output = {};
-
-      dias.forEach(dia => {
+      dias.forEach(dia=>{
         output[dia] = {};
-        for (let i = 0; i < qtd; i++) {
+        for(let i=0;i<qtd;i++){
           output[dia][i] = {
-            casa: parseFloat(aleatorio(1.15, 1.50)),
-            empate: parseFloat(aleatorio(2.50, 4.00)),
-            fora: parseFloat(aleatorio(1.50, 3.00)),
-            ambasMarcam: parseFloat(aleatorio(1.70, 2.50)),
-            acima2: parseFloat(aleatorio(1.50, 3.00)),
-            abaixo2: parseFloat(aleatorio(2.00, 3.00)),
-            casaFora: parseFloat(aleatorio(1.50, 2.50)),
-            casaEmpate: parseFloat(aleatorio(1.90, 3.00)),
-            empateFora: parseFloat(aleatorio(1.80, 2.50)),
-            faixa: {
-              "0-1": 3.0,
-              "2-3": 2.5,
-              "4-5": 4.0,
-              "6+": 6.5
+            casa: parseFloat(aleatorio(1.25,2.50)),
+            empate: parseFloat(aleatorio(2.5,3)),
+            fora: parseFloat(aleatorio(1.50,3.50)),
+            ambasMarcam: parseFloat(aleatorio(1.7,2.5)),
+            acima0_5: parseFloat(aleatorio(1.8,2.2)),
+            abaixo0_5: parseFloat(aleatorio(1.8,2.5)),
+            acima1_5: parseFloat(aleatorio(1.6,2)),
+            abaixo1_5: parseFloat(aleatorio(2,2.8)),
+            acima3_5: parseFloat(aleatorio(2.2,2.8)),
+            abaixo3_5: parseFloat(aleatorio(1.7,2.2)),
+            acima2: parseFloat(aleatorio(1.5,2.2)),
+            abaixo2: parseFloat(aleatorio(2.2,3.5)),
+            casaFora: parseFloat(aleatorio(1.5,2.5)),
+            casaEmpate: parseFloat(aleatorio(1.9,3)),
+            empateFora: parseFloat(aleatorio(1.8,2.5)),
+            faixa:{
+              "0-1": parseFloat(aleatorio(2.5,4)),
+              "2-3": parseFloat(aleatorio(2,3.5)),
+              "4-5": parseFloat(aleatorio(3.5,5.5)),
+              "6+": parseFloat(aleatorio(5.5,8))
             }
           };
         }
       });
 
-      let resultadoTexto = '';
-      for (const dia in output) {
-        resultadoTexto += `${dia}: {\n`;
-        for (const i in output[dia]) {
-          const c = output[dia][i];
-          resultadoTexto += `  ${i}: { casa: ${c.casa}, empate: ${c.empate}, fora: ${c.fora}, ambasMarcam: ${c.ambasMarcam}, acima2: ${c.acima2}, abaixo2: ${c.abaixo2}, casaFora: ${c.casaFora}, casaEmpate: ${c.casaEmpate}, empateFora: ${c.empateFora}, faixa: { "0-1": ${c.faixa["0-1"]}, "2-3": ${c.faixa["2-3"]}, "4-5": ${c.faixa["4-5"]}, "6+": ${c.faixa["6+"]} } },\n`;
+      let texto="";
+      for(const dia in output){
+        texto+=`${dia}: {\n`;
+        for(const i in output[dia]){
+          const c=output[dia][i];
+          texto+=`  ${i}: { casa:${c.casa}, empate:${c.empate}, fora:${c.fora}, ambasMarcam:${c.ambasMarcam}, acima0_5:${c.acima0_5}, abaixo0_5:${c.abaixo0_5}, acima1_5:${c.acima1_5}, abaixo1_5:${c.abaixo1_5}, acima3_5:${c.acima3_5}, abaixo3_5:${c.abaixo3_5}, acima2:${c.acima2}, abaixo2:${c.abaixo2}, casaFora:${c.casaFora}, casaEmpate:${c.casaEmpate}, empateFora:${c.empateFora}, faixa:{"0-1":${c.faixa["0-1"]},"2-3":${c.faixa["2-3"]},"4-5":${c.faixa["4-5"]},"6+":${c.faixa["6+"]}} },\n`;
         }
-        resultadoTexto += `},\n\n`;
+        texto+="},\n\n";
       }
-
-      document.getElementById("cotacoesResultado").value = resultadoTexto;
+      resultadoFinal=texto;
+      document.getElementById("cotacoesResultado").value=texto;
     }
 
     function copiarCotacoes() {
-      const textarea = document.getElementById("cotacoesResultado");
+      if(!resultadoFinal) return alert("Primeiro gere as cotações!");
+      const textarea=document.getElementById("cotacoesResultado");
       textarea.select();
       document.execCommand("copy");
-      alert("✅ Cotações copiadas com sucesso!");
+      alert("✅ Cotações copiadas!");
     }
 
     document.getElementById("gerarBtn").addEventListener("click", gerarCotacoes);
