@@ -1,71 +1,78 @@
-   <!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MULTI PLAY.BET</title>
+<meta charset="UTF-8">
+<title>Contagem de Duelos</title>
 </head>
-  <body>
+<body>
+
 <textarea id="entrada" rows="20" cols="80" placeholder="Cole aqui o texto..."></textarea>
 <br><br>
 <button onclick="contarDuelo()">Contar Duelo</button>
 <p id="saida"></p>
+<div id="detalhes" style="white-space:pre-wrap; font-family:monospace;"></div>
 
 <script>
 function contarDuelo() {
-  const texto = document.getElementById('entrada').value || '';
-  const linhas = texto
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l.length > 0);
+  const texto = document.getElementById('entrada').value;
+  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l);
 
   const resultado = [];
-  let countTimes = 0;
+  const nomesComp = [];
+  let count = 0;
+  let compAtual = null;
 
-  // Palavras-chave para identificar início de blocos (país/competição)
-  const headerRegex = /(Brasileir[aã]o|S[ée]rie|Premier League|LaLiga|Liga(?:\s|$)|LigaPro|Bundesliga|Championship|Eredivisie|Ligue\s?\d|Primeira Liga|2ª Liga|1ª Liga|Confer[êe]ncia|Campeonato|Serie A|Serie B|S[ée]rie C|S[ée]rie D|Copa|UEFA|CONCACAF|Major League Soccer|Toppserien|Regionalliga|Superliga|Virsliga|Ekstraklasa|J\.League|J\.League 2|J\.League 3|K-League|Liga Nacional|Primeira Divis[aã]o|Primeira A|Apertura|Encerramento|Super Cup|Premier League do Canad[aá]|Liga Portugal 3)/i;
+  const compRe = /(Brasileir[aã]o.*Série\s*[ABCD]|Brasileir[aã]o.*Fem\.?|Camp\.\s*Brasileiro.*Fem\.?|Premier\s*League|La\s*Liga|Serie\s*A|Serie\s*B|Bundesliga|Ligue\s*1|Ligue\s*2|Copa|Libertadores|Sul-?Americana)/i;
+  const headerRe = /(Casa|Emp|Fora)/i;
+  const oddsRe = /^\d+[,.]\d+/;
+  const dataRe = /\d{1,2}\/[a-z]{3}|\d{1,2}:\d{2}/i;
 
-  // Linhas “meta” que não são times
-  const isLabel = (l) => /^(Casa|Emp\.?|Fora)$/i.test(l);
-  const isDisponiveis = (l) => /Jogos disponíveis/i.test(l);
-  const isMais = (l) => /^\+\d+$/.test(l);                         // +475
-  const isData = (l) => /^\*{2}\d{2}\/[a-z]{3}\s+\d{1,2}:\d{2}$/i.test(l); // **23/ago 16:00
-  const isOdds = (l) => /^[\d,.\s]+$/.test(l) && (l.includes(',') || l.includes('.')); // 1,77,3,27,4,74 etc.
+  const isCompeticao = l => compRe.test(l);
 
-  // Alguns países sozinhos também começam bloco (Brasil, Inglaterra, etc.)
-  const paisRegex = /^(Brasil|Inglaterra|It[aá]lia|Espanha|Alemanha|Holanda|Fran[çc]a|Portugal|Argentina|M[eé]xico|Chile|Col[oô]mbia|Equador|Paraguai|Austr[aá]lia|[ÁA]ustria|B[eé]lgica|Bielorr[úu]ssia|Bol[ií]via|B[óo]snia|Bulg[áa]ria|Canad[aá]|Catar|Cazaquist[aã]o|China|Chipre|Coreia do Sul|Costa Rica|Cro[aá]cia|Dinamarca|Esc[óo]cia|Eslov[áa]quia|Eslov[êe]nia|Estados Unidos|Est[ôo]nia|Finl[âa]ndia|Ge[óo]rgia|Gr[ée]cia|Guatemala|Honduras|Hungria|Ilhas Faro[ée]|Indon[eé]sia|Irlanda do Norte|Isl[âa]ndia|Israel|Jap[aã]o|Jord[âa]nia|Let[ôo]nia|Noruega|Peru|Pol[ôo]nia|Rep\.? Checa|Rom[êe]nia|R[úu]ssia|S[ée]rvia)$/i;
-
-  const isHeader = (l) => headerRegex.test(l) || paisRegex.test(l);
-
-  const flush = () => {
-    if (countTimes > 0) {
-      resultado.push(Math.floor(countTimes / 2)); // 2 times = 1 duelo
-      countTimes = 0;
-    }
+  const isTime = l => {
+    if (isCompeticao(l)) return false;
+    if (headerRe.test(l)) return false;
+    if (oddsRe.test(l)) return false;
+    if (dataRe.test(l)) return false;
+    if (/^[+*]/.test(l)) return false;
+    if (/^\d+$/.test(l)) return false;
+    return true;
   };
 
-  for (const linha of linhas) {
-    // 1) Primeiro: se é cabeçalho de país/competição, fecha bloco anterior e começa novo
-    if (isHeader(linha)) {
-      flush();
+  for (let i = 0; i < linhas.length; i++) {
+    const linha = linhas[i];
+
+    if (isCompeticao(linha)) {
+      // fecha a competição anterior
+      if (compAtual !== null) {
+        resultado.push(count);
+        nomesComp.push(compAtual);
+      }
+      compAtual = linha;
+      count = 0;
       continue;
     }
 
-    // 2) Ignora linhas não relacionadas a times
-    if (isLabel(linha) || isDisponiveis(linha) || isMais(linha) || isData(linha) || isOdds(linha)) {
-      continue;
+    if (isTime(linha) && isTime(linhas[i+1])) {
+      count++;
+      i++; // pula a próxima linha (já usada no duelo)
     }
-
-    // 3) Qualquer outra linha aqui é nome de time (inclui times com números, ex.: "1860 Munique", "1. FC ...")
-    countTimes++;
   }
 
-  // Fecha o último bloco
-  flush();
+  // fecha a última competição
+  if (compAtual !== null) {
+    resultado.push(count);
+    nomesComp.push(compAtual);
+  }
 
-  document.getElementById('saida').innerText = 'Contagem de duelos: [' + resultado.join(', ') + ']';
+  // saída
+  document.getElementById('saida').innerText =
+    'Contagem de duelos: [' + resultado.join(', ') + ']';
+
+  const detalhe = nomesComp.map((n, i) => `${n}: ${resultado[i]} duelos`).join('\n');
+  document.getElementById('detalhes').innerText = detalhe;
 }
-  </script>
-  </body>
+</script>
+
+</body>
 </html>
-  
