@@ -1,34 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Limpar Blocos de Jogos</title>
+<meta charset="UTF-8" />
+<title>Extrair Competição</title>
+<style>
+  textarea { width: 100%; height: 200px; margin-top: 10px; }
+  button { margin-top: 10px; }
+</style>
 </head>
 <body>
-<textarea id="entrada" rows="20" cols="80" placeholder="Cole o texto aqui..."></textarea>
-<br><br>
-<button onclick="limparBlocos()">Limpar</button>
-<br><br>
-<textarea id="saida" rows="20" cols="80" readonly></textarea>
+
+<h2>Coloque o texto aqui:</h2>
+<textarea id="inputText" placeholder="Cole aqui o texto com jogos..."></textarea>
+
+<button onclick="extrairCompeticoes()">Extrair Competições</button>
+
+<h2>Competições extraídas:</h2>
+<textarea id="outputText" readonly></textarea>
 
 <script>
-function limparBlocos() {
-  let texto = document.getElementById("entrada").value;
+function extrairCompeticoes() {
+  const texto = document.getElementById('inputText').value;
+  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
 
-  // Expressão regular para capturar de "Casa" até antes do próximo "+número" ou final do texto
-  let regex = /Casa[\s\S]*?(?=(?:\+\d|\n[A-Z].*?:)|$)/g;
+  // Palavras chave típicas para competições (case insensitive)
+  const palavrasChave = [
+    'copa', 'brasileirão', 'série', 'liga', 'championship', 'divisão',
+    'primeira', 'segunda', 'campeonato', 'feminino', 'superliga', 'premier',
+    'nacional', 'amistoso', 'npl', 'regional', 'primeira b', 'primeira a',
+    'segunda divisão', 'liga de expansão', 'league', 'cup', 'division', 'serie a2',
+    'champions', 'league', 'conference', 'conference', 'segunda', 'primeira liga',
+    'división', 'liga mx', 'liga femenina', 'segunda división', 'league', 'serie a'
+  ];
 
-  let resultado = texto.match(regex);
+  // Lista curta de países e seleções para ignorar
+  const paises = [
+    'argélia', 'áfrica do sul', 'guiné', 'uganda', 'inglaterra', 'alemanha',
+    'holanda', 'frança', 'bélgica', 'bielorrússia', 'bolívia', 'bósnia', 'china',
+    'coreia do sul', 'croácia', 'dinamarca', 'egito', 'escócia', 'estados unidos',
+    'finlândia', 'hungria', 'indonésia', 'irlanda', 'islândia', 'itália', 'japão',
+    'jordânia', 'lituânia', 'méxico', 'peru', 'polônia', 'rep. checa', 'romênia',
+    'rússia', 'sérvia', 'suíça', 'turquia', 'ucrânia', 'uruguai', 'uzbequistão',
+    'wales', 'país de gales', 'países baixos', 'austrália', 'austria', 'colômbia',
+    'paraguai', 'portugal', 'chile'
+  ];
 
-  if (resultado) {
-    // Junta todos os blocos limpos
-    texto = resultado.join("\n\n");
-  } else {
-    texto = "";
+  // Palavras que indicam time (siglas comuns)
+  const siglasTimes = ['sp', 'rj', 'am', 'fc', 'sc', 'ec', 'ce', 'pr', 'pa', 'mg', 'ba', 'rs', 'df', 'go'];
+
+  // Palavras a ignorar
+  const ignorarLinhas = ['casa', 'emp.', 'fora'];
+
+  const competicoes = [];
+
+  function contemPalavraChave(linha) {
+    return palavrasChave.some(palavra => linha.toLowerCase().includes(palavra));
   }
 
-  document.getElementById("saida").value = texto.trim();
+  function ePais(linha) {
+    // Linha é considerada país se for exata ou substring sem outras palavras
+    const linhaLower = linha.toLowerCase();
+    return paises.some(pais => linhaLower === pais);
+  }
+
+  function contemSiglaTime(linha) {
+    // Verifica se tem siglas de estado ou FC etc (exemplo: "Palmeiras SP" ou "Fortaleza EC")
+    const palavras = linha.toLowerCase().split(' ');
+    return palavras.some(p => siglasTimes.includes(p));
+  }
+
+  function ignorar(linha) {
+    return ignorarLinhas.includes(linha.toLowerCase());
+  }
+
+  for(let i = 0; i < linhas.length; i++) {
+    const linha = linhas[i];
+
+    if (
+      contemPalavraChave(linha) &&          // Tem palavra chave de competição
+      !ePais(linha) &&                      // Não é país/seleção
+      !contemSiglaTime(linha) &&            // Não tem sigla de time
+      !ignorar(linha) &&                    // Não é palavra ignorada tipo casa, emp., fora
+      linha.length > 3                      // Linha razoável (evita linhas muito curtas)
+    ) {
+      // Adiciona só se ainda não estiver na lista (evita duplicatas)
+      if (!competicoes.includes(linha)) {
+        competicoes.push(linha);
+      }
+    }
+  }
+
+  document.getElementById('outputText').value = competicoes.join('\n');
 }
 </script>
+
 </body>
 </html>
