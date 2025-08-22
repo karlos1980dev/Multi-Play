@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Limpar Blocos de Jogos</title>
+<style>
+    body{
+        background: Black;
+        color:white;
+    }
+    textarea{
+        width:100%;
+    }
+    .btnLimpa{
+        text-align: center;
+        width:70%;
+        justify-content:center;
+        margin-left:20%;
+    }
+</style>
+</head>
+<body>
+    <h2>LIMPAR REMOVER AS SELECOES CAMPEONATO</h2>
+<textarea style="text-align:center;"id="entrada" rows="20" cols="80" placeholder="Cole o texto aqui..."></textarea>
+<br><br>
+<button class="btnLimpa" onclick="limparBlocos()">Limpar</button>
+<br><br>
+<textarea id="saida" rows="20" cols="80" readonly></textarea>
+
+<script>
+function limparBlocos() {
+  let texto = document.getElementById("entrada").value;
+
+  // Expressão regular para capturar de "Casa" até antes do próximo "+número" ou final do texto
+  let regex = /Casa[\s\S]*?(?=(?:\+\d|\n[A-Z].*?:)|$)/g;
+
+  let resultado = texto.match(regex);
+
+  if (resultado) {
+    // Junta todos os blocos limpos
+    texto = resultado.join("\n\n");
+  } else {
+    texto = "";
+  }
+
+  document.getElementById("saida").value = texto.trim();
+}
+</script>
+</body>
+  </html>
