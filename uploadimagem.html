@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Upload Times</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+  padding: 30px;
+}
+
+.box {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+}
+
+button {
+  padding: 10px 15px;
+  background: #22c55e;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+img {
+  margin-top: 10px;
+  width: 120px;
+  display: none;
+}
+
+#link {
+  margin-top: 10px;
+  word-break: break-all;
+  font-size: 12px;
+}
+
+.lista {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.item {
+  background: #0f172a;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #334155;
+}
+
+.item button {
+  background: #3b82f6;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.clear-btn {
+  background: #ef4444;
+  margin-top: 10px;
+  width: 100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>⚽ Upload de Times</h2>
+
+  <input type="file" id="file"><br><br>
+
+  <button onclick="enviar()">Enviar Imagem</button>
+
+  <img id="preview">
+  <p id="link"></p>
+
+  <button onclick="copiar()">📋 Copiar Último Link</button>
+
+  <div class="lista">
+    <h3>📌 Lista de Times</h3>
+    <button class="clear-btn" onclick="limparLista()">🗑️ Limpar Lista</button>
+    <div id="listaLinks"></div>
+  </div>
+</div>
+
+<script>
+const CLOUD_NAME = "dtw3turzb";
+const PRESET = "Newtech";
+
+let urlFinal = "";
+let lista = JSON.parse(localStorage.getItem("listaTimes")) || [];
+
+function limparNome(nome) {
+  return nome
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+function salvarLista() {
+  localStorage.setItem("listaTimes", JSON.stringify(lista));
+}
+
+function atualizarLista() {
+  const container = document.getElementById("listaLinks");
+  container.innerHTML = "";
+
+  lista.forEach((item) => {
+    container.innerHTML += `
+      <div class="item">
+        <strong>${item.nome}</strong><br>
+        <small>${item.url}</small>
+        <button onclick="copiarItem('${item.url}')">Copiar Link</button>
+      </div>
+    `;
+  });
+}
+
+async function enviar() {
+  const file = document.getElementById("file").files[0];
+
+  if (!file) return alert("Escolha uma imagem");
+
+  let nome = prompt("Digite o nome do time:");
+  if (!nome) return alert("Nome obrigatório!");
+
+  nome = limparNome(nome);
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", PRESET);
+  formData.append("public_id", nome);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+    { method: "POST", body: formData }
+  );
+
+  const data = await res.json();
+
+  if (data.error) return alert(data.error.message);
+
+  urlFinal = data.secure_url;
+
+  document.getElementById("preview").src = urlFinal;
+  document.getElementById("preview").style.display = "block";
+
+  document.getElementById("link").innerText = urlFinal;
+
+  lista.push({ nome, url: urlFinal });
+
+  salvarLista();
+  atualizarLista();
+}
+
+function copiar() {
+  if (!urlFinal) return alert("Nenhum link ainda!");
+  navigator.clipboard.writeText(urlFinal);
+  alert("Link copiado!");
+}
+
+function copiarItem(url) {
+  navigator.clipboard.writeText(url);
+  alert("Link copiado!");
+}
+
+function limparLista() {
+  if (confirm("Tem certeza que deseja apagar tudo?")) {
+    localStorage.removeItem("listaTimes");
+    lista = [];
+    atualizarLista();
+  }
+}
+
+atualizarLista();
+</script>
+
+</body>
+</html>
