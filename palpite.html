@@ -729,7 +729,251 @@ font-size:20px;
 }
 
 }
+/* =========================
+MODAL PIX
+========================= */
 
+.modal-pix{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.75);
+
+z-index:3000;
+
+align-items:center;
+
+justify-content:center;
+
+padding:15px;
+
+}
+
+.modal-pix.ativo{
+
+display:flex;
+
+}
+
+.modal-conteudo{
+
+width:100%;
+
+max-width:380px;
+
+background:#1e293b;
+
+border-radius:16px;
+
+padding:20px;
+
+position:relative;
+
+box-shadow:0 10px 40px rgba(0,0,0,.7);
+
+}
+
+.modal-conteudo h2{
+
+text-align:center;
+
+color:#22c55e;
+
+margin-bottom:12px;
+
+}
+
+.pix-info{
+
+text-align:center;
+
+color:#cbd5e1;
+
+font-size:13px;
+
+line-height:1.5;
+
+margin-bottom:15px;
+
+}
+
+.fechar-pix{
+
+position:absolute;
+
+right:12px;
+
+top:12px;
+
+width:35px;
+
+height:35px;
+
+border:0;
+
+border-radius:8px;
+
+background:#dc2626;
+
+color:white;
+
+font-size:17px;
+
+cursor:pointer;
+
+}
+
+.modal-conteudo label{
+
+display:block;
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:6px;
+
+}
+
+.modal-conteudo input{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#334155;
+
+color:white;
+
+font-size:16px;
+
+outline:none;
+
+margin-bottom:10px;
+
+}
+
+.btn-gerar-pix{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#22c55e;
+
+color:#052e16;
+
+font-weight:bold;
+
+font-size:14px;
+
+cursor:pointer;
+
+}
+
+.btn-gerar-pix:hover{
+
+background:#16a34a;
+
+}
+
+.area-pix{
+
+margin-top:18px;
+
+text-align:center;
+
+}
+
+.area-pix p{
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:8px;
+
+}
+
+.chave-pix{
+
+background:#0f172a;
+
+padding:12px;
+
+border-radius:8px;
+
+word-break:break-all;
+
+color:#22c55e;
+
+font-weight:bold;
+
+font-size:13px;
+
+margin-bottom:10px;
+
+}
+
+.btn-copiar{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#3b82f6;
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+.btn-copiar:hover{
+
+background:#2563eb;
+
+}
+
+.pix-copiado{
+
+color:#22c55e !important;
+
+font-weight:bold;
+
+margin-top:8px;
+
+}
+
+.aviso-pix{
+
+font-size:11px !important;
+
+color:#fbbf24 !important;
+
+margin-top:12px;
+
+line-height:1.5;
+
+}
 </style>
 
 </head>
@@ -1149,7 +1393,75 @@ Escolha o placar
 
 </div>
 
+<!-- =========================
+MODAL DE RECARGA PIX
+========================= -->
 
+<div id="modalPix" class="modal-pix">
+
+  <div class="modal-conteudo">
+
+    <button
+      id="fecharPix"
+      class="fechar-pix">
+      ✕
+    </button>
+
+    <h2>💰 Adicionar saldo</h2>
+
+    <p class="pix-info">
+      Seu saldo é insuficiente para realizar o palpite.
+    </p>
+
+    <label>Digite o valor que deseja adicionar:</label>
+
+    <input
+      type="number"
+      id="valorRecarga"
+      min="1"
+      step="0.01"
+      placeholder="Ex: 10,00">
+
+    <button
+      id="gerarPix"
+      class="btn-gerar-pix">
+      💳 MOSTRAR PIX
+    </button>
+
+    <div
+      id="areaPix"
+      class="area-pix"
+      style="display:none;">
+
+      <p>Faça o pagamento via Pix:</p>
+
+      <div class="chave-pix">
+        <span id="chavePix">
+          71992290058
+        </span>
+      </div>
+
+      <button
+        id="copiarPix"
+        class="btn-copiar">
+        📋 COPIAR PIX
+      </button>
+
+      <p
+        id="pixCopiado"
+        class="pix-copiado">
+      </p>
+
+      <p class="aviso-pix">
+        ⚠️ Após realizar o pagamento, aguarde a confirmação
+        do saldo antes de enviar o palpite.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
 <script>
 
 /* =========================
@@ -1192,7 +1504,217 @@ db.ref("palpites");
 const jogadoresRef =
 db.ref("jogadores");
 
+/* =========================
+CONFIGURAÇÃO PIX
+========================= */
 
+const CHAVE_PIX =
+"71992290058";
+
+
+/* =========================
+ELEMENTOS MODAL
+========================= */
+
+const modalPix =
+document.getElementById("modalPix");
+
+const valorRecarga =
+document.getElementById("valorRecarga");
+
+const areaPix =
+document.getElementById("areaPix");
+
+const chavePix =
+document.getElementById("chavePix");
+
+const pixCopiado =
+document.getElementById("pixCopiado");
+
+
+/* =========================
+ABRIR MODAL PIX
+========================= */
+
+function abrirModalPix(){
+
+valorRecarga.value = "";
+
+areaPix.style.display = "none";
+
+pixCopiado.textContent = "";
+
+chavePix.textContent =
+CHAVE_PIX;
+
+modalPix.classList.add("ativo");
+
+}
+
+
+/* =========================
+FECHAR MODAL PIX
+========================= */
+
+function fecharModalPix(){
+
+modalPix.classList.remove("ativo");
+
+}
+
+
+document
+.getElementById("fecharPix")
+.addEventListener(
+"click",
+fecharModalPix
+);
+
+
+/* =========================
+MOSTRAR PIX
+========================= */
+
+document
+.getElementById("gerarPix")
+.addEventListener("click", async function(){
+
+    const valor = Number(valorRecarga.value);
+
+    if (!Number.isFinite(valor) || valor <= 0){
+        alert("⚠️ Informe um valor válido.");
+        return;
+    }
+
+    const nome = obterNome();
+
+    if (!nome){
+        alert("⚠️ Nome não informado.");
+        return;
+    }
+
+    const jogadorId = criarIdJogador(nome);
+
+    try {
+
+        const solicitacaoRef = db
+            .ref("solicitacoesRecarga")
+            .push();
+
+        await solicitacaoRef.set({
+
+            nome: nome,
+
+            jogadorId: jogadorId,
+
+            valor: Number(valor.toFixed(2)),
+
+            chavePix: CHAVE_PIX,
+
+            status: "pendente",
+
+            data: new Date().toLocaleString("pt-BR"),
+
+            timestamp: Date.now()
+
+        });
+
+        areaPix.style.display = "block";
+
+        chavePix.textContent = CHAVE_PIX;
+
+        pixCopiado.textContent = "";
+
+        alert(
+            "✅ Solicitação registrada!\n\n" +
+            "Nome: " + nome + "\n" +
+            "Valor: R$ " + dinheiro(valor) +
+            "\n\nFaça o Pix e aguarde a confirmação."
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+            "❌ Não foi possível registrar a solicitação.\n\n" +
+            erro.message
+        );
+
+    }
+
+});
+
+
+
+/* =========================
+COPIAR PIX
+========================= */
+
+document
+.getElementById("copiarPix")
+.addEventListener(
+"click",
+async function(){
+
+const texto = CHAVE_PIX;
+
+try{
+
+if(navigator.clipboard){
+
+await navigator.clipboard.writeText(texto);
+
+}else{
+
+const campo = document.createElement("textarea");
+
+campo.value = texto;
+
+campo.style.position = "fixed";
+campo.style.opacity = "0";
+
+document.body.appendChild(campo);
+
+campo.focus();
+campo.select();
+
+document.execCommand("copy");
+
+campo.remove();
+
+}
+
+pixCopiado.textContent =
+"✅ Chave Pix copiada!";
+
+this.textContent =
+"✅ PIX COPIADO";
+
+setTimeout(function(){
+
+pixCopiado.textContent = "";
+
+document.getElementById(
+"copiarPix"
+).textContent =
+"📋 COPIAR PIX";
+
+},2000);
+
+}catch(erro){
+
+console.error(erro);
+
+alert(
+"❌ Não foi possível copiar automaticamente. Segure sobre a chave Pix para copiar."
+);
+
+}
+
+}
+
+);
 /* =========================
 CONFIGURAÇÃO
 ========================= */
@@ -1556,27 +2078,24 @@ R$ ${dinheiro(configuracao.valorLiberacao)}
 
 
 const botao =
-document.getElementById(
-"btnEnviar"
-);
+document.getElementById("btnEnviar");
 
-
-if(!podeMarcar){
-
-botao.disabled = true;
-
-botao.textContent =
-"🔒 BLOQUEADO";
-
-}else{
+/*
+O botão continua clicável mesmo
+com saldo insuficiente para abrir o PIX.
+*/
 
 botao.disabled = false;
 
-botao.textContent =
-"📤 ENVIAR";
+if(!podeMarcar){
+
+botao.textContent = "💰 ADICIONAR SALDO";
+
+}else{
+
+botao.textContent = "📤 ENVIAR";
 
 }
-
 
 atualizarStatusJogos();
 
@@ -2061,19 +2580,7 @@ saldoAtual <
 valorLiberacao
 ){
 
-alert(
-
-"🔒 PALPITE BLOQUEADO!\n\n" +
-
-"Saldo atual: R$ " +
-dinheiro(saldoAtual) +
-
-"\n\n" +
-
-"Valor necessário: R$ " +
-dinheiro(valorLiberacao)
-
-);
+abrirModalPix();
 
 return;
 
@@ -2350,24 +2857,18 @@ erro.message
 }
 finally{
 
+botao.disabled = false;
+
 if(
 configuracao.saldo >=
 configuracao.valorLiberacao
 ){
 
-botao.disabled =
-false;
-
-botao.textContent =
-"📤 ENVIAR";
+botao.textContent = "📤 ENVIAR";
 
 }else{
 
-botao.disabled =
-true;
-
-botao.textContent =
-"🔒 BLOQUEADO";
+botao.textContent = "💰 ADICIONAR SALDO";
 
 }
 
