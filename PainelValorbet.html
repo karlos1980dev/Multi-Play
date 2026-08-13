@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Painel Admin - Recargas</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#0f172a;
+    color:white;
+    padding:15px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+}
+
+header{
+    background:#16a34a;
+    padding:18px;
+    border-radius:14px;
+    text-align:center;
+    margin-bottom:15px;
+}
+
+header h1{
+    font-size:22px;
+}
+
+header p{
+    margin-top:6px;
+    font-size:13px;
+}
+
+.resumo{
+    display:flex;
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.resumo-box{
+    flex:1;
+    background:#1e293b;
+    padding:14px 8px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.resumo-box span{
+    display:block;
+    color:#94a3b8;
+    font-size:11px;
+}
+
+.resumo-box strong{
+    display:block;
+    margin-top:5px;
+    font-size:18px;
+    color:#22c55e;
+}
+
+.status{
+    text-align:center;
+    color:#94a3b8;
+    font-size:12px;
+    margin-bottom:12px;
+}
+
+.lista{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.card{
+    background:#1e293b;
+    border-radius:14px;
+    padding:15px;
+    border-left:5px solid #f59e0b;
+}
+
+.card.aprovado{
+    border-left-color:#22c55e;
+}
+
+.card.recusado{
+    border-left-color:#ef4444;
+}
+
+.nome{
+    color:#22c55e;
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+.linha{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:6px 0;
+    font-size:13px;
+    border-bottom:1px solid #334155;
+}
+
+.linha:last-child{
+    border-bottom:0;
+}
+
+.valor{
+    color:#fbbf24;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.status-pendente{
+    color:#fbbf24;
+    font-weight:bold;
+}
+
+.status-aprovado{
+    color:#22c55e;
+    font-weight:bold;
+}
+
+.status-recusado{
+    color:#ef4444;
+    font-weight:bold;
+}
+
+.botoes{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.botoes button{
+    flex:1;
+    border:0;
+    border-radius:9px;
+    padding:12px 5px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.aprovar{
+    background:#22c55e;
+    color:#052e16;
+}
+
+.recusar{
+    background:#dc2626;
+    color:white;
+}
+
+.aprovar:hover{
+    background:#16a34a;
+}
+
+.recusar:hover{
+    background:#b91c1c;
+}
+
+.sem{
+    background:#1e293b;
+    padding:30px 15px;
+    border-radius:12px;
+    text-align:center;
+    color:#94a3b8;
+}
+
+@media(max-width:450px){
+
+    .resumo-box strong{
+        font-size:15px;
+    }
+
+    .botoes{
+        flex-direction:column;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+
+<h1>💰 PAINEL DE RECARGAS</h1>
+
+<p>Solicitações de saldo</p>
+
+</header>
+
+
+<div class="resumo">
+
+<div class="resumo-box">
+
+<span>PENDENTES</span>
+
+<strong id="totalPendentes">
+0
+</strong>
+
+</div>
+
+<div class="resumo-box">
+
+<span>APROVADAS</span>
+
+<strong id="totalAprovadas">
+0
+</strong>
+
+</div>
+
+<div class="resumo-box">
+
+<span>TOTAL</span>
+
+<strong id="totalValor">
+R$ 0,00
+</strong>
+
+</div>
+
+</div>
+
+
+<div
+id="status"
+class="status">
+
+🔄 Conectando...
+
+</div>
+
+
+<div
+id="lista"
+class="lista">
+
+<div class="sem">
+
+Carregando solicitações...
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+FIREBASE
+========================= */
+
+const firebaseConfig = {
+
+    apiKey:
+    "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+
+    authDomain:
+    "placarexato-97966.firebaseapp.com",
+
+    databaseURL:
+    "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+    "placarexato-97966",
+
+    storageBucket:
+    "placarexato-97966.firebasestorage.app",
+
+    messagingSenderId:
+    "942191850183",
+
+    appId:
+    "1:942191850183:web:9870fab0d09044b11004e2"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+
+const db =
+firebase.database();
+
+
+const solicitacoesRef =
+db.ref("solicitacoesRecarga");
+
+
+const jogadoresRef =
+db.ref("jogadores");
+
+
+/* =========================
+ELEMENTOS
+========================= */
+
+const lista =
+document.getElementById("lista");
+
+const totalPendentes =
+document.getElementById("totalPendentes");
+
+const totalAprovadas =
+document.getElementById("totalAprovadas");
+
+const totalValor =
+document.getElementById("totalValor");
+
+
+/* =========================
+DINHEIRO
+========================= */
+
+function dinheiro(valor){
+
+    return Number(valor || 0)
+        .toFixed(2)
+        .replace(".",",");
+
+}
+
+
+/* =========================
+SEGURANÇA HTML
+========================= */
+
+function escapeHTML(text){
+
+    return String(text ?? "")
+
+        .replace(/&/g,"&amp;")
+
+        .replace(/</g,"&lt;")
+
+        .replace(/>/g,"&gt;")
+
+        .replace(/"/g,"&quot;")
+
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+CARREGAR SOLICITAÇÕES
+========================= */
+
+solicitacoesRef.on(
+    "value",
+    function(snapshot){
+
+        const solicitacoes = [];
+
+        let pendentes = 0;
+
+        let aprovadas = 0;
+
+        let valorTotal = 0;
+
+
+        snapshot.forEach(
+            function(child){
+
+                const item =
+                child.val();
+
+                if(!item){
+                    return;
+                }
+
+
+                item.id =
+                child.key;
+
+
+                solicitacoes.push(item);
+
+
+                if(item.status === "pendente"){
+
+                    pendentes++;
+
+                }
+
+
+                if(item.status === "aprovado"){
+
+                    aprovadas++;
+
+                    valorTotal +=
+                    Number(item.valor) || 0;
+
+                }
+
+            }
+        );
+
+
+        solicitacoes.sort(
+            function(a,b){
+
+                return (
+                    Number(b.timestamp || 0) -
+                    Number(a.timestamp || 0)
+                );
+
+            }
+        );
+
+
+        totalPendentes.textContent =
+        pendentes;
+
+
+        totalAprovadas.textContent =
+        aprovadas;
+
+
+        totalValor.textContent =
+        "R$ " +
+        dinheiro(valorTotal);
+
+
+        if(solicitacoes.length === 0){
+
+            lista.innerHTML = `
+
+                <div class="sem">
+
+                    📭 Nenhuma solicitação encontrada.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        lista.innerHTML = "";
+
+
+        solicitacoes.forEach(
+            function(item){
+
+                const card =
+                document.createElement("div");
+
+
+                card.className =
+                "card " +
+                (
+                    item.status === "aprovado"
+                    ? "aprovado"
+                    : item.status === "recusado"
+                    ? "recusado"
+                    : ""
+                );
+
+
+                let statusHTML;
+
+
+                if(item.status === "aprovado"){
+
+                    statusHTML = `
+                        <span class="status-aprovado">
+                            ✅ APROVADO
+                        </span>
+                    `;
+
+                }
+                else if(item.status === "recusado"){
+
+                    statusHTML = `
+                        <span class="status-recusado">
+                            ❌ RECUSADO
+                        </span>
+                    `;
+
+                }
+                else{
+
+                    statusHTML = `
+                        <span class="status-pendente">
+                            ⏳ PENDENTE
+                        </span>
+                    `;
+
+                }
+
+
+                let botoes = "";
+
+
+                if(item.status === "pendente"){
+
+                    botoes = `
+
+                        <div class="botoes">
+
+                            <button
+                                class="aprovar"
+                                onclick="aprovarRecarga('${item.id}')">
+
+                                ✅ APROVAR
+
+                            </button>
+
+
+                            <button
+                                class="recusar"
+                                onclick="recusarRecarga('${item.id}')">
+
+                                ❌ RECUSAR
+
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                card.innerHTML = `
+
+                    <div class="nome">
+
+                        👤
+                        ${escapeHTML(item.nome)}
+
+                    </div>
+
+
+                    <div class="linha">
+
+                        <span>💰 Valor solicitado</span>
+
+                        <strong class="valor">
+
+                            R$ ${dinheiro(item.valor)}
+
+                        </strong>
+
+                    </div>
+
+
+                    <div class="linha">
+
+                        <span>👤 ID jogador</span>
+
+                        <span>
+
+                            ${escapeHTML(item.jogadorId)}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="linha">
+
+                        <span>📅 Data</span>
+
+                        <span>
+
+                            ${escapeHTML(item.data)}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="linha">
+
+                        <span>📌 Status</span>
+
+                        ${statusHTML}
+
+                    </div>
+
+
+                    ${botoes}
+
+                `;
+
+
+                lista.appendChild(card);
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================
+APROVAR
+========================= */
+
+async function aprovarRecarga(id){
+
+    if(!confirm(
+        "Confirma a aprovação desta recarga?"
+    )){
+        return;
+    }
+
+
+    try{
+
+        const snap =
+        await solicitacoesRef
+            .child(id)
+            .once("value");
+
+
+        if(!snap.exists()){
+
+            alert(
+                "❌ Solicitação não encontrada."
+            );
+
+            return;
+
+        }
+
+
+        const solicitacao =
+        snap.val();
+
+
+        if(
+            solicitacao.status !==
+            "pendente"
+        ){
+
+            alert(
+                "⚠️ Esta solicitação já foi processada."
+            );
+
+            return;
+
+        }
+
+
+        const jogadorId =
+        solicitacao.jogadorId;
+
+
+        const valor =
+        Number(solicitacao.valor);
+
+
+        if(
+            !jogadorId ||
+            !Number.isFinite(valor) ||
+            valor <= 0
+        ){
+
+            alert(
+                "❌ Dados da solicitação inválidos."
+            );
+
+            return;
+
+        }
+
+
+        const jogadorSnap =
+        await jogadoresRef
+            .child(jogadorId)
+            .once("value");
+
+
+        if(!jogadorSnap.exists()){
+
+            alert(
+                "❌ Jogador não encontrado."
+            );
+
+            return;
+
+        }
+
+
+        const jogador =
+        jogadorSnap.val();
+
+
+        const saldoAtual =
+        Number(jogador.saldo) || 0;
+
+
+        const novoSaldo =
+        Number(
+            (
+                saldoAtual +
+                valor
+            ).toFixed(2)
+        );
+
+
+        /*
+        ATUALIZA SALDO E SOLICITAÇÃO
+        */
+
+        await jogadoresRef
+            .child(jogadorId)
+            .update({
+
+                saldo:
+                novoSaldo,
+
+                atualizadoEm:
+                Date.now()
+
+            });
+
+
+        await solicitacoesRef
+            .child(id)
+            .update({
+
+                status:
+                "aprovado",
+
+                saldoAnterior:
+                saldoAtual,
+
+                saldoAdicionado:
+                valor,
+
+                saldoNovo:
+                novoSaldo,
+
+                processadoEm:
+                Date.now(),
+
+                processadoData:
+                new Date()
+                .toLocaleString("pt-BR")
+
+            });
+
+
+        alert(
+            "✅ Recarga aprovada!\n\n" +
+
+            "Jogador: " +
+            solicitacao.nome +
+
+            "\nValor: R$ " +
+            dinheiro(valor) +
+
+            "\nNovo saldo: R$ " +
+            dinheiro(novoSaldo)
+        );
+
+
+    }catch(erro){
+
+        console.error(erro);
+
+        alert(
+            "❌ Erro ao aprovar:\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+RECUSAR
+========================= */
+
+async function recusarRecarga(id){
+
+    if(!confirm(
+        "Deseja recusar esta solicitação?"
+    )){
+        return;
+    }
+
+
+    try{
+
+        const snap =
+        await solicitacoesRef
+            .child(id)
+            .once("value");
+
+
+        if(!snap.exists()){
+
+            alert(
+                "❌ Solicitação não encontrada."
+            );
+
+            return;
+
+        }
+
+
+        const solicitacao =
+        snap.val();
+
+
+        if(
+            solicitacao.status !==
+            "pendente"
+        ){
+
+            alert(
+                "⚠️ Esta solicitação já foi processada."
+            );
+
+            return;
+
+        }
+
+
+        await solicitacoesRef
+            .child(id)
+            .update({
+
+                status:
+                "recusado",
+
+                processadoEm:
+                Date.now(),
+
+                processadoData:
+                new Date()
+                .toLocaleString("pt-BR")
+
+            });
+
+
+        alert(
+            "❌ Solicitação recusada."
+        );
+
+
+    }catch(erro){
+
+        console.error(erro);
+
+        alert(
+            "❌ Erro ao recusar:\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+CONEXÃO
+========================= */
+
+db.ref(".info/connected")
+.on(
+    "value",
+    function(snap){
+
+        const status =
+        document.getElementById("status");
+
+
+        if(snap.val() === true){
+
+            status.textContent =
+            "🟢 Conectado ao Firebase";
+
+            status.style.color =
+            "#22c55e";
+
+        }else{
+
+            status.textContent =
+            "🔴 Sem conexão";
+
+            status.style.color =
+            "#ef4444";
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
