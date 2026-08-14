@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Painel Admin - Palpite Premiado</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:#0f172a;
+  color:white;
+  padding:15px;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.topo{
+  background:#1e293b;
+  padding:18px;
+  border-radius:14px;
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.topo h1{
+  color:#22c55e;
+  font-size:22px;
+}
+
+.status{
+  text-align:center;
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:8px;
+}
+
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:14px;
+  margin-bottom:15px;
+}
+
+.card h2{
+  color:#22c55e;
+  font-size:18px;
+  margin-bottom:12px;
+}
+
+label{
+  display:block;
+  color:#cbd5e1;
+  font-size:13px;
+  margin-top:10px;
+  margin-bottom:5px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:9px;
+  background:#334155;
+  color:white;
+  font-size:16px;
+  outline:none;
+}
+
+input:focus{
+  box-shadow:0 0 0 2px #22c55e;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:9px;
+  margin-top:12px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn-salvar{
+  background:#22c55e;
+  color:white;
+}
+
+.btn-salvar:hover{
+  background:#16a34a;
+}
+
+.btn-limpar{
+  background:#475569;
+  color:white;
+}
+
+.btn-excluir{
+  background:#dc2626;
+  color:white;
+  width:auto;
+  padding:8px 12px;
+  margin:0;
+  font-size:12px;
+}
+
+.btn-editar{
+  background:#2563eb;
+  color:white;
+  width:auto;
+  padding:8px 12px;
+  margin:0;
+  font-size:12px;
+}
+
+.btn-liberar{
+  background:#16a34a;
+  color:white;
+  width:auto;
+  padding:8px 12px;
+  margin:0;
+  font-size:12px;
+}
+
+.btn-bloquear{
+  background:#dc2626;
+  color:white;
+  width:auto;
+  padding:8px 12px;
+  margin:0;
+  font-size:12px;
+}
+
+.acoes{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.acoes button{
+  margin:0;
+}
+
+.jogador{
+  background:#0f172a;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
+
+.jogador-topo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.nome{
+  color:#22c55e;
+  font-size:17px;
+  font-weight:bold;
+}
+
+.info{
+  margin-top:10px;
+  line-height:1.8;
+  font-size:13px;
+  color:#cbd5e1;
+}
+
+.liberado{
+  display:inline-block;
+  background:#166534;
+  color:#bbf7d0;
+  padding:5px 8px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.bloqueado{
+  display:inline-block;
+  background:#7f1d1d;
+  color:#fecaca;
+  padding:5px 8px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.palpite{
+  background:#334155;
+  padding:10px;
+  border-radius:8px;
+  margin-top:8px;
+  font-size:13px;
+}
+
+.palpite strong{
+  color:#22c55e;
+  font-size:17px;
+}
+
+.sem{
+  text-align:center;
+  color:#94a3b8;
+  padding:20px;
+}
+
+.aviso{
+  background:#854d0e;
+  color:#fef08a;
+  padding:10px;
+  border-radius:8px;
+  font-size:12px;
+  margin-bottom:10px;
+  line-height:1.5;
+}
+
+.separador{
+  height:1px;
+  background:#334155;
+  margin:12px 0;
+}
+
+@media(max-width:500px){
+
+  .jogador-topo{
+    align-items:flex-start;
+  }
+
+  .acoes{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .acoes button{
+    width:100%;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topo">
+
+<h1>⚽ PAINEL ADMIN</h1>
+
+<div
+class="status"
+id="status">
+
+🔄 Conectando...
+
+</div>
+
+</div>
+
+
+<div class="aviso">
+
+⚠️ Cada jogador possui seu próprio saldo, valor de liberação e prêmio.
+Alterar um jogador NÃO altera os demais.
+
+</div>
+
+
+<!-- =========================
+     CONFIGURAÇÃO
+========================= -->
+
+<div class="card">
+
+<h2>
+⚙️ Configuração individual
+</h2>
+
+
+<label>
+👤 Nome do jogador
+</label>
+
+<input
+id="nome"
+type="text"
+placeholder="Ex: João">
+
+
+<label>
+💰 Saldo do jogador
+</label>
+
+<input
+id="saldo"
+type="number"
+step="0.01"
+min="0"
+placeholder="Ex: 2.00">
+
+
+<label>
+🎯 Valor necessário para liberar
+</label>
+
+<input
+id="valorLiberacao"
+type="number"
+step="0.01"
+min="0"
+value="2.00"
+placeholder="Ex: 2.00">
+
+
+<label>
+🏆 Prêmio deste jogador
+</label>
+
+<input
+id="premio"
+type="number"
+step="0.01"
+min="0"
+value="500.00"
+placeholder="Ex: 500.00">
+
+
+<button
+class="btn-salvar"
+id="btnSalvar">
+
+💾 SALVAR CONFIGURAÇÃO
+
+</button>
+
+
+<button
+class="btn-limpar"
+id="btnLimpar">
+
+🧹 NOVO JOGADOR
+
+</button>
+
+</div>
+
+
+<!-- =========================
+     JOGADORES
+========================= -->
+
+<div class="card">
+
+<h2>
+👥 Jogadores cadastrados
+</h2>
+
+<div id="jogadores">
+
+<p class="sem">
+Carregando...
+</p>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     PALPITES
+========================= -->
+
+<div class="card">
+
+<h2>
+📋 Palpites enviados
+</h2>
+
+<div id="palpites">
+
+<p class="sem">
+Carregando...
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+  "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+
+  authDomain:
+  "placarexato-97966.firebaseapp.com",
+
+  databaseURL:
+  "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId:
+  "placarexato-97966",
+
+  storageBucket:
+  "placarexato-97966.firebasestorage.app",
+
+  messagingSenderId:
+  "942191850183",
+
+  appId:
+  "1:942191850183:web:9870fab0d09044b11004e2"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+
+const db =
+firebase.database();
+
+
+const jogadoresRef =
+db.ref("jogadores");
+
+
+const palpitesRef =
+db.ref("palpites");
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const nomeInput =
+document.getElementById("nome");
+
+const saldoInput =
+document.getElementById("saldo");
+
+const valorLiberacaoInput =
+document.getElementById("valorLiberacao");
+
+const premioInput =
+document.getElementById("premio");
+
+const btnSalvar =
+document.getElementById("btnSalvar");
+
+const btnLimpar =
+document.getElementById("btnLimpar");
+
+const jogadoresArea =
+document.getElementById("jogadores");
+
+const palpitesArea =
+document.getElementById("palpites");
+
+
+/*
+  Guarda o ID que está sendo editado.
+  Isso evita criar outro jogador quando editar.
+*/
+
+let jogadorEditando = null;
+
+
+/* =====================================================
+   ESCAPE
+===================================================== */
+
+function escapeHTML(text){
+
+  return String(text)
+
+  .replace(/&/g,"&amp;")
+
+  .replace(/</g,"&lt;")
+
+  .replace(/>/g,"&gt;")
+
+  .replace(/"/g,"&quot;")
+
+  .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   DINHEIRO
+===================================================== */
+
+function dinheiro(valor){
+
+  return Number(valor || 0)
+
+  .toFixed(2)
+
+  .replace(".",",");
+
+}
+
+
+/* =====================================================
+   CRIAR ID
+===================================================== */
+
+function criarId(nome){
+
+  return nome
+
+  .toLowerCase()
+
+  .normalize("NFD")
+
+  .replace(/[\u0300-\u036f]/g,"")
+
+  .replace(/[^a-z0-9]+/g,"_")
+
+  .replace(/^_+|_+$/g,"");
+
+}
+
+
+/* =====================================================
+   SALVAR JOGADOR
+===================================================== */
+
+async function salvarJogador(){
+
+  const nome =
+  nomeInput.value.trim();
+
+
+  const saldo =
+  Number(saldoInput.value);
+
+
+  const valorLiberacao =
+  Number(valorLiberacaoInput.value);
+
+
+  const premio =
+  Number(premioInput.value);
+
+
+  if(!nome){
+
+    alert(
+      "⚠️ Digite o nome do jogador."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    isNaN(saldo) ||
+    saldo < 0
+  ){
+
+    alert(
+      "⚠️ Informe um saldo válido."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    isNaN(valorLiberacao) ||
+    valorLiberacao < 0
+  ){
+
+    alert(
+      "⚠️ Informe um valor de liberação válido."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    isNaN(premio) ||
+    premio < 0
+  ){
+
+    alert(
+      "⚠️ Informe um prêmio válido."
+    );
+
+    return;
+
+  }
+
+
+  btnSalvar.disabled = true;
+
+  btnSalvar.textContent =
+  "⏳ SALVANDO...";
+
+
+  try{
+
+    /*
+      Se estiver editando,
+      mantém o mesmo ID.
+    */
+
+    let id =
+    jogadorEditando;
+
+
+    /*
+      Se for novo jogador,
+      cria ID pelo nome.
+    */
+
+    if(!id){
+
+      id =
+      criarId(nome);
+
+    }
+
+
+    /*
+      Verifica se existe outro jogador
+      com o mesmo ID.
+    */
+
+    const jogadorAtual =
+    await jogadoresRef
+    .child(id)
+    .once("value");
+
+
+    /*
+      Se for novo jogador e já existir,
+      confirma.
+    */
+
+    if(
+      jogadorAtual.exists() &&
+      !jogadorEditando
+    ){
+
+      const confirmar =
+      confirm(
+        "⚠️ Este jogador já existe.\n\nDeseja substituir a configuração?"
+      );
+
+
+      if(!confirmar){
+
+        btnSalvar.disabled = false;
+
+        btnSalvar.textContent =
+        "💾 SALVAR CONFIGURAÇÃO";
+
+        return;
+
+      }
+
+    }
+
+
+    /*
+      SALVA SOMENTE NESTE JOGADOR
+    */
+
+    await jogadoresRef
+    .child(id)
+    .update({
+
+      nome:
+      nome,
+
+      saldo:
+      saldo,
+
+      valorLiberacao:
+      valorLiberacao,
+
+      premio:
+      premio,
+
+      atualizadoEm:
+      Date.now()
+
+    });
+
+
+    alert(
+      "✅ Configuração do jogador salva!"
+    );
+
+
+    limparFormulario();
+
+
+  }catch(erro){
+
+    console.error(erro);
+
+    alert(
+      "❌ Erro ao salvar:\n\n" +
+      erro.message
+    );
+
+  }
+
+
+  btnSalvar.disabled = false;
+
+  btnSalvar.textContent =
+  "💾 SALVAR CONFIGURAÇÃO";
+
+}
+
+
+/* =====================================================
+   LIMPAR
+===================================================== */
+
+function limparFormulario(){
+
+  jogadorEditando = null;
+
+  nomeInput.value = "";
+
+  saldoInput.value = "";
+
+  valorLiberacaoInput.value =
+  "2.00";
+
+  premioInput.value =
+  "500.00";
+
+  btnSalvar.textContent =
+  "💾 SALVAR CONFIGURAÇÃO";
+
+}
+
+
+btnLimpar.addEventListener(
+  "click",
+  limparFormulario
+);
+
+
+/* =====================================================
+   EDITAR
+===================================================== */
+
+async function editarJogador(id){
+
+  try{
+
+    const snap =
+    await jogadoresRef
+    .child(id)
+    .once("value");
+
+
+    const jogador =
+    snap.val();
+
+
+    if(!jogador){
+
+      alert(
+        "Jogador não encontrado."
+      );
+
+      return;
+
+    }
+
+
+    jogadorEditando =
+    id;
+
+
+    nomeInput.value =
+    jogador.nome || "";
+
+
+    saldoInput.value =
+    jogador.saldo ?? 0;
+
+
+    valorLiberacaoInput.value =
+    jogador.valorLiberacao ?? 2;
+
+
+    premioInput.value =
+    jogador.premio ?? 500;
+
+
+    btnSalvar.textContent =
+    "💾 ATUALIZAR JOGADOR";
+
+
+    window.scrollTo({
+
+      top:0,
+
+      behavior:"smooth"
+
+    });
+
+
+  }catch(erro){
+
+    alert(
+      "❌ Não foi possível carregar o jogador."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LIBERAR JOGADOR
+===================================================== */
+
+async function liberarJogador(id){
+
+  try{
+
+    const snap =
+    await jogadoresRef
+    .child(id)
+    .once("value");
+
+
+    const jogador =
+    snap.val();
+
+
+    if(!jogador){
+
+      return;
+
+    }
+
+
+    const valor =
+    Number(
+      jogador.valorLiberacao
+    ) || 0;
+
+
+    await jogadoresRef
+    .child(id)
+    .update({
+
+      saldo:
+      valor,
+
+      atualizadoEm:
+      Date.now()
+
+    });
+
+
+    alert(
+
+      "✅ Liberado somente para " +
+      jogador.nome +
+      "\n\n" +
+      "Saldo: R$ " +
+      dinheiro(valor)
+
+    );
+
+
+  }catch(erro){
+
+    alert(
+      "❌ Erro ao liberar jogador."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   BLOQUEAR JOGADOR
+===================================================== */
+
+async function bloquearJogador(id){
+
+  try{
+
+    const snap =
+    await jogadoresRef
+    .child(id)
+    .once("value");
+
+
+    const jogador =
+    snap.val();
+
+
+    if(!jogador){
+
+      return;
+
+    }
+
+
+    await jogadoresRef
+    .child(id)
+    .update({
+
+      saldo:0,
+
+      atualizadoEm:
+      Date.now()
+
+    });
+
+
+    alert(
+      "🔒 " +
+      jogador.nome +
+      " foi bloqueado."
+    );
+
+
+  }catch(erro){
+
+    alert(
+      "❌ Erro ao bloquear jogador."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   EXCLUIR JOGADOR
+===================================================== */
+
+async function excluirJogador(id){
+
+  const snap =
+  await jogadoresRef
+  .child(id)
+  .once("value");
+
+
+  const jogador =
+  snap.val();
+
+
+  if(!jogador){
+
+    return;
+
+  }
+
+
+  const confirmar =
+  confirm(
+
+    "⚠️ EXCLUIR JOGADOR?\n\n" +
+
+    "Nome: " +
+    jogador.nome +
+    "\n" +
+
+    "Saldo: R$ " +
+    dinheiro(jogador.saldo) +
+    "\n\n" +
+
+    "Essa ação não pode ser desfeita."
+
+  );
+
+
+  if(!confirmar){
+
+    return;
+
+  }
+
+
+  try{
+
+    await jogadoresRef
+    .child(id)
+    .remove();
+
+
+    if(jogadorEditando === id){
+
+      limparFormulario();
+
+    }
+
+
+    alert(
+      "✅ Jogador excluído."
+    );
+
+
+  }catch(erro){
+
+    alert(
+      "❌ Não foi possível excluir."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CARREGAR JOGADORES
+===================================================== */
+
+function carregarJogadores(){
+
+  jogadoresRef.on(
+    "value",
+    function(snapshot){
+
+      jogadoresArea.innerHTML =
+      "";
+
+
+      if(!snapshot.exists()){
+
+        jogadoresArea.innerHTML =
+        '<p class="sem">Nenhum jogador cadastrado.</p>';
+
+        return;
+
+      }
+
+
+      snapshot.forEach(
+        function(child){
+
+          const jogador =
+          child.val();
+
+
+          const id =
+          child.key;
+
+
+          const saldo =
+          Number(
+            jogador.saldo
+          ) || 0;
+
+
+          const liberacao =
+          Number(
+            jogador.valorLiberacao
+          ) || 0;
+
+
+          const premio =
+          Number(
+            jogador.premio
+          ) || 0;
+
+
+          const liberado =
+          saldo >= liberacao;
+
+
+          const div =
+          document.createElement(
+            "div"
+          );
+
+
+          div.className =
+          "jogador";
+
+
+          div.innerHTML = `
+
+            <div class="jogador-topo">
+
+              <div class="nome">
+
+                👤
+                ${escapeHTML(
+                  jogador.nome || ""
+                )}
+
+              </div>
+
+              <span class="${
+                liberado
+                ?
+                "liberado"
+                :
+                "bloqueado"
+              }">
+
+                ${
+                  liberado
+                  ?
+                  "🟢 LIBERADO"
+                  :
+                  "🔴 BLOQUEADO"
+                }
+
+              </span>
+
+            </div>
+
+
+            <div class="info">
+
+              💰 Saldo:
+
+              <strong>
+                R$ ${dinheiro(saldo)}
+              </strong>
+
+              <br>
+
+
+              🎯 Valor para liberar:
+
+              <strong>
+                R$ ${dinheiro(liberacao)}
+              </strong>
+
+              <br>
+
+
+              🏆 Prêmio:
+
+              <strong>
+                R$ ${dinheiro(premio)}
+              </strong>
+
+            </div>
+
+
+            <div class="acoes">
+
+              <button
+                class="btn-editar"
+                onclick="editarJogador('${id}')">
+
+                ✏️ EDITAR
+
+              </button>
+
+
+              ${
+                liberado
+
+                ?
+
+                `
+                <button
+                  class="btn-bloquear"
+                  onclick="bloquearJogador('${id}')">
+
+                  🔒 BLOQUEAR
+
+                </button>
+                `
+
+                :
+
+                `
+                <button
+                  class="btn-liberar"
+                  onclick="liberarJogador('${id}')">
+
+                  🔓 LIBERAR
+
+                </button>
+                `
+              }
+
+
+              <button
+                class="btn-excluir"
+                onclick="excluirJogador('${id}')">
+
+                🗑️ EXCLUIR
+
+              </button>
+
+            </div>
+
+          `;
+
+
+          jogadoresArea.appendChild(
+            div
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   CARREGAR PALPITES
+===================================================== */
+
+function carregarPalpites(){
+
+  palpitesRef.on(
+    "value",
+    function(snapshot){
+
+      palpitesArea.innerHTML =
+      "";
+
+
+      if(!snapshot.exists()){
+
+        palpitesArea.innerHTML =
+        '<p class="sem">Nenhum palpite enviado.</p>';
+
+        return;
+
+      }
+
+
+      const lista = [];
+
+
+      snapshot.forEach(
+        function(child){
+
+          lista.push({
+
+            id:
+            child.key,
+
+            dados:
+            child.val()
+
+          });
+
+        }
+      );
+
+
+      lista.reverse();
+
+
+      lista.forEach(
+        function(item){
+
+          const p =
+          item.dados;
+
+
+          const j1 =
+          p.jogo1?.palpite || "-";
+
+
+          const j2 =
+          p.jogo2?.palpite || "-";
+
+
+          const j3 =
+          p.jogo3?.palpite || "-";
+
+
+          const div =
+          document.createElement(
+            "div"
+          );
+
+
+          div.className =
+          "jogador";
+
+
+          div.innerHTML = `
+
+            <div class="jogador-topo">
+
+              <div class="nome">
+
+                👤
+                ${escapeHTML(
+                  p.nome || ""
+                )}
+
+              </div>
+
+
+              <button
+                class="btn-excluir"
+                onclick="excluirPalpite('${item.id}')">
+
+                🗑️ EXCLUIR
+
+              </button>
+
+            </div>
+
+
+            <div class="palpite">
+
+              São Bernardo x Botafogo:
+
+              <strong>
+                ${escapeHTML(j1)}
+              </strong>
+
+            </div>
+
+
+            <div class="palpite">
+
+              Ponte Preta x Náutico:
+
+              <strong>
+                ${escapeHTML(j2)}
+              </strong>
+
+            </div>
+
+
+            <div class="palpite">
+
+              Sport x Londrina:
+
+              <strong>
+                ${escapeHTML(j3)}
+              </strong>
+
+            </div>
+
+
+            <div class="info">
+
+              💰 Valor:
+
+              <strong>
+                R$ ${dinheiro(p.valor)}
+              </strong>
+
+              <br>
+
+
+              🏆 Prêmio:
+
+              <strong>
+                R$ ${dinheiro(p.premio)}
+              </strong>
+
+              <br>
+
+
+              📅 Enviado:
+
+              ${escapeHTML(
+                p.data || ""
+              )}
+
+            </div>
+
+          `;
+
+
+          palpitesArea.appendChild(
+            div
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   EXCLUIR PALPITE
+===================================================== */
+
+async function excluirPalpite(id){
+
+  const confirmar =
+  confirm(
+    "⚠️ Deseja excluir este palpite?"
+  );
+
+
+  if(!confirmar){
+
+    return;
+
+  }
+
+
+  try{
+
+    await palpitesRef
+    .child(id)
+    .remove();
+
+
+    alert(
+      "✅ Palpite excluído."
+    );
+
+
+  }catch(erro){
+
+    alert(
+      "❌ Não foi possível excluir o palpite."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   STATUS FIREBASE
+===================================================== */
+
+db.ref(".info/connected")
+.on(
+  "value",
+  function(snapshot){
+
+    const status =
+    document.getElementById(
+      "status"
+    );
+
+
+    if(
+      snapshot.val() === true
+    ){
+
+      status.textContent =
+      "🟢 Firebase conectado";
+
+      status.style.color =
+      "#22c55e";
+
+    }else{
+
+      status.textContent =
+      "🔴 Firebase desconectado";
+
+      status.style.color =
+      "#ef4444";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   BOTÃO SALVAR
+===================================================== */
+
+btnSalvar.addEventListener(
+  "click",
+  salvarJogador
+);
+
+
+/* =====================================================
+   INICIAR
+===================================================== */
+
+carregarJogadores();
+
+carregarPalpites();
+
+</script>
+
+</body>
+
+</html>
