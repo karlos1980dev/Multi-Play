@@ -1,0 +1,3499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Palpite Premiado</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:8px;
+padding-top:8px;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+/* =========================
+TOPO
+========================= */
+
+.topo{
+max-width:500px;
+margin:0 auto 8px;
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+min-height:42px;
+}
+
+.menu-btn{
+position:absolute;
+left:0;
+width:42px;
+height:42px;
+border:0;
+border-radius:10px;
+background:#1e293b;
+color:white;
+font-size:23px;
+cursor:pointer;
+}
+
+.titulo{
+text-align:center;
+font-size:20px;
+font-weight:bold;
+color:#22c55e;
+}
+
+/* =========================
+PAINEL FIXO
+========================= */
+
+.painel-fixo{
+
+position:sticky;
+
+top:0;
+
+z-index:900;
+
+max-width:500px;
+
+margin:0 auto 10px;
+
+background:#16a34a;
+
+padding:7px;
+
+border-radius:10px;
+
+box-shadow:
+0 4px 15px rgba(0,0,0,.45);
+
+}
+
+.topo-valores{
+
+display:flex;
+
+align-items:stretch;
+
+gap:5px;
+
+}
+
+.topo-item{
+
+flex:1;
+
+min-width:0;
+
+background:rgba(0,0,0,.18);
+
+border-radius:8px;
+
+padding:6px 3px;
+
+text-align:center;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+}
+
+.topo-item span{
+
+font-size:9px;
+
+font-weight:bold;
+
+white-space:nowrap;
+
+}
+
+.topo-item strong{
+
+font-size:12px;
+
+margin-top:3px;
+
+white-space:nowrap;
+
+}
+
+.enviar-fixo{
+
+flex:1.2;
+
+min-width:75px;
+
+border:0;
+
+border-radius:8px;
+
+background:white;
+
+color:#15803d;
+
+font-size:12px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+padding:5px 3px;
+
+}
+
+.enviar-fixo:hover{
+
+background:#dcfce7;
+
+}
+
+.enviar-fixo:disabled{
+
+background:#64748b;
+
+color:white;
+
+cursor:not-allowed;
+
+}
+
+/* =========================
+MENU
+========================= */
+
+.menu-lateral{
+
+position:fixed;
+
+top:0;
+
+left:-350px;
+
+width:350px;
+
+max-width:88%;
+
+height:100vh;
+
+background:#0f172a;
+
+z-index:1000;
+
+padding:20px;
+
+transition:.3s;
+
+overflow-y:auto;
+
+box-shadow:
+5px 0 20px rgba(0,0,0,.6);
+
+}
+
+.menu-lateral.ativo{
+
+left:0;
+
+}
+
+.menu-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:20px;
+
+}
+
+.menu-header h2{
+
+color:#22c55e;
+
+font-size:20px;
+
+}
+
+.fechar{
+
+width:40px;
+
+height:40px;
+
+border:0;
+
+border-radius:10px;
+
+background:#dc2626;
+
+color:white;
+
+font-size:18px;
+
+cursor:pointer;
+
+}
+
+.fundo-menu{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.65);
+
+z-index:999;
+
+}
+
+.fundo-menu.ativo{
+
+display:block;
+
+}
+
+/* =========================
+SITUAÇÃO
+========================= */
+
+.situacao{
+
+background:#1e293b;
+
+padding:12px;
+
+border-radius:12px;
+
+text-align:center;
+
+margin-bottom:10px;
+
+font-size:13px;
+
+line-height:1.7;
+
+}
+
+.situacao .liberado{
+
+color:#22c55e;
+
+font-weight:bold;
+
+font-size:16px;
+
+}
+
+.situacao .bloqueado{
+
+color:#ef4444;
+
+font-weight:bold;
+
+font-size:16px;
+
+}
+
+.status{
+
+text-align:center;
+
+font-size:12px;
+
+margin:6px 0 10px;
+
+color:#94a3b8;
+
+}
+
+/* =========================
+PRÓXIMO JOGO
+========================= */
+
+.proximo-jogo{
+
+background:#1e293b;
+
+padding:11px;
+
+border-radius:10px;
+
+text-align:center;
+
+margin-bottom:10px;
+
+font-size:13px;
+
+line-height:1.6;
+
+}
+
+.proximo-jogo strong{
+
+color:#22c55e;
+
+font-size:16px;
+
+}
+
+/* =========================
+DUELO
+========================= */
+
+.duelo{
+
+background:#1e293b;
+
+border-radius:12px;
+
+padding:8px;
+
+margin-bottom:10px;
+
+}
+
+.times{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+margin-bottom:6px;
+
+}
+
+.time{
+
+width:35%;
+
+text-align:center;
+
+}
+
+.time img{
+
+width:48px;
+
+height:48px;
+
+object-fit:contain;
+
+background:white;
+
+border-radius:50%;
+
+padding:3px;
+
+}
+
+.time p{
+
+margin-top:3px;
+
+font-weight:bold;
+
+font-size:12px;
+
+white-space:nowrap;
+
+}
+
+.placar-selecionado{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:4px;
+
+min-width:70px;
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#22c55e;
+
+}
+
+.placar-selecionado span{
+
+width:25px;
+
+height:30px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:#334155;
+
+border-radius:6px;
+
+}
+
+.placar-selecionado b{
+
+color:white;
+
+font-size:17px;
+
+}
+
+.jogo-info{
+
+text-align:center;
+
+font-size:11px;
+
+color:#94a3b8;
+
+margin:5px 0 7px;
+
+}
+
+/* =========================
+CONTADOR
+========================= */
+
+.contador{
+
+text-align:center;
+
+background:#0f172a;
+
+color:#22c55e;
+
+padding:7px;
+
+border-radius:8px;
+
+font-size:13px;
+
+font-weight:bold;
+
+margin-bottom:6px;
+
+}
+
+.contador.encerrado{
+
+background:#7f1d1d;
+
+color:#fecaca;
+
+}
+
+/* =========================
+SELECT
+========================= */
+
+select{
+
+width:100%;
+
+padding:9px;
+
+border:0;
+
+border-radius:8px;
+
+background:#334155;
+
+color:white;
+
+font-size:14px;
+
+outline:none;
+
+cursor:pointer;
+
+}
+
+select.bloqueado{
+
+background:#475569;
+
+color:#94a3b8;
+
+cursor:not-allowed;
+
+opacity:.7;
+
+}
+
+/* =========================
+NOME
+========================= */
+
+.nome-salvo{
+
+background:#1e293b;
+
+border-radius:12px;
+
+padding:12px;
+
+margin-bottom:15px;
+
+text-align:center;
+
+color:#cbd5e1;
+
+font-size:14px;
+
+}
+
+.nome-salvo strong{
+
+color:#22c55e;
+
+}
+
+/* =========================
+MEUS PALPITES
+========================= */
+
+.meu-card{
+
+background:#1e293b;
+
+padding:12px;
+
+border-radius:12px;
+
+margin-bottom:12px;
+
+}
+
+.meu-nome{
+
+color:#22c55e;
+
+font-size:17px;
+
+font-weight:bold;
+
+margin-bottom:8px;
+
+}
+
+.meu-placar{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:8px;
+
+background:#334155;
+
+padding:9px;
+
+border-radius:8px;
+
+margin-top:6px;
+
+font-size:12px;
+
+}
+
+.meu-placar strong{
+
+color:#22c55e;
+
+font-size:18px;
+
+}
+
+.data{
+
+color:#94a3b8;
+
+font-size:11px;
+
+margin-top:10px;
+
+line-height:1.5;
+
+}
+
+.sem-palpite{
+
+color:#94a3b8;
+
+text-align:center;
+
+padding:20px 0;
+
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:400px){
+
+.topo-valores{
+
+gap:3px;
+
+}
+
+.topo-item{
+
+padding:5px 2px;
+
+}
+
+.topo-item span{
+
+font-size:8px;
+
+}
+
+.topo-item strong{
+
+font-size:10px;
+
+}
+
+.enviar-fixo{
+
+min-width:65px;
+
+font-size:10px;
+
+}
+
+.time img{
+
+width:42px;
+
+height:42px;
+
+}
+
+.time p{
+
+font-size:11px;
+
+}
+
+.placar-selecionado{
+
+font-size:20px;
+
+}
+
+}
+/* =========================
+MODAL PIX
+========================= */
+
+.modal-pix{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.75);
+
+z-index:3000;
+
+align-items:center;
+
+justify-content:center;
+
+padding:15px;
+
+}
+
+.modal-pix.ativo{
+
+display:flex;
+
+}
+
+.modal-conteudo{
+
+width:100%;
+
+max-width:380px;
+
+background:#1e293b;
+
+border-radius:16px;
+
+padding:20px;
+
+position:relative;
+
+box-shadow:0 10px 40px rgba(0,0,0,.7);
+
+}
+
+.modal-conteudo h2{
+
+text-align:center;
+
+color:#22c55e;
+
+margin-bottom:12px;
+
+}
+
+.pix-info{
+
+text-align:center;
+
+color:#cbd5e1;
+
+font-size:13px;
+
+line-height:1.5;
+
+margin-bottom:15px;
+
+}
+
+.fechar-pix{
+
+position:absolute;
+
+right:12px;
+
+top:12px;
+
+width:35px;
+
+height:35px;
+
+border:0;
+
+border-radius:8px;
+
+background:#dc2626;
+
+color:white;
+
+font-size:17px;
+
+cursor:pointer;
+
+}
+
+.modal-conteudo label{
+
+display:block;
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:6px;
+
+}
+
+.modal-conteudo input{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#334155;
+
+color:white;
+
+font-size:16px;
+
+outline:none;
+
+margin-bottom:10px;
+
+}
+
+.btn-gerar-pix{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#22c55e;
+
+color:#052e16;
+
+font-weight:bold;
+
+font-size:14px;
+
+cursor:pointer;
+
+}
+
+.btn-gerar-pix:hover{
+
+background:#16a34a;
+
+}
+
+.area-pix{
+
+margin-top:18px;
+
+text-align:center;
+
+}
+
+.area-pix p{
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:8px;
+
+}
+
+.chave-pix{
+
+background:#0f172a;
+
+padding:12px;
+
+border-radius:8px;
+
+word-break:break-all;
+
+color:#22c55e;
+
+font-weight:bold;
+
+font-size:13px;
+
+margin-bottom:10px;
+
+}
+
+.btn-copiar{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#3b82f6;
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+.btn-copiar:hover{
+
+background:#2563eb;
+
+}
+
+.pix-copiado{
+
+color:#22c55e !important;
+
+font-weight:bold;
+
+margin-top:8px;
+
+}
+
+.aviso-pix{
+
+font-size:11px !important;
+
+color:#fbbf24 !important;
+
+margin-top:12px;
+
+line-height:1.5;
+
+}
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =========================
+TOPO
+========================= -->
+
+<div class="topo">
+
+<button
+id="btnMenu"
+class="menu-btn">
+
+☰
+
+</button>
+
+<div class="titulo">
+
+⚽ PALPITE PREMIADO
+
+</div>
+
+</div>
+
+
+<!-- =========================
+MENU
+========================= -->
+
+<div
+id="menuLateral"
+class="menu-lateral">
+
+<div class="menu-header">
+
+<h2>
+
+📋 Meus Palpites
+
+</h2>
+
+<button
+id="btnFechar"
+class="fechar">
+
+✕
+
+</button>
+
+</div>
+
+<div
+id="nomeMenu"
+class="nome-salvo">
+
+</div>
+
+<div id="meusPalpites">
+
+<p class="sem-palpite">
+
+Nenhum palpite realizado.
+
+</p>
+
+</div>
+
+</div>
+
+
+<div
+id="fundoMenu"
+class="fundo-menu">
+</div>
+
+
+<!-- =========================
+CONTEÚDO
+========================= -->
+
+<div class="container">
+
+
+<!-- =========================
+PAINEL FIXO
+========================= -->
+
+<div class="painel-fixo">
+
+<div class="topo-valores">
+
+
+<div class="topo-item">
+
+<span>
+💰 SALDO
+</span>
+
+<strong
+id="saldoTela">
+
+R$ 0,00
+
+</strong>
+
+</div>
+
+
+<div class="topo-item">
+
+<span>
+💵 VALOR
+</span>
+
+<strong
+id="valorTela">
+
+R$ 2,00
+
+</strong>
+
+</div>
+
+
+<div class="topo-item">
+
+<span>
+🏆 PRÊMIO
+</span>
+
+<strong
+id="premioTela">
+
+R$ 1500,00
+
+</strong>
+
+</div>
+
+
+<button
+id="btnEnviar"
+class="enviar-fixo">
+
+📤 ENVIAR
+
+</button>
+
+
+</div>
+
+</div>
+
+
+<!-- =========================
+SITUAÇÃO
+========================= -->
+
+<div style="display: none;"
+id="situacao"
+class="situacao">
+
+⏳ Verificando saldo...
+
+</div>
+
+
+<!-- =========================
+STATUS
+========================= -->
+
+<div style="display: none;"
+id="status"
+class="status">
+
+🔄 Conectando...
+
+</div>
+
+
+<!-- =========================
+PRÓXIMO JOGO
+========================= -->
+
+<div style="display: none;"
+id="proximoJogo"
+class="proximo-jogo">
+
+⏳ Verificando próximo jogo...
+
+</div>
+
+
+<!-- =========================
+JOGO 1
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746224/fluminense-fc.png">
+
+<p>
+fluminense
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar1Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar1Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png">
+
+<p>
+palmeiras
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 15/08/2026
+&nbsp; | &nbsp;
+⏰ 16:30
+
+</div>
+
+
+<select id="jogo1">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+
+<!-- =========================
+JOGO 2
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746535/athletico-paranaense.png">
+
+<p>
+athletico-paranaense
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar2Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar2Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746647/red-bull-bragantino.png">
+
+<p>
+red-bull-bragantino
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 14/08/2026
+&nbsp; | &nbsp;
+⏰ 19:00
+
+</div>
+
+
+<select id="jogo2">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+
+<!-- =========================
+JOGO 3
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746738/sao-paulo-fc.png">
+
+<p>
+sao-paulo-fc
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar3Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar3Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg">
+
+<p>
+coritiba
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 14/08/2026
+&nbsp; | &nbsp;
+⏰ 21:00
+
+</div>
+
+
+<select id="jogo3">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+<!-- =========================
+JOGO 4
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png">
+
+<p>
+atletico-goianiense
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar4Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar4Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746995/vila-nova-go.png">
+
+<p>
+vila-nova-go
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 14/08/2026
+&nbsp; | &nbsp;
+⏰ 21:00
+
+</div>
+
+<select id="jogo4">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+<!-- =========================
+MODAL DE RECARGA PIX
+========================= -->
+
+<div id="modalPix" class="modal-pix">
+
+  <div class="modal-conteudo">
+
+    <button
+      id="fecharPix"
+      class="fechar-pix">
+      ✕
+    </button>
+
+    <h2>💰 Adicionar saldo</h2>
+
+    <p class="pix-info">
+      Seu saldo é insuficiente para realizar o palpite.
+    </p>
+
+    <label>Digite o valor que deseja adicionar:</label>
+
+    <input
+      type="number"
+      id="valorRecarga"
+      min="1"
+      step="0.01"
+      placeholder="Ex: 10,00">
+
+    <button
+      id="gerarPix"
+      class="btn-gerar-pix">
+      💳 MOSTRAR PIX
+    </button>
+
+    <div
+      id="areaPix"
+      class="area-pix"
+      style="display:none;">
+
+      <p>Faça o pagamento via Pix:</p>
+
+      <div class="chave-pix">
+        <span id="chavePix">
+          71992290058
+        </span>
+      </div>
+
+      <button
+        id="copiarPix"
+        class="btn-copiar">
+        📋 COPIAR PIX
+      </button>
+
+      <p
+        id="pixCopiado"
+        class="pix-copiado">
+      </p>
+
+      <p class="aviso-pix">
+        ⚠️ Após realizar o pagamento, aguarde a confirmação
+        do saldo antes de enviar o palpite.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+<script>
+
+/* =========================
+FIREBASE
+========================= */
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+
+authDomain:
+"placarexato-97966.firebaseapp.com",
+
+databaseURL:
+"https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:
+"placarexato-97966",
+
+storageBucket:
+"placarexato-97966.firebasestorage.app",
+
+messagingSenderId:
+"942191850183",
+
+appId:
+"1:942191850183:web:9870fab0d09044b11004e2"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db =
+firebase.database();
+
+const palpitesRef =
+db.ref("palpites");
+
+const jogadoresRef =
+db.ref("jogadores");
+
+/* =========================
+CONFIGURAÇÃO PIX
+========================= */
+
+const CHAVE_PIX =
+"71992290058";
+
+
+/* =========================
+ELEMENTOS MODAL
+========================= */
+
+const modalPix =
+document.getElementById("modalPix");
+
+const valorRecarga =
+document.getElementById("valorRecarga");
+
+const areaPix =
+document.getElementById("areaPix");
+
+const chavePix =
+document.getElementById("chavePix");
+
+const pixCopiado =
+document.getElementById("pixCopiado");
+
+
+/* =========================
+ABRIR MODAL PIX
+========================= */
+
+function abrirModalPix(){
+
+valorRecarga.value = "";
+
+areaPix.style.display = "none";
+
+pixCopiado.textContent = "";
+
+chavePix.textContent =
+CHAVE_PIX;
+
+modalPix.classList.add("ativo");
+
+}
+
+
+/* =========================
+FECHAR MODAL PIX
+========================= */
+
+function fecharModalPix(){
+
+modalPix.classList.remove("ativo");
+
+}
+
+
+document
+.getElementById("fecharPix")
+.addEventListener(
+"click",
+fecharModalPix
+);
+
+
+/* =========================
+MOSTRAR PIX
+========================= */
+
+document
+.getElementById("gerarPix")
+.addEventListener("click", async function(){
+
+    const valor = Number(valorRecarga.value);
+
+    if (!Number.isFinite(valor) || valor <= 0){
+        alert("⚠️ Informe um valor válido.");
+        return;
+    }
+
+    const nome = obterNome();
+
+    if (!nome){
+        alert("⚠️ Nome não informado.");
+        return;
+    }
+
+    const jogadorId = criarIdJogador(nome);
+
+    try {
+
+        const solicitacaoRef = db
+            .ref("solicitacoesRecarga")
+            .push();
+
+        await solicitacaoRef.set({
+
+            nome: nome,
+
+            jogadorId: jogadorId,
+
+            valor: Number(valor.toFixed(2)),
+
+            chavePix: CHAVE_PIX,
+
+            status: "pendente",
+
+            data: new Date().toLocaleString("pt-BR"),
+
+            timestamp: Date.now()
+
+        });
+
+        areaPix.style.display = "block";
+
+        chavePix.textContent = CHAVE_PIX;
+
+        pixCopiado.textContent = "";
+
+        alert(
+            "✅ Solicitação registrada!\n\n" +
+            "Nome: " + nome + "\n" +
+            "Valor: R$ " + dinheiro(valor) +
+            "\n\nFaça o Pix e aguarde a confirmação."
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+            "❌ Não foi possível registrar a solicitação.\n\n" +
+            erro.message
+        );
+
+    }
+
+});
+
+
+
+/* =========================
+COPIAR PIX
+========================= */
+
+document
+.getElementById("copiarPix")
+.addEventListener(
+"click",
+async function(){
+
+const texto = CHAVE_PIX;
+
+try{
+
+if(navigator.clipboard){
+
+await navigator.clipboard.writeText(texto);
+
+}else{
+
+const campo = document.createElement("textarea");
+
+campo.value = texto;
+
+campo.style.position = "fixed";
+campo.style.opacity = "0";
+
+document.body.appendChild(campo);
+
+campo.focus();
+campo.select();
+
+document.execCommand("copy");
+
+campo.remove();
+
+}
+
+pixCopiado.textContent =
+"✅ Chave Pix copiada!";
+
+this.textContent =
+"✅ PIX COPIADO";
+
+setTimeout(function(){
+
+pixCopiado.textContent = "";
+
+document.getElementById(
+"copiarPix"
+).textContent =
+"📋 COPIAR PIX";
+
+},2000);
+
+}catch(erro){
+
+console.error(erro);
+
+alert(
+"❌ Não foi possível copiar automaticamente. Segure sobre a chave Pix para copiar."
+);
+
+}
+
+}
+
+);
+/* =========================
+CONFIGURAÇÃO
+========================= */
+
+let configuracao = {
+
+saldo:0,
+
+valorLiberacao:2,
+
+premio:1500
+
+};
+
+
+/* =========================
+PLACARES
+========================= */
+
+const placares = [
+
+"0:0",
+"1:0",
+"0:1",
+"1:1",
+
+"2:0",
+"2:1",
+"1:2",
+"2:2",
+
+"3:0",
+"3:1",
+"1:3",
+"3:2",
+"2:3",
+"3:3",
+
+"4:0",
+"0:4",
+"4:1",
+"1:4",
+"4:2",
+"2:4",
+"4:3",
+"3:4",
+"4:4",
+
+"5:0",
+"0:5",
+"5:1",
+"1:5",
+"5:2",
+"2:5"
+
+];
+
+
+/* =========================
+JOGOS
+========================= */
+
+const jogos = {
+
+jogo1:{
+
+nome:
+"Fluminense FC x Palmeiras SP",
+
+data:
+"2026-08-15",
+
+hora:
+"16:30",
+
+select:
+"jogo1"
+
+},
+
+jogo2:{
+
+nome:
+"Athletico Paranaense x Red Bull Bragantino",
+
+data:
+"2026-08-15",
+
+hora:
+"18:30",
+
+select:
+"jogo2"
+
+},
+
+jogo3:{
+
+nome:
+"Sao Paulo FC x Coritiba",
+
+data:
+"2026-08-15",
+
+hora:
+"21:00",
+
+select:
+"jogo3"
+
+},
+
+jogo4:{
+
+nome:
+"Atletico Goianiense x Vila Nova GO",
+
+data:
+"2026-08-15",
+
+hora:
+"16:00",
+
+select:
+"jogo4"
+
+}
+
+};
+
+/* =========================
+DINHEIRO
+========================= */
+
+function dinheiro(valor){
+
+return Number(valor || 0)
+
+.toFixed(2)
+
+.replace(".",",");
+
+}
+
+
+/* =========================
+ID JOGADOR
+========================= */
+
+function criarIdJogador(nome){
+
+return nome
+
+.toLowerCase()
+
+.normalize("NFD")
+
+.replace(/[\u0300-\u036f]/g,"")
+
+.replace(/[^a-z0-9]+/g,"_")
+
+.replace(/^_+|_+$/g,"");
+
+}
+
+
+/* =========================
+NOME
+========================= */
+
+function obterNome(){
+
+let nome =
+localStorage.getItem(
+"nomeJogador"
+);
+
+if(
+nome &&
+nome.trim() !== ""
+){
+
+return nome.trim();
+
+}
+
+while(true){
+
+nome =
+prompt(
+"👤 Digite seu nome:"
+);
+
+if(nome === null){
+
+alert(
+"⚠️ É necessário informar seu nome."
+);
+
+continue;
+
+}
+
+nome =
+nome.trim();
+
+if(nome !== ""){
+
+localStorage.setItem(
+"nomeJogador",
+nome
+);
+
+return nome;
+
+}
+
+alert(
+"⚠️ Digite um nome válido."
+);
+
+}
+
+}
+
+
+/* =========================
+CARREGAR CONFIGURAÇÃO
+========================= */
+
+function carregarConfiguracao(){
+
+const nome =
+obterNome();
+
+const id =
+criarIdJogador(nome);
+
+jogadoresRef
+.child(id)
+.on(
+"value",
+function(snapshot){
+
+if(!snapshot.exists()){
+
+configuracao = {
+
+saldo:0,
+
+valorLiberacao:2,
+
+premio:1500
+
+};
+
+atualizarTela();
+
+return;
+
+}
+const dados =
+snapshot.val();
+
+configuracao.saldo =
+Number(dados.saldo) || 0;
+
+configuracao.valorLiberacao =
+Number(dados.valorLiberacao);
+
+if(
+!Number.isFinite(
+configuracao.valorLiberacao
+)
+){
+
+configuracao.valorLiberacao = 2;
+
+}
+
+configuracao.premio =
+Number(dados.premio) || 1500;
+
+atualizarTela();
+
+}
+);
+
+}
+
+
+/* =========================
+ATUALIZAR TELA
+========================= */
+
+function atualizarTela(){
+
+document.getElementById(
+"saldoTela"
+).textContent =
+"R$ " +
+dinheiro(
+configuracao.saldo
+);
+
+document.getElementById(
+"valorTela"
+).textContent =
+"R$ " +
+dinheiro(
+configuracao.valorLiberacao
+);
+
+document.getElementById(
+"premioTela"
+).textContent =
+"R$ " +
+dinheiro(
+configuracao.premio
+);
+
+
+const podeMarcar =
+configuracao.saldo >=
+configuracao.valorLiberacao;
+
+
+const situacao =
+document.getElementById(
+"situacao"
+);
+
+
+if(podeMarcar){
+
+situacao.innerHTML = `
+
+<span class="liberado">
+
+🟢 PALPITE LIBERADO
+
+</span>
+
+<br>
+
+Seu saldo é suficiente para jogar.
+
+`;
+
+}else{
+
+situacao.innerHTML = `
+
+<span class="bloqueado">
+
+🔴 PALPITE BLOQUEADO
+
+</span>
+
+<br>
+
+Saldo insuficiente.
+
+<br>
+
+Necessário:
+
+<strong>
+R$ ${dinheiro(configuracao.valorLiberacao)}
+</strong>
+
+`;
+
+}
+
+
+const botao =
+document.getElementById("btnEnviar");
+
+/*
+O botão continua clicável mesmo
+com saldo insuficiente para abrir o PIX.
+*/
+
+botao.disabled = false;
+
+if(!podeMarcar){
+
+botao.textContent = "💰 ADICIONAR SALDO";
+
+}else{
+
+botao.textContent = "📤 ENVIAR";
+
+}
+
+atualizarStatusJogos();
+
+}
+
+
+/* =========================
+PREENCHER SELECT
+========================= */
+
+function preencherSelect(id){
+
+const select =
+document.getElementById(id);
+
+placares.forEach(
+function(placar){
+
+const option =
+document.createElement("option");
+
+option.value =
+placar;
+
+option.textContent =
+placar;
+
+select.appendChild(
+option
+);
+
+}
+
+);
+
+}
+
+
+/* =========================
+ATUALIZAR PLACAR
+========================= */
+
+function atualizarPlacar(
+selectId,
+casaId,
+foraId
+){
+
+const valor =
+document
+.getElementById(selectId)
+.value;
+
+const casa =
+document.getElementById(casaId);
+
+const fora =
+document.getElementById(foraId);
+
+if(!valor){
+
+casa.textContent =
+"-";
+
+fora.textContent =
+"-";
+
+return;
+
+}
+
+const partes =
+valor.split(":");
+
+casa.textContent =
+partes[0];
+
+fora.textContent =
+partes[1];
+
+}
+
+
+/* =========================
+DATA JOGO
+========================= */
+
+function obterDataJogo(jogo){
+
+return new Date(
+
+jogo.data +
+"T" +
+jogo.hora +
+":00"
+
+);
+
+}
+
+
+/* =========================
+JOGO ABERTO
+========================= */
+
+function jogoEstaAberto(jogo){
+
+return new Date() <
+obterDataJogo(jogo);
+
+}
+
+
+/* =========================
+FORMATAR TEMPO
+========================= */
+
+function formatarTempo(ms){
+
+if(ms <= 0){
+
+return "00:00";
+
+}
+
+const totalSegundos =
+Math.floor(ms / 1000);
+
+const horas =
+Math.floor(
+totalSegundos / 3600
+);
+
+const minutos =
+Math.floor(
+(totalSegundos % 3600) / 60
+);
+
+const segundos =
+totalSegundos % 60;
+
+if(horas > 0){
+
+return (
+
+String(horas)
+.padStart(2,"0")
+
++
+":"
+
++
+String(minutos)
+.padStart(2,"0")
+
++
+":"
+
++
+String(segundos)
+.padStart(2,"0")
+
+);
+
+}
+
+return (
+
+String(minutos)
+.padStart(2,"0")
+
++
+":"
+
++
+String(segundos)
+.padStart(2,"0")
+
+);
+
+}
+
+
+/* =========================
+STATUS DOS JOGOS
+========================= */
+
+function atualizarStatusJogos(){
+
+const agora =
+new Date();
+
+Object.keys(jogos)
+.forEach(
+function(chave){
+
+const jogo =
+jogos[chave];
+
+const select =
+document.getElementById(
+jogo.select
+);
+
+const horario =
+obterDataJogo(jogo);
+
+const duelo =
+select.closest(".duelo");
+
+let contador =
+duelo.querySelector(
+".contador"
+);
+
+if(!contador){
+
+contador =
+document.createElement("div");
+
+contador.className =
+"contador";
+
+duelo.insertBefore(
+contador,
+select
+);
+
+}
+
+
+if(agora >= horario){
+
+select.disabled =
+true;
+
+select.classList.add(
+"bloqueado"
+);
+
+contador.className =
+"contador encerrado";
+
+contador.textContent =
+"🔒 PALPITES ENCERRADOS";
+
+return;
+
+}
+
+
+if(
+configuracao.saldo <
+configuracao.valorLiberacao
+){
+
+select.disabled =
+true;
+
+select.classList.add(
+"bloqueado"
+);
+
+contador.className =
+"contador";
+
+contador.textContent =
+"🔒 SALDO INSUFICIENTE";
+
+return;
+
+}
+
+
+select.disabled =
+false;
+
+select.classList.remove(
+"bloqueado"
+);
+
+contador.className =
+"contador";
+
+contador.textContent =
+"⏳ Encerra em: " +
+formatarTempo(
+horario - agora
+);
+
+}
+);
+
+atualizarProximoJogo();
+
+}
+
+
+/* =========================
+PRÓXIMO JOGO
+========================= */
+
+function atualizarProximoJogo(){
+
+const agora =
+new Date();
+
+let proximo =
+null;
+
+Object.keys(jogos)
+.forEach(
+function(chave){
+
+const jogo =
+jogos[chave];
+
+const horario =
+obterDataJogo(jogo);
+
+if(
+
+horario > agora
+
+&&
+
+(
+!proximo ||
+horario <
+obterDataJogo(proximo)
+)
+
+){
+
+proximo =
+jogo;
+
+}
+
+});
+
+const area =
+document.getElementById(
+"proximoJogo"
+);
+
+if(!proximo){
+
+area.innerHTML =
+"🏁 Todos os jogos foram encerrados.";
+
+return;
+
+}
+
+const tempo =
+obterDataJogo(proximo) -
+agora;
+
+area.innerHTML = `
+
+⏭️ Próximo jogo:<br>
+
+<strong>
+${escapeHTML(proximo.nome)}
+</strong>
+
+<br>
+
+⏳ Começa em:
+
+<strong>
+${formatarTempo(tempo)}
+</strong>
+
+<br>
+
+📅
+${formatarData(proximo.data)}
+
+às
+${proximo.hora}
+
+`;
+
+}
+
+
+/* =========================
+FORMATAR DATA
+========================= */
+
+function formatarData(data){
+
+const partes =
+data.split("-");
+
+return (
+
+partes[2] +
+"/" +
+partes[1] +
+"/" +
+partes[0]
+
+);
+
+}
+
+
+/* =========================
+ENVIAR PALPITE
+========================= */
+
+async function enviarPalpite(){
+
+const nome =
+obterNome();
+
+if(!nome){
+return;
+}
+
+const id =
+criarIdJogador(nome);
+
+const botao =
+document.getElementById(
+"btnEnviar"
+);
+
+try{
+
+botao.disabled =
+true;
+
+botao.textContent =
+"⏳ ENVIANDO...";
+
+
+/*
+BUSCAR SALDO ATUAL
+*/
+
+const jogadorSnap =
+await jogadoresRef
+.child(id)
+.once("value");
+
+if(!jogadorSnap.exists()){
+
+  await jogadoresRef
+  .child(id)
+  .set({
+
+    nome: nome,
+
+    saldo: 0,
+
+    valorLiberacao: 2,
+
+    premio: 1500,
+
+    criadoEm: Date.now()
+
+  });
+
+ 
+
+}
+
+
+const jogador =
+jogadorSnap.exists()
+  ? jogadorSnap.val()
+  : {
+      saldo: 0,
+      valorLiberacao: 2,
+      premio: 1500
+    };
+
+const saldoAtual =
+Number(jogador.saldo) || 0;
+
+const valorLiberacao =
+Number(jogador.valorLiberacao) || 2;
+
+const premio =
+Number(jogador.premio) || 1500;
+
+/*
+VERIFICAR SALDO
+*/
+
+if(
+saldoAtual <
+valorLiberacao
+){
+
+abrirModalPix();
+
+return;
+
+}
+
+
+/*
+VERIFICAR JOGOS
+*/
+
+for(
+const chave of Object.keys(jogos)
+){
+
+if(
+!jogoEstaAberto(
+jogos[chave]
+)
+){
+
+alert(
+"🔒 Um dos jogos já foi encerrado."
+);
+
+atualizarStatusJogos();
+
+return;
+
+}
+
+}
+
+
+/*
+PEGAR PALPITES
+*/
+
+const jogo1 =
+document.getElementById(
+"jogo1"
+).value;
+
+const jogo2 =
+document.getElementById(
+"jogo2"
+).value;
+
+const jogo3 =
+document.getElementById(
+"jogo3"
+).value;
+
+const jogo4 =
+document.getElementById(
+"jogo4"
+).value;
+
+if(
+!jogo1 ||
+!jogo2 ||
+!jogo3
+){
+
+alert(
+"⚠️ Escolha os 4 placares antes de enviar!"
+);
+
+return;
+
+}
+
+
+/*
+CALCULAR NOVO SALDO
+*/
+
+const novoSaldo =
+Number(
+(
+saldoAtual -
+valorLiberacao
+).toFixed(2)
+);
+
+
+/*
+CRIAR PALPITE
+*/
+
+const novoPalpite = {
+
+nome:
+nome,
+
+jogadorId:
+id,
+
+valor:
+valorLiberacao,
+
+premio:
+premio,
+
+saldoAnterior:
+saldoAtual,
+
+saldoRestante:
+novoSaldo,
+
+jogo1:{
+
+confronto:
+jogos.jogo1.nome,
+
+palpite:
+jogo1,
+
+data:
+jogos.jogo1.data,
+
+hora:
+jogos.jogo1.hora
+
+},
+
+jogo2:{
+
+confronto:
+jogos.jogo2.nome,
+
+palpite:
+jogo2,
+
+data:
+jogos.jogo2.data,
+
+hora:
+jogos.jogo2.hora
+
+},
+
+jogo3:{
+
+confronto:
+jogos.jogo3.nome,
+
+palpite:
+jogo3,
+
+data:
+jogos.jogo3.data,
+
+hora:
+jogos.jogo3.hora
+
+},
+jogo4:{
+
+confronto:
+jogos.jogo4.nome,
+
+palpite:
+jogo4,
+
+data:
+jogos.jogo4.data,
+
+hora:
+jogos.jogo4.hora
+
+},
+
+data:
+new Date()
+.toLocaleString("pt-BR"),
+
+timestamp:
+Date.now()
+
+};
+
+
+/*
+SALVAR PALPITE
+*/
+
+const novaReferencia =
+palpitesRef.push();
+
+await novaReferencia.set(
+novoPalpite
+);
+
+
+/*
+DESCONTAR SALDO
+*/
+
+await jogadoresRef
+.child(id)
+.update({
+
+saldo:
+novoSaldo,
+
+atualizadoEm:
+Date.now()
+
+});
+
+
+/*
+ATUALIZAR TELA
+*/
+
+configuracao.saldo =
+novoSaldo;
+
+configuracao.valorLiberacao =
+valorLiberacao;
+
+configuracao.premio =
+premio;
+
+atualizarTela();
+
+
+/*
+LIMPAR PALPITES
+*/
+
+document.getElementById(
+"jogo1"
+).value = "";
+
+document.getElementById(
+"jogo2"
+).value = "";
+
+document.getElementById(
+"jogo3"
+).value = "";
+
+document.getElementById(
+"jogo4"
+).value = "";
+
+atualizarPlacar(
+"jogo1",
+"placar1Casa",
+"placar1Fora"
+);
+
+atualizarPlacar(
+"jogo2",
+"placar2Casa",
+"placar2Fora"
+);
+
+atualizarPlacar(
+"jogo3",
+"placar3Casa",
+"placar3Fora"
+);
+
+
+alert(
+
+"✅ PALPITE ENVIADO!\n\n" +
+
+"💰 Valor descontado: R$ " +
+dinheiro(valorLiberacao) +
+
+"\n\n" +
+
+"💰 Saldo restante: R$ " +
+dinheiro(novoSaldo)
+
+);
+
+
+carregarMeusPalpites();
+
+}
+catch(erro){
+
+console.error(erro);
+
+alert(
+
+"❌ Não foi possível enviar o palpite.\n\n" +
+erro.message
+
+);
+
+}
+finally{
+
+botao.disabled = false;
+
+if(
+configuracao.saldo >=
+configuracao.valorLiberacao
+){
+
+botao.textContent = "📤 ENVIAR";
+
+}else{
+
+botao.textContent = "💰 ADICIONAR SALDO";
+
+}
+
+}
+
+}
+
+
+/* =========================
+MEUS PALPITES
+========================= */
+
+function carregarMeusPalpites(){
+
+const nome =
+localStorage.getItem(
+"nomeJogador"
+);
+
+const area =
+document.getElementById(
+"meusPalpites"
+);
+
+if(!nome){
+
+area.innerHTML =
+'<p class="sem-palpite">Nenhum palpite realizado.</p>';
+
+return;
+
+}
+
+palpitesRef.on(
+"value",
+function(snapshot){
+
+const dados = [];
+
+snapshot.forEach(
+function(child){
+
+const item =
+child.val();
+
+if(
+item &&
+item.nome === nome
+){
+
+dados.push(item);
+
+}
+
+});
+
+dados.reverse();
+
+if(
+dados.length === 0
+){
+
+area.innerHTML =
+'<p class="sem-palpite">Nenhum palpite realizado.</p>';
+
+return;
+
+}
+
+area.innerHTML = "";
+
+dados.forEach(
+function(item){
+
+const jogo1 =
+item.jogo1?.palpite || "-";
+
+const jogo2 =
+item.jogo2?.palpite || "-";
+
+const jogo3 =
+item.jogo3?.palpite || "-";
+
+const jogo4 =
+item.jogo4?.palpite || "-";
+
+const valor =
+Number(item.valor) || 0;
+
+const premio =
+Number(item.premio) || 0;
+
+area.innerHTML += `
+
+<div class="meu-card">
+
+<div class="meu-nome">
+
+👤
+${escapeHTML(item.nome)}
+
+</div>
+
+
+<div class="meu-placar">
+
+<span>
+
+${escapeHTML(
+item.jogo1?.confronto ||
+"São Bernardo x Botafogo SP"
+)}
+
+</span>
+
+<strong>
+
+${escapeHTML(jogo1)}
+
+</strong>
+
+</div>
+
+
+<div class="meu-placar">
+
+<span>
+
+${escapeHTML(
+item.jogo2?.confronto ||
+"Ponte Preta x Náutico"
+)}
+
+</span>
+
+<strong>
+
+${escapeHTML(jogo2)}
+
+</strong>
+
+</div>
+
+
+<div class="meu-placar">
+
+<span>
+
+${escapeHTML(
+item.jogo3?.confronto ||
+"Sport x Londrina"
+)}
+
+</span>
+
+<strong>
+
+${escapeHTML(jogo3)}
+
+</strong>
+
+</div>
+
+<div class="meu-placar">
+
+<span>
+
+${escapeHTML(
+item.jogo4?.confronto ||
+"Jogo 4"
+)}
+
+</span>
+
+<strong>
+
+${escapeHTML(jogo4)}
+
+</strong>
+
+</div>
+
+<div class="data">
+
+💰 Valor:
+R$ ${dinheiro(valor)}
+
+<br>
+
+🏆 Prêmio:
+R$ ${dinheiro(premio)}
+
+<br>
+
+💵 Saldo restante:
+R$ ${dinheiro(item.saldoRestante)}
+
+<br>
+
+📅 Enviado:
+${escapeHTML(item.data || "")}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+);
+
+}
+
+);
+
+}
+
+
+/* =========================
+MENU
+========================= */
+
+function abrirMenu(){
+
+document
+.getElementById("menuLateral")
+.classList
+.add("ativo");
+
+document
+.getElementById("fundoMenu")
+.classList
+.add("ativo");
+
+mostrarNome();
+
+}
+
+
+function fecharMenu(){
+
+document
+.getElementById("menuLateral")
+.classList
+.remove("ativo");
+
+document
+.getElementById("fundoMenu")
+.classList
+.remove("ativo");
+
+}
+
+
+/* =========================
+MOSTRAR NOME
+========================= */
+
+function mostrarNome(){
+
+const nome =
+localStorage.getItem(
+"nomeJogador"
+);
+
+const area =
+document.getElementById(
+"nomeMenu"
+);
+
+if(nome){
+
+area.innerHTML =
+"👤 Jogador: <strong>" +
+escapeHTML(nome) +
+"</strong>";
+
+}else{
+
+area.innerHTML =
+"👤 Nenhum nome cadastrado";
+
+}
+
+}
+
+
+/* =========================
+SEGURANÇA
+========================= */
+
+function escapeHTML(text){
+
+return String(text)
+
+.replace(/&/g,"&amp;")
+
+.replace(/</g,"&lt;")
+
+.replace(/>/g,"&gt;")
+
+.replace(/"/g,"&quot;")
+
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+INICIAR
+========================= */
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+preencherSelect("jogo1");
+
+preencherSelect("jogo2");
+
+preencherSelect("jogo3");
+
+preencherSelect("jogo4");
+
+
+/*
+JOGO 1
+*/
+
+document
+.getElementById("jogo1")
+.addEventListener(
+"change",
+function(){
+
+atualizarPlacar(
+"jogo1",
+"placar1Casa",
+"placar1Fora"
+);
+
+}
+);
+
+
+/*
+JOGO 2
+*/
+
+document
+.getElementById("jogo2")
+.addEventListener(
+"change",
+function(){
+
+atualizarPlacar(
+"jogo2",
+"placar2Casa",
+"placar2Fora"
+);
+
+}
+);
+
+
+/*
+JOGO 3
+*/
+
+document
+.getElementById("jogo3")
+.addEventListener(
+"change",
+function(){
+
+atualizarPlacar(
+"jogo3",
+"placar3Casa",
+"placar3Fora"
+);
+
+}
+);
+
+document
+.getElementById("jogo4")
+.addEventListener(
+"change",
+function(){
+
+atualizarPlacar(
+"jogo4",
+"placar4Casa",
+"placar4Fora"
+);
+
+}
+);
+
+/*
+MENU
+*/
+
+document
+.getElementById("btnMenu")
+.addEventListener(
+"click",
+abrirMenu
+);
+
+document
+.getElementById("btnFechar")
+.addEventListener(
+"click",
+fecharMenu
+);
+
+document
+.getElementById("fundoMenu")
+.addEventListener(
+"click",
+fecharMenu
+);
+
+
+/*
+ENVIAR
+*/
+
+document
+.getElementById("btnEnviar")
+.addEventListener(
+"click",
+enviarPalpite
+);
+
+
+/*
+MEUS PALPITES
+*/
+
+carregarMeusPalpites();
+
+
+/*
+CONFIGURAÇÃO
+*/
+
+carregarConfiguracao();
+
+
+/*
+STATUS FIREBASE
+*/
+
+db.ref(".info/connected")
+.on(
+"value",
+function(snap){
+
+const status =
+document.getElementById(
+"status"
+);
+
+if(
+snap.val() === true
+){
+
+status.textContent =
+"🟢 Conectado ao servidor";
+
+status.style.color =
+"#22c55e";
+
+}else{
+
+status.textContent =
+"🔴 Sem conexão";
+
+status.style.color =
+"#ef4444";
+
+}
+
+}
+);
+
+
+/*
+STATUS INICIAL
+*/
+
+atualizarStatusJogos();
+
+
+/*
+ATUALIZAÇÃO A CADA SEGUNDO
+*/
+
+setInterval(
+atualizarStatusJogos,
+1000
+);
+
+});
+
+</script>
+
+</body>
+
+</html>
