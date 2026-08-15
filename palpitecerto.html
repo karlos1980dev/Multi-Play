@@ -974,6 +974,99 @@ margin-top:12px;
 line-height:1.5;
 
 }
+select{
+    width:100%;
+    padding:11px;
+    border:2px solid #22ff66;
+    border-radius:10px;
+    background:linear-gradient(135deg,#064e3b,#16a34a);
+    color:#ffffff;
+    font-size:15px;
+    font-weight:bold;
+    outline:none;
+    cursor:pointer;
+    text-align:center;
+    text-align-last:center;
+    box-shadow:0 0 12px rgba(34,255,102,.45);
+}
+
+select:focus{
+    border-color:#86efac;
+    box-shadow:0 0 18px rgba(34,255,102,.8);
+}
+
+select option{
+    background:#064e3b;
+    color:white;
+    font-weight:bold;
+}
+/* =========================
+STATUS DO PALPITE
+SOMENTE EM MEUS PALPITES
+========================= */
+
+.status-palpite{
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.status-aguardando{
+    background:#713f12;
+    color:#facc15;
+    border:1px solid #eab308;
+}
+
+.status-ganhou{
+    background:#14532d;
+    color:#4ade80;
+    border:1px solid #22c55e;
+}
+
+.status-perdeu{
+    background:#7f1d1d;
+    color:#f87171;
+    border:1px solid #ef4444;
+}
+.status-palpite{
+    text-align:center;
+    padding:8px;
+    border-radius:8px;
+    margin:10px 0;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.status-aguardando{
+    background:#92400e;
+    color:#fde68a;
+}
+
+.status-ganhou{
+    background:#166534;
+    color:#bbf7d0;
+}
+
+.status-perdeu{
+    background:#991b1b;
+    color:#fecaca;
+}
+
+.resultado-real{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-top:8px;
+}
+
+.resultado-real span{
+    color:#94a3b8;
+    font-size:12px;
+}
 </style>
 
 </head>
@@ -1112,7 +1205,7 @@ R$ 2,00
 <strong
 id="premioTela">
 
-R$ 1500,00
+R$ 1000,00
 
 </strong>
 
@@ -1184,10 +1277,10 @@ JOGO 1
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746224/fluminense-fc.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784512917/chapecoense.png">
 
 <p>
-fluminense
+chapecoense
 </p>
 
 </div>
@@ -1213,10 +1306,10 @@ fluminense
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197838/bahia.jpg">
 
 <p>
-palmeiras
+bahia
 </p>
 
 </div>
@@ -1227,9 +1320,9 @@ palmeiras
 
 <div class="jogo-info">
 
-📅 15/08/2026
+📅 16/08/2026
 &nbsp; | &nbsp;
-⏰ 16:30
+⏰ 11:00
 
 </div>
 
@@ -1257,10 +1350,10 @@ JOGO 2
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746535/athletico-paranaense.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png">
 
 <p>
-athletico-paranaense
+atletico-mineiro
 </p>
 
 </div>
@@ -1286,10 +1379,10 @@ athletico-paranaense
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746647/red-bull-bragantino.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786830843/gremio.png">
 
 <p>
-red-bull-bragantino
+gremio
 </p>
 
 </div>
@@ -1300,9 +1393,9 @@ red-bull-bragantino
 
 <div class="jogo-info">
 
-📅 15/08/2026
+📅 16/08/2026
 &nbsp; | &nbsp;
-⏰ 19:00
+⏰ 16:00
 
 </div>
 
@@ -1330,10 +1423,10 @@ JOGO 3
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746738/sao-paulo-fc.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786830901/cr-vasco-da-gama.png">
 
 <p>
-sao-paulo-fc
+cr-vasco-da-gama
 </p>
 
 </div>
@@ -1359,10 +1452,10 @@ sao-paulo-fc
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197703/coritiba.jpg">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831003/santos-fc-sp.png">
 
 <p>
-coritiba
+santos-fc-sp
 </p>
 
 </div>
@@ -1373,9 +1466,9 @@ coritiba
 
 <div class="jogo-info">
 
-📅 15/08/2026
+📅 16/08/2026
 &nbsp; | &nbsp;
-⏰ 21:00
+⏰ 16:00
 
 </div>
 
@@ -1400,7 +1493,7 @@ JOGO 4
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831074/mirassol.png">
 
 <p>
 atletico-goianiense
@@ -1427,10 +1520,10 @@ atletico-goianiense
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746995/vila-nova-go.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831142/cr-flamengo.png">
 
 <p>
-vila-nova-go
+cr-flamengo
 </p>
 
 </div>
@@ -1439,9 +1532,9 @@ vila-nova-go
 
 <div class="jogo-info">
 
-📅 15/08/2026
+📅 16/08/2026
 &nbsp; | &nbsp;
-⏰ 21:00
+⏰ 18:30
 
 </div>
 
@@ -1454,7 +1547,71 @@ Escolha o placar
 </select>
 
 </div>
+<!-- =========================
+JOGO 5
+========================= -->
 
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831225/vitoria-esporte-clube.png">
+
+<p>
+vitoria-esporte-clube
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar5Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar5Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831302/botafogo-rj.png">
+
+<p>
+botafogo-rj
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 16/08/2026
+&nbsp; | &nbsp;
+⏰ 18:30
+
+</div>
+
+<select id="jogo5">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
 </div>
 
 <!-- =========================
@@ -1789,7 +1946,7 @@ saldo:0,
 
 valorLiberacao:2,
 
-premio:1500
+premio:1000
 
 };
 
@@ -1846,13 +2003,13 @@ const jogos = {
 jogo1:{
 
 nome:
-"Fluminense FC x Palmeiras SP",
+"Chapecoense x EC Bahia",
 
 data:
-"2026-08-15",
+"2026-08-16",
 
 hora:
-"16:30",
+"11:00",
 
 select:
 "jogo1"
@@ -1862,13 +2019,13 @@ select:
 jogo2:{
 
 nome:
-"Athletico Paranaense x Red Bull Bragantino",
+"Atletico Mineiro x Gremio",
 
 data:
-"2026-08-15",
+"2026-08-16",
 
 hora:
-"18:30",
+"16:00",
 
 select:
 "jogo2"
@@ -1878,13 +2035,13 @@ select:
 jogo3:{
 
 nome:
-"Sao Paulo FC x Coritiba",
+"CR Vasco da Gama x Santos FC SP",
 
 data:
-"2026-08-15",
+"2026-08-17",
 
 hora:
-"21:00",
+"16:00",
 
 select:
 "jogo3"
@@ -1894,19 +2051,34 @@ select:
 jogo4:{
 
 nome:
-"Atletico Goianiense x Vila Nova GO",
+"Mirassol x CR Flamengo",
 
 data:
-"2026-08-15",
+"2026-08-16",
 
 hora:
-"16:00",
+"18:30",
 
 select:
 "jogo4"
 
-}
+},
 
+jogo5:{
+
+nome:
+"Esporte Clube Vitoria x Botafogo RJ",
+
+data:
+"2026-08-16",
+
+hora:
+"18:30",
+
+select:
+"jogo5"
+
+}
 };
 
 /* =========================
@@ -2031,7 +2203,7 @@ saldo:0,
 
 valorLiberacao:2,
 
-premio:1500
+premio:1000
 
 };
 
@@ -2060,7 +2232,7 @@ configuracao.valorLiberacao = 2;
 }
 
 configuracao.premio =
-Number(dados.premio) || 1500;
+Number(dados.premio) || 1000;
 
 atualizarTela();
 
@@ -2635,7 +2807,7 @@ if(!jogadorSnap.exists()){
 
     valorLiberacao: 2,
 
-    premio: 1500,
+    premio: 1000,
 
     criadoEm: Date.now()
 
@@ -2652,7 +2824,7 @@ jogadorSnap.exists()
   : {
       saldo: 0,
       valorLiberacao: 2,
-      premio: 1500
+      premio: 1000
     };
 
 const saldoAtual =
@@ -2662,7 +2834,7 @@ const valorLiberacao =
 Number(jogador.valorLiberacao) || 2;
 
 const premio =
-Number(jogador.premio) || 1500;
+Number(jogador.premio) || 1000;
 
 /*
 VERIFICAR SALDO
@@ -2731,19 +2903,27 @@ document.getElementById(
 "jogo4"
 ).value;
 
+const jogo5 =
+document.getElementById(
+"jogo5"
+).value;
+
 if(
 !jogo1 ||
 !jogo2 ||
-!jogo3
+!jogo3 ||
+!jogo4 ||
+!jogo5
 ){
 
 alert(
-"⚠️ Escolha os 4 placares antes de enviar!"
+"⚠️ Escolha os 5 placares antes de enviar!"
 );
 
 return;
 
 }
+
 
 
 /*
@@ -2765,24 +2945,27 @@ CRIAR PALPITE
 
 const novoPalpite = {
 
-nome:
-nome,
+    status: "aguardando",
 
-jogadorId:
-id,
+    resultados: {
+        jogo1: "- : -",
+        jogo2: "- : -",
+        jogo3: "- : -",
+        jogo4: "- : -",
+        jogo5: "- : -"
+    },
 
-valor:
-valorLiberacao,
+    nome: nome,
 
-premio:
-premio,
+    jogadorId: id,
 
-saldoAnterior:
-saldoAtual,
+    valor: valorLiberacao,
 
-saldoRestante:
-novoSaldo,
+    premio: premio,
 
+    saldoAnterior: saldoAtual,
+
+    saldoRestante: novoSaldo,
 jogo1:{
 
 confronto:
@@ -2845,7 +3028,21 @@ hora:
 jogos.jogo4.hora
 
 },
+jogo5:{
 
+confronto:
+jogos.jogo5.nome,
+
+palpite:
+jogo5,
+
+data:
+jogos.jogo5.data,
+
+hora:
+jogos.jogo5.hora
+
+},
 data:
 new Date()
 .toLocaleString("pt-BR"),
@@ -2921,6 +3118,10 @@ document.getElementById(
 "jogo4"
 ).value = "";
 
+document.getElementById(
+"jogo5"
+).value = "";
+
 atualizarPlacar(
 "jogo1",
 "placar1Casa",
@@ -2991,6 +3192,95 @@ botao.textContent = "💰 ADICIONAR SALDO";
 
 }
 
+/* =========================
+STATUS DO PALPITE
+========================= */
+
+const TEMPO_AGUARDAR_RESULTADO = 110 * 60 * 1000;
+
+
+/*
+PEGA O HORÁRIO DO ÚLTIMO JOGO
+DO PALPITE
+*/
+
+function obterFimDosJogos(){
+
+    let maiorHorario = 0;
+
+    Object.keys(jogos).forEach(function(chave){
+
+        const jogo = jogos[chave];
+
+        const inicio = obterDataJogo(jogo).getTime();
+
+        if(inicio > maiorHorario){
+            maiorHorario = inicio;
+        }
+
+    });
+
+    return maiorHorario;
+}
+
+
+/*
+STATUS VISUAL
+*/
+
+function obterStatusPalpite(item){
+
+    /*
+    SE ADMIN JÁ DEFINIU
+    GANHOU OU PERDEU,
+    RESPEITA O STATUS
+    */
+
+    if(item.status === "ganhou"){
+        return "ganhou";
+    }
+
+    if(item.status === "perdeu"){
+        return "perdeu";
+    }
+
+
+    /*
+    CASO NÃO TENHA STATUS,
+    CONSIDERA AGUARDANDO
+    */
+
+    const agora = Date.now();
+
+    const fimJogos =
+        obterFimDosJogos();
+
+    const limite =
+        fimJogos +
+        TEMPO_AGUARDAR_RESULTADO;
+
+
+    /*
+    AINDA ESTÁ DENTRO DOS 110 MINUTOS
+    */
+
+    if(agora < limite){
+
+        return "aguardando";
+
+    }
+
+
+    /*
+    PASSOU DOS 110 MINUTOS
+    */
+
+    return "perdeu";
+
+}
+/* =========================
+MEUS PALPITES
+========================= */
 
 /* =========================
 MEUS PALPITES
@@ -2998,210 +3288,395 @@ MEUS PALPITES
 
 function carregarMeusPalpites(){
 
-const nome =
-localStorage.getItem(
-"nomeJogador"
-);
+    const nome =
+        localStorage.getItem("nomeJogador");
 
-const area =
-document.getElementById(
-"meusPalpites"
-);
+    const area =
+        document.getElementById("meusPalpites");
 
-if(!nome){
+    if(!nome){
 
-area.innerHTML =
-'<p class="sem-palpite">Nenhum palpite realizado.</p>';
+        area.innerHTML =
+        '<p class="sem-palpite">Nenhum palpite realizado.</p>';
 
-return;
+        return;
 
-}
+    }
 
-palpitesRef.on(
-"value",
-function(snapshot){
 
-const dados = [];
+    palpitesRef.on(
+        "value",
+        function(snapshot){
 
-snapshot.forEach(
-function(child){
+            const dados = [];
 
-const item =
-child.val();
 
-if(
-item &&
-item.nome === nome
-){
+            snapshot.forEach(function(child){
 
-dados.push(item);
+                const item = child.val();
 
-}
+                /*
+                GUARDA A CHAVE DO FIREBASE
+                PARA CONTROLE DO ADMIN
+                */
+
+                if(
+                    item &&
+                    item.nome === nome
+                ){
+
+                    item._id = child.key;
+
+                    dados.push(item);
+
+                }
+
+            });
+
+
+            dados.reverse();
+
+
+            if(dados.length === 0){
+
+                area.innerHTML =
+                '<p class="sem-palpite">Nenhum palpite realizado.</p>';
+
+                return;
+
+            }
+
+
+            area.innerHTML = "";
+
+
+            dados.forEach(function(item){
+
+    const jogo1 =
+        item.jogo1?.palpite || "-";
+
+    const jogo2 =
+        item.jogo2?.palpite || "-";
+
+    const jogo3 =
+        item.jogo3?.palpite || "-";
+
+    const jogo4 =
+        item.jogo4?.palpite || "-";
+
+    const jogo5 =
+        item.jogo5?.palpite || "-";
+
+
+    const valor =
+        Number(item.valor) || 0;
+
+    const premio =
+        Number(item.premio) || 0;
+
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    const status =
+        item.status || "aguardando";
+
+
+    let classeStatus =
+        "status-aguardando";
+
+    let textoStatus =
+        "🟡 AGUARDANDO";
+
+
+    if(status === "ganhou"){
+
+        classeStatus =
+            "status-ganhou";
+
+        textoStatus =
+            "🟢 GANHOU";
+
+    }
+
+
+    if(status === "perdeu"){
+
+        classeStatus =
+            "status-perdeu";
+
+        textoStatus =
+            "🔴 PERDEU";
+
+    }
+
+
+    /* =========================
+       STATUS HTML
+    ========================= */
+
+    const statusHTML = `
+
+        <div class="status-palpite ${classeStatus}">
+
+            ${textoStatus}
+
+        </div>
+
+    `;
+
+
+    /* =========================
+       RESULTADOS REAIS
+    ========================= */
+
+    const resultados =
+        item.resultados || {
+
+            jogo1: "- : -",
+            jogo2: "- : -",
+            jogo3: "- : -",
+            jogo4: "- : -",
+            jogo5: "- : -"
+
+        };
+
+
+    area.innerHTML += `
+
+        <div class="meu-card">
+
+            ${statusHTML}
+
+
+            <div class="meu-nome">
+
+                👤
+                ${escapeHTML(item.nome)}
+
+            </div>
+
+
+            <!-- JOGO 1 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo1?.confronto ||
+                        "Chapecoense x EC Bahia"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo1)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo1 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 2 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo2?.confronto ||
+                        "Atletico Mineiro x Gremio"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo2)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo2 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 3 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo3?.confronto ||
+                        "CR Vasco da Gama x Santos FC SP"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo3)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo3 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 4 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo4?.confronto ||
+                        "Mirassol x CR Flamengo"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo4)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo4 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 5 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo5?.confronto ||
+                        "Esporte Clube Vitoria x Botafogo RJ"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo5)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo5 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <div class="data">
+
+                💰 Valor:
+
+                R$ ${dinheiro(valor)}
+
+                <br>
+
+                🏆 Prêmio:
+
+                R$ ${dinheiro(premio)}
+
+                <br>
+
+                💵 Saldo restante:
+
+                R$ ${dinheiro(
+                    item.saldoRestante
+                )}
+
+                <br>
+
+                📅 Enviado:
+
+                ${escapeHTML(
+                    item.data || ""
+                )}
+
+            </div>
+
+        </div>
+
+    `;
 
 });
-
-dados.reverse();
-
-if(
-dados.length === 0
-){
-
-area.innerHTML =
-'<p class="sem-palpite">Nenhum palpite realizado.</p>';
-
-return;
+       }
+    );
 
 }
-
-area.innerHTML = "";
-
-dados.forEach(
-function(item){
-
-const jogo1 =
-item.jogo1?.palpite || "-";
-
-const jogo2 =
-item.jogo2?.palpite || "-";
-
-const jogo3 =
-item.jogo3?.palpite || "-";
-
-const jogo4 =
-item.jogo4?.palpite || "-";
-
-const valor =
-Number(item.valor) || 0;
-
-const premio =
-Number(item.premio) || 0;
-
-area.innerHTML += `
-
-<div class="meu-card">
-
-<div class="meu-nome">
-
-👤
-${escapeHTML(item.nome)}
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo1?.confronto ||
-"fluminense x palmeiras"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo1)}
-
-</strong>
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo2?.confronto ||
-"athletico-paranaense x red-bull-bragantino"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo2)}
-
-</strong>
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo3?.confronto ||
-"sao-paulo-fc x coritiba"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo3)}
-
-</strong>
-
-</div>
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo4?.confronto ||
-"atletico-goianiense x vila-nova-go"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo4)}
-
-</strong>
-
-</div>
-
-<div class="data">
-
-💰 Valor:
-R$ ${dinheiro(valor)}
-
-<br>
-
-🏆 Prêmio:
-R$ ${dinheiro(premio)}
-
-<br>
-
-💵 Saldo restante:
-R$ ${dinheiro(item.saldoRestante)}
-
-<br>
-
-📅 Enviado:
-${escapeHTML(item.data || "")}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-);
-
-}
-
-);
-
-}
-
 
 /* =========================
 MENU
@@ -3309,6 +3784,7 @@ preencherSelect("jogo3");
 
 preencherSelect("jogo4");
 
+preencherSelect("jogo5");
 
 /*
 JOGO 1
@@ -3368,7 +3844,17 @@ atualizarPlacar(
 
 }
 );
+atualizarPlacar(
+"jogo4",
+"placar4Casa",
+"placar4Fora"
+);
 
+atualizarPlacar(
+"jogo5",
+"placar5Casa",
+"placar5Fora"
+);
 document
 .getElementById("jogo4")
 .addEventListener(
@@ -3383,7 +3869,20 @@ atualizarPlacar(
 
 }
 );
+document
+.getElementById("jogo5")
+.addEventListener(
+"change",
+function(){
 
+atualizarPlacar(
+"jogo5",
+"placar5Casa",
+"placar5Fora"
+);
+
+}
+);
 /*
 MENU
 */
@@ -3491,7 +3990,10 @@ atualizarStatusJogos,
 );
 
 });
-
+setInterval(
+    carregarMeusPalpites,
+    60000
+);
 </script>
 
 </body>
