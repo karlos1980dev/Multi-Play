@@ -16,247 +16,375 @@ content="width=device-width, initial-scale=1.0">
 <style>
 
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial,Helvetica,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-  background:#0f172a;
-  color:white;
-  padding:15px;
+background:#0f172a;
+color:white;
+padding:15px;
 }
 
 .container{
-  max-width:700px;
-  margin:auto;
+max-width:750px;
+margin:auto;
 }
 
 .topo{
-  background:#1e293b;
-  padding:18px;
-  border-radius:14px;
-  text-align:center;
-  margin-bottom:15px;
+background:#1e293b;
+padding:18px;
+border-radius:14px;
+text-align:center;
+margin-bottom:15px;
 }
 
 .topo h1{
-  color:#22c55e;
-  font-size:22px;
+color:#22c55e;
+font-size:22px;
 }
 
 .status{
-  text-align:center;
-  font-size:12px;
-  color:#94a3b8;
-  margin-top:8px;
+text-align:center;
+font-size:12px;
+color:#94a3b8;
+margin-top:8px;
 }
 
 .card{
-  background:#1e293b;
-  padding:15px;
-  border-radius:14px;
-  margin-bottom:15px;
+background:#1e293b;
+padding:15px;
+border-radius:14px;
+margin-bottom:15px;
 }
 
 .card h2{
-  color:#22c55e;
-  font-size:18px;
-  margin-bottom:12px;
+color:#22c55e;
+font-size:18px;
+margin-bottom:12px;
 }
 
 label{
-  display:block;
-  color:#cbd5e1;
-  font-size:13px;
-  margin-top:10px;
-  margin-bottom:5px;
+display:block;
+color:#cbd5e1;
+font-size:13px;
+margin-top:10px;
+margin-bottom:5px;
 }
 
 input{
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:9px;
-  background:#334155;
-  color:white;
-  font-size:16px;
-  outline:none;
+width:100%;
+padding:12px;
+border:0;
+border-radius:9px;
+background:#334155;
+color:white;
+font-size:16px;
+outline:none;
 }
 
 input:focus{
-  box-shadow:0 0 0 2px #22c55e;
+box-shadow:0 0 0 2px #22c55e;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:9px;
-  margin-top:12px;
-  font-size:15px;
-  font-weight:bold;
-  cursor:pointer;
+width:100%;
+padding:12px;
+border:0;
+border-radius:9px;
+margin-top:12px;
+font-size:14px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
 }
 
 .btn-salvar{
-  background:#22c55e;
-  color:white;
-}
-
-.btn-salvar:hover{
-  background:#16a34a;
+background:#22c55e;
+color:white;
 }
 
 .btn-limpar{
-  background:#475569;
-  color:white;
+background:#475569;
+color:white;
 }
 
 .btn-excluir{
-  background:#dc2626;
-  color:white;
-  width:auto;
-  padding:8px 12px;
-  margin:0;
-  font-size:12px;
+background:#dc2626;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
 }
 
 .btn-editar{
-  background:#2563eb;
-  color:white;
-  width:auto;
-  padding:8px 12px;
-  margin:0;
-  font-size:12px;
+background:#2563eb;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
 }
 
 .btn-liberar{
-  background:#16a34a;
-  color:white;
-  width:auto;
-  padding:8px 12px;
-  margin:0;
-  font-size:12px;
+background:#16a34a;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
 }
 
 .btn-bloquear{
-  background:#dc2626;
-  color:white;
-  width:auto;
-  padding:8px 12px;
-  margin:0;
-  font-size:12px;
+background:#dc2626;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
+}
+
+.btn-resultado{
+background:#7c3aed;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
+}
+
+.btn-ganhou{
+background:#16a34a;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
+}
+
+.btn-perdeu{
+background:#dc2626;
+color:white;
+width:auto;
+padding:8px 12px;
+margin:0;
+font-size:12px;
 }
 
 .acoes{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-top:12px;
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+margin-top:12px;
 }
 
 .acoes button{
-  margin:0;
+margin:0;
 }
 
 .jogador{
-  background:#0f172a;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:10px;
+background:#0f172a;
+border-radius:12px;
+padding:12px;
+margin-bottom:10px;
 }
 
 .jogador-topo{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
 }
 
 .nome{
-  color:#22c55e;
-  font-size:17px;
-  font-weight:bold;
+color:#22c55e;
+font-size:17px;
+font-weight:bold;
 }
 
 .info{
-  margin-top:10px;
-  line-height:1.8;
-  font-size:13px;
-  color:#cbd5e1;
+margin-top:10px;
+line-height:1.9;
+font-size:13px;
+color:#cbd5e1;
+}
+
+.info strong{
+color:white;
 }
 
 .liberado{
-  display:inline-block;
-  background:#166534;
-  color:#bbf7d0;
-  padding:5px 8px;
-  border-radius:7px;
-  font-size:11px;
-  font-weight:bold;
+display:inline-block;
+background:#166534;
+color:#bbf7d0;
+padding:5px 8px;
+border-radius:7px;
+font-size:11px;
+font-weight:bold;
 }
 
 .bloqueado{
-  display:inline-block;
-  background:#7f1d1d;
-  color:#fecaca;
-  padding:5px 8px;
-  border-radius:7px;
-  font-size:11px;
-  font-weight:bold;
+display:inline-block;
+background:#7f1d1d;
+color:#fecaca;
+padding:5px 8px;
+border-radius:7px;
+font-size:11px;
+font-weight:bold;
+}
+
+.solicitado{
+color:#facc15 !important;
+font-weight:bold;
+}
+
+.recarga{
+margin-top:10px;
+padding:10px;
+background:#334155;
+border-radius:8px;
+font-size:12px;
+line-height:1.7;
+}
+
+.recarga strong{
+color:#22c55e;
 }
 
 .palpite{
-  background:#334155;
-  padding:10px;
-  border-radius:8px;
-  margin-top:8px;
-  font-size:13px;
+background:#334155;
+padding:11px;
+border-radius:8px;
+margin-top:8px;
+font-size:13px;
+}
+
+.palpite .jogo{
+color:#cbd5e1;
+font-size:13px;
+margin-bottom:7px;
 }
 
 .palpite strong{
-  color:#22c55e;
-  font-size:17px;
+color:#22c55e;
+font-size:18px;
+}
+
+.resultado-box{
+background:#0f172a;
+padding:10px;
+border-radius:8px;
+margin-top:8px;
+}
+
+.resultado-box label{
+margin-top:0;
+}
+
+.resultado-input{
+width:100%;
+padding:9px;
+background:#334155;
+border:1px solid #475569;
+color:white;
+border-radius:7px;
+font-size:15px;
+text-align:center;
+}
+
+.status-palpite{
+margin-top:10px;
+padding:8px;
+border-radius:8px;
+text-align:center;
+font-size:13px;
+font-weight:bold;
+}
+
+.status-aguardando{
+background:#713f12;
+color:#fde68a;
+}
+
+.status-ganhou{
+background:#166534;
+color:#bbf7d0;
+}
+
+.status-perdeu{
+background:#991b1b;
+color:#fecaca;
+}
+
+.resultado-real{
+margin-top:7px;
+padding:7px;
+border-radius:7px;
+background:#1e293b;
+font-size:12px;
+color:#cbd5e1;
+}
+
+.resultado-real strong{
+color:#60a5fa;
+font-size:15px;
 }
 
 .sem{
-  text-align:center;
-  color:#94a3b8;
-  padding:20px;
+text-align:center;
+color:#94a3b8;
+padding:20px;
 }
 
 .aviso{
-  background:#854d0e;
-  color:#fef08a;
-  padding:10px;
-  border-radius:8px;
-  font-size:12px;
-  margin-bottom:10px;
-  line-height:1.5;
+background:#854d0e;
+color:#fef08a;
+padding:10px;
+border-radius:8px;
+font-size:12px;
+margin-bottom:10px;
+line-height:1.5;
 }
 
-.separador{
-  height:1px;
-  background:#334155;
-  margin:12px 0;
+.filtros{
+display:flex;
+gap:8px;
+margin-bottom:12px;
+}
+
+.filtros input{
+flex:1;
 }
 
 @media(max-width:500px){
 
-  .jogador-topo{
-    align-items:flex-start;
-  }
+.jogador-topo{
+align-items:flex-start;
+}
 
-  .acoes{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-  }
+.acoes{
+display:grid;
+grid-template-columns:1fr 1fr;
+}
 
-  .acoes button{
-    width:100%;
-  }
+.acoes button{
+width:100%;
+}
+
+.filtros{
+display:block;
+}
+
+.filtros input{
+margin-bottom:8px;
+}
 
 }
 
@@ -282,25 +410,28 @@ id="status">
 
 </div>
 
-
 <div class="aviso">
 
-⚠️ Cada jogador possui seu próprio saldo, valor de liberação e prêmio.
-Alterar um jogador NÃO altera os demais.
+⚠️ Painel conectado ao Firebase.
+
+<br>
+
+💵 <strong>Saldo solicitado</strong> = valor do palpite enviado.
+
+<br>
+
+💳 <strong>Recarga solicitada</strong> = valor pedido pelo jogador para adicionar saldo.
 
 </div>
 
 
-<!-- =========================
-     CONFIGURAÇÃO
-========================= -->
+<!-- CONFIGURAÇÃO -->
 
 <div class="card">
 
 <h2>
 ⚙️ Configuração individual
 </h2>
-
 
 <label>
 👤 Nome do jogador
@@ -333,8 +464,7 @@ id="valorLiberacao"
 type="number"
 step="0.01"
 min="0"
-value="2.00"
-placeholder="Ex: 2.00">
+value="2.00">
 
 
 <label>
@@ -346,8 +476,7 @@ id="premio"
 type="number"
 step="0.01"
 min="0"
-value="500.00"
-placeholder="Ex: 500.00">
+value="1000.00">
 
 
 <button
@@ -370,9 +499,7 @@ id="btnLimpar">
 </div>
 
 
-<!-- =========================
-     JOGADORES
-========================= -->
+<!-- JOGADORES -->
 
 <div class="card">
 
@@ -391,15 +518,22 @@ Carregando...
 </div>
 
 
-<!-- =========================
-     PALPITES
-========================= -->
+<!-- PALPITES -->
 
 <div class="card">
 
 <h2>
 📋 Palpites enviados
 </h2>
+
+<div class="filtros">
+
+<input
+id="filtroNome"
+type="text"
+placeholder="🔎 Pesquisar jogador...">
+
+</div>
 
 <div id="palpites">
 
@@ -417,52 +551,51 @@ Carregando...
 <script>
 
 /* =====================================================
-   FIREBASE
+FIREBASE
 ===================================================== */
 
 const firebaseConfig = {
 
-  apiKey:
-  "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+apiKey:
+"AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
 
-  authDomain:
-  "placarexato-97966.firebaseapp.com",
+authDomain:
+"placarexato-97966.firebaseapp.com",
 
-  databaseURL:
-  "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+databaseURL:
+"https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
 
-  projectId:
-  "placarexato-97966",
+projectId:
+"placarexato-97966",
 
-  storageBucket:
-  "placarexato-97966.firebasestorage.app",
+storageBucket:
+"placarexato-97966.firebasestorage.app",
 
-  messagingSenderId:
-  "942191850183",
+messagingSenderId:
+"942191850183",
 
-  appId:
-  "1:942191850183:web:9870fab0d09044b11004e2"
+appId:
+"1:942191850183:web:9870fab0d09044b11004e2"
 
 };
 
-
 firebase.initializeApp(firebaseConfig);
-
 
 const db =
 firebase.database();
 
-
 const jogadoresRef =
 db.ref("jogadores");
-
 
 const palpitesRef =
 db.ref("palpites");
 
+const recargasRef =
+db.ref("solicitacoesRecarga");
+
 
 /* =====================================================
-   ELEMENTOS
+ELEMENTOS
 ===================================================== */
 
 const nomeInput =
@@ -489,1046 +622,1764 @@ document.getElementById("jogadores");
 const palpitesArea =
 document.getElementById("palpites");
 
+const filtroNome =
+document.getElementById("filtroNome");
 
-/*
-  Guarda o ID que está sendo editado.
-  Isso evita criar outro jogador quando editar.
-*/
 
 let jogadorEditando = null;
 
+let listaPalpites = [];
+
+let listaRecargas = [];
+
 
 /* =====================================================
-   ESCAPE
+ESCAPE
 ===================================================== */
 
 function escapeHTML(text){
 
-  return String(text)
+return String(text ?? "")
 
-  .replace(/&/g,"&amp;")
-
-  .replace(/</g,"&lt;")
-
-  .replace(/>/g,"&gt;")
-
-  .replace(/"/g,"&quot;")
-
-  .replace(/'/g,"&#039;");
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
 
 /* =====================================================
-   DINHEIRO
+DINHEIRO
 ===================================================== */
 
 function dinheiro(valor){
 
-  return Number(valor || 0)
+return Number(valor || 0)
 
-  .toFixed(2)
+.toFixed(2)
 
-  .replace(".",",");
+.replace(".",",");
 
 }
 
 
 /* =====================================================
-   CRIAR ID
+CRIAR ID
 ===================================================== */
 
 function criarId(nome){
 
-  return nome
+return String(nome)
 
-  .toLowerCase()
+.toLowerCase()
 
-  .normalize("NFD")
+.normalize("NFD")
 
-  .replace(/[\u0300-\u036f]/g,"")
+.replace(/[\u0300-\u036f]/g,"")
 
-  .replace(/[^a-z0-9]+/g,"_")
+.replace(/[^a-z0-9]+/g,"_")
 
-  .replace(/^_+|_+$/g,"");
+.replace(/^_+|_+$/g,"");
 
 }
 
 
 /* =====================================================
-   SALVAR JOGADOR
+SALVAR JOGADOR
 ===================================================== */
 
 async function salvarJogador(){
 
-  const nome =
-  nomeInput.value.trim();
+const nome =
+nomeInput.value.trim();
 
+const saldo =
+Number(saldoInput.value);
 
-  const saldo =
-  Number(saldoInput.value);
+const valorLiberacao =
+Number(valorLiberacaoInput.value);
 
+const premio =
+Number(premioInput.value);
 
-  const valorLiberacao =
-  Number(valorLiberacaoInput.value);
 
+if(!nome){
 
-  const premio =
-  Number(premioInput.value);
+alert("⚠️ Digite o nome do jogador.");
 
+return;
 
-  if(!nome){
+}
 
-    alert(
-      "⚠️ Digite o nome do jogador."
-    );
 
-    return;
+if(!Number.isFinite(saldo) || saldo < 0){
 
-  }
+alert("⚠️ Informe um saldo válido.");
 
+return;
 
-  if(
-    isNaN(saldo) ||
-    saldo < 0
-  ){
+}
 
-    alert(
-      "⚠️ Informe um saldo válido."
-    );
 
-    return;
+if(
+!Number.isFinite(valorLiberacao) ||
+valorLiberacao < 0
+){
 
-  }
+alert("⚠️ Informe um valor válido.");
 
+return;
 
-  if(
-    isNaN(valorLiberacao) ||
-    valorLiberacao < 0
-  ){
+}
 
-    alert(
-      "⚠️ Informe um valor de liberação válido."
-    );
 
-    return;
+if(!Number.isFinite(premio) || premio < 0){
 
-  }
+alert("⚠️ Informe um prêmio válido.");
 
+return;
 
-  if(
-    isNaN(premio) ||
-    premio < 0
-  ){
+}
 
-    alert(
-      "⚠️ Informe um prêmio válido."
-    );
 
-    return;
+btnSalvar.disabled = true;
 
-  }
+btnSalvar.textContent =
+"⏳ SALVANDO...";
 
 
-  btnSalvar.disabled = true;
+try{
 
-  btnSalvar.textContent =
-  "⏳ SALVANDO...";
+let id =
+jogadorEditando ||
+criarId(nome);
 
 
-  try{
+await jogadoresRef
+.child(id)
+.update({
 
-    /*
-      Se estiver editando,
-      mantém o mesmo ID.
-    */
+nome:nome,
 
-    let id =
-    jogadorEditando;
+saldo:
+Number(saldo.toFixed(2)),
 
+valorLiberacao:
+Number(valorLiberacao.toFixed(2)),
 
-    /*
-      Se for novo jogador,
-      cria ID pelo nome.
-    */
+premio:
+Number(premio.toFixed(2)),
 
-    if(!id){
+atualizadoEm:
+Date.now()
 
-      id =
-      criarId(nome);
+});
 
-    }
 
+alert("✅ Configuração salva!");
 
-    /*
-      Verifica se existe outro jogador
-      com o mesmo ID.
-    */
+limparFormulario();
 
-    const jogadorAtual =
-    await jogadoresRef
-    .child(id)
-    .once("value");
 
+}catch(erro){
 
-    /*
-      Se for novo jogador e já existir,
-      confirma.
-    */
+console.error(erro);
 
-    if(
-      jogadorAtual.exists() &&
-      !jogadorEditando
-    ){
+alert(
+"❌ Erro:\n" +
+erro.message
+);
 
-      const confirmar =
-      confirm(
-        "⚠️ Este jogador já existe.\n\nDeseja substituir a configuração?"
-      );
+}
 
 
-      if(!confirmar){
+btnSalvar.disabled = false;
 
-        btnSalvar.disabled = false;
-
-        btnSalvar.textContent =
-        "💾 SALVAR CONFIGURAÇÃO";
-
-        return;
-
-      }
-
-    }
-
-
-    /*
-      SALVA SOMENTE NESTE JOGADOR
-    */
-
-    await jogadoresRef
-    .child(id)
-    .update({
-
-      nome:
-      nome,
-
-      saldo:
-      saldo,
-
-      valorLiberacao:
-      valorLiberacao,
-
-      premio:
-      premio,
-
-      atualizadoEm:
-      Date.now()
-
-    });
-
-
-    alert(
-      "✅ Configuração do jogador salva!"
-    );
-
-
-    limparFormulario();
-
-
-  }catch(erro){
-
-    console.error(erro);
-
-    alert(
-      "❌ Erro ao salvar:\n\n" +
-      erro.message
-    );
-
-  }
-
-
-  btnSalvar.disabled = false;
-
-  btnSalvar.textContent =
-  "💾 SALVAR CONFIGURAÇÃO";
+btnSalvar.textContent =
+"💾 SALVAR CONFIGURAÇÃO";
 
 }
 
 
 /* =====================================================
-   LIMPAR
+LIMPAR
 ===================================================== */
 
 function limparFormulario(){
 
-  jogadorEditando = null;
+jogadorEditando = null;
 
-  nomeInput.value = "";
+nomeInput.value = "";
 
-  saldoInput.value = "";
+saldoInput.value = "";
 
-  valorLiberacaoInput.value =
-  "2.00";
+valorLiberacaoInput.value =
+"2.00";
 
-  premioInput.value =
-  "500.00";
+premioInput.value =
+"1000.00";
 
-  btnSalvar.textContent =
-  "💾 SALVAR CONFIGURAÇÃO";
+btnSalvar.textContent =
+"💾 SALVAR CONFIGURAÇÃO";
 
 }
 
 
-btnLimpar.addEventListener(
-  "click",
-  limparFormulario
-);
-
-
 /* =====================================================
-   EDITAR
+EDITAR
 ===================================================== */
 
 async function editarJogador(id){
 
-  try{
+const snap =
+await jogadoresRef
+.child(id)
+.once("value");
 
-    const snap =
-    await jogadoresRef
-    .child(id)
-    .once("value");
-
-
-    const jogador =
-    snap.val();
+const jogador =
+snap.val();
 
 
-    if(!jogador){
+if(!jogador){
 
-      alert(
-        "Jogador não encontrado."
-      );
+alert("Jogador não encontrado.");
 
-      return;
+return;
 
-    }
+}
 
 
-    jogadorEditando =
-    id;
+jogadorEditando = id;
+
+nomeInput.value =
+jogador.nome || "";
+
+saldoInput.value =
+jogador.saldo ?? 0;
+
+valorLiberacaoInput.value =
+jogador.valorLiberacao ?? 2;
+
+premioInput.value =
+jogador.premio ?? 1000;
 
 
-    nomeInput.value =
-    jogador.nome || "";
+btnSalvar.textContent =
+"💾 ATUALIZAR JOGADOR";
 
 
-    saldoInput.value =
-    jogador.saldo ?? 0;
+window.scrollTo({
 
+top:0,
 
-    valorLiberacaoInput.value =
-    jogador.valorLiberacao ?? 2;
+behavior:"smooth"
 
-
-    premioInput.value =
-    jogador.premio ?? 500;
-
-
-    btnSalvar.textContent =
-    "💾 ATUALIZAR JOGADOR";
-
-
-    window.scrollTo({
-
-      top:0,
-
-      behavior:"smooth"
-
-    });
-
-
-  }catch(erro){
-
-    alert(
-      "❌ Não foi possível carregar o jogador."
-    );
-
-  }
+});
 
 }
 
 
 /* =====================================================
-   LIBERAR JOGADOR
+LIBERAR
 ===================================================== */
 
 async function liberarJogador(id){
 
-  try{
+const snap =
+await jogadoresRef
+.child(id)
+.once("value");
 
-    const snap =
-    await jogadoresRef
-    .child(id)
-    .once("value");
-
-
-    const jogador =
-    snap.val();
+const jogador =
+snap.val();
 
 
-    if(!jogador){
+if(!jogador){
 
-      return;
+alert("⚠️ Jogador não encontrado.");
 
-    }
+return;
 
-
-    const valor =
-    Number(
-      jogador.valorLiberacao
-    ) || 0;
+}
 
 
-    await jogadoresRef
-    .child(id)
-    .update({
+/*
+PEGAR O VALOR REAL SOLICITADO
+*/
 
-      saldo:
-      valor,
+const dados =
+obterDadosJogador(id);
 
-      atualizadoEm:
-      Date.now()
-
-    });
+const valorSolicitado =
+Number(dados.saldoSolicitado) || 0;
 
 
-    alert(
+if(valorSolicitado <= 0){
 
-      "✅ Liberado somente para " +
-      jogador.nome +
-      "\n\n" +
-      "Saldo: R$ " +
-      dinheiro(valor)
+alert(
+"⚠️ Este jogador não possui uma solicitação de saldo."
+);
 
-    );
+return;
+
+}
 
 
-  }catch(erro){
+/*
+CONFIRMAÇÃO
+*/
 
-    alert(
-      "❌ Erro ao liberar jogador."
-    );
+const confirmar =
+confirm(
 
-  }
+"🔓 LIBERAR SALDO\n\n" +
+
+"👤 Jogador: " +
+jogador.nome +
+
+"\n\n" +
+
+"💰 VALOR SOLICITADO: R$ " +
+dinheiro(valorSolicitado) +
+
+"\n\n" +
+
+"🎯 Valor mínimo: R$ " +
+dinheiro(jogador.valorLiberacao) +
+
+"\n\n" +
+
+"Confirmar liberação de R$ " +
+dinheiro(valorSolicitado) +
+"?"
+
+);
+
+
+if(!confirmar){
+
+return;
+
+}
+
+
+try{
+
+/*
+LIBERA EXATAMENTE O VALOR SOLICITADO
+*/
+
+await jogadoresRef
+.child(id)
+.update({
+
+saldo:
+Number(valorSolicitado.toFixed(2)),
+
+saldoLiberado:
+Number(valorSolicitado.toFixed(2)),
+
+valorLiberado:
+Number(valorSolicitado.toFixed(2)),
+
+ultimaLiberacao:
+Number(valorSolicitado.toFixed(2)),
+
+liberado:true,
+
+liberadoEm:
+Date.now(),
+
+atualizadoEm:
+Date.now()
+
+});
+
+
+alert(
+
+"✅ SALDO LIBERADO!\n\n" +
+
+"👤 " +
+jogador.nome +
+
+"\n\n💰 Saldo liberado: R$ " +
+dinheiro(valorSolicitado)
+
+);
+
+
+}catch(erro){
+
+console.error(erro);
+
+alert(
+"❌ Erro ao liberar saldo:\n\n" +
+erro.message
+);
+
+}
 
 }
 
 
 /* =====================================================
-   BLOQUEAR JOGADOR
+BLOQUEAR
 ===================================================== */
 
 async function bloquearJogador(id){
 
-  try{
+const snap =
+await jogadoresRef
+.child(id)
+.once("value");
 
-    const snap =
-    await jogadoresRef
-    .child(id)
-    .once("value");
-
-
-    const jogador =
-    snap.val();
+const jogador =
+snap.val();
 
 
-    if(!jogador){
-
-      return;
-
-    }
+if(!jogador) return;
 
 
-    await jogadoresRef
-    .child(id)
-    .update({
+await jogadoresRef
+.child(id)
+.update({
 
-      saldo:0,
+saldo:0,
 
-      atualizadoEm:
-      Date.now()
+atualizadoEm:
+Date.now()
 
-    });
-
-
-    alert(
-      "🔒 " +
-      jogador.nome +
-      " foi bloqueado."
-    );
+});
 
 
-  }catch(erro){
-
-    alert(
-      "❌ Erro ao bloquear jogador."
-    );
-
-  }
+alert(
+"🔒 " +
+jogador.nome +
+" foi bloqueado."
+);
 
 }
 
 
 /* =====================================================
-   EXCLUIR JOGADOR
+EXCLUIR
 ===================================================== */
 
 async function excluirJogador(id){
 
-  const snap =
-  await jogadoresRef
-  .child(id)
-  .once("value");
+const snap =
+await jogadoresRef
+.child(id)
+.once("value");
+
+const jogador =
+snap.val();
 
 
-  const jogador =
-  snap.val();
+if(!jogador) return;
 
 
-  if(!jogador){
+if(!confirm(
+"⚠️ EXCLUIR JOGADOR?\n\n" +
+jogador.nome
+)){
 
-    return;
+return;
 
-  }
-
-
-  const confirmar =
-  confirm(
-
-    "⚠️ EXCLUIR JOGADOR?\n\n" +
-
-    "Nome: " +
-    jogador.nome +
-    "\n" +
-
-    "Saldo: R$ " +
-    dinheiro(jogador.saldo) +
-    "\n\n" +
-
-    "Essa ação não pode ser desfeita."
-
-  );
+}
 
 
-  if(!confirmar){
-
-    return;
-
-  }
+await jogadoresRef
+.child(id)
+.remove();
 
 
-  try{
+if(jogadorEditando === id){
 
-    await jogadoresRef
-    .child(id)
-    .remove();
+limparFormulario();
 
-
-    if(jogadorEditando === id){
-
-      limparFormulario();
-
-    }
+}
 
 
-    alert(
-      "✅ Jogador excluído."
-    );
-
-
-  }catch(erro){
-
-    alert(
-      "❌ Não foi possível excluir."
-    );
-
-  }
+alert("✅ Jogador excluído.");
 
 }
 
 
 /* =====================================================
-   CARREGAR JOGADORES
+OBTER DADOS DO JOGADOR
+===================================================== */
+
+function obterDadosJogador(id){
+
+let resultado = {
+
+saldoSolicitado:0,
+
+ultimaRecarga:0,
+
+dataRecarga:"",
+
+statusRecarga:"",
+
+timestampPalpite:0,
+
+timestampRecarga:0
+
+};
+
+
+/* =====================================================
+PALPITES
+===================================================== */
+
+if(listaPalpites.length){
+
+listaPalpites.forEach(function(item){
+
+const p =
+item.dados || {};
+
+const jogadorId =
+p.jogadorId ||
+criarId(
+p.nome ||
+p.nomeJogador ||
+p.usuario ||
+""
+);
+
+
+if(jogadorId !== id){
+
+return;
+
+}
+
+
+const timestamp =
+Number(p.timestamp || 0);
+
+
+/*
+TENTA ENCONTRAR O VALOR REAL SOLICITADO
+*/
+
+const valoresPossiveis = [
+
+p.saldoSolicitado,
+
+p.valorSolicitado,
+
+p.valorRecarga,
+
+p.valorPedido,
+
+p.valorSaldo,
+
+p.valor
+
+];
+
+
+let valor = 0;
+
+
+for(let i = 0; i < valoresPossiveis.length; i++){
+
+const numero =
+Number(valoresPossiveis[i]);
+
+if(
+Number.isFinite(numero) &&
+numero > 0
+){
+
+valor = numero;
+
+break;
+
+}
+
+}
+
+
+if(
+timestamp >=
+resultado.timestampPalpite
+){
+
+resultado.saldoSolicitado =
+valor;
+
+resultado.timestampPalpite =
+timestamp;
+
+}
+
+});
+
+}
+
+
+/* =====================================================
+SOLICITAÇÕES DE RECARGA
+===================================================== */
+
+if(listaRecargas.length){
+
+listaRecargas.forEach(function(item){
+
+const r =
+item.dados || {};
+
+const jogadorId =
+r.jogadorId ||
+criarId(
+r.nome ||
+r.nomeJogador ||
+r.usuario ||
+""
+);
+
+
+if(jogadorId !== id){
+
+return;
+
+}
+
+
+const timestamp =
+Number(r.timestamp || 0);
+
+
+/*
+AQUI ESTÁ O VALOR QUE O JOGADOR
+SOLICITOU PARA RECEBER NO SALDO
+*/
+
+const valorRecarga =
+Number(
+r.valorSolicitado ??
+r.valor ??
+r.valorRecarga ??
+r.valorPedido ??
+0
+) || 0;
+
+
+if(
+timestamp >=
+resultado.timestampRecarga
+){
+
+resultado.ultimaRecarga =
+valorRecarga;
+
+resultado.dataRecarga =
+r.data || "";
+
+resultado.statusRecarga =
+r.status || "pendente";
+
+resultado.timestampRecarga =
+timestamp;
+
+}
+
+});
+
+}
+
+
+/* =====================================================
+ESCOLHER O VALOR A LIBERAR
+===================================================== */
+
+/*
+SE EXISTIR UMA RECARGA SOLICITADA,
+ELA TEM PRIORIDADE.
+
+Exemplo:
+
+Palpite = R$ 2,00
+Recarga = R$ 30,00
+
+Saldo a liberar = R$ 30,00
+*/
+
+if(resultado.ultimaRecarga > 0){
+
+resultado.saldoSolicitado =
+resultado.ultimaRecarga;
+
+}
+
+
+return resultado;
+
+}
+
+/* =====================================================
+CARREGAR JOGADORES
 ===================================================== */
 
 function carregarJogadores(){
 
-  jogadoresRef.on(
-    "value",
-    function(snapshot){
+jogadoresRef.on(
+"value",
+function(snapshot){
 
-      jogadoresArea.innerHTML =
-      "";
+jogadoresArea.innerHTML = "";
 
 
-      if(!snapshot.exists()){
+if(!snapshot.exists()){
 
-        jogadoresArea.innerHTML =
-        '<p class="sem">Nenhum jogador cadastrado.</p>';
+jogadoresArea.innerHTML =
+'<p class="sem">Nenhum jogador cadastrado.</p>';
 
-        return;
+return;
 
-      }
+}
 
 
-      snapshot.forEach(
-        function(child){
+snapshot.forEach(function(child){
 
-          const jogador =
-          child.val();
+const jogador =
+child.val();
 
+const id =
+child.key;
 
-          const id =
-          child.key;
 
+const saldo =
+Number(jogador.saldo) || 0;
 
-          const saldo =
-          Number(
-            jogador.saldo
-          ) || 0;
+const liberacao =
+Number(jogador.valorLiberacao) || 0;
 
+const premio =
+Number(jogador.premio) || 0;
 
-          const liberacao =
-          Number(
-            jogador.valorLiberacao
-          ) || 0;
 
+const dadosExtras =
+obterDadosJogador(id);
 
-          const premio =
-          Number(
-            jogador.premio
-          ) || 0;
 
+const saldoSolicitado =
+dadosExtras.saldoSolicitado;
 
-          const liberado =
-          saldo >= liberacao;
+const ultimaRecarga =
+dadosExtras.ultimaRecarga;
 
+const dataRecarga =
+dadosExtras.dataRecarga;
 
-          const div =
-          document.createElement(
-            "div"
-          );
+const statusRecarga =
+dadosExtras.statusRecarga;
 
 
-          div.className =
-          "jogador";
+const liberado =
+saldo >= liberacao;
 
 
-          div.innerHTML = `
+const div =
+document.createElement("div");
 
-            <div class="jogador-topo">
+div.className =
+"jogador";
 
-              <div class="nome">
 
-                👤
-                ${escapeHTML(
-                  jogador.nome || ""
-                )}
+let recargaHTML = "";
 
-              </div>
 
-              <span class="${
-                liberado
-                ?
-                "liberado"
-                :
-                "bloqueado"
-              }">
+if(ultimaRecarga > 0){
 
-                ${
-                  liberado
-                  ?
-                  "🟢 LIBERADO"
-                  :
-                  "🔴 BLOQUEADO"
-                }
+recargaHTML = `
 
-              </span>
+<div class="recarga">
 
-            </div>
+💳 Última recarga solicitada:
 
+<strong>
+R$ ${dinheiro(ultimaRecarga)}
+</strong>
 
-            <div class="info">
+<br>
 
-              💰 Saldo:
+📅 ${escapeHTML(dataRecarga)}
 
-              <strong>
-                R$ ${dinheiro(saldo)}
-              </strong>
+<br>
 
-              <br>
+📌 Status:
 
+<strong>
+${escapeHTML(statusRecarga)}
+</strong>
 
-              🎯 Valor para liberar:
+</div>
 
-              <strong>
-                R$ ${dinheiro(liberacao)}
-              </strong>
+`;
 
-              <br>
+}
 
 
-              🏆 Prêmio:
+div.innerHTML = `
 
-              <strong>
-                R$ ${dinheiro(premio)}
-              </strong>
+<div class="jogador-topo">
 
-            </div>
+<div class="nome">
 
+👤
+${escapeHTML(jogador.nome || "")}
 
-            <div class="acoes">
+</div>
 
-              <button
-                class="btn-editar"
-                onclick="editarJogador('${id}')">
+<span class="${
+liberado
+?
+"liberado"
+:
+"bloqueado"
+}">
 
-                ✏️ EDITAR
+${
+liberado
+?
+"🟢 LIBERADO"
+:
+"🔴 BLOQUEADO"
+}
 
-              </button>
+</span>
 
+</div>
 
-              ${
-                liberado
 
-                ?
+<div class="info">
 
-                `
-                <button
-                  class="btn-bloquear"
-                  onclick="bloquearJogador('${id}')">
+💰 Saldo atual:
 
-                  🔒 BLOQUEAR
+<strong>
+R$ ${dinheiro(saldo)}
+</strong>
 
-                </button>
-                `
+<br>
 
-                :
+💵 Saldo solicitado:
 
-                `
-                <button
-                  class="btn-liberar"
-                  onclick="liberarJogador('${id}')">
+<strong class="solicitado">
+R$ ${dinheiro(saldoSolicitado)}
+</strong>
 
-                  🔓 LIBERAR
+<br>
 
-                </button>
-                `
-              }
+🎯 Para liberar:
 
+<strong>
+R$ ${dinheiro(liberacao)}
+</strong>
 
-              <button
-                class="btn-excluir"
-                onclick="excluirJogador('${id}')">
+<br>
 
-                🗑️ EXCLUIR
+🏆 Prêmio:
 
-              </button>
+<strong>
+R$ ${dinheiro(premio)}
+</strong>
 
-            </div>
+</div>
 
-          `;
 
+${recargaHTML}
 
-          jogadoresArea.appendChild(
-            div
-          );
 
-        }
-      );
+<div class="acoes">
 
-    }
-  );
+<button
+class="btn-editar"
+onclick="editarJogador('${id}')">
+
+✏️ EDITAR
+
+</button>
+
+
+${
+liberado
+
+?
+
+`<button
+class="btn-bloquear"
+onclick="bloquearJogador('${id}')">
+
+🔒 BLOQUEAR
+
+</button>`
+
+:
+
+`<button
+class="btn-liberar"
+onclick="liberarJogador('${id}')">
+
+🔓 LIBERAR R$ ${dinheiro(saldoSolicitado)}
+
+</button>`
+}
+
+
+<button
+class="btn-excluir"
+onclick="excluirJogador('${id}')">
+
+🗑️ EXCLUIR
+
+</button>
+
+</div>
+
+`;
+
+
+jogadoresArea.appendChild(div);
+
+});
+
+});
 
 }
 
 
 /* =====================================================
-   CARREGAR PALPITES
+NOME DO JOGO
+===================================================== */
+
+function pegarNomeJogo(jogo){
+
+if(!jogo){
+
+return "Jogo não informado";
+
+}
+
+
+if(
+jogo.confronto &&
+String(jogo.confronto).trim()
+){
+
+return String(jogo.confronto).trim();
+
+}
+
+
+if(
+jogo.casa &&
+jogo.fora
+){
+
+return (
+
+String(jogo.casa).trim() +
+
+" x " +
+
+String(jogo.fora).trim()
+
+);
+
+}
+
+
+if(jogo.time){
+
+return jogo.time;
+
+}
+
+
+if(jogo.nome){
+
+return jogo.nome;
+
+}
+
+
+if(jogo.jogo){
+
+return jogo.jogo;
+
+}
+
+
+if(jogo.partida){
+
+return jogo.partida;
+
+}
+
+
+return "Jogo não informado";
+
+}
+
+
+/* =====================================================
+PALPITE
+===================================================== */
+
+function pegarPalpite(jogo){
+
+if(!jogo){
+
+return "-";
+
+}
+
+
+if(
+jogo.palpite !== undefined &&
+jogo.palpite !== null
+){
+
+return jogo.palpite;
+
+}
+
+
+if(
+jogo.placar !== undefined
+){
+
+return jogo.placar;
+
+}
+
+
+if(
+jogo.resultado !== undefined
+){
+
+return jogo.resultado;
+
+}
+
+
+return "-";
+
+}
+
+
+/* =====================================================
+RESULTADO
+===================================================== */
+
+function pegarResultado(item,numero){
+
+if(
+item.resultados &&
+item.resultados["jogo"+numero]
+){
+
+return item.resultados["jogo"+numero];
+
+}
+
+
+return "- : -";
+
+}
+
+
+/* =====================================================
+STATUS
+===================================================== */
+
+function statusTexto(status){
+
+if(status === "ganhou"){
+
+return `
+<div class="status-palpite status-ganhou">
+🟢 GANHOU
+</div>
+`;
+
+}
+
+
+if(status === "perdeu"){
+
+return `
+<div class="status-palpite status-perdeu">
+🔴 PERDEU
+</div>
+`;
+
+}
+
+
+return `
+<div class="status-palpite status-aguardando">
+🟡 AGUARDANDO RESULTADO
+</div>
+`;
+
+}
+
+
+/* =====================================================
+CARREGAR PALPITES
 ===================================================== */
 
 function carregarPalpites(){
 
-  palpitesRef.on(
-    "value",
-    function(snapshot){
+palpitesRef.on(
+"value",
+function(snapshot){
 
-      palpitesArea.innerHTML =
-      "";
+listaPalpites = [];
 
 
-      if(!snapshot.exists()){
+if(snapshot.exists()){
 
-        palpitesArea.innerHTML =
-        '<p class="sem">Nenhum palpite enviado.</p>';
+snapshot.forEach(function(child){
 
-        return;
+listaPalpites.push({
 
-      }
+id:child.key,
 
+dados:child.val()
 
-      const lista = [];
+});
 
+});
 
-      snapshot.forEach(
-        function(child){
+}
 
-          lista.push({
 
-            id:
-            child.key,
+listaPalpites.sort(function(a,b){
 
-            dados:
-            child.val()
+return (
 
-          });
+Number(b.dados?.timestamp || 0)
 
-        }
-      );
+-
 
+Number(a.dados?.timestamp || 0)
 
-      lista.reverse();
+);
 
+});
 
-      lista.forEach(
-        function(item){
 
-          const p =
-          item.dados;
+renderizarPalpites();
 
+carregarJogadores();
 
-          const j1 =
-          p.jogo1?.palpite || "-";
-
-
-          const j2 =
-          p.jogo2?.palpite || "-";
-
-
-          const j3 =
-          p.jogo3?.palpite || "-";
-
-
-          const div =
-          document.createElement(
-            "div"
-          );
-
-
-          div.className =
-          "jogador";
-
-
-          div.innerHTML = `
-
-            <div class="jogador-topo">
-
-              <div class="nome">
-
-                👤
-                ${escapeHTML(
-                  p.nome || ""
-                )}
-
-              </div>
-
-
-              <button
-                class="btn-excluir"
-                onclick="excluirPalpite('${item.id}')">
-
-                🗑️ EXCLUIR
-
-              </button>
-
-            </div>
-
-
-            <div class="palpite">
-
-              São Bernardo x Botafogo:
-
-              <strong>
-                ${escapeHTML(j1)}
-              </strong>
-
-            </div>
-
-
-            <div class="palpite">
-
-              Ponte Preta x Náutico:
-
-              <strong>
-                ${escapeHTML(j2)}
-              </strong>
-
-            </div>
-
-
-            <div class="palpite">
-
-              Sport x Londrina:
-
-              <strong>
-                ${escapeHTML(j3)}
-              </strong>
-
-            </div>
-
-
-            <div class="info">
-
-              💰 Valor:
-
-              <strong>
-                R$ ${dinheiro(p.valor)}
-              </strong>
-
-              <br>
-
-
-              🏆 Prêmio:
-
-              <strong>
-                R$ ${dinheiro(p.premio)}
-              </strong>
-
-              <br>
-
-
-              📅 Enviado:
-
-              ${escapeHTML(
-                p.data || ""
-              )}
-
-            </div>
-
-          `;
-
-
-          palpitesArea.appendChild(
-            div
-          );
-
-        }
-      );
-
-    }
-  );
+});
 
 }
 
 
 /* =====================================================
-   EXCLUIR PALPITE
+CARREGAR RECARGAS
+===================================================== */
+
+function carregarRecargas(){
+
+recargasRef.on(
+"value",
+function(snapshot){
+
+listaRecargas = [];
+
+
+if(snapshot.exists()){
+
+snapshot.forEach(function(child){
+
+listaRecargas.push({
+
+id:child.key,
+
+dados:child.val()
+
+});
+
+});
+
+}
+
+
+listaRecargas.sort(function(a,b){
+
+return (
+
+Number(b.dados?.timestamp || 0)
+
+-
+
+Number(a.dados?.timestamp || 0)
+
+);
+
+});
+
+
+carregarJogadores();
+
+});
+
+}
+
+
+/* =====================================================
+RENDERIZAR PALPITES
+===================================================== */
+
+function renderizarPalpites(){
+
+palpitesArea.innerHTML = "";
+
+
+let lista =
+listaPalpites;
+
+
+const filtro =
+filtroNome.value
+.trim()
+.toLowerCase();
+
+
+if(filtro){
+
+lista =
+lista.filter(function(item){
+
+const nome =
+String(
+item.dados?.nome ||
+""
+).toLowerCase();
+
+return nome.includes(filtro);
+
+});
+
+}
+
+
+if(lista.length === 0){
+
+palpitesArea.innerHTML =
+'<p class="sem">Nenhum palpite encontrado.</p>';
+
+return;
+
+}
+
+
+lista.forEach(function(item){
+
+const p =
+item.dados || {};
+
+const id =
+item.id;
+
+
+const nome =
+p.nome ||
+p.nomeJogador ||
+p.usuario ||
+"Jogador";
+
+
+const status =
+p.status ||
+"aguardando";
+
+
+const jogos = [
+
+p.jogo1,
+p.jogo2,
+p.jogo3,
+p.jogo4,
+p.jogo5
+
+];
+
+
+let jogosHTML = "";
+
+
+jogos.forEach(function(jogo,index){
+
+if(!jogo){
+
+return;
+
+}
+
+
+const numero =
+index + 1;
+
+const nomeJogo =
+pegarNomeJogo(jogo);
+
+const palpite =
+pegarPalpite(jogo);
+
+const resultado =
+pegarResultado(
+p,
+numero
+);
+
+
+jogosHTML += `
+
+<div class="palpite">
+
+<div class="jogo">
+
+⚽ <strong>JOGO ${numero}</strong>
+
+<br>
+
+<span>
+
+${escapeHTML(nomeJogo)}
+
+</span>
+
+</div>
+
+
+<div>
+
+🎯 Palpite:
+
+<strong>
+${escapeHTML(palpite)}
+</strong>
+
+</div>
+
+
+<div class="resultado-box">
+
+<label>
+
+📊 Resultado real do jogo ${numero}
+
+</label>
+
+
+<input
+
+class="resultado-input"
+
+id="resultado_${id}_${numero}"
+
+value="${
+escapeHTML(
+resultado === "- : -"
+?
+""
+:
+resultado
+)
+}"
+
+placeholder="Ex: 2:1"
+
+
+<button
+
+class="btn-resultado"
+
+onclick="salvarResultado(
+'${id}',
+${numero}
+)">
+
+💾 SALVAR RESULTADO
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+const div =
+document.createElement("div");
+
+div.className =
+"jogador";
+
+
+div.innerHTML = `
+
+<div class="jogador-topo">
+
+<div class="nome">
+
+👤 ${escapeHTML(nome)}
+
+</div>
+
+<div>
+
+${statusTexto(status)}
+
+</div>
+
+</div>
+
+
+${jogosHTML}
+
+
+<div class="info">
+
+💵 Saldo solicitado:
+
+<strong>
+R$ ${dinheiro(p.valor)}
+</strong>
+
+<br>
+
+💳 Saldo anterior:
+
+<strong>
+R$ ${dinheiro(p.saldoAnterior)}
+</strong>
+
+<br>
+
+🏆 Prêmio:
+
+<strong>
+R$ ${dinheiro(p.premio)}
+</strong>
+
+<br>
+
+💰 Saldo restante:
+
+<strong>
+R$ ${dinheiro(p.saldoRestante)}
+</strong>
+
+<br>
+
+📅 Enviado:
+
+${escapeHTML(p.data || "")}
+
+</div>
+
+
+<div class="acoes">
+
+<button
+class="btn-ganhou"
+onclick="alterarStatus(
+'${id}',
+'ganhou'
+)">
+
+🟢 GANHOU
+
+</button>
+
+
+<button
+class="btn-perdeu"
+onclick="alterarStatus(
+'${id}',
+'perdeu'
+)">
+
+🔴 PERDEU
+
+</button>
+
+
+<button
+class="btn-excluir"
+onclick="excluirPalpite(
+'${id}'
+)">
+
+🗑️ EXCLUIR
+
+</button>
+
+</div>
+
+`;
+
+
+palpitesArea.appendChild(div);
+
+});
+
+}
+
+
+/* =====================================================
+SALVAR RESULTADO
+===================================================== */
+
+async function salvarResultado(
+palpiteId,
+numero
+){
+
+const input =
+document.getElementById(
+`resultado_${palpiteId}_${numero}`
+);
+
+if(!input){
+
+return;
+
+}
+
+
+const resultado =
+input.value.trim();
+
+
+if(!resultado){
+
+alert(
+"⚠️ Informe o resultado. Exemplo: 2:1"
+);
+
+return;
+
+}
+
+
+if(
+!/^\d+\s*:\s*\d+$/.test(resultado)
+){
+
+alert(
+"⚠️ Use o formato correto.\n\nExemplo: 2:1"
+);
+
+return;
+
+}
+
+
+try{
+
+await palpitesRef
+.child(palpiteId)
+.child("resultados")
+.child("jogo"+numero)
+.set(resultado);
+
+
+alert(
+"✅ Resultado do jogo " +
+numero +
+" salvo!"
+);
+
+
+}catch(erro){
+
+console.error(erro);
+
+alert(
+"❌ Erro ao salvar resultado."
+);
+
+}
+
+}
+
+
+/* =====================================================
+ALTERAR STATUS
+===================================================== */
+
+async function alterarStatus(
+id,
+status
+){
+
+try{
+
+await palpitesRef
+.child(id)
+.update({
+
+status:status,
+
+statusAtualizadoEm:
+Date.now()
+
+});
+
+
+if(status === "ganhou"){
+
+alert(
+"🟢 Palpite marcado como GANHOU."
+);
+
+}else{
+
+alert(
+"🔴 Palpite marcado como PERDEU."
+);
+
+}
+
+
+}catch(erro){
+
+console.error(erro);
+
+alert(
+"❌ Erro ao atualizar status."
+);
+
+}
+
+}
+
+
+/* =====================================================
+EXCLUIR PALPITE
 ===================================================== */
 
 async function excluirPalpite(id){
 
-  const confirmar =
-  confirm(
-    "⚠️ Deseja excluir este palpite?"
-  );
+if(!confirm(
+"⚠️ Deseja excluir este palpite?"
+)){
+
+return;
+
+}
 
 
-  if(!confirmar){
+try{
 
-    return;
+await palpitesRef
+.child(id)
+.remove();
 
-  }
+alert(
+"✅ Palpite excluído."
+);
 
+}catch(erro){
 
-  try{
+console.error(erro);
 
-    await palpitesRef
-    .child(id)
-    .remove();
+alert(
+"❌ Não foi possível excluir o palpite."
+);
 
-
-    alert(
-      "✅ Palpite excluído."
-    );
-
-
-  }catch(erro){
-
-    alert(
-      "❌ Não foi possível excluir o palpite."
-    );
-
-  }
+}
 
 }
 
 
 /* =====================================================
-   STATUS FIREBASE
+FILTRO
+===================================================== */
+
+filtroNome.addEventListener(
+"input",
+renderizarPalpites
+);
+
+
+/* =====================================================
+BOTÕES
+===================================================== */
+
+btnSalvar.addEventListener(
+"click",
+salvarJogador
+);
+
+btnLimpar.addEventListener(
+"click",
+limparFormulario
+);
+
+
+/* =====================================================
+STATUS FIREBASE
 ===================================================== */
 
 db.ref(".info/connected")
 .on(
-  "value",
-  function(snapshot){
+"value",
+function(snapshot){
 
-    const status =
-    document.getElementById(
-      "status"
-    );
+const status =
+document.getElementById("status");
 
 
-    if(
-      snapshot.val() === true
-    ){
+if(snapshot.val() === true){
 
-      status.textContent =
-      "🟢 Firebase conectado";
+status.textContent =
+"🟢 Firebase conectado";
 
-      status.style.color =
-      "#22c55e";
+status.style.color =
+"#22c55e";
 
-    }else{
+}else{
 
-      status.textContent =
-      "🔴 Firebase desconectado";
+status.textContent =
+"🔴 Firebase desconectado";
 
-      status.style.color =
-      "#ef4444";
+status.style.color =
+"#ef4444";
 
-    }
+}
 
-  }
-);
+});
 
 
 /* =====================================================
-   BOTÃO SALVAR
+INICIAR
 ===================================================== */
-
-btnSalvar.addEventListener(
-  "click",
-  salvarJogador
-);
-
-
-/* =====================================================
-   INICIAR
-===================================================== */
-
-carregarJogadores();
 
 carregarPalpites();
+
+carregarRecargas();
+
+carregarJogadores();
 
 </script>
 
