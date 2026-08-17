@@ -974,6 +974,120 @@ margin-top:12px;
 line-height:1.5;
 
 }
+select{
+    width:100%;
+    padding:11px;
+    border:2px solid #22ff66;
+    border-radius:10px;
+    background:linear-gradient(135deg,#064e3b,#16a34a);
+    color:#ffffff;
+    font-size:15px;
+    font-weight:bold;
+    outline:none;
+    cursor:pointer;
+    text-align:center;
+    text-align-last:center;
+    box-shadow:0 0 12px rgba(34,255,102,.45);
+}
+
+select:focus{
+    border-color:#86efac;
+    box-shadow:0 0 18px rgba(34,255,102,.8);
+}
+
+select option{
+    background:#064e3b;
+    color:white;
+    font-weight:bold;
+}
+/* =========================
+STATUS DO PALPITE
+SOMENTE EM MEUS PALPITES
+========================= */
+
+.status-palpite{
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.status-aguardando{
+    background:#713f12;
+    color:#facc15;
+    border:1px solid #eab308;
+}
+
+.status-ganhou{
+    background:#14532d;
+    color:#4ade80;
+    border:1px solid #22c55e;
+}
+
+.status-perdeu{
+    background:#7f1d1d;
+    color:#f87171;
+    border:1px solid #ef4444;
+}
+.status-palpite{
+    text-align:center;
+    padding:8px;
+    border-radius:8px;
+    margin:10px 0;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.status-aguardando{
+    background:#92400e;
+    color:#fde68a;
+}
+
+.status-ganhou{
+    background:#166534;
+    color:#bbf7d0;
+}
+
+.status-perdeu{
+    background:#991b1b;
+    color:#fecaca;
+}
+
+.resultado-real{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-top:8px;
+}
+
+.resultado-real span{
+    color:#94a3b8;
+    font-size:12px;
+}
+/* Esconde o campo de seleção, mas mantém ele funcionando */
+select{
+    position:absolute;
+    opacity:0;
+    width:100%;
+    height:60px;
+    left:0;
+    top:0;
+    cursor:pointer;
+    z-index:10;
+}
+
+.duelo{
+    position:relative;
+}
+
+.placar-selecionado{
+    position:relative;
+    z-index:1;
+    pointer-events:none;
+}
 </style>
 
 </head>
@@ -1106,13 +1220,13 @@ R$ 2,00
 <div class="topo-item">
 
 <span>
-🏆 PRÊMIO
+🏆 PRÊMIO 
 </span>
 
 <strong
 id="premioTela">
 
-R$ 500,00
+R$ 3000,00
 
 </strong>
 
@@ -1137,7 +1251,7 @@ class="enviar-fixo">
 SITUAÇÃO
 ========================= -->
 
-<div
+<div style="display: none;"
 id="situacao"
 class="situacao">
 
@@ -1150,7 +1264,7 @@ class="situacao">
 STATUS
 ========================= -->
 
-<div
+<div style="display: none;"
 id="status"
 class="status">
 
@@ -1163,7 +1277,7 @@ class="status">
 PRÓXIMO JOGO
 ========================= -->
 
-<div
+<div style="display: none;"
 id="proximoJogo"
 class="proximo-jogo">
 
@@ -1184,10 +1298,10 @@ JOGO 1
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786636721/sao-bernardo.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778198189/internacional.jpg">
 
 <p>
-São Bernardo
+internacional
 </p>
 
 </div>
@@ -1213,10 +1327,10 @@ São Bernardo
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786636859/botafogo.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786926638/remo.png">
 
 <p>
-Botafogo SP
+Remo
 </p>
 
 </div>
@@ -1227,9 +1341,9 @@ Botafogo SP
 
 <div class="jogo-info">
 
-📅 14/08/2026
+📅 17/08/2026
 &nbsp; | &nbsp;
-⏰ 19:00
+⏰ 20:00
 
 </div>
 
@@ -1257,10 +1371,10 @@ JOGO 2
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786926820/ferroviaria.png">
 
 <p>
-Ponte Preta
+ferroviaria
 </p>
 
 </div>
@@ -1286,10 +1400,10 @@ Ponte Preta
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513173/nautico.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786926923/paysandu.png">
 
 <p>
-Náutico
+paysandu
 </p>
 
 </div>
@@ -1300,9 +1414,9 @@ Náutico
 
 <div class="jogo-info">
 
-📅 14/08/2026
+📅 17/08/2026
 &nbsp; | &nbsp;
-⏰ 19:00
+⏰ 20:00
 
 </div>
 
@@ -1330,10 +1444,10 @@ JOGO 3
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513812/sport.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786927037/guarani.png">
 
 <p>
-Sport
+guarani
 </p>
 
 </div>
@@ -1359,10 +1473,10 @@ Sport
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786927146/ypiranga.png">
 
 <p>
-Londrina
+ypiranga
 </p>
 
 </div>
@@ -1373,9 +1487,9 @@ Londrina
 
 <div class="jogo-info">
 
-📅 14/08/2026
+📅 17/08/2026
 &nbsp; | &nbsp;
-⏰ 21:00
+⏰ 20:00
 
 </div>
 
@@ -1389,8 +1503,136 @@ Escolha o placar
 </select>
 
 </div>
+<!-- =========================
+JOGO 4
+========================= -->
 
+<div class="duelo">
 
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786985849/necaxa.png">
+
+<p>
+necaxa
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar4Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar4Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786985963/leon.png">
+
+<p>
+leon
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 17/08/2026
+&nbsp; | &nbsp;
+⏰ 13:00
+
+</div>
+
+<select id="jogo4">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+<!-- =========================
+JOGO 5
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786986242/tauro-fc.png">
+
+<p>
+tauro-fc
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar5Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar5Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786986376/cd-arabe-unido.png">
+
+<p>
+cd-arabe-unido
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 17/08/2026
+&nbsp; | &nbsp;
+⏰ 13:30
+
+</div>
+
+<select id="jogo5">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
 </div>
 
 <!-- =========================
@@ -1700,7 +1942,7 @@ document.getElementById(
 ).textContent =
 "📋 COPIAR PIX";
 
-},2000);
+},1000);
 
 }catch(erro){
 
@@ -1725,7 +1967,7 @@ saldo:0,
 
 valorLiberacao:2,
 
-premio:500
+premio:3000
 
 };
 
@@ -1782,13 +2024,13 @@ const jogos = {
 jogo1:{
 
 nome:
-"São Bernardo x Botafogo SP",
+"internacional.jpg x Remo",
 
 data:
-"2026-08-14",
+"2026-08-17",
 
 hora:
-"19:00",
+"20:00",
 
 select:
 "jogo1"
@@ -1798,13 +2040,13 @@ select:
 jogo2:{
 
 nome:
-"Ponte Preta x Náutico",
+"ferroviaria x paysandu",
 
 data:
-"2026-08-14",
+"2026-08-17",
 
 hora:
-"19:00",
+"20:00",
 
 select:
 "jogo2"
@@ -1814,21 +2056,51 @@ select:
 jogo3:{
 
 nome:
-"Sport x Londrina",
+"guarani x ypiranga",
 
 data:
-"2026-08-14",
+"2026-08-17",
 
 hora:
-"21:00",
+"20:00",
 
 select:
 "jogo3"
 
+},
+
+jogo4:{
+
+nome:
+"necaxa x leon",
+
+data:
+"2026-08-17",
+
+hora:
+"22:00",
+
+select:
+"jogo4"
+
+},
+
+jogo5:{
+
+nome:
+"tauro-fc x cd-arabe-unido",
+
+data:
+"2026-08-17",
+
+hora:
+"22:00",
+
+select:
+"jogo5"
+
 }
-
 };
-
 
 /* =========================
 DINHEIRO
@@ -1952,7 +2224,7 @@ saldo:0,
 
 valorLiberacao:2,
 
-premio:500
+premio:3000
 
 };
 
@@ -1961,7 +2233,6 @@ atualizarTela();
 return;
 
 }
-
 const dados =
 snapshot.val();
 
@@ -1982,7 +2253,7 @@ configuracao.valorLiberacao = 2;
 }
 
 configuracao.premio =
-Number(dados.premio) || 0;
+Number(dados.premio) || 3000;
 
 atualizarTela();
 
@@ -2046,7 +2317,7 @@ situacao.innerHTML = `
 
 <br>
 
-Seu saldo é suficiente para participar.
+Seu saldo é suficiente para jogar.
 
 `;
 
@@ -2089,7 +2360,7 @@ botao.disabled = false;
 
 if(!podeMarcar){
 
-botao.textContent = "💰 ADICIONAR SALDO";
+botao.textContent = "📤 ENVIAR";
 
 }else{
 
@@ -2352,18 +2623,19 @@ configuracao.saldo <
 configuracao.valorLiberacao
 ){
 
-select.disabled =
-true;
+/*
+Permite escolher o placar mesmo sem saldo.
+O bloqueio acontece somente na hora de enviar.
+*/
 
-select.classList.add(
-"bloqueado"
-);
+select.disabled = false;
 
-contador.className =
-"contador";
+select.classList.remove("bloqueado");
+
+contador.className = "contador";
 
 contador.textContent =
-"🔒 SALDO INSUFICIENTE";
+"💰 Escolha seu placar";
 
 return;
 
@@ -2545,21 +2817,37 @@ await jogadoresRef
 .child(id)
 .once("value");
 
-
 if(!jogadorSnap.exists()){
 
-alert(
-"❌ Jogador não encontrado no sistema."
-);
+  await jogadoresRef
+  .child(id)
+  .set({
 
-return;
+    nome: nome,
+
+    saldo: 0,
+
+    valorLiberacao: 2,
+
+    premio: 3000,
+
+    criadoEm: Date.now()
+
+  });
+
+ 
 
 }
 
 
 const jogador =
-jogadorSnap.val();
-
+jogadorSnap.exists()
+  ? jogadorSnap.val()
+  : {
+      saldo: 0,
+      valorLiberacao: 2,
+      premio: 3000
+    };
 
 const saldoAtual =
 Number(jogador.saldo) || 0;
@@ -2568,8 +2856,7 @@ const valorLiberacao =
 Number(jogador.valorLiberacao) || 2;
 
 const premio =
-Number(jogador.premio) || 0;
-
+Number(jogador.premio) || 3000;
 
 /*
 VERIFICAR SALDO
@@ -2633,20 +2920,32 @@ document.getElementById(
 "jogo3"
 ).value;
 
+const jogo4 =
+document.getElementById(
+"jogo4"
+).value;
+
+const jogo5 =
+document.getElementById(
+"jogo5"
+).value;
 
 if(
 !jogo1 ||
 !jogo2 ||
-!jogo3
+!jogo3 ||
+!jogo4 ||
+!jogo5
 ){
 
 alert(
-"⚠️ Escolha os 3 placares antes de enviar!"
+"⚠️ Escolha os 5 placares antes de enviar!"
 );
 
 return;
 
 }
+
 
 
 /*
@@ -2668,24 +2967,27 @@ CRIAR PALPITE
 
 const novoPalpite = {
 
-nome:
-nome,
+    status: "aguardando",
 
-jogadorId:
-id,
+    resultados: {
+        jogo1: "- : -",
+        jogo2: "- : -",
+        jogo3: "- : -",
+        jogo4: "- : -",
+        jogo5: "- : -"
+    },
 
-valor:
-valorLiberacao,
+    nome: nome,
 
-premio:
-premio,
+    jogadorId: id,
 
-saldoAnterior:
-saldoAtual,
+    valor: valorLiberacao,
 
-saldoRestante:
-novoSaldo,
+    premio: premio,
 
+    saldoAnterior: saldoAtual,
+
+    saldoRestante: novoSaldo,
 jogo1:{
 
 confronto:
@@ -2733,7 +3035,36 @@ hora:
 jogos.jogo3.hora
 
 },
+jogo4:{
 
+confronto:
+jogos.jogo4.nome,
+
+palpite:
+jogo4,
+
+data:
+jogos.jogo4.data,
+
+hora:
+jogos.jogo4.hora
+
+},
+jogo5:{
+
+confronto:
+jogos.jogo5.nome,
+
+palpite:
+jogo5,
+
+data:
+jogos.jogo5.data,
+
+hora:
+jogos.jogo5.hora
+
+},
 data:
 new Date()
 .toLocaleString("pt-BR"),
@@ -2805,6 +3136,13 @@ document.getElementById(
 "jogo3"
 ).value = "";
 
+document.getElementById(
+"jogo4"
+).value = "";
+
+document.getElementById(
+"jogo5"
+).value = "";
 
 atualizarPlacar(
 "jogo1",
@@ -2868,7 +3206,7 @@ botao.textContent = "📤 ENVIAR";
 
 }else{
 
-botao.textContent = "💰 ADICIONAR SALDO";
+botao.textContent = "📤 ENVIAR";
 
 }
 
@@ -2876,6 +3214,95 @@ botao.textContent = "💰 ADICIONAR SALDO";
 
 }
 
+/* =========================
+STATUS DO PALPITE
+========================= */
+
+const TEMPO_AGUARDAR_RESULTADO = 110 * 60 * 1000;
+
+
+/*
+PEGA O HORÁRIO DO ÚLTIMO JOGO
+DO PALPITE
+*/
+
+function obterFimDosJogos(){
+
+    let maiorHorario = 0;
+
+    Object.keys(jogos).forEach(function(chave){
+
+        const jogo = jogos[chave];
+
+        const inicio = obterDataJogo(jogo).getTime();
+
+        if(inicio > maiorHorario){
+            maiorHorario = inicio;
+        }
+
+    });
+
+    return maiorHorario;
+}
+
+
+/*
+STATUS VISUAL
+*/
+
+function obterStatusPalpite(item){
+
+    /*
+    SE ADMIN JÁ DEFINIU
+    GANHOU OU PERDEU,
+    RESPEITA O STATUS
+    */
+
+    if(item.status === "ganhou"){
+        return "ganhou";
+    }
+
+    if(item.status === "perdeu"){
+        return "perdeu";
+    }
+
+
+    /*
+    CASO NÃO TENHA STATUS,
+    CONSIDERA AGUARDANDO
+    */
+
+    const agora = Date.now();
+
+    const fimJogos =
+        obterFimDosJogos();
+
+    const limite =
+        fimJogos +
+        TEMPO_AGUARDAR_RESULTADO;
+
+
+    /*
+    AINDA ESTÁ DENTRO DOS 110 MINUTOS
+    */
+
+    if(agora < limite){
+
+        return "aguardando";
+
+    }
+
+
+    /*
+    PASSOU DOS 110 MINUTOS
+    */
+
+    return "perdeu";
+
+}
+/* =========================
+MEUS PALPITES
+========================= */
 
 /* =========================
 MEUS PALPITES
@@ -2883,189 +3310,395 @@ MEUS PALPITES
 
 function carregarMeusPalpites(){
 
-const nome =
-localStorage.getItem(
-"nomeJogador"
-);
+    const nome =
+        localStorage.getItem("nomeJogador");
 
-const area =
-document.getElementById(
-"meusPalpites"
-);
+    const area =
+        document.getElementById("meusPalpites");
 
-if(!nome){
+    if(!nome){
 
-area.innerHTML =
-'<p class="sem-palpite">Nenhum palpite realizado.</p>';
+        area.innerHTML =
+        '<p class="sem-palpite">Nenhum palpite realizado.</p>';
 
-return;
+        return;
 
-}
+    }
 
-palpitesRef.on(
-"value",
-function(snapshot){
 
-const dados = [];
+    palpitesRef.on(
+        "value",
+        function(snapshot){
 
-snapshot.forEach(
-function(child){
+            const dados = [];
 
-const item =
-child.val();
 
-if(
-item &&
-item.nome === nome
-){
+            snapshot.forEach(function(child){
 
-dados.push(item);
+                const item = child.val();
 
-}
+                /*
+                GUARDA A CHAVE DO FIREBASE
+                PARA CONTROLE DO ADMIN
+                */
+
+                if(
+                    item &&
+                    item.nome === nome
+                ){
+
+                    item._id = child.key;
+
+                    dados.push(item);
+
+                }
+
+            });
+
+
+            dados.reverse();
+
+
+            if(dados.length === 0){
+
+                area.innerHTML =
+                '<p class="sem-palpite">Nenhum palpite realizado.</p>';
+
+                return;
+
+            }
+
+
+            area.innerHTML = "";
+
+
+            dados.forEach(function(item){
+
+    const jogo1 =
+        item.jogo1?.palpite || "-";
+
+    const jogo2 =
+        item.jogo2?.palpite || "-";
+
+    const jogo3 =
+        item.jogo3?.palpite || "-";
+
+    const jogo4 =
+        item.jogo4?.palpite || "-";
+
+    const jogo5 =
+        item.jogo5?.palpite || "-";
+
+
+    const valor =
+        Number(item.valor) || 0;
+
+    const premio =
+        Number(item.premio) || 0;
+
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    const status =
+        item.status || "aguardando";
+
+
+    let classeStatus =
+        "status-aguardando";
+
+    let textoStatus =
+        "🟡 AGUARDANDO";
+
+
+    if(status === "ganhou"){
+
+        classeStatus =
+            "status-ganhou";
+
+        textoStatus =
+            "🟢 GANHOU";
+
+    }
+
+
+    if(status === "perdeu"){
+
+        classeStatus =
+            "status-perdeu";
+
+        textoStatus =
+            "🔴 PERDEU";
+
+    }
+
+
+    /* =========================
+       STATUS HTML
+    ========================= */
+
+    const statusHTML = `
+
+        <div class="status-palpite ${classeStatus}">
+
+            ${textoStatus}
+
+        </div>
+
+    `;
+
+
+    /* =========================
+       RESULTADOS REAIS
+    ========================= */
+
+    const resultados =
+        item.resultados || {
+
+            jogo1: "- : -",
+            jogo2: "- : -",
+            jogo3: "- : -",
+            jogo4: "- : -",
+            jogo5: "- : -"
+
+        };
+
+
+    area.innerHTML += `
+
+        <div class="meu-card">
+
+            ${statusHTML}
+
+
+            <div class="meu-nome">
+
+                👤
+                ${escapeHTML(item.nome)}
+
+            </div>
+
+
+            <!-- JOGO 1 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo1?.confronto ||
+                        "internacional x Remo"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo1)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo1 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 2 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo2?.confronto ||
+                        "ferroviaria x paysandu"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo2)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo2 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 3 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo3?.confronto ||
+                        "guarani x ypiranga"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo3)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo3 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 4 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo4?.confronto ||
+                        "necaxa x leon"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo4)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo4 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <!-- JOGO 5 -->
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ${escapeHTML(
+                        item.jogo5?.confronto ||
+                        "tauro-fc x cd-arabe-unido"
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(jogo5)}
+
+                </strong>
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>Resultado:</span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        resultados.jogo5 || "- : -"
+                    )}
+
+                </strong>
+
+            </div>
+
+
+            <div class="data">
+
+                💰 Valor:
+
+                R$ ${dinheiro(valor)}
+
+                <br>
+
+                🏆 Prêmio:
+
+                R$ ${dinheiro(premio)}
+
+                <br>
+
+                💵 Saldo restante:
+
+                R$ ${dinheiro(
+                    item.saldoRestante
+                )}
+
+                <br>
+
+                📅 Enviado:
+
+                ${escapeHTML(
+                    item.data || ""
+                )}
+
+            </div>
+
+        </div>
+
+    `;
 
 });
-
-dados.reverse();
-
-if(
-dados.length === 0
-){
-
-area.innerHTML =
-'<p class="sem-palpite">Nenhum palpite realizado.</p>';
-
-return;
+       }
+    );
 
 }
-
-area.innerHTML = "";
-
-dados.forEach(
-function(item){
-
-const jogo1 =
-item.jogo1?.palpite || "-";
-
-const jogo2 =
-item.jogo2?.palpite || "-";
-
-const jogo3 =
-item.jogo3?.palpite || "-";
-
-const valor =
-Number(item.valor) || 0;
-
-const premio =
-Number(item.premio) || 0;
-
-area.innerHTML += `
-
-<div class="meu-card">
-
-<div class="meu-nome">
-
-👤
-${escapeHTML(item.nome)}
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo1?.confronto ||
-"São Bernardo x Botafogo SP"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo1)}
-
-</strong>
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo2?.confronto ||
-"Ponte Preta x Náutico"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo2)}
-
-</strong>
-
-</div>
-
-
-<div class="meu-placar">
-
-<span>
-
-${escapeHTML(
-item.jogo3?.confronto ||
-"Sport x Londrina"
-)}
-
-</span>
-
-<strong>
-
-${escapeHTML(jogo3)}
-
-</strong>
-
-</div>
-
-
-<div class="data">
-
-💰 Valor:
-R$ ${dinheiro(valor)}
-
-<br>
-
-🏆 Prêmio:
-R$ ${dinheiro(premio)}
-
-<br>
-
-💵 Saldo restante:
-R$ ${dinheiro(item.saldoRestante)}
-
-<br>
-
-📅 Enviado:
-${escapeHTML(item.data || "")}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-);
-
-}
-
-);
-
-}
-
 
 /* =========================
 MENU
@@ -3171,6 +3804,9 @@ preencherSelect("jogo2");
 
 preencherSelect("jogo3");
 
+preencherSelect("jogo4");
+
+preencherSelect("jogo5");
 
 /*
 JOGO 1
@@ -3230,8 +3866,45 @@ atualizarPlacar(
 
 }
 );
+atualizarPlacar(
+"jogo4",
+"placar4Casa",
+"placar4Fora"
+);
 
+atualizarPlacar(
+"jogo5",
+"placar5Casa",
+"placar5Fora"
+);
+document
+.getElementById("jogo4")
+.addEventListener(
+"change",
+function(){
 
+atualizarPlacar(
+"jogo4",
+"placar4Casa",
+"placar4Fora"
+);
+
+}
+);
+document
+.getElementById("jogo5")
+.addEventListener(
+"change",
+function(){
+
+atualizarPlacar(
+"jogo5",
+"placar5Casa",
+"placar5Fora"
+);
+
+}
+);
 /*
 MENU
 */
@@ -3339,7 +4012,10 @@ atualizarStatusJogos,
 );
 
 });
-
+setInterval(
+    carregarMeusPalpites,
+    60000
+);
 </script>
 
 </body>
