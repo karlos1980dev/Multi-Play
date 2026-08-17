@@ -1067,6 +1067,27 @@ SOMENTE EM MEUS PALPITES
     color:#94a3b8;
     font-size:12px;
 }
+/* Esconde o campo de seleção, mas mantém ele funcionando */
+select{
+    position:absolute;
+    opacity:0;
+    width:100%;
+    height:60px;
+    left:0;
+    top:0;
+    cursor:pointer;
+    z-index:10;
+}
+
+.duelo{
+    position:relative;
+}
+
+.placar-selecionado{
+    position:relative;
+    z-index:1;
+    pointer-events:none;
+}
 </style>
 
 </head>
@@ -2339,7 +2360,7 @@ botao.disabled = false;
 
 if(!podeMarcar){
 
-botao.textContent = "💰 ADICIONAR SALDO";
+botao.textContent = "📤 ENVIAR";
 
 }else{
 
@@ -2602,18 +2623,19 @@ configuracao.saldo <
 configuracao.valorLiberacao
 ){
 
-select.disabled =
-true;
+/*
+Permite escolher o placar mesmo sem saldo.
+O bloqueio acontece somente na hora de enviar.
+*/
 
-select.classList.add(
-"bloqueado"
-);
+select.disabled = false;
 
-contador.className =
-"contador";
+select.classList.remove("bloqueado");
+
+contador.className = "contador";
 
 contador.textContent =
-"🔒 SALDO INSUFICIENTE";
+"💰 Escolha seu placar";
 
 return;
 
@@ -3184,7 +3206,7 @@ botao.textContent = "📤 ENVIAR";
 
 }else{
 
-botao.textContent = "💰 ADICIONAR SALDO";
+botao.textContent = "📤 ENVIAR";
 
 }
 
