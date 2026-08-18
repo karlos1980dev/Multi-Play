@@ -1580,10 +1580,10 @@ JOGO 5
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787009738/fenerbahce.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787081047/botafogo-sp.png">
 
 <p>
-fenerbahce
+
 </p>
 
 </div>
@@ -1607,10 +1607,10 @@ fenerbahce
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787009818/lyon.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg">
 
 <p>
-lyon
+
 </p>
 
 </div>
@@ -1619,9 +1619,9 @@ lyon
 
 <div class="jogo-info">
 
-📅 18/08/2026
+📅 19/08/2026
 &nbsp; | &nbsp;
-⏰ 16:00
+⏰ 21:30
 
 </div>
 
@@ -2023,84 +2023,35 @@ JOGOS
 const jogos = {
 
 jogo1:{
-
-nome:
-"londrina x atletico-goianiense",
-
-data:
-"2026-08-18",
-
-hora:
-"19:30",
-
-select:
-"jogo1"
-
+data:"2026-08-18",
+hora:"19:30",
+select:"jogo1"
 },
 
 jogo2:{
-
-nome:
-"nautico-capibaribe x ceara-ce",
-
-data:
-"2026-08-18",
-
-hora:
-"21:30",
-
-select:
-"jogo2"
-
+data:"2026-08-18",
+hora:"21:30",
+select:"jogo2"
 },
 
 jogo3:{
-
-nome:
-"goias x juventude",
-
-data:
-"2026-08-18",
-
-hora:
-"21:35",
-
-select:
-"jogo3"
-
+data:"2026-08-18",
+hora:"21:35",
+select:"jogo3"
 },
 
 jogo4:{
-
-nome:
-"independiente-rivadavia x fluminense",
-
-data:
-"2026-08-18",
-
-hora:
-"19:00",
-
-select:
-"jogo4"
-
+data:"2026-08-18",
+hora:"19:00",
+select:"jogo4"
 },
 
 jogo5:{
-
-nome:
-"fenerbahce x lyon",
-
-data:
-"2026-08-18",
-
-hora:
-"16:00",
-
-select:
-"jogo5"
-
+data:"2026-08-19",
+hora:"21:30",
+select:"jogo5"
 }
+
 };
 
 /* =========================
@@ -3809,6 +3760,8 @@ preencherSelect("jogo4");
 
 preencherSelect("jogo5");
 
+atualizarNomesDosTimes();
+
 /*
 JOGO 1
 */
@@ -4017,6 +3970,90 @@ setInterval(
     carregarMeusPalpites,
     60000
 );
+function nomeDoTimeDaImagem(src) {
+    try {
+        const url = new URL(src);
+        const arquivo = url.pathname.split("/").pop();
+
+        // Remove extensão e versão do Cloudinary
+        let nome = arquivo
+            .split("?")[0]
+            .replace(/\.(png|jpg|jpeg|webp)$/i, "");
+
+        // Transforma o nome do arquivo em nome do time
+        nome = nome.replace(/[-_]+/g, " ");
+
+        return nome;
+    } catch (erro) {
+        return "";
+    }
+}
+function atualizarNomesDosTimes(){
+
+    document.querySelectorAll(".time img").forEach(function(img){
+
+        const nome =
+            nomeDoTimeDaImagem(img.src);
+
+        const time =
+            img.closest(".time");
+
+        if(!time) return;
+
+        const texto =
+            time.querySelector("p");
+
+        if(!texto) return;
+
+        if(nome){
+            texto.textContent = nome;
+        }
+
+    });
+
+    // Atualiza também o nome dos confrontos
+    atualizarConfrontos();
+}
+function obterConfrontoDasImagens(duelo){
+
+    const imagens = duelo.querySelectorAll(".time img");
+
+    if(imagens.length < 2){
+        return "";
+    }
+
+    const casa = nomeDoTimeDaImagem(imagens[0].src);
+    const fora = nomeDoTimeDaImagem(imagens[1].src);
+
+    if(!casa || !fora){
+        return "";
+    }
+
+    return casa + " x " + fora;
+}
+function atualizarConfrontos(){
+
+    const duelos = document.querySelectorAll(".duelo");
+
+    duelos.forEach(function(duelo, indice){
+
+        const confronto =
+            obterConfrontoDasImagens(duelo);
+
+        if(!confronto){
+            return;
+        }
+
+        const chave =
+            "jogo" + (indice + 1);
+
+        if(jogos[chave]){
+            jogos[chave].nome = confronto;
+        }
+
+    });
+
+}
 </script>
 
 </body>
