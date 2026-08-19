@@ -1298,10 +1298,10 @@ JOGO 1
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513960/londrina.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784507594/atletico-mineiro.png">
 
 <p>
-londrina
+
 </p>
 
 </div>
@@ -1327,10 +1327,10 @@ londrina
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746932/atletico-goianiense.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746647/red-bull-bragantino.png">
 
 <p>
-atletico-goianiense
+
 </p>
 
 </div>
@@ -1341,9 +1341,9 @@ atletico-goianiense
 
 <div class="jogo-info">
 
-📅 18/08/2026
+📅 19/08/2026
 &nbsp; | &nbsp;
-⏰ 19:30
+⏰ 19:00
 
 </div>
 
@@ -1371,10 +1371,10 @@ JOGO 2
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787008946/nautico-capibaribe.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831142/cr-flamengo.png">
 
 <p>
-nautico-capibaribe
+
 </p>
 
 </div>
@@ -1400,7 +1400,7 @@ nautico-capibaribe
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787009069/ceara-ce.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786890155/cruzeiro-esporte-clube.png">
 
 <p>
 ceara-ce
@@ -1414,7 +1414,7 @@ ceara-ce
 
 <div class="jogo-info">
 
-📅 18/08/2026
+📅 19/08/2026
 
 &nbsp; | &nbsp;
 ⏰ 21:30
@@ -1445,10 +1445,10 @@ JOGO 3
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197882/goias.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746995/vila-nova-go.png">
 
 <p>
-goias
+
 </p>
 
 </div>
@@ -1474,10 +1474,10 @@ goias
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197334/juventude.jpg">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778197963/ponte-preta.png">
 
 <p>
-juventude
+
 </p>
 
 </div>
@@ -1488,7 +1488,7 @@ juventude
 
 <div class="jogo-info">
 
-📅 18/08/2026
+📅 19/08/2026
 &nbsp; | &nbsp;
 ⏰ 21:35
 
@@ -1515,10 +1515,10 @@ JOGO 4
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787075766/independiente-rivadavia.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787101117/cerro-porteno.png">
 
 <p>
-independiente-rivadavia
+
 </p>
 
 </div>
@@ -1542,10 +1542,10 @@ independiente-rivadavia
 <div class="time">
 
 <img
-src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746224/fluminense-fc.png">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png">
 
 <p>
-fluminense
+
 </p>
 
 </div>
@@ -1554,7 +1554,7 @@ fluminense
 
 <div class="jogo-info">
 
-📅 18/08/2026
+📅 19/08/2026
 &nbsp; | &nbsp;
 ⏰ 19:00
 
@@ -2023,25 +2023,25 @@ JOGOS
 const jogos = {
 
 jogo1:{
-data:"2026-08-18",
-hora:"19:30",
+data:"2026-08-19",
+hora:"19:00",
 select:"jogo1"
 },
 
 jogo2:{
-data:"2026-08-18",
+data:"2026-08-19",
 hora:"21:30",
 select:"jogo2"
 },
 
 jogo3:{
-data:"2026-08-18",
-hora:"21:35",
+data:"2026-08-19",
+hora:"20:30",
 select:"jogo3"
 },
 
 jogo4:{
-data:"2026-08-18",
+data:"2026-08-19",
 hora:"19:00",
 select:"jogo4"
 },
@@ -2585,9 +2585,9 @@ select.disabled = false;
 select.classList.remove("bloqueado");
 
 contador.className = "contador";
-
 contador.textContent =
 "💰 Escolha seu placar";
+contador.style.display = "none";
 
 return;
 
@@ -3260,6 +3260,35 @@ MEUS PALPITES
 MEUS PALPITES
 ========================= */
 
+function obterConfrontoAutomatico(numeroJogo){
+
+    const duelo =
+        document.querySelectorAll(".duelo")[numeroJogo - 1];
+
+    if(!duelo){
+        return "";
+    }
+
+    const imagens =
+        duelo.querySelectorAll(".time img");
+
+    if(imagens.length < 2){
+        return "";
+    }
+
+    const casa =
+        nomeDoTimeDaImagem(imagens[0].src);
+
+    const fora =
+        nomeDoTimeDaImagem(imagens[1].src);
+
+    if(!casa || !fora){
+        return "";
+    }
+
+    return casa + " x " + fora;
+}
+
 function carregarMeusPalpites(){
 
     const nome =
@@ -3325,7 +3354,31 @@ function carregarMeusPalpites(){
 
 
             dados.forEach(function(item){
+const confronto1 =
+    item.jogo1?.confronto ||
+    obterConfrontoAutomatico(1) ||
+    "Jogo 1";
 
+const confronto2 =
+    item.jogo2?.confronto ||
+    obterConfrontoAutomatico(2) ||
+    "Jogo 2";
+
+const confronto3 =
+    item.jogo3?.confronto ||
+    obterConfrontoAutomatico(3) ||
+    "Jogo 3";
+
+const confronto4 =
+    item.jogo4?.confronto ||
+    obterConfrontoAutomatico(4) ||
+    "Jogo 4";
+
+const confronto5 =
+    item.jogo5?.confronto ||
+    obterConfrontoAutomatico(5) ||
+    "Jogo 5";
+    
     const jogo1 =
         item.jogo1?.palpite || "-";
 
@@ -3419,232 +3472,250 @@ function carregarMeusPalpites(){
 
     area.innerHTML += `
 
-        <div class="meu-card">
+    <div class="meu-card">
 
-            ${statusHTML}
+        ${statusHTML}
 
+        <div class="meu-nome">
 
-            <div class="meu-nome">
-
-                👤
-                ${escapeHTML(item.nome)}
-
-            </div>
-
-
-            <!-- JOGO 1 -->
-
-            <div class="meu-placar">
-
-                <span>
-
-                    ${escapeHTML(
-                        item.jogo1?.confronto ||
-                        "londrina x atletico-goianiense"
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${escapeHTML(jogo1)}
-
-                </strong>
-
-            </div>
-
-            <div class="resultado-real">
-
-                <span>Resultado:</span>
-
-                <strong>
-
-                    ${escapeHTML(
-                        resultados.jogo1 || "- : -"
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <!-- JOGO 2 -->
-
-            <div class="meu-placar">
-
-                <span>
-
-                    ${escapeHTML(
-                        item.jogo2?.confronto ||
-                        "nautico-capibaribe x ceara-ce"
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${escapeHTML(jogo2)}
-
-                </strong>
-
-            </div>
-
-            <div class="resultado-real">
-
-                <span>Resultado:</span>
-
-                <strong>
-
-                    ${escapeHTML(
-                        resultados.jogo2 || "- : -"
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <!-- JOGO 3 -->
-
-            <div class="meu-placar">
-
-                <span>
-
-                    ${escapeHTML(
-                        item.jogo3?.confronto ||
-                        "goias x juventude"
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${escapeHTML(jogo3)}
-
-                </strong>
-
-            </div>
-
-            <div class="resultado-real">
-
-                <span>Resultado:</span>
-
-                <strong>
-
-                    ${escapeHTML(
-                        resultados.jogo3 || "- : -"
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <!-- JOGO 4 -->
-
-            <div class="meu-placar">
-
-                <span>
-
-                    ${escapeHTML(
-                        item.jogo4?.confronto ||
-                        "independiente-rivadavia x fluminense"
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${escapeHTML(jogo4)}
-
-                </strong>
-
-            </div>
-
-            <div class="resultado-real">
-
-                <span>Resultado:</span>
-
-                <strong>
-
-                    ${escapeHTML(
-                        resultados.jogo4 || "- : -"
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <!-- JOGO 5 -->
-
-            <div class="meu-placar">
-
-                <span>
-
-                    ${escapeHTML(
-                        item.jogo5?.confronto ||
-                        "fenerbahce x lyon"
-                    )}
-
-                </span>
-
-                <strong>
-
-                    ${escapeHTML(jogo5)}
-
-                </strong>
-
-            </div>
-
-            <div class="resultado-real">
-
-                <span>Resultado:</span>
-
-                <strong>
-
-                    ${escapeHTML(
-                        resultados.jogo5 || "- : -"
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <div class="data">
-
-                💰 Valor:
-
-                R$ ${dinheiro(valor)}
-
-                <br>
-
-                🏆 Prêmio:
-
-                R$ ${dinheiro(premio)}
-
-                <br>
-
-                💵 Saldo restante:
-
-                R$ ${dinheiro(
-                    item.saldoRestante
-                )}
-
-                <br>
-
-                📅 Enviado:
-
-                ${escapeHTML(
-                    item.data || ""
-                )}
-
-            </div>
+            👤
+            ${escapeHTML(item.nome)}
 
         </div>
 
-    `;
+
+        <!-- =========================
+             JOGO 1
+        ========================= -->
+
+        <div class="meu-placar">
+
+            <span>
+
+                ${escapeHTML(
+                    item.jogo1?.confronto ||
+                    obterConfrontoAutomatico(1) ||
+                    " x "
+                )}
+
+            </span>
+
+            <strong>
+
+                ${escapeHTML(jogo1)}
+
+            </strong>
+
+        </div>
+
+        <div class="resultado-real">
+
+            <span>Resultado:</span>
+
+            <strong>
+
+                ${escapeHTML(
+                    resultados.jogo1 || "- : -"
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <!-- =========================
+             JOGO 2
+        ========================= -->
+
+        <div class="meu-placar">
+
+            <span>
+
+                ${escapeHTML(
+                    item.jogo2?.confronto ||
+                    obterConfrontoAutomatico(2) ||
+                    " x "
+                )}
+
+            </span>
+
+            <strong>
+
+                ${escapeHTML(jogo2)}
+
+            </strong>
+
+        </div>
+
+        <div class="resultado-real">
+
+            <span>Resultado:</span>
+
+            <strong>
+
+                ${escapeHTML(
+                    resultados.jogo2 || "- : -"
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <!-- =========================
+             JOGO 3
+        ========================= -->
+
+        <div class="meu-placar">
+
+            <span>
+
+                ${escapeHTML(
+                    item.jogo3?.confronto ||
+                    obterConfrontoAutomatico(3) ||
+                    " x "
+                )}
+
+            </span>
+
+            <strong>
+
+                ${escapeHTML(jogo3)}
+
+            </strong>
+
+        </div>
+
+        <div class="resultado-real">
+
+            <span>Resultado:</span>
+
+            <strong>
+
+                ${escapeHTML(
+                    resultados.jogo3 || "- : -"
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <!-- =========================
+             JOGO 4
+        ========================= -->
+
+        <div class="meu-placar">
+
+            <span>
+
+                ${escapeHTML(
+                    item.jogo4?.confronto ||
+                    obterConfrontoAutomatico(4) ||
+                    " x "
+                )}
+
+            </span>
+
+            <strong>
+
+                ${escapeHTML(jogo4)}
+
+            </strong>
+
+        </div>
+
+        <div class="resultado-real">
+
+            <span>Resultado:</span>
+
+            <strong>
+
+                ${escapeHTML(
+                    resultados.jogo4 || "- : -"
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <!-- =========================
+             JOGO 5
+        ========================= -->
+
+        <div class="meu-placar">
+
+            <span>
+
+                ${escapeHTML(
+                    item.jogo5?.confronto ||
+                    obterConfrontoAutomatico(5) ||
+                    " x "
+                )}
+
+            </span>
+
+            <strong>
+
+                ${escapeHTML(jogo5)}
+
+            </strong>
+
+        </div>
+
+        <div class="resultado-real">
+
+            <span>Resultado:</span>
+
+            <strong>
+
+                ${escapeHTML(
+                    resultados.jogo5 || "- : -"
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <!-- =========================
+             INFORMAÇÕES
+        ========================= -->
+
+        <div class="data">
+
+            💰 Valor:
+
+            R$ ${dinheiro(valor)}
+
+            <br>
+
+            🏆 Prêmio:
+
+            R$ ${dinheiro(premio)}
+
+            <br>
+
+            💵 Saldo restante:
+
+            R$ ${dinheiro(
+                item.saldoRestante
+            )}
+
+            <br>
+
+            📅 Enviado:
+
+            ${escapeHTML(
+                item.data || ""
+            )}
+
+        </div>
+
+    </div>
+
+`;
 
 });
        }
@@ -3761,6 +3832,8 @@ preencherSelect("jogo4");
 preencherSelect("jogo5");
 
 atualizarNomesDosTimes();
+
+atualizarDatasHorasDosJogos();
 
 /*
 JOGO 1
@@ -4053,6 +4126,77 @@ function atualizarConfrontos(){
 
     });
 
+}
+function atualizarDatasHorasDosJogos(){
+
+    const duelos =
+        document.querySelectorAll(".duelo");
+
+    duelos.forEach(function(duelo, indice){
+
+        const numero =
+            indice + 1;
+
+        const chave =
+            "jogo" + numero;
+
+        const jogo =
+            jogos[chave];
+
+        if(!jogo){
+            return;
+        }
+
+        const info =
+            duelo.querySelector(".jogo-info");
+
+        if(!info){
+            return;
+        }
+
+        const dataFormatada =
+            formatarData(jogo.data);
+
+        info.innerHTML = `
+
+            📅 ${dataFormatada}
+
+            &nbsp; | &nbsp;
+
+            ⏰ ${jogo.hora}
+
+        `;
+
+    });
+
+}
+function obterConfrontoAutomatico(numeroJogo){
+
+    const duelo =
+        document.querySelectorAll(".duelo")[numeroJogo - 1];
+
+    if(!duelo){
+        return "";
+    }
+
+    const imagens =
+        duelo.querySelectorAll(".time img");
+
+    if(imagens.length < 2){
+        return "";
+    }
+
+    const casa =
+        nomeDoTimeDaImagem(imagens[0].src);
+
+    const fora =
+        nomeDoTimeDaImagem(imagens[1].src);
+
+    if(!casa || !fora){
+        return "";
+    }
+
+    return casa + " x " + fora;
 }
 </script>
 
