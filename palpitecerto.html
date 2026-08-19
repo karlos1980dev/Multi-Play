@@ -28,7 +28,30 @@ color:white;
 padding:8px;
 padding-top:8px;
 }
+.data-jogo{
+    text-align:center;
+    background:#0f172a;
+    color:#94a3b8;
+    padding:6px;
+    margin-top:4px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:bold;
+}
+.data-jogo{
+    text-align:center;
+    margin-top:6px;
+    padding:6px;
+    border-radius:7px;
+    background:#0f172a;
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:bold;
+}
 
+.data-jogo strong{
+    color:#22c55e;
+}
 .container{
 max-width:500px;
 margin:auto;
@@ -1343,7 +1366,7 @@ src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786746647/red-bull-brag
 
 📅 19/08/2026
 &nbsp; | &nbsp;
-⏰ 19:00
+⏰ 
 
 </div>
 
@@ -1417,7 +1440,7 @@ ceara-ce
 📅 19/08/2026
 
 &nbsp; | &nbsp;
-⏰ 21:30
+⏰ 
 
 </div>
 
@@ -1556,7 +1579,7 @@ src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png
 
 📅 19/08/2026
 &nbsp; | &nbsp;
-⏰ 19:00
+⏰ 
 
 </div>
 
@@ -1621,7 +1644,7 @@ src="https://res.cloudinary.com/dtw3turzb/image/upload/v1778198777/criciuma.jpg"
 
 📅 19/08/2026
 &nbsp; | &nbsp;
-⏰ 21:30
+⏰ 
 
 </div>
 
@@ -2020,40 +2043,43 @@ const placares = [
 JOGOS
 ========================= */
 
+/* =========================
+JOGOS
+========================= */
+
 const jogos = {
 
-jogo1:{
-data:"2026-08-19",
-hora:"19:00",
-select:"jogo1"
-},
+    jogo1: {
+        data: "2026-08-19",
+        hora: "19:00",
+        select: "jogo1"
+    },
 
-jogo2:{
-data:"2026-08-19",
-hora:"21:30",
-select:"jogo2"
-},
+    jogo2: {
+        data: "2026-08-19",
+        hora: "21:30",
+        select: "jogo2"
+    },
 
-jogo3:{
-data:"2026-08-19",
-hora:"20:30",
-select:"jogo3"
-},
+    jogo3: {
+        data: "2026-08-19",
+        hora: "20:30",
+        select: "jogo3"
+    },
 
-jogo4:{
-data:"2026-08-19",
-hora:"19:00",
-select:"jogo4"
-},
+    jogo4: {
+        data: "2026-08-19",
+        hora: "19:00",
+        select: "jogo4"
+    },
 
-jogo5:{
-data:"2026-08-19",
-hora:"21:30",
-select:"jogo5"
-}
+    jogo5: {
+        data: "2026-08-19",
+        hora: "21:30",
+        select: "jogo5"
+    }
 
 };
-
 /* =========================
 DINHEIRO
 ========================= */
@@ -3288,14 +3314,49 @@ function obterConfrontoAutomatico(numeroJogo){
 
     return casa + " x " + fora;
 }
+function dataHoraJogo(item, numero){
+
+    const jogo = item["jogo" + numero];
+
+    if(!jogo){
+        return "";
+    }
+
+    const data = jogo.data || "";
+    const hora = jogo.hora || "";
+
+    if(!data && !hora){
+        return "";
+    }
+
+    let dataFormatada = data;
+
+    if(data.includes("-")){
+        const partes = data.split("-");
+
+        dataFormatada =
+            partes[2] + "/" +
+            partes[1] + "/" +
+            partes[0];
+    }
+
+    return `
+        <div class="data-jogo">
+            📅 ${escapeHTML(dataFormatada)}
+            &nbsp; | &nbsp;
+            ⏰ ${escapeHTML(hora)}
+        </div>
+    `;
+}
+/* =========================
+MEUS PALPITES
+========================= */
 
 function carregarMeusPalpites(){
 
-    const nome =
-        localStorage.getItem("nomeJogador");
+    const nome = localStorage.getItem("nomeJogador");
 
-    const area =
-        document.getElementById("meusPalpites");
+    const area = document.getElementById("meusPalpites");
 
     if(!nome){
 
@@ -3303,426 +3364,401 @@ function carregarMeusPalpites(){
         '<p class="sem-palpite">Nenhum palpite realizado.</p>';
 
         return;
-
     }
 
+    palpitesRef.on("value", function(snapshot){
 
-    palpitesRef.on(
-        "value",
-        function(snapshot){
+        const dados = [];
 
-            const dados = [];
+        snapshot.forEach(function(child){
+
+            const item = child.val();
+
+            if(item && item.nome === nome){
+
+                item._id = child.key;
+
+                dados.push(item);
+            }
+
+        });
+
+        dados.reverse();
+
+        if(dados.length === 0){
+
+            area.innerHTML =
+            '<p class="sem-palpite">Nenhum palpite realizado.</p>';
+
+            return;
+        }
+
+        area.innerHTML = "";
+
+        dados.forEach(function(item){
+
+            /* =========================
+            PALPITES
+            ========================= */
+
+            const jogo1 =
+                item.jogo1?.palpite || "-";
+
+            const jogo2 =
+                item.jogo2?.palpite || "-";
+
+            const jogo3 =
+                item.jogo3?.palpite || "-";
+
+            const jogo4 =
+                item.jogo4?.palpite || "-";
+
+            const jogo5 =
+                item.jogo5?.palpite || "-";
 
 
-            snapshot.forEach(function(child){
+            /* =========================
+            CONFRONTOS
+            ========================= */
 
-                const item = child.val();
+            const confronto1 =
+                item.jogo1?.confronto ||
+                obterConfrontoAutomatico(1) ||
+                "Jogo 1";
 
-                /*
-                GUARDA A CHAVE DO FIREBASE
-                PARA CONTROLE DO ADMIN
-                */
+            const confronto2 =
+                item.jogo2?.confronto ||
+                obterConfrontoAutomatico(2) ||
+                "Jogo 2";
 
-                if(
-                    item &&
-                    item.nome === nome
-                ){
+            const confronto3 =
+                item.jogo3?.confronto ||
+                obterConfrontoAutomatico(3) ||
+                "Jogo 3";
 
-                    item._id = child.key;
+            const confronto4 =
+                item.jogo4?.confronto ||
+                obterConfrontoAutomatico(4) ||
+                "Jogo 4";
 
-                    dados.push(item);
+            const confronto5 =
+                item.jogo5?.confronto ||
+                obterConfrontoAutomatico(5) ||
+                "Jogo 5";
 
+
+            /* =========================
+            DATA E HORA DE CADA JOGO
+            ========================= */
+
+            function dataHoraJogo(numero){
+
+                const jogo =
+                    item["jogo" + numero];
+
+                if(!jogo){
+                    return "📅 --/--/---- | ⏰ --:--";
                 }
 
-            });
+                let data =
+                    jogo.data || "";
+
+                const hora =
+                    jogo.hora || "--:--";
 
 
-            dados.reverse();
+                /* CONVERTER 2026-08-19
+                   PARA 19/08/2026 */
 
+                if(data.includes("-")){
 
-            if(dados.length === 0){
+                    const partes =
+                        data.split("-");
 
-                area.innerHTML =
-                '<p class="sem-palpite">Nenhum palpite realizado.</p>';
+                    if(partes.length === 3){
 
-                return;
+                        data =
+                            partes[2] +
+                            "/" +
+                            partes[1] +
+                            "/" +
+                            partes[0];
+                    }
+                }
 
+                return `
+                    📅 ${escapeHTML(data)}
+                    &nbsp; | &nbsp;
+                    ⏰ ${escapeHTML(hora)}
+                `;
             }
 
 
-            area.innerHTML = "";
+            /* =========================
+            VALORES
+            ========================= */
 
+            const valor =
+                Number(item.valor) || 0;
 
-            dados.forEach(function(item){
-const confronto1 =
-    item.jogo1?.confronto ||
-    obterConfrontoAutomatico(1) ||
-    "Jogo 1";
+            const premio =
+                Number(item.premio) || 0;
 
-const confronto2 =
-    item.jogo2?.confronto ||
-    obterConfrontoAutomatico(2) ||
-    "Jogo 2";
+            const saldoRestante =
+                Number(item.saldoRestante) || 0;
 
-const confronto3 =
-    item.jogo3?.confronto ||
-    obterConfrontoAutomatico(3) ||
-    "Jogo 3";
 
-const confronto4 =
-    item.jogo4?.confronto ||
-    obterConfrontoAutomatico(4) ||
-    "Jogo 4";
+            /* =========================
+            STATUS
+            ========================= */
 
-const confronto5 =
-    item.jogo5?.confronto ||
-    obterConfrontoAutomatico(5) ||
-    "Jogo 5";
-    
-    const jogo1 =
-        item.jogo1?.palpite || "-";
+            const status =
+                item.status || "aguardando";
 
-    const jogo2 =
-        item.jogo2?.palpite || "-";
+            let classeStatus =
+                "status-aguardando";
 
-    const jogo3 =
-        item.jogo3?.palpite || "-";
+            let textoStatus =
+                "🟡 AGUARDANDO";
 
-    const jogo4 =
-        item.jogo4?.palpite || "-";
 
-    const jogo5 =
-        item.jogo5?.palpite || "-";
+            if(status === "ganhou"){
 
+                classeStatus =
+                    "status-ganhou";
 
-    const valor =
-        Number(item.valor) || 0;
+                textoStatus =
+                    "🟢 GANHOU";
+            }
 
-    const premio =
-        Number(item.premio) || 0;
 
+            if(status === "perdeu"){
 
-    /* =========================
-       STATUS
-    ========================= */
+                classeStatus =
+                    "status-perdeu";
 
-    const status =
-        item.status || "aguardando";
+                textoStatus =
+                    "🔴 PERDEU";
+            }
 
 
-    let classeStatus =
-        "status-aguardando";
+            /* =========================
+            RESULTADOS
+            ========================= */
 
-    let textoStatus =
-        "🟡 AGUARDANDO";
+            const resultados =
+                item.resultados || {};
 
 
-    if(status === "ganhou"){
+            /* =========================
+            CARD
+            ========================= */
 
-        classeStatus =
-            "status-ganhou";
+            area.innerHTML += `
 
-        textoStatus =
-            "🟢 GANHOU";
+            <div class="meu-card">
 
-    }
+                <div class="status-palpite ${classeStatus}">
+                    ${textoStatus}
+                </div>
 
 
-    if(status === "perdeu"){
+                <div class="meu-nome">
 
-        classeStatus =
-            "status-perdeu";
+                    👤
+                    ${escapeHTML(item.nome)}
 
-        textoStatus =
-            "🔴 PERDEU";
+                </div>
 
-    }
 
+                <!-- JOGO 1 -->
 
-    /* =========================
-       STATUS HTML
-    ========================= */
+                <div class="meu-placar">
 
-    const statusHTML = `
+                    <span>
+                        ⚽ ${escapeHTML(confronto1)}
+                    </span>
 
-        <div class="status-palpite ${classeStatus}">
+                    <strong>
+                        ${escapeHTML(jogo1)}
+                    </strong>
 
-            ${textoStatus}
+                </div>
 
-        </div>
+                <div class="data-jogo">
+                    ${dataHoraJogo(1)}
+                </div>
 
-    `;
+                <div class="resultado-real">
 
+                    <span>Resultado:</span>
 
-    /* =========================
-       RESULTADOS REAIS
-    ========================= */
+                    <strong>
+                        ${escapeHTML(
+                            resultados.jogo1 || "- : -"
+                        )}
+                    </strong>
 
-    const resultados =
-        item.resultados || {
+                </div>
 
-            jogo1: "- : -",
-            jogo2: "- : -",
-            jogo3: "- : -",
-            jogo4: "- : -",
-            jogo5: "- : -"
 
-        };
+                <!-- JOGO 2 -->
 
+                <div class="meu-placar">
 
-    area.innerHTML += `
+                    <span>
+                        ⚽ ${escapeHTML(confronto2)}
+                    </span>
 
-    <div class="meu-card">
+                    <strong>
+                        ${escapeHTML(jogo2)}
+                    </strong>
 
-        ${statusHTML}
+                </div>
 
-        <div class="meu-nome">
+                <div class="data-jogo">
+                    ${dataHoraJogo(2)}
+                </div>
 
-            👤
-            ${escapeHTML(item.nome)}
+                <div class="resultado-real">
 
-        </div>
+                    <span>Resultado:</span>
 
+                    <strong>
+                        ${escapeHTML(
+                            resultados.jogo2 || "- : -"
+                        )}
+                    </strong>
 
-        <!-- =========================
-             JOGO 1
-        ========================= -->
+                </div>
 
-        <div class="meu-placar">
 
-            <span>
+                <!-- JOGO 3 -->
 
-                ${escapeHTML(
-                    item.jogo1?.confronto ||
-                    obterConfrontoAutomatico(1) ||
-                    " x "
-                )}
+                <div class="meu-placar">
 
-            </span>
+                    <span>
+                        ⚽ ${escapeHTML(confronto3)}
+                    </span>
 
-            <strong>
+                    <strong>
+                        ${escapeHTML(jogo3)}
+                    </strong>
 
-                ${escapeHTML(jogo1)}
+                </div>
 
-            </strong>
+                <div class="data-jogo">
+                    ${dataHoraJogo(3)}
+                </div>
 
-        </div>
+                <div class="resultado-real">
 
-        <div class="resultado-real">
+                    <span>Resultado:</span>
 
-            <span>Resultado:</span>
+                    <strong>
+                        ${escapeHTML(
+                            resultados.jogo3 || "- : -"
+                        )}
+                    </strong>
 
-            <strong>
+                </div>
 
-                ${escapeHTML(
-                    resultados.jogo1 || "- : -"
-                )}
 
-            </strong>
+                <!-- JOGO 4 -->
 
-        </div>
+                <div class="meu-placar">
 
+                    <span>
+                        ⚽ ${escapeHTML(confronto4)}
+                    </span>
 
-        <!-- =========================
-             JOGO 2
-        ========================= -->
+                    <strong>
+                        ${escapeHTML(jogo4)}
+                    </strong>
 
-        <div class="meu-placar">
+                </div>
 
-            <span>
+                <div class="data-jogo">
+                    ${dataHoraJogo(4)}
+                </div>
 
-                ${escapeHTML(
-                    item.jogo2?.confronto ||
-                    obterConfrontoAutomatico(2) ||
-                    " x "
-                )}
+                <div class="resultado-real">
 
-            </span>
+                    <span>Resultado:</span>
 
-            <strong>
+                    <strong>
+                        ${escapeHTML(
+                            resultados.jogo4 || "- : -"
+                        )}
+                    </strong>
 
-                ${escapeHTML(jogo2)}
+                </div>
 
-            </strong>
 
-        </div>
+                <!-- JOGO 5 -->
 
-        <div class="resultado-real">
+                <div class="meu-placar">
 
-            <span>Resultado:</span>
+                    <span>
+                        ⚽ ${escapeHTML(confronto5)}
+                    </span>
 
-            <strong>
+                    <strong>
+                        ${escapeHTML(jogo5)}
+                    </strong>
 
-                ${escapeHTML(
-                    resultados.jogo2 || "- : -"
-                )}
+                </div>
 
-            </strong>
+                <div class="data-jogo">
+                    ${dataHoraJogo(5)}
+                </div>
 
-        </div>
+                <div class="resultado-real">
 
+                    <span>Resultado:</span>
 
-        <!-- =========================
-             JOGO 3
-        ========================= -->
+                    <strong>
+                        ${escapeHTML(
+                            resultados.jogo5 || "- : -"
+                        )}
+                    </strong>
 
-        <div class="meu-placar">
+                </div>
 
-            <span>
 
-                ${escapeHTML(
-                    item.jogo3?.confronto ||
-                    obterConfrontoAutomatico(3) ||
-                    " x "
-                )}
+                <!-- INFORMAÇÕES DO PALPITE -->
 
-            </span>
+                <div class="data">
 
-            <strong>
+                    💰 Valor:
+                    R$ ${dinheiro(valor)}
 
-                ${escapeHTML(jogo3)}
+                    <br>
 
-            </strong>
+                    🏆 Prêmio:
+                    R$ ${dinheiro(premio)}
 
-        </div>
+                    <br>
 
-        <div class="resultado-real">
+                    💵 Saldo restante:
+                    R$ ${dinheiro(saldoRestante)}
 
-            <span>Resultado:</span>
+                    <br>
 
-            <strong>
+                    📅 Enviado:
+                    ${escapeHTML(item.data || "")}
 
-                ${escapeHTML(
-                    resultados.jogo3 || "- : -"
-                )}
+                </div>
 
-            </strong>
+            </div>
 
-        </div>
+            `;
 
+        });
 
-        <!-- =========================
-             JOGO 4
-        ========================= -->
-
-        <div class="meu-placar">
-
-            <span>
-
-                ${escapeHTML(
-                    item.jogo4?.confronto ||
-                    obterConfrontoAutomatico(4) ||
-                    " x "
-                )}
-
-            </span>
-
-            <strong>
-
-                ${escapeHTML(jogo4)}
-
-            </strong>
-
-        </div>
-
-        <div class="resultado-real">
-
-            <span>Resultado:</span>
-
-            <strong>
-
-                ${escapeHTML(
-                    resultados.jogo4 || "- : -"
-                )}
-
-            </strong>
-
-        </div>
-
-
-        <!-- =========================
-             JOGO 5
-        ========================= -->
-
-        <div class="meu-placar">
-
-            <span>
-
-                ${escapeHTML(
-                    item.jogo5?.confronto ||
-                    obterConfrontoAutomatico(5) ||
-                    " x "
-                )}
-
-            </span>
-
-            <strong>
-
-                ${escapeHTML(jogo5)}
-
-            </strong>
-
-        </div>
-
-        <div class="resultado-real">
-
-            <span>Resultado:</span>
-
-            <strong>
-
-                ${escapeHTML(
-                    resultados.jogo5 || "- : -"
-                )}
-
-            </strong>
-
-        </div>
-
-
-        <!-- =========================
-             INFORMAÇÕES
-        ========================= -->
-
-        <div class="data">
-
-            💰 Valor:
-
-            R$ ${dinheiro(valor)}
-
-            <br>
-
-            🏆 Prêmio:
-
-            R$ ${dinheiro(premio)}
-
-            <br>
-
-            💵 Saldo restante:
-
-            R$ ${dinheiro(
-                item.saldoRestante
-            )}
-
-            <br>
-
-            📅 Enviado:
-
-            ${escapeHTML(
-                item.data || ""
-            )}
-
-        </div>
-
-    </div>
-
-`;
-
-});
-       }
-    );
+    });
 
 }
-
 /* =========================
 MENU
 ========================= */
@@ -4044,26 +4080,34 @@ setInterval(
     60000
 );
 function nomeDoTimeDaImagem(src) {
-    try {
-        const url = new URL(src);
-        const arquivo = url.pathname.split("/").pop();
 
-        // Remove extensão e versão do Cloudinary
+    try {
+
+        const url = new URL(src);
+
+        const arquivo =
+            url.pathname.split("/").pop();
+
         let nome = arquivo
             .split("?")[0]
             .replace(/\.(png|jpg|jpeg|webp)$/i, "");
 
-        // Transforma o nome do arquivo em nome do time
         nome = nome.replace(/[-_]+/g, " ");
 
         return nome;
+
     } catch (erro) {
+
         return "";
+
     }
+
 }
 function atualizarNomesDosTimes(){
 
-    document.querySelectorAll(".time img").forEach(function(img){
+    document
+    .querySelectorAll(".time img")
+    .forEach(function(img){
 
         const nome =
             nomeDoTimeDaImagem(img.src);
@@ -4079,13 +4123,15 @@ function atualizarNomesDosTimes(){
         if(!texto) return;
 
         if(nome){
+
             texto.textContent = nome;
+
         }
 
     });
 
-    // Atualiza também o nome dos confrontos
     atualizarConfrontos();
+
 }
 function obterConfrontoDasImagens(duelo){
 
@@ -4106,14 +4152,25 @@ function obterConfrontoDasImagens(duelo){
 }
 function atualizarConfrontos(){
 
-    const duelos = document.querySelectorAll(".duelo");
+    const duelos =
+        document.querySelectorAll(".duelo");
 
     duelos.forEach(function(duelo, indice){
 
-        const confronto =
-            obterConfrontoDasImagens(duelo);
+        const imagens =
+            duelo.querySelectorAll(".time img");
 
-        if(!confronto){
+        if(imagens.length < 2){
+            return;
+        }
+
+        const casa =
+            nomeDoTimeDaImagem(imagens[0].src);
+
+        const fora =
+            nomeDoTimeDaImagem(imagens[1].src);
+
+        if(!casa || !fora){
             return;
         }
 
@@ -4121,7 +4178,10 @@ function atualizarConfrontos(){
             "jogo" + (indice + 1);
 
         if(jogos[chave]){
-            jogos[chave].nome = confronto;
+
+            jogos[chave].nome =
+                casa + " x " + fora;
+
         }
 
     });
@@ -4134,11 +4194,8 @@ function atualizarDatasHorasDosJogos(){
 
     duelos.forEach(function(duelo, indice){
 
-        const numero =
-            indice + 1;
-
         const chave =
-            "jogo" + numero;
+            "jogo" + (indice + 1);
 
         const jogo =
             jogos[chave];
@@ -4154,12 +4211,9 @@ function atualizarDatasHorasDosJogos(){
             return;
         }
 
-        const dataFormatada =
-            formatarData(jogo.data);
-
         info.innerHTML = `
 
-            📅 ${dataFormatada}
+            📅 ${formatarData(jogo.data)}
 
             &nbsp; | &nbsp;
 
