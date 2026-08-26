@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel MULTI PLAY.BET</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    get,
+    set
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+    authDomain: "jogo-60a9e.firebaseapp.com",
+    projectId: "jogo-60a9e",
+    storageBucket: "jogo-60a9e.appspot.com",
+    messagingSenderId: "352852303591",
+    appId: "1:352852303591:web:8083c950047c9026bd8c42",
+    databaseURL: "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.db = db;
+window.firebaseRef = ref;
+window.firebaseGet = get;
+window.firebaseSet = set;
+
+</script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #fff;
+}
+
+header {
+    background: #000;
+    padding: 18px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px #000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.container {
+    width: 95%;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.card {
+    background: #222;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.5);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 7px;
+    border: 1px solid #555;
+    background: #111;
+    color: white;
+    font-size: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 7px;
+    padding: 12px 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-verde {
+    background: #00c853;
+    color: white;
+}
+
+.btn-azul {
+    background: #008cff;
+    color: white;
+}
+
+.btn-vermelho {
+    background: #e53935;
+    color: white;
+}
+
+.btn-cinza {
+    background: #555;
+    color: white;
+}
+
+.acoes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.jogo {
+    background: #171717;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.jogo-titulo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00e676;
+    margin-bottom: 10px;
+}
+
+.preview {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 15px 0;
+}
+
+.preview div {
+    text-align: center;
+}
+
+.preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    background: white;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.status {
+    padding: 12px;
+    border-radius: 7px;
+    margin-bottom: 15px;
+    display: none;
+    text-align: center;
+}
+
+.sucesso {
+    background: #075d28;
+}
+
+.erro {
+    background: #7d1111;
+}
+
+.info {
+    background: #173c58;
+}
+
+.login {
+    position: fixed;
+    inset: 0;
+    background: #080808;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.login-box {
+    width: 90%;
+    max-width: 350px;
+    background: #222;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.login-box h2 {
+    text-align: center;
+}
+
+#painel {
+    display: none;
+}
+
+.pequeno {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.linha {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+@media(max-width:600px) {
+
+    .linha {
+        grid-template-columns: 1fr;
+    }
+
+    .preview {
+        gap: 15px;
+    }
+
+    .preview img {
+        width: 65px;
+        height: 65px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div class="login" id="telaLogin">
+
+    <div class="login-box">
+
+        <h2>🔐 Painel Administrativo</h2>
+
+        <p class="pequeno">
+            MULTI PLAY.BET
+        </p>
+
+        <label>Senha</label>
+
+        <input
+            type="password"
+            id="senhaPainel"
+            placeholder="Digite a senha"
+        >
+
+        <button
+            class="btn-verde"
+            style="width:100%;margin-top:15px"
+            onclick="entrarPainel()"
+        >
+            ENTRAR
+        </button>
+
+        <div
+            id="erroLogin"
+            style="color:#ff5252;text-align:center;margin-top:10px"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- PAINEL -->
+
+<div id="painel">
+
+<header>
+
+    <h1>⚽ MULTI PLAY.BET</h1>
+
+    <div class="pequeno">
+        PAINEL DE JOGOS
+    </div>
+
+</header>
+
+
+<div class="container">
+
+    <div id="status" class="status"></div>
+
+
+    <!-- SELEÇÃO DO DIA -->
+
+    <div class="card">
+
+        <h2>📅 Escolher dia</h2>
+
+        <select id="diaSelecionado" onchange="carregarDia()">
+
+            <option value="domingo">Domingo</option>
+            <option value="segunda">Segunda</option>
+            <option value="terca">Terça</option>
+            <option value="quarta">Quarta</option>
+            <option value="quinta">Quinta</option>
+            <option value="sexta">Sexta</option>
+            <option value="sabado">Sábado</option>
+
+        </select>
+
+        <div class="acoes">
+
+            <button
+                class="btn-azul"
+                onclick="carregarDia()"
+            >
+                🔄 CARREGAR
+            </button>
+
+            <button
+                class="btn-verde"
+                onclick="novoJogo()"
+            >
+                ➕ NOVO JOGO
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- JOGOS -->
+
+    <div class="card">
+
+        <h2>🎮 Jogos</h2>
+
+        <div id="listaJogos"></div>
+
+    </div>
+
+
+    <div class="card">
+
+        <button
+            class="btn-verde"
+            style="width:100%;font-size:17px"
+            onclick="salvarTodos()"
+        >
+            💾 SALVAR TODOS OS JOGOS
+        </button>
+
+        <button
+            class="btn-cinza"
+            style="width:100%;margin-top:10px"
+            onclick="sairPainel()"
+        >
+            🚪 SAIR
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const SENHA_PAINEL = "123456";
+
+const nomesDias = {
+    domingo: "Domingo",
+    segunda: "Segunda",
+    terca: "Terça",
+    quarta: "Quarta",
+    quinta: "Quinta",
+    sexta: "Sexta",
+    sabado: "Sábado"
+};
+
+
+function entrarPainel() {
+
+    const senha =
+        document.getElementById("senhaPainel").value;
+
+    if (senha === SENHA_PAINEL) {
+
+        localStorage.setItem(
+            "multiPlayPainel",
+            "autorizado"
+        );
+
+        document.getElementById(
+            "telaLogin"
+        ).style.display = "none";
+
+        document.getElementById(
+            "painel"
+        ).style.display = "block";
+
+        carregarDia();
+
+    } else {
+
+        document.getElementById(
+            "erroLogin"
+        ).textContent = "Senha incorreta.";
+
+    }
+}
+
+
+function sairPainel() {
+
+    localStorage.removeItem(
+        "multiPlayPainel"
+    );
+
+    location.reload();
+
+}
+
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    if (
+        localStorage.getItem(
+            "multiPlayPainel"
+        ) === "autorizado"
+    ) {
+
+        document.getElementById(
+            "telaLogin"
+        ).style.display = "none";
+
+        document.getElementById(
+            "painel"
+        ).style.display = "block";
+
+        carregarDia();
+
+    }
+
+});
+
+
+function mostrarStatus(texto, tipo = "sucesso") {
+
+    const status =
+        document.getElementById("status");
+
+    status.textContent = texto;
+
+    status.className =
+        "status " + tipo;
+
+    status.style.display = "block";
+
+    setTimeout(() => {
+
+        status.style.display = "none";
+
+    }, 4000);
+
+}
+
+
+async function carregarDia() {
+
+    const dia =
+        document.getElementById(
+            "diaSelecionado"
+        ).value;
+
+    const lista =
+        document.getElementById(
+            "listaJogos"
+        );
+
+    lista.innerHTML =
+        "<p>Carregando...</p>";
+
+    try {
+
+        const referencia =
+            window.firebaseRef(
+                window.db,
+                "jogos/" + dia
+            );
+
+        const snapshot =
+            await window.firebaseGet(
+                referencia
+            );
+
+        let jogos =
+            snapshot.exists()
+                ? snapshot.val()
+                : [];
+
+        if (!Array.isArray(jogos)) {
+            jogos = Object.values(jogos);
+        }
+
+        lista.innerHTML = "";
+
+        if (jogos.length === 0) {
+
+            lista.innerHTML = `
+                <p>
+                    Nenhum jogo cadastrado para
+                    ${nomesDias[dia]}.
+                </p>
+            `;
+
+            return;
+        }
+
+        jogos.forEach((jogo, index) => {
+
+            criarCardJogo(
+                jogo,
+                index
+            );
+
+        });
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        lista.innerHTML =
+            "<p>Erro ao carregar os jogos.</p>";
+
+        mostrarStatus(
+            "Erro ao carregar Firebase.",
+            "erro"
+        );
+
+    }
+
+}
+
+
+function criarCardJogo(jogo, index) {
+
+    const lista =
+        document.getElementById(
+            "listaJogos"
+        );
+
+    const div =
+        document.createElement("div");
+
+    div.className = "jogo";
+
+    div.dataset.index = index;
+
+    div.innerHTML = `
+
+        <div class="jogo-titulo">
+            Jogo ${index + 1}
+        </div>
+
+        <label>Imagem / Escudo Time A</label>
+
+        <input
+            class="imagemA"
+            value="${escapar(jogo.imagemA || "")}"
+            placeholder="URL da imagem"
+            oninput="atualizarPreview(this)"
+        >
+
+        <label>Imagem / Escudo Time B</label>
+
+        <input
+            class="imagemB"
+            value="${escapar(jogo.imagemB || "")}"
+            placeholder="URL da imagem"
+            oninput="atualizarPreview(this)"
+        >
+
+        <div class="preview">
+
+            <div>
+
+                <div>Time A</div>
+
+                <img
+                    class="previewA"
+                    src="${escapar(jogo.imagemA || "")}"
+                    onerror="this.style.opacity='.3'"
+                >
+
+            </div>
+
+            <div>
+
+                <div>Time B</div>
+
+                <img
+                    class="previewB"
+                    src="${escapar(jogo.imagemB || "")}"
+                    onerror="this.style.opacity='.3'"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="linha">
+
+            <div>
+
+                <label>Data</label>
+
+                <input
+                    type="date"
+                    class="dataJogo"
+                    value="${jogo.data || ""}"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Hora</label>
+
+                <input
+                    type="time"
+                    class="horaJogo"
+                    value="${jogo.hora || ""}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <label>Nome do campeonato</label>
+
+        <input
+            class="campeonato"
+            value="${escapar(jogo.campeonato || "")}"
+            placeholder="Ex.: Brasileirão Série A"
+        >
+
+
+        <div class="linha">
+
+            <div>
+
+                <label>Cotação Casa</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    class="casa"
+                    value="${jogo.cotacoes?.casa ?? 1.50}"
+                >
+
+            </div>
+
+            <div>
+
+                <label>Cotação Empate</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    class="empate"
+                    value="${jogo.cotacoes?.empate ?? 2.50}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="linha">
+
+            <div>
+
+                <label>Cotação Fora</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    class="fora"
+                    value="${jogo.cotacoes?.fora ?? 2.50}"
+                >
+
+            </div>
+
+            <div>
+
+                <label>Ambas Marcam</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    class="ambas"
+                    value="${jogo.cotacoes?.ambasMarcam ?? 2.50}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="acoes">
+
+            <button
+                class="btn-vermelho"
+                onclick="removerJogo(this)"
+            >
+                🗑️ REMOVER
+            </button>
+
+        </div>
+
+    `;
+
+    lista.appendChild(div);
+
+}
+
+
+function novoJogo() {
+
+    const lista =
+        document.getElementById(
+            "listaJogos"
+        );
+
+    const index =
+        lista.querySelectorAll(
+            ".jogo"
+        ).length;
+
+    criarCardJogo({
+
+        imagemA: "",
+        imagemB: "",
+
+        data: "",
+        hora: "",
+
+        campeonato:
+            "Brasileirão Série A",
+
+        cotacoes: {
+
+            casa: 1.50,
+            empate: 2.50,
+            fora: 2.50,
+            ambasMarcam: 2.50
+
+        }
+
+    }, index);
+
+}
+
+
+function removerJogo(botao) {
+
+    if (
+        !confirm(
+            "Deseja remover este jogo?"
+        )
+    ) {
+        return;
+    }
+
+    botao
+        .closest(".jogo")
+        .remove();
+
+}
+
+
+function atualizarPreview(input) {
+
+    const jogo =
+        input.closest(".jogo");
+
+    if (
+        input.classList.contains(
+            "imagemA"
+        )
+    ) {
+
+        jogo.querySelector(
+            ".previewA"
+        ).src = input.value;
+
+    }
+
+    if (
+        input.classList.contains(
+            "imagemB"
+        )
+    ) {
+
+        jogo.querySelector(
+            ".previewB"
+        ).src = input.value;
+
+    }
+
+}
+
+
+async function salvarTodos() {
+
+    const dia =
+        document.getElementById(
+            "diaSelecionado"
+        ).value;
+
+    const cards =
+        document.querySelectorAll(
+            ".jogo"
+        );
+
+    const jogos = [];
+
+    cards.forEach(card => {
+
+        jogos.push({
+
+            imagemA:
+                card.querySelector(
+                    ".imagemA"
+                ).value.trim(),
+
+            imagemB:
+                card.querySelector(
+                    ".imagemB"
+                ).value.trim(),
+
+            data:
+                card.querySelector(
+                    ".dataJogo"
+                ).value,
+
+            hora:
+                card.querySelector(
+                    ".horaJogo"
+                ).value,
+
+            campeonato:
+                card.querySelector(
+                    ".campeonato"
+                ).value.trim(),
+
+            cotacoes: {
+
+                casa:
+                    Number(
+                        card.querySelector(
+                            ".casa"
+                        ).value
+                    ) || 1.50,
+
+                empate:
+                    Number(
+                        card.querySelector(
+                            ".empate"
+                        ).value
+                    ) || 2.50,
+
+                fora:
+                    Number(
+                        card.querySelector(
+                            ".fora"
+                        ).value
+                    ) || 2.50,
+
+                ambasMarcam:
+                    Number(
+                        card.querySelector(
+                            ".ambas"
+                        ).value
+                    ) || 2.50
+
+            }
+
+        });
+
+    });
+
+
+    try {
+
+        await window.firebaseSet(
+
+            window.firebaseRef(
+                window.db,
+                "jogos/" + dia
+            ),
+
+            jogos
+
+        );
+
+        mostrarStatus(
+            "✅ Jogos salvos com sucesso!"
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        mostrarStatus(
+            "❌ Erro ao salvar no Firebase.",
+            "erro"
+        );
+
+    }
+
+}
+
+
+function escapar(texto) {
+
+    return String(texto)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+}
+
+</script>
+
+</body>
+</html>
