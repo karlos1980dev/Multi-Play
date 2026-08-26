@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>MULTI PLAY.BET</title>
+
+<link
+rel="shortcut icon"
+href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
+>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    font-family: Arial, sans-serif;
+
+    text-align: center;
+
+    margin: 0;
+
+    padding-top: 80px;
+
+    color: black;
+
+    background: #f1f1f1;
+
+}
+
+
+/* =========================================================
+   TÍTULOS
+========================================================= */
+
+h1 {
+
+    font-size: 20px;
+
+    margin: 0;
+
+}
+
+h2 {
+
+    margin: 2px 0;
+
+    background: red;
+
+    color: white;
+
+    display: inline;
+
+    font-size: 15px;
+
+    border-radius: 5px;
+
+}
+
+
+/* =========================================================
+   TOPO FIXO
+========================================================= */
+
+.topo-fixo {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    background: black;
+
+    color: white;
+
+    padding: 8px;
+
+    box-shadow:
+    0 2px 5px rgba(0,0,0,.3);
+
+    z-index: 999;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+}
+
+
+.topo-fixo input#valorUnico {
+    flex: 0 0 70px;
+    width: 70px;
+    height: 40px;
+    font-size: 14px;
+    padding: 0 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+#totalFinal {
+
+    flex: 1.2;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: white;
+
+    color: black;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    font-size: 13px;
+
+}
+
+
+#apostarBtn {
+
+    flex: 1;
+
+    min-width: 90px;
+
+    height: 40px;
+
+    border-radius: 6px;
+
+    background: #00b300;
+
+    color: white;
+
+    border: none;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+#apostarBtn:disabled {
+
+    background: #777;
+
+    cursor: not-allowed;
+
+}
+
+
+.hamburger {
+
+    font-size: 18px;
+
+    border: 1px solid #777;
+
+    border-radius: 7px;
+
+    padding: 5px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+#menuEsportes {
+
+    display: none;
+
+    background: #333;
+
+    color: white;
+
+    padding: 10px;
+
+    position: absolute;
+
+    top: 60px;
+
+    left: 0;
+
+    z-index: 999;
+
+    width: 170px;
+
+}
+
+
+#menuEsportes ul {
+
+    list-style: none;
+
+    padding: 0;
+
+    margin: 0;
+
+}
+
+
+#menuEsportes li {
+
+    padding: 12px;
+
+    border-bottom: 2px solid #000;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+.carrossel-container {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+
+}
+
+
+.carrossel {
+
+    display: flex;
+
+    transition:
+    transform .5s ease;
+
+}
+
+
+.carrossel img {
+
+    width: 100%;
+
+    height: 133px;
+
+    object-fit: cover;
+
+    flex-shrink: 0;
+
+}
+
+
+/* =========================================================
+   TÍTULO DA PÁGINA
+========================================================= */
+
+.paginaTitulo {
+
+    background: green;
+
+    color: white;
+
+    margin-top: 10px;
+
+    padding: 5px;
+
+}
+
+
+/* =========================================================
+   DIAS
+========================================================= */
+
+.dias {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    padding: 0 5px;
+}
+
+.dias button {
+    flex: 1;
+    min-width: 0;
+    height: 45px;
+    padding: 8px 4px;
+    background: white;
+    color: black;
+    border-radius: 6px;
+    border: 1px solid #999;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: background 0.3s;
+}
+
+.dias button.ativo {
+
+    background: #0072d3;
+
+    color: white;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================================
+   CONTEÚDO
+========================================================= */
+
+.conteudo-dia {
+
+    display: none;
+
+    max-width: 600px;
+
+    margin: auto;
+
+}
+
+
+/* =========================================================
+   JOGO
+========================================================= */
+
+.duelo {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 4px;
+
+    font-weight: bold;
+
+    background: #f0f0f0;
+
+    color: black;
+
+    padding: 5px;
+
+    border-radius: 8px;
+
+    margin: 8px auto;
+
+}
+
+
+.linha-duelo {
+
+    display: grid;
+
+    grid-template-columns:
+    60px 1fr 1fr 1fr 60px 35px;
+
+    align-items: center;
+
+    gap: 5px;
+
+    width: 100%;
+
+}
+
+
+.time-nome-img {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    width: 60px;
+
+}
+
+
+.time-nome-img img {
+
+    width: 50px;
+
+    height: 50px;
+
+    object-fit: contain;
+
+    background: white;
+
+    border-radius: 6px;
+
+}
+
+
+.nome-time {
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    max-width: 60px;
+
+    overflow-wrap: break-word;
+
+}
+
+
+.btn {
+
+    border: none;
+
+    background: #008cff;
+
+    color: white;
+
+    border-radius: 6px;
+
+    min-height: 42px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.btn.selecionado {
+
+    background: #00c853 !important;
+
+}
+
+
+.valor-cotacao {
+
+    font-size: 10px;
+
+}
+
+
+.toggleExtras {
+
+    width: 32px;
+
+    height: 45px;
+
+    background: #008cff;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 5px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+.extras {
+
+    display: none;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 5px;
+
+}
+
+
+.coluna-botao {
+
+    width: 30%;
+
+}
+
+
+.coluna-botao .btn {
+
+    width: 100%;
+
+}
+
+
+/* =========================================================
+   MODAL DA APOSTA
+========================================================= */
+
+.codigo-modal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 10000;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+}
+
+
+.codigo-conteudo {
+
+    background: white;
+
+    width: 100%;
+
+    max-width: 360px;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+    0 5px 30px rgba(0,0,0,.5);
+
+    text-align: center;
+
+}
+
+
+.codigo-conteudo h2 {
+
+    display: block;
+
+    margin-bottom: 15px;
+
+    padding: 8px;
+
+}
+
+
+#codigoAposta {
+
+    font-size: 27px;
+
+    font-weight: bold;
+
+    margin: 15px 0;
+
+    color: #111;
+
+}
+
+
+#qrPix {
+
+    margin: 15px 0;
+
+}
+
+
+#qrPix img {
+
+    width: 170px;
+
+    height: 170px;
+
+}
+
+
+.modal-botoes {
+
+    display: flex;
+
+    gap: 7px;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+}
+
+
+.modal-botoes button {
+
+    width: auto;
+
+    min-width: 85px;
+
+    padding: 10px 15px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+}
+
+
+#btnCopiar {
+
+    background: #0072d3;
+
+}
+
+
+#btnWhatsapp {
+
+    background: #00a884;
+
+}
+
+
+#btnFechar {
+
+    background: #555;
+
+}
+
+
+/* =========================================================
+   MODAL CARREGANDO
+========================================================= */
+
+.carregando {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 9999;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+.carregando-box {
+
+    background: white;
+
+    color: black;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+
+    box-shadow:
+    0 5px 25px rgba(0,0,0,.4);
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:500px) {
+
+    .linha-duelo {
+
+        grid-template-columns:
+        52px 1fr 1fr 1fr 52px 30px;
+
+    }
+
+    .time-nome-img {
+
+        width: 52px;
+
+    }
+
+    .time-nome-img img {
+
+        width: 43px;
+
+        height: 43px;
+
+    }
+
+    .topo-fixo {
+
+        gap: 4px;
+
+        padding: 6px;
+
+    }
+
+    .topo-fixo input {
+
+        font-size: 13px;
+
+    }
+
+    #totalFinal {
+
+        font-size: 11px;
+
+    }
+
+    #apostarBtn {
+
+        min-width: 75px;
+
+        font-size: 11px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<h1>MULTI PLAY.BET</h1>
+
+
+<!-- =====================================================
+     TOPO
+===================================================== -->
+
+<div class="topo-fixo">
+
+    <div
+        class="hamburger"
+        id="hamburger"
+    >
+        ☰
+    </div>
+
+    <input
+        type="number"
+        id="valorUnico"
+        placeholder="Valor"
+        min="1"
+    >
+
+    <div id="totalFinal">
+        Total: R$ 0,00
+    </div>
+
+    <button
+        id="apostarBtn"
+        disabled
+    >
+        Apostar
+        <br>
+
+        <span id="contadorMarcados">
+            Times 0
+        </span>
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     MENU
+===================================================== -->
+
+<div id="menuEsportes">
+
+    <ul id="listaEsportes"></ul>
+
+</div>
+
+
+<!-- =====================================================
+     CARROSSEL
+===================================================== -->
+
+<div class="carrossel-container">
+
+    <div
+        class="carrossel"
+        id="carrossel"
+    >
+
+        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png">
+
+        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483513/elllitersapostaonline1.webp">
+
+        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483593/images1.jpg">
+
+        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784505133/07sportsonline-12-mobile.png">
+
+    </div>
+
+</div>
+
+
+<div
+    class="paginaTitulo"
+    id="tituloPagina"
+>
+    MULTI PLAY.BET
+</div>
+
+
+<!-- =====================================================
+     DIAS
+===================================================== -->
+
+<div
+    class="dias"
+    id="diasContainer"
+>
+
+    <button data-dia="domingo"
+            onclick="mostrarDia('domingo')">
+        Domingo
+    </button>
+
+    <button data-dia="segunda"
+            onclick="mostrarDia('segunda')">
+        Segunda
+    </button>
+
+    <button data-dia="terca"
+            onclick="mostrarDia('terca')">
+        Terça
+    </button>
+
+    <button data-dia="quarta"
+            onclick="mostrarDia('quarta')">
+        Quarta
+    </button>
+
+    <button data-dia="quinta"
+            onclick="mostrarDia('quinta')">
+        Quinta
+    </button>
+
+    <button data-dia="sexta"
+            onclick="mostrarDia('sexta')">
+        Sexta
+    </button>
+
+    <button data-dia="sabado"
+            onclick="mostrarDia('sabado')">
+        Sábado
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     CONTEÚDOS
+===================================================== -->
+
+<div id="conteudo-domingo"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-segunda"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-terca"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-quarta"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-quinta"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-sexta"
+     class="conteudo-dia">
+</div>
+
+<div id="conteudo-sabado"
+     class="conteudo-dia">
+</div>
+
+
+<!-- =====================================================
+     MODAL DA APOSTA
+===================================================== -->
+
+<div
+    id="codigoModal"
+    class="codigo-modal"
+>
+
+    <div class="codigo-conteudo">
+
+        <h2>
+            Aposta enviada!
+        </h2>
+
+        <p>
+            Código da aposta:
+        </p>
+
+        <div id="codigoAposta"></div>
+
+        <div id="qrPix"></div>
+
+        <div class="modal-botoes">
+
+            <button id="btnCopiar">
+                Copiar
+            </button>
+
+            <button id="btnWhatsapp">
+                WhatsApp
+            </button>
+
+            <button id="btnFechar">
+                Fechar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL CARREGANDO
+===================================================== -->
+
+<div
+    id="modalCarregando"
+    class="carregando"
+>
+
+    <div class="carregando-box">
+
+        Carregando jogos...
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+import {
+    initializeApp
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    get,
+    set
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+    "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+
+    authDomain:
+    "jogo-60a9e.firebaseapp.com",
+
+    projectId:
+    "jogo-60a9e",
+
+    storageBucket:
+    "jogo-60a9e.appspot.com",
+
+    messagingSenderId:
+    "352852303591",
+
+    appId:
+    "1:352852303591:web:8083c950047c9026bd8c42",
+
+    databaseURL:
+    "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getDatabase(app);
+
+
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+const LIMITE = 3000;
+
+const chavePix = "71992290058";
+
+
+const dias = [
+
+    "domingo",
+    "segunda",
+    "terca",
+    "quarta",
+    "quinta",
+    "sexta",
+    "sabado"
+
+];
+
+
+let selects = [];
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+const esportes = [
+
+    "Boxe",
+    "Corrida",
+    "Futebol",
+    "Basquete",
+    "Tênis",
+    "Play Game",
+    "Combate",
+    "Fut Americano",
+    "Hoquei",
+    "Handebol",
+    "x5",
+    "Mjb"
+
+];
+
+
+const lista =
+    document.getElementById(
+        "listaEsportes"
+    );
+
+
+esportes.forEach(esporte => {
+
+    const li =
+        document.createElement("li");
+
+    li.textContent =
+        esporte;
+
+    li.onclick = () => {
+
+        document.getElementById(
+            "tituloPagina"
+        ).textContent =
+            "Esporte : " + esporte;
+
+        document.getElementById(
+            "menuEsportes"
+        ).style.display =
+            "none";
+
+    };
+
+    lista.appendChild(li);
+
+});
+
+
+document.getElementById(
+    "hamburger"
+).onclick = () => {
+
+    const menu =
+        document.getElementById(
+            "menuEsportes"
+        );
+
+    menu.style.display =
+        menu.style.display === "block"
+        ? "none"
+        : "block";
+
+};
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const menu =
+            document.getElementById(
+                "menuEsportes"
+            );
+
+        const hamburger =
+            document.getElementById(
+                "hamburger"
+            );
+
+        if (
+            !menu.contains(event.target) &&
+            !hamburger.contains(event.target)
+        ) {
+
+            menu.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MOSTRAR DIA
+========================================================= */
+
+window.mostrarDia = function(dia) {
+
+    document
+        .querySelectorAll(".conteudo-dia")
+        .forEach(el => {
+
+            el.style.display =
+                "none";
+
+        });
+
+
+    const container =
+        document.getElementById(
+            "conteudo-" + dia
+        );
+
+
+    if (!container) return;
+
+
+    container.style.display =
+        "block";
+
+
+    document
+        .querySelectorAll(".dias button")
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "ativo"
+            );
+
+        });
+
+
+    const botao =
+        document.querySelector(
+            `.dias button[data-dia="${dia}"]`
+        );
+
+
+    if (botao) {
+
+        botao.classList.add(
+            "ativo"
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   CARREGAR JOGOS
+========================================================= */
+
+async function carregarJogos(dia) {
+
+    const container =
+        document.getElementById(
+            "conteudo-" + dia
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "<p>Carregando jogos...</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "jogos/" + dia
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            container.innerHTML =
+                "<p>Nenhum jogo disponível.</p>";
+
+            return;
+
+        }
+
+
+        let jogos =
+            snapshot.val();
+
+
+        if (!Array.isArray(jogos)) {
+
+            jogos =
+                Object.values(jogos);
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        const agora =
+            new Date();
+
+
+        let encontrou =
+            false;
+
+
+        jogos.forEach(
+            (jogo, index) => {
+
+                if (
+                    !jogo ||
+                    !jogo.data ||
+                    !jogo.hora
+                ) {
+
+                    return;
+
+                }
+
+
+                const dataHora =
+                    new Date(
+                        `${jogo.data}T${jogo.hora}`
+                    );
+
+
+                /*
+                 * NÃO MOSTRAR EXPIRADOS
+                 */
+
+                if (
+                    dataHora <= agora
+                ) {
+
+                    return;
+
+                }
+
+
+                encontrou =
+                    true;
+
+
+                criarJogo(
+                    container,
+                    jogo,
+                    index
+                );
+
+            }
+        );
+
+
+        if (!encontrou) {
+
+            container.innerHTML =
+                "<p>Não há jogos futuros para este dia.</p>";
+
+        }
+
+    } catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        container.innerHTML =
+            "<p>Erro ao carregar jogos.</p>";
+
+    }
+
+}
+
+
+/* =========================================================
+   CRIAR JOGO
+========================================================= */
+
+function criarJogo(
+    container,
+    jogo,
+    index
+) {
+
+    const cot =
+        jogo.cotacoes || {};
+
+
+    const casa =
+        Number(cot.casa) || 1.50;
+
+    const empate =
+        Number(cot.empate) || 2.50;
+
+    const fora =
+        Number(cot.fora) || 2.50;
+
+    const ambas =
+        Number(cot.ambasMarcam) || 2.50;
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "duelo";
+
+
+    div.dataset.grupo =
+        "grupo-" + index;
+
+
+    div.dataset.campeonato =
+    jogo.campeonato || "Campeonato";
+
+div.dataset.data = jogo.data || "";
+div.dataset.hora = jogo.hora || "";
+
+
+    const nomeA =
+        extrairNome(
+            jogo.imagemA
+        );
+
+
+    const nomeB =
+        extrairNome(
+            jogo.imagemB
+        );
+
+
+    div.innerHTML = `
+
+        <div class="linha-duelo">
+
+            <div class="time-nome-img">
+
+                <img
+                    src="${jogo.imagemA}"
+                    alt="${nomeA}"
+                >
+
+                <div class="nome-time">
+                    ${nomeA}
+                </div>
+
+            </div>
+
+
+            <button
+                class="btn"
+                data-valor="${casa}"
+            >
+                Casa<br>
+                <span class="valor-cotacao">
+                    ${casa.toFixed(2)}
+                </span>
+            </button>
+
+
+            <button
+                class="btn"
+                data-valor="${empate}"
+            >
+                Empate<br>
+                <span class="valor-cotacao">
+                    ${empate.toFixed(2)}
+                </span>
+            </button>
+
+
+            <button
+                class="btn"
+                data-valor="${fora}"
+            >
+                Fora<br>
+                <span class="valor-cotacao">
+                    ${fora.toFixed(2)}
+                </span>
+            </button>
+
+
+            <div class="time-nome-img">
+
+                <img
+                    src="${jogo.imagemB}"
+                    alt="${nomeB}"
+                >
+
+                <div class="nome-time">
+                    ${nomeB}
+                </div>
+
+            </div>
+
+
+            <button class="toggleExtras">
+                +
+            </button>
+
+        </div>
+
+
+        <div class="extras">
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="${ambas}"
+                >
+                    Ambas<br>
+                    <span class="valor-cotacao">
+                        ${ambas.toFixed(2)}
+                    </span>
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.00"
+                >
+                    +2 Gols<br>
+                    <span class="valor-cotacao">
+                        2.00
+                    </span>
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.80"
+                >
+                    -2 Gols<br>
+                    <span class="valor-cotacao">
+                        2.80
+                    </span>
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="1.50"
+                >
+                    Casa/Fora<br>
+                    <span class="valor-cotacao">
+                        1.50
+                    </span>
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.00"
+                >
+                    Casa/Empate<br>
+                    <span class="valor-cotacao">
+                        2.00
+                    </span>
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="1.80"
+                >
+                    Empate/Fora<br>
+                    <span class="valor-cotacao">
+                        1.80
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <small>
+
+            <strong>
+                ${jogo.campeonato || "Campeonato"}
+            </strong>
+
+            <br>
+
+            ${formatarData(jogo.data)}
+            às
+            ${jogo.hora}
+
+        </small>
+
+    `;
+
+
+    container.appendChild(
+        div
+    );
+
+
+    /* =====================================================
+       BOTÃO +
+    ===================================================== */
+
+    const toggle =
+        div.querySelector(
+            ".toggleExtras"
+        );
+
+
+    const extras =
+        div.querySelector(
+            ".extras"
+        );
+
+
+    toggle.onclick = () => {
+
+        const aberto =
+            extras.style.display === "flex";
+
+
+        extras.style.display =
+            aberto
+            ? "none"
+            : "flex";
+
+
+        toggle.textContent =
+            aberto
+            ? "+"
+            : "-";
+
+    };
+
+
+    /* =====================================================
+       BOTÕES DE PALPITE
+    ===================================================== */
+
+    div.querySelectorAll(
+        ".btn"
+    ).forEach(btn => {
+
+        btn.onclick = () => {
+
+            const jaSelecionado =
+                btn.classList.contains(
+                    "selecionado"
+                );
+
+
+            div.querySelectorAll(
+                ".btn"
+            ).forEach(b => {
+
+                b.classList.remove(
+                    "selecionado"
+                );
+
+            });
+
+
+            if (!jaSelecionado) {
+
+                btn.classList.add(
+                    "selecionado"
+                );
+
+            }
+
+
+            atualizarSelecoes();
+
+            atualizarTotal();
+
+        };
+
+    });
+
+}
+
+
+/* =========================================================
+   NOME
+========================================================= */
+
+function extrairNome(url) {
+
+    if (!url) return "Time";
+
+
+    try {
+
+        let nome =
+            decodeURIComponent(
+                url.split("/").pop()
+            );
+
+
+        nome =
+            nome.replace(
+                /\.(png|jpg|jpeg|webp|svg)$/i,
+                ""
+            );
+
+
+        nome =
+            nome.replace(
+                /[_-]/g,
+                " "
+            );
+
+
+        return nome
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim();
+
+    } catch {
+
+        return "Time";
+
+    }
+
+}
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+function formatarData(data) {
+
+    if (!data) return "";
+
+    const partes =
+        data.split("-");
+
+
+    if (partes.length !== 3)
+        return data;
+
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+/* =========================================================
+   SELEÇÕES
+========================================================= */
+
+function atualizarSelecoes() {
+
+    selects = [];
+
+    document.querySelectorAll(".duelo").forEach(duelo => {
+
+        const btn =
+            duelo.querySelector(".btn.selecionado");
+
+        if (!btn) return;
+
+        const nomes =
+            duelo.querySelectorAll(".nome-time");
+
+        selects.push({
+
+            timeA:
+                nomes[0]?.textContent.trim() || "",
+
+            timeB:
+                nomes[1]?.textContent.trim() || "",
+
+            valor:
+                Number(btn.dataset.valor) || 0,
+
+            escolha:
+                btn.textContent
+                    .trim()
+                    .split("\n")[0]
+                    .trim(),
+
+            campeonato:
+                duelo.dataset.campeonato ||
+                "Campeonato",
+
+            data:
+                duelo.dataset.data || "",
+
+            hora:
+                duelo.dataset.hora || "",
+
+            dataHora:
+                `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
+
+            status:
+                "aguardando"
+
+        });
+
+    });
+
+    document.getElementById(
+        "contadorMarcados"
+    ).textContent =
+        "Times " + selects.length;
+}
+/* =========================================================
+   TOTAL
+========================================================= */
+
+function atualizarTotal() {
+
+    const valor =
+        Number(
+            document.getElementById(
+                "valorUnico"
+            ).value
+        ) || 0;
+
+
+    let multiplicador =
+        1;
+
+
+    document
+        .querySelectorAll(
+            ".btn.selecionado"
+        )
+        .forEach(btn => {
+
+            multiplicador *=
+                Number(
+                    btn.dataset.valor
+                );
+
+        });
+
+
+    const total =
+        valor *
+        multiplicador;
+
+
+    const totalFinal =
+        document.getElementById(
+            "totalFinal"
+        );
+
+
+    const apostar =
+        document.getElementById(
+            "apostarBtn"
+        );
+
+
+    if (
+        valor <= 0 ||
+        selects.length === 0
+    ) {
+
+        totalFinal.textContent =
+            "Total: R$ 0,00";
+
+        apostar.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if (total > LIMITE) {
+
+        totalFinal.innerHTML =
+            `<span style="color:red">
+                R$ ${total.toFixed(2)}
+            </span>`;
+
+        apostar.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    totalFinal.innerHTML =
+        `<span style="color:green">
+            R$ ${total.toFixed(2)}
+        </span>`;
+
+
+    apostar.disabled =
+        false;
+
+}
+
+
+/* =========================================================
+   ENVIO DA APOSTA
+========================================================= */
+
+document.getElementById("apostarBtn").onclick = async function () {
+
+    const botao = this;
+
+    try {
+
+        const campoValor = document.getElementById("valorUnico");
+
+        if (!campoValor) {
+            alert("Erro: campo de valor não encontrado.");
+            return;
+        }
+
+        const valor = Number(campoValor.value);
+
+        if (!valor || valor <= 0) {
+            alert("Digite um valor válido.");
+            return;
+        }
+
+        if (!selects || selects.length === 0) {
+            alert("Selecione pelo menos um jogo.");
+            return;
+        }
+
+        /* ==========================================
+           BLOQUEIA BOTÃO
+        ========================================== */
+
+        botao.disabled = true;
+
+        botao.innerHTML = "Enviando...";
+
+        /* ==========================================
+           CÓDIGO
+        ========================================== */
+
+        const codigo = "MJ" + Date.now();
+
+        /* ==========================================
+           MONTA APOSTA
+        ========================================== */
+
+        const aposta = {
+
+            codigo: codigo,
+
+            valorUnico: valor,
+
+            selecoes: selects.map(s => ({
+
+                timeA: String(s.timeA || ""),
+
+                timeB: String(s.timeB || ""),
+
+                valor: Number(s.valor) || 0,
+
+                escolha: String(s.escolha || ""),
+
+                campeonato:
+                    String(
+                        s.campeonato ||
+                        "Campeonato"
+                    ),
+
+                data:
+                    String(
+                        s.data || ""
+                    ),
+
+                hora:
+                    String(
+                        s.hora || ""
+                    ),
+
+                dataHora:
+                    String(
+                        s.dataHora || ""
+                    ),
+
+                status:
+                    "aguardando"
+
+            })),
+
+            dataHora:
+                new Date().toISOString()
+
+        };
+
+
+        console.log(
+            "ENVIANDO APOSTA:",
+            aposta
+        );
+
+
+        /* ==========================================
+           SALVA NO FIREBASE
+        ========================================== */
+
+        await set(
+            ref(
+                db,
+                "apostas/" + codigo
+            ),
+            aposta
+        );
+
+
+        console.log(
+            "APOSTA SALVA:",
+            codigo
+        );
+
+
+        /* ==========================================
+           ABRE MODAL
+           IMPORTANTE:
+           O modal NÃO pode impedir o envio
+        ========================================== */
+
+        try {
+
+            abrirModal(codigo);
+
+        } catch (erroModal) {
+
+            console.error(
+                "ERRO AO ABRIR MODAL:",
+                erroModal
+            );
+
+            /*
+             * A aposta já foi salva.
+             * Portanto não mostramos erro de conexão.
+             */
+
+            alert(
+                "Aposta salva com sucesso!\n\n" +
+                "Código: " + codigo
+            );
+
+        }
+
+
+        /* ==========================================
+           LIMPA SELEÇÕES
+        ========================================== */
+
+        document
+            .querySelectorAll(
+                ".btn.selecionado"
+            )
+            .forEach(btn => {
+
+                btn.classList.remove(
+                    "selecionado"
+                );
+
+            });
+
+
+        selects = [];
+
+
+        /* ==========================================
+           LIMPA VALOR
+        ========================================== */
+
+        campoValor.value = "";
+
+
+        /* ==========================================
+           ATUALIZA CONTADOR
+        ========================================== */
+
+        const contador =
+            document.getElementById(
+                "contadorMarcados"
+            );
+
+        if (contador) {
+
+            contador.textContent =
+                "Times 0";
+
+        }
+
+
+        /* ==========================================
+           ATUALIZA TOTAL
+        ========================================== */
+
+        atualizarTotal();
+
+
+        /* ==========================================
+           RESTAURA BOTÃO
+        ========================================== */
+
+        botao.disabled = true;
+
+        botao.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times 0
+            </span>
+        `;
+
+
+    } catch (erro) {
+
+        console.error(
+            "ERRO AO ENVIAR APOSTA:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível enviar a aposta.\n\n" +
+            "Erro: " +
+            (
+                erro?.message ||
+                String(erro)
+            )
+        );
+
+
+        botao.disabled = false;
+
+        botao.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times ${selects.length}
+            </span>
+        `;
+
+    }
+
+};
+/* =========================================================
+   MODAL
+========================================================= */
+
+function abrirModal(codigo) {
+
+    const modal =
+        document.getElementById(
+            "codigoModal"
+        );
+
+
+    document.getElementById(
+        "codigoAposta"
+    ).textContent =
+        codigo;
+
+
+    /*
+     * QR CODE
+     */
+
+    const pix =
+        encodeURIComponent(
+            chavePix
+        );
+
+
+    document.getElementById(
+        "qrPix"
+    ).innerHTML = `
+
+        <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${pix}"
+            alt="QR Code PIX"
+        >
+
+        <p>
+            PIX: <strong>${chavePix}</strong>
+        </p>
+
+    `;
+
+
+    /*
+     * MOSTRA MODAL
+     */
+
+    modal.style.display =
+        "flex";
+
+
+    /*
+     * COPIAR
+     */
+
+    document.getElementById(
+        "btnCopiar"
+    ).onclick = async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(
+                codigo
+            );
+
+            alert(
+                "Código copiado!"
+            );
+
+        } catch {
+
+            alert(
+                "Código: " + codigo
+            );
+
+        }
+
+    };
+
+
+    /*
+     * WHATSAPP
+     */
+
+    document.getElementById(
+        "btnWhatsapp"
+    ).onclick = () => {
+
+        const texto =
+            `Minha aposta MULTI PLAY.BET%0A%0ACódigo: ${codigo}`;
+
+        window.open(
+            `https://wa.me/?text=${texto}`,
+            "_blank"
+        );
+
+    };
+
+}
+
+
+/* =========================================================
+   FECHAR MODAL
+========================================================= */
+
+document.getElementById(
+    "btnFechar"
+).onclick = () => {
+
+    document.getElementById(
+        "codigoModal"
+    ).style.display =
+        "none";
+
+};
+
+
+document.getElementById(
+    "codigoModal"
+).addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.id ===
+            "codigoModal"
+        ) {
+
+            event.target.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CARREGAR SOMENTE 3 DIAS
+========================================================= */
+
+async function inicializar() {
+
+    const modal =
+        document.getElementById(
+            "modalCarregando"
+        );
+
+
+    modal.style.display =
+        "flex";
+
+
+    const hoje =
+        new Date();
+
+
+    const indiceHoje =
+        hoje.getDay();
+
+
+    /*
+     * PRIMEIRO ESCONDE OS 7
+     */
+
+    document
+        .querySelectorAll(
+            "#diasContainer button"
+        )
+        .forEach(btn => {
+
+            btn.style.display =
+                "none";
+
+            btn.classList.remove(
+                "ativo"
+            );
+
+        });
+
+
+    /*
+     * ESCONDE CONTEÚDOS
+     */
+
+    document
+        .querySelectorAll(
+            ".conteudo-dia"
+        )
+        .forEach(el => {
+
+            el.style.display =
+                "none";
+
+        });
+
+
+    /*
+     * MOSTRA APENAS:
+     *
+     * HOJE
+     * AMANHÃ
+     * DEPOIS DE AMANHÃ
+     */
+
+    for (
+        let i = 0;
+        i < 3;
+        i++
+    ) {
+
+        const indiceDia =
+            (indiceHoje + i) % 7;
+
+
+        const dia =
+            dias[indiceDia];
+
+
+        const botao =
+            document.querySelector(
+                `#diasContainer button[data-dia="${dia}"]`
+            );
+
+
+        if (botao) {
+
+            botao.style.display =
+                "inline-block";
+
+        }
+
+
+        await carregarJogos(
+            dia
+        );
+
+    }
+
+
+    /*
+     * ABRE HOJE
+     */
+
+    const diaHoje =
+        dias[indiceHoje];
+
+
+    mostrarDia(
+        diaHoje
+    );
+
+
+    modal.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   CLIQUE NOS 3 DIAS
+========================================================= */
+
+document
+    .querySelectorAll(
+        "#diasContainer button"
+    )
+    .forEach(btn => {
+
+        btn.addEventListener(
+            "click",
+            async () => {
+
+                const dia =
+                    btn.dataset.dia;
+
+
+                await carregarJogos(
+                    dia
+                );
+
+
+                mostrarDia(
+                    dia
+                );
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   VALOR
+========================================================= */
+
+document.getElementById(
+    "valorUnico"
+).addEventListener(
+    "input",
+    atualizarTotal
+);
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+const carrossel =
+    document.getElementById(
+        "carrossel"
+    );
+
+
+let slide = 0;
+
+
+setInterval(() => {
+
+    if (!carrossel) return;
+
+
+    const total =
+        carrossel.children.length;
+
+
+    slide =
+        (slide + 1) %
+        total;
+
+
+    carrossel.style.transform =
+        `translateX(-${slide * 100}%)`;
+
+}, 3000);
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+inicializar();
+
+</script>
+
+</body>
+
+</html>
