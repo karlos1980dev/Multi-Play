@@ -53,16 +53,7 @@
   <div id="acoes" style="display:none;">
     <button onclick="baixarPDF()">📥 Baixar PDF</button>
     <button onclick="compartilharLink()">🔗 Compartilhar Link</button>
-    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button><!DOCTYPE html>
-    <html lang="pt">
-    <head>
-        <meta charset="UTF-8">
-        <title>Título da página</title>
-    </head>
-    <body>
-        
-    </body>
-    </html>
+    <button onclick="enviarWhatsApp()">📲 Enviar via WhatsApp</button>
   </div>
 
   <script type="module">
@@ -126,7 +117,9 @@
   // Agrupar seleções por data
   const agrupadoPorData = {};
   aposta.selecoes.forEach((sel, i) => {
-    const data = sel.dataHora.split(" ")[0];
+    const data = sel.dataHora
+    ? sel.dataHora.split(" ")[0]
+    : (sel.data || "Sem data");
     if (!agrupadoPorData[data]) agrupadoPorData[data] = [];
     agrupadoPorData[data].push({ ...sel, index: i });
   });
@@ -164,7 +157,10 @@
             <p><strong>Duelo ${sel.index + 1}:</strong> ${sel.timeA} x ${sel.timeB}</p>
             <p><strong>Escolha marcada:</strong> <span style="color:blue;">${sel.escolha || "Não informada"}</span></p>
             <p><strong>Cotação:</strong> R$ ${sel.valor.toFixed(2)}</p>
-            <p><strong>🕒 Data/Hora:</strong> ${sel.dataHora}</p>
+            <p>
+    <strong>🕒 Data/Hora:</strong>
+    ${sel.dataHora || `${sel.data || ""} ${sel.hora || ""}`}
+</p>
             <p><strong>Status:</strong> <span style="color:${cor}; font-weight:bold;">${label}</span></p>
           </div>
         `;
