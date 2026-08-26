@@ -2478,7 +2478,178 @@ const jogos = {
 
 };
 
+/* =========================================================
+   CONFIGURAÇÃO DOS JOGOS VINDO DO FIREBASE
+========================================================= */
 
+const configuracaoJogosRef =
+    db.ref("configuracaoJogos");
+
+
+configuracaoJogosRef.on(
+    "value",
+    function(snapshot) {
+
+        const dados =
+            snapshot.val();
+
+        if (!dados) {
+            return;
+        }
+
+
+        for (let i = 1; i <= 6; i++) {
+
+            const chave =
+                "jogo" + i;
+
+            const configuracao =
+                dados[chave];
+
+
+            if (!configuracao) {
+                continue;
+            }
+
+
+            /*
+            DATA
+            */
+
+            if (configuracao.data) {
+
+                jogos[chave].data =
+                    configuracao.data;
+
+            }
+
+
+            /*
+            HORA
+            */
+
+            if (configuracao.hora) {
+
+                jogos[chave].hora =
+                    configuracao.hora;
+
+            }
+
+
+            /*
+            IMAGEM DO TIME DA CASA
+            */
+
+            if (
+                configuracao.casaImagem
+            ) {
+
+                jogos[chave].casaImagem =
+                    configuracao.casaImagem;
+
+            }
+
+
+            /*
+            IMAGEM DO TIME VISITANTE
+            */
+
+            if (
+                configuracao.foraImagem
+            ) {
+
+                jogos[chave].foraImagem =
+                    configuracao.foraImagem;
+
+            }
+
+        }
+
+
+        /*
+        ATUALIZAR SITE
+        */
+
+        atualizarImagensDosJogos();
+
+        atualizarDatasHorasDosJogos();
+
+        atualizarStatusJogos();
+
+        atualizarNomesDosTimes();
+
+    }
+);
+/* =========================================================
+   ATUALIZAR IMAGENS DOS JOGOS
+========================================================= */
+
+function atualizarImagensDosJogos() {
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+
+    duelos.forEach(
+        function(duelo, indice) {
+
+            const numero =
+                indice + 1;
+
+
+            const chave =
+                "jogo" + numero;
+
+
+            const jogo =
+                jogos[chave];
+
+
+            if (!jogo) {
+                return;
+            }
+
+
+            const imagens =
+                duelo.querySelectorAll(
+                    ".time img"
+                );
+
+
+            if (
+                imagens.length >= 2
+            ) {
+
+                if (
+                    jogo.casaImagem
+                ) {
+
+                    imagens[0].src =
+                        jogo.casaImagem;
+
+                }
+
+
+                if (
+                    jogo.foraImagem
+                ) {
+
+                    imagens[1].src =
+                        jogo.foraImagem;
+
+                }
+
+            }
+
+        }
+    );
+
+
+    atualizarNomesDosTimes();
+
+}
 /* =========================================================
    VARIÁVEL TEMPORÁRIA DE CONFIRMAÇÃO
 ========================================================= */
@@ -3814,47 +3985,67 @@ function obterPalpitesSelecionados() {
    VERIFICAR JOGOS SELECIONADOS
 ========================================================= */
 
-function verificarJogosSelecionados(
-    palpites
-) {
+/* =========================================================
+   PEGAR SOMENTE OS PALPITES AINDA VÁLIDOS
+========================================================= */
 
-    for (
-        const chave of Object.keys(jogos)
-    ) {
+function obterPalpitesValidos(palpites) {
 
-        const numero =
-            chave.replace(
-                "jogo",
-                ""
-            );
+    const validos = {};
 
+    Object.keys(jogos).forEach(function(chave) {
 
         const palpite =
-            palpites[
-                "jogo" + numero
-            ];
+            palpites[chave];
 
+        if (!palpite) {
+            return;
+        }
 
-        if (
-            palpite &&
-            !jogoEstaAberto(
-                jogos[chave]
-            )
-        ) {
+        /*
+        Só aceita se o horário ainda não expirou
+        */
+        if (jogoEstaAberto(jogos[chave])) {
 
-            alert(
-
-                "🔒 O jogo " +
-                numero +
-                " já foi encerrado."
-
-            );
-
-            atualizarStatusJogos();
-
-            return false;
+            validos[chave] =
+                palpite;
 
         }
+
+    });
+
+    return validos;
+
+}
+
+
+/* =========================================================
+   VERIFICAR JOGOS SELECIONADOS
+========================================================= */
+
+function verificarJogosSelecionados(palpites) {
+
+    const validos =
+        obterPalpitesValidos(palpites);
+
+    const quantidadeValidos =
+        Object.keys(validos).length;
+
+
+    /*
+    PRECISA TER PELO MENOS 2 JOGOS VÁLIDOS
+    */
+
+    if (quantidadeValidos < 2) {
+
+        alert(
+            "⚠️ É necessário ter pelo menos 2 placares válidos.\n\n" +
+            "Os jogos cujo horário já expirou não são considerados."
+        );
+
+        atualizarStatusJogos();
+
+        return false;
 
     }
 
@@ -3862,7 +4053,6 @@ function verificarJogosSelecionados(
     return true;
 
 }
-
 
 /* =========================================================
    ENVIAR PALPITE
@@ -3939,28 +4129,36 @@ async function enviarPalpite() {
             obterPalpitesSelecionados();
 
 
-        /*
-        ==========================================
-        CONTAR QUANTOS FORAM ESCOLHIDOS
-        ==========================================
-        */
+ /* =================================================
+   PEGAR SOMENTE OS JOGOS AINDA VÁLIDOS
+================================================= */
 
-        const selecionados =
-            Object.values(palpites).filter(
-                valor =>
-                    valor &&
-                    String(valor).trim() !== ""
-            );
+const palpitesValidos =
+    obterPalpitesValidos(palpites);
 
 
-        const quantidade =
-            selecionados.length;
+const selecionados =
+    Object.values(palpitesValidos).filter(
+        valor =>
+            valor &&
+            String(valor).trim() !== ""
+    );
 
 
-        console.log(
-            "Quantidade selecionada:",
-            quantidade
-        );
+const quantidade =
+    selecionados.length;
+
+
+console.log(
+    "Palpites válidos:",
+    palpitesValidos
+);
+
+
+console.log(
+    "Quantidade de palpites válidos:",
+    quantidade
+);
 
 
         /*
@@ -3971,12 +4169,13 @@ async function enviarPalpite() {
 
         if (quantidade < 2) {
 
-            alert(
-                "⚠️ Escolha pelo menos 2 placares."
-            );
+    alert(
+        "⚠️ É necessário ter pelo menos 2 placares válidos.\n\n" +
+        "Os placares de jogos já encerrados não contam."
+    );
 
-            return;
-        }
+    return;
+}
 
 
         /*
@@ -4047,18 +4246,12 @@ async function enviarPalpite() {
 
             premio: premio,
 
-            jogo1: palpites.jogo1,
-
-            jogo2: palpites.jogo2,
-
-            jogo3: palpites.jogo3,
-
-            jogo4: palpites.jogo4,
-
-            jogo5: palpites.jogo5,
-
-            jogo6: palpites.jogo6
-
+            jogo1: palpitesValidos.jogo1 || "",
+jogo2: palpitesValidos.jogo2 || "",
+jogo3: palpitesValidos.jogo3 || "",
+jogo4: palpitesValidos.jogo4 || "",
+jogo5: palpitesValidos.jogo5 || "",
+jogo6: palpitesValidos.jogo6 || ""
         };
 
 
@@ -4212,15 +4405,34 @@ async function confirmarPalpite() {
         VERIFICAR JOGOS NOVAMENTE
         */
 
-        if (
-            !verificarJogosSelecionados(
-                dados
-            )
-        ) {
+        /* =================================================
+   PEGAR NOVAMENTE SOMENTE OS JOGOS VÁLIDOS
+================================================= */
 
-            return;
+const palpitesConfirmados =
+    obterPalpitesValidos(dados);
 
-        }
+
+/*
+PRECISA TER PELO MENOS 2 VÁLIDOS
+*/
+
+const quantidadeValidos =
+    Object.keys(
+        palpitesConfirmados
+    ).length;
+
+
+if (quantidadeValidos < 2) {
+
+    alert(
+        "⚠️ Não existem mais 2 placares válidos para enviar.\n\n" +
+        "Algum jogo pode ter expirado enquanto a confirmação estava aberta."
+    );
+
+    return;
+
+}
 
 
         /*
@@ -4278,7 +4490,7 @@ async function confirmarPalpite() {
 
 
             quantidadePlacares:
-                dados.quantidade,
+    quantidadeValidos,
 
 
             valor:
@@ -4300,40 +4512,34 @@ async function confirmarPalpite() {
 
 
             jogo1: criarDadosJogo(
-                "jogo1",
-                dados.jogo1
-            ),
+    "jogo1",
+    palpitesConfirmados.jogo1
+),
 
+jogo2: criarDadosJogo(
+    "jogo2",
+    palpitesConfirmados.jogo2
+),
 
-            jogo2: criarDadosJogo(
-                "jogo2",
-                dados.jogo2
-            ),
+jogo3: criarDadosJogo(
+    "jogo3",
+    palpitesConfirmados.jogo3
+),
 
+jogo4: criarDadosJogo(
+    "jogo4",
+    palpitesConfirmados.jogo4
+),
 
-            jogo3: criarDadosJogo(
-                "jogo3",
-                dados.jogo3
-            ),
+jogo5: criarDadosJogo(
+    "jogo5",
+    palpitesConfirmados.jogo5
+),
 
-
-            jogo4: criarDadosJogo(
-                "jogo4",
-                dados.jogo4
-            ),
-
-
-            jogo5: criarDadosJogo(
-                "jogo5",
-                dados.jogo5
-            ),
-
-
-            jogo6: criarDadosJogo(
-                "jogo6",
-                dados.jogo6
-            ),
-
+jogo6: criarDadosJogo(
+    "jogo6",
+    palpitesConfirmados.jogo6
+),
 
             data:
                 new Date()
