@@ -107,9 +107,9 @@ h2 {
 
 .topo-fixo input#valorUnico {
     flex: 0 0 70px;
-    width: 70px;
+    width: 100px;
     height: 40px;
-    font-size: 14px;
+    font-size: 16px;
     padding: 0 5px;
     border-radius: 6px;
     border: 1px solid #ccc;
@@ -136,7 +136,7 @@ h2 {
 
     font-weight: bold;
 
-    font-size: 13px;
+    font-size: 18px;
 
 }
 
@@ -748,7 +748,7 @@ h2 {
 
     #totalFinal {
 
-        font-size: 11px;
+        font-size: 14px;
 
     }
 
@@ -805,14 +805,14 @@ h2 {
     >
 
     <div id="totalFinal">
-        Total: R$ 0,00
-    </div>
+        Possível Retorno<Br> R$ 0,00
+    </div>    
 
     <button
         id="apostarBtn"
         disabled
     >
-        Apostar
+        APOSTAS
         <br>
 
         <span id="contadorMarcados">
@@ -856,14 +856,6 @@ h2 {
 
     </div>
 
-</div>
-
-
-<div
-    class="paginaTitulo"
-    id="tituloPagina"
->
-    MULTI PLAY.BET
 </div>
 
 
@@ -973,7 +965,7 @@ h2 {
         <div class="modal-botoes">
 
             <button id="btnCopiar">
-                Copiar
+                Copiar Aposta
             </button>
 
             <button id="btnWhatsapp">
@@ -1068,7 +1060,7 @@ const db =
 
 const LIMITE = 3000;
 
-const chavePix = "71992290058";
+const chavePix = "a779076a-56a2-46ad-bb37-f0de8b87e2be";
 
 
 const dias = [
@@ -1842,46 +1834,35 @@ function atualizarTotal() {
 
     const valor =
         Number(
-            document.getElementById(
-                "valorUnico"
-            ).value
+            document.getElementById("valorUnico").value
         ) || 0;
 
-
-    let multiplicador =
-        1;
-
+    let multiplicador = 1;
 
     document
-        .querySelectorAll(
-            ".btn.selecionado"
-        )
+        .querySelectorAll(".btn.selecionado")
         .forEach(btn => {
 
             multiplicador *=
-                Number(
-                    btn.dataset.valor
-                );
+                Number(btn.dataset.valor) || 1;
 
         });
 
-
     const total =
-        valor *
-        multiplicador;
-
+        valor * multiplicador;
 
     const totalFinal =
-        document.getElementById(
-            "totalFinal"
-        );
-
+        document.getElementById("totalFinal");
 
     const apostar =
-        document.getElementById(
-            "apostarBtn"
-        );
+        document.getElementById("apostarBtn");
 
+    const contador =
+        document.getElementById("contadorMarcados");
+
+    /* =========================
+       NENHUMA SELEÇÃO OU VALOR
+    ========================= */
 
     if (
         valor <= 0 ||
@@ -1891,13 +1872,22 @@ function atualizarTotal() {
         totalFinal.textContent =
             "Total: R$ 0,00";
 
-        apostar.disabled =
-            true;
+        apostar.disabled = true;
+
+        apostar.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times ${selects.length}
+            </span>
+        `;
 
         return;
-
     }
 
+    /* =========================
+       LIMITE
+    ========================= */
 
     if (total > LIMITE) {
 
@@ -1906,25 +1896,42 @@ function atualizarTotal() {
                 R$ ${total.toFixed(2)}
             </span>`;
 
-        apostar.disabled =
-            true;
+        apostar.disabled = true;
+
+        apostar.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times ${selects.length}
+            </span>
+        `;
 
         return;
-
     }
 
+    /* =========================
+       TOTAL VÁLIDO
+    ========================= */
 
     totalFinal.innerHTML =
         `<span style="color:green">
             R$ ${total.toFixed(2)}
         </span>`;
 
+    apostar.disabled = false;
 
-    apostar.disabled =
-        false;
+    /* =========================
+       MUDA PARA ENVIAR
+    ========================= */
 
+    apostar.innerHTML = `
+        Enviar
+        <br>
+        <span id="contadorMarcados">
+            Times ${selects.length}
+        </span>
+    `;
 }
-
 
 /* =========================================================
    ENVIO DA APOSTA
