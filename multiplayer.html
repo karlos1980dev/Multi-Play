@@ -370,15 +370,20 @@ h2 {
 
     color: black;
 
-    padding: 5px;
+    padding: 8px;
 
     border-radius: 8px;
 
-    margin: 8px auto;
+    margin: 10px auto;
+
+    /* SOMBRA DO CARD */
+    box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.30);
+
+    /* borda leve */
+    border: 1px solid #ddd;
 
 }
-
-
 .linha-duelo {
 
     display: grid;
@@ -756,7 +761,19 @@ h2 {
     }
 
 }
+.linha-duelo > .btn {
+    background: #000000;
+    color: #ffffff;
+}
 
+.linha-duelo > .btn:hover {
+    background: #222222;
+}
+
+.linha-duelo > .btn.selecionado {
+    background: #00c853 !important;
+    color: #ffffff;
+}
 </style>
 
 </head>
