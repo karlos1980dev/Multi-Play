@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Painel Administrativo</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 15px;
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+.card {
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #38bdf8;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.imagens {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.preview {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    display: block;
+    margin: 10px auto;
+    background: white;
+    border-radius: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: 0;
+    border-radius: 10px;
+    background: #22c55e;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.status {
+    text-align: center;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.sucesso {
+    color: #22c55e;
+}
+
+.erro {
+    color: #ef4444;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>⚙️ PAINEL ADMINISTRATIVO</h1>
+
+<div id="status" class="status">
+    🔄 Carregando...
+</div>
+
+<div id="jogos"></div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+
+    authDomain:
+        "placarexato-97966.firebaseapp.com",
+
+    databaseURL:
+        "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+        "placarexato-97966",
+
+    storageBucket:
+        "placarexato-97966.firebasestorage.app",
+
+    messagingSenderId:
+        "942191850183",
+
+    appId:
+        "1:942191850183:web:9870fab0d09044b11004e2"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db =
+    firebase.database();
+
+
+/* =========================================================
+   REFERÊNCIA
+========================================================= */
+
+const jogosRef =
+    db.ref("configuracaoJogos");
+
+
+/* =========================================================
+   CRIAR PAINEL
+========================================================= */
+
+const area =
+    document.getElementById("jogos");
+
+
+for (let i = 1; i <= 6; i++) {
+
+    area.innerHTML += `
+
+        <div class="card">
+
+            <h2>⚽ JOGO ${i}</h2>
+
+            <div class="imagens">
+
+                <div>
+
+                    <label>
+                        🏠 Escudo casa
+                    </label>
+
+                    <input
+                        type="text"
+                        id="jogo${i}CasaImagem"
+                        placeholder="URL da imagem"
+                    >
+
+                    <img
+                        id="jogo${i}CasaPreview"
+                        class="preview"
+                        src=""
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        ✈️ Escudo visitante
+                    </label>
+
+                    <input
+                        type="text"
+                        id="jogo${i}ForaImagem"
+                        placeholder="URL da imagem"
+                    >
+
+                    <img
+                        id="jogo${i}ForaPreview"
+                        class="preview"
+                        src=""
+                    >
+
+                </div>
+
+            </div>
+
+
+            <label>
+                📅 Data
+            </label>
+
+            <input
+                type="date"
+                id="jogo${i}Data"
+            >
+
+
+            <label>
+                ⏰ Horário
+            </label>
+
+            <input
+                type="time"
+                id="jogo${i}Hora"
+            >
+
+
+            <button
+                onclick="salvarJogo(${i})">
+
+                💾 SALVAR JOGO ${i}
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   PRÉ-VISUALIZAÇÃO DAS IMAGENS
+========================================================= */
+
+for (let i = 1; i <= 6; i++) {
+
+    const casa =
+        document.getElementById(
+            `jogo${i}CasaImagem`
+        );
+
+    const fora =
+        document.getElementById(
+            `jogo${i}ForaImagem`
+        );
+
+
+    casa.addEventListener(
+        "input",
+        function() {
+
+            document.getElementById(
+                `jogo${i}CasaPreview`
+            ).src = this.value;
+
+        }
+    );
+
+
+    fora.addEventListener(
+        "input",
+        function() {
+
+            document.getElementById(
+                `jogo${i}ForaPreview`
+            ).src = this.value;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SALVAR JOGO
+========================================================= */
+
+async function salvarJogo(numero) {
+
+    const data =
+        document.getElementById(
+            `jogo${numero}Data`
+        ).value;
+
+
+    const hora =
+        document.getElementById(
+            `jogo${numero}Hora`
+        ).value;
+
+
+    const casaImagem =
+        document.getElementById(
+            `jogo${numero}CasaImagem`
+        ).value.trim();
+
+
+    const foraImagem =
+        document.getElementById(
+            `jogo${numero}ForaImagem`
+        ).value.trim();
+
+
+    if (!data) {
+
+        alert(
+            "⚠️ Informe a data do Jogo " +
+            numero
+        );
+
+        return;
+
+    }
+
+
+    if (!hora) {
+
+        alert(
+            "⚠️ Informe o horário do Jogo " +
+            numero
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await jogosRef
+            .child(
+                "jogo" + numero
+            )
+            .update({
+
+                data:
+                    data,
+
+                hora:
+                    hora,
+
+                casaImagem:
+                    casaImagem,
+
+                foraImagem:
+                    foraImagem,
+
+                atualizadoEm:
+                    Date.now()
+
+            });
+
+
+        mostrarStatus(
+            "✅ Jogo " +
+            numero +
+            " atualizado com sucesso!",
+            true
+        );
+
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        mostrarStatus(
+            "❌ Erro ao salvar: " +
+            erro.message,
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR CONFIGURAÇÃO
+========================================================= */
+
+jogosRef.on(
+    "value",
+    function(snapshot) {
+
+        const dados =
+            snapshot.val() || {};
+
+
+        for (let i = 1; i <= 6; i++) {
+
+            const jogo =
+                dados[
+                    "jogo" + i
+                ] || {};
+
+
+            const data =
+                document.getElementById(
+                    `jogo${i}Data`
+                );
+
+            const hora =
+                document.getElementById(
+                    `jogo${i}Hora`
+                );
+
+            const casa =
+                document.getElementById(
+                    `jogo${i}CasaImagem`
+                );
+
+            const fora =
+                document.getElementById(
+                    `jogo${i}ForaImagem`
+                );
+
+
+            if (data) {
+
+                data.value =
+                    jogo.data || "";
+
+            }
+
+
+            if (hora) {
+
+                hora.value =
+                    jogo.hora || "";
+
+            }
+
+
+            if (casa) {
+
+                casa.value =
+                    jogo.casaImagem || "";
+
+                document.getElementById(
+                    `jogo${i}CasaPreview`
+                ).src =
+                    jogo.casaImagem || "";
+
+            }
+
+
+            if (fora) {
+
+                fora.value =
+                    jogo.foraImagem || "";
+
+                document.getElementById(
+                    `jogo${i}ForaPreview`
+                ).src =
+                    jogo.foraImagem || "";
+
+            }
+
+        }
+
+
+        mostrarStatus(
+            "🟢 Configuração carregada",
+            true
+        );
+
+    }
+);
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function mostrarStatus(
+    texto,
+    sucesso
+) {
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    status.textContent =
+        texto;
+
+
+    status.className =
+        "status " +
+        (
+            sucesso
+                ? "sucesso"
+                : "erro"
+        );
+
+
+    setTimeout(
+        function() {
+
+            status.textContent =
+                "🟢 Painel pronto";
+
+        },
+        3000
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>
