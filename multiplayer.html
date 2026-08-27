@@ -25,48 +25,23 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
     box-sizing: border-box;
 }
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
 body {
 
     font-family: Arial, sans-serif;
 
     text-align: center;
 
-    margin: 0;
+    padding-top: 78px;
 
-    padding-top: 80px;
-
-    color: black;
+    color: #000;
 
     background: #f1f1f1;
-
-}
-
-
-/* =========================================================
-   TÍTULOS
-========================================================= */
-
-h1 {
-
-    font-size: 20px;
-
-    margin: 0;
-
-}
-
-h2 {
-
-    margin: 2px 0;
-
-    background: red;
-
-    color: white;
-
-    display: inline;
-
-    font-size: 15px;
-
-    border-radius: 5px;
 
 }
 
@@ -80,47 +55,84 @@ h2 {
     position: fixed;
 
     top: 0;
-
     left: 0;
 
     width: 100%;
 
-    background: black;
+    background: #000;
 
-    color: white;
+    color: #fff;
 
-    padding: 8px;
-
-    box-shadow:
-    0 2px 5px rgba(0,0,0,.3);
-
-    z-index: 999;
+    padding: 7px;
 
     display: flex;
 
     align-items: center;
 
-    gap: 7px;
+    gap: 6px;
+
+    z-index: 9999;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.35);
 
 }
 
 
-.topo-fixo input#valorUnico {
-    flex: 0 0 70px;
-    width: 100px;
+.hamburger {
+
+    width: 38px;
     height: 40px;
-    font-size: 16px;
-    padding: 0 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    text-align: center;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 20px;
+
+    border: 1px solid #777;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    background: #222;
+
 }
+
+
+#valorUnico {
+
+    width: 72px;
+
+    height: 40px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+}
+
 
 #totalFinal {
 
-    flex: 1.2;
+    flex: 1;
 
     height: 40px;
+
+    background: #fff;
+
+    color: #000;
+
+    border-radius: 6px;
 
     display: flex;
 
@@ -128,62 +140,43 @@ h2 {
 
     justify-content: center;
 
-    background: white;
-
-    color: black;
-
-    border-radius: 6px;
+    font-size: 14px;
 
     font-weight: bold;
 
-    font-size: 18px;
+    line-height: 15px;
 
 }
 
 
 #apostarBtn {
 
-    flex: 1;
-
     min-width: 90px;
 
     height: 40px;
 
+    border: none;
+
     border-radius: 6px;
 
-    background: #00b300;
+    background: #777;
 
-    color: white;
-
-    border: none;
+    color: #fff;
 
     font-weight: bold;
 
     cursor: pointer;
+
+    line-height: 14px;
 
 }
 
 
 #apostarBtn:disabled {
 
-    background: #777;
+    background: #555;
 
     cursor: not-allowed;
-
-}
-
-
-.hamburger {
-
-    font-size: 18px;
-
-    border: 1px solid #777;
-
-    border-radius: 7px;
-
-    padding: 5px;
-
-    cursor: pointer;
 
 }
 
@@ -196,26 +189,48 @@ h2 {
 
     display: none;
 
-    background: #333;
+    position: fixed;
+
+    top: 62px;
+
+    left: 5px;
+
+    width: 220px;
+
+    max-height: 80vh;
+
+    overflow-y: auto;
+
+    background: #222;
 
     color: white;
 
-    padding: 10px;
+    z-index: 10000;
 
-    position: absolute;
+    border-radius: 8px;
 
-    top: 60px;
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.5);
 
-    left: 0;
-
-    z-index: 999;
-
-    width: 170px;
+    text-align: left;
 
 }
 
 
-#menuEsportes ul {
+.menu-titulo {
+
+    background: #008000;
+
+    padding: 12px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+}
+
+
+#listaEsportes {
 
     list-style: none;
 
@@ -226,13 +241,20 @@ h2 {
 }
 
 
-#menuEsportes li {
+#listaEsportes li {
 
     padding: 12px;
 
-    border-bottom: 2px solid #000;
+    border-bottom: 1px solid #444;
 
     cursor: pointer;
+
+}
+
+
+#listaEsportes li:hover {
+
+    background: #333;
 
 }
 
@@ -259,7 +281,7 @@ h2 {
     display: flex;
 
     transition:
-    transform .5s ease;
+        transform .5s ease;
 
 }
 
@@ -278,7 +300,7 @@ h2 {
 
 
 /* =========================================================
-   TÍTULO DA PÁGINA
+   TÍTULO
 ========================================================= */
 
 .paginaTitulo {
@@ -287,9 +309,11 @@ h2 {
 
     color: white;
 
-    margin-top: 10px;
+    padding: 7px;
 
-    padding: 5px;
+    margin-top: 8px;
+
+    font-weight: bold;
 
 }
 
@@ -299,38 +323,54 @@ h2 {
 ========================================================= */
 
 .dias {
-    margin-top: 20px;
+
+    margin-top: 15px;
+
     display: flex;
+
     justify-content: center;
-    gap: 6px;
-    align-items: center;
+
+    gap: 5px;
+
     width: 100%;
+
     padding: 0 5px;
+
 }
 
+
 .dias button {
+
     flex: 1;
+
     min-width: 0;
-    height: 45px;
-    padding: 8px 4px;
-    background: white;
-    color: black;
-    border-radius: 6px;
+
+    height: 44px;
+
     border: 1px solid #999;
-    cursor: pointer;
-    font-size: 13px;
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    color: #000;
+
+    font-size: 12px;
+
     font-weight: bold;
-    white-space: nowrap;
-    transition: background 0.3s;
+
+    cursor: pointer;
+
 }
+
 
 .dias button.ativo {
 
     background: #0072d3;
 
-    color: white;
+    color: #fff;
 
-    font-weight: bold;
+    border-color: #0072d3;
 
 }
 
@@ -343,53 +383,47 @@ h2 {
 
     display: none;
 
+    width: 100%;
+
     max-width: 600px;
 
     margin: auto;
+
+    padding-bottom: 20px;
 
 }
 
 
 /* =========================================================
-   JOGO
+   CARD DO JOGO
 ========================================================= */
 
 .duelo {
 
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 4px;
-
-    font-weight: bold;
-
-    background: #f0f0f0;
-
-    color: black;
-
-    padding: 8px;
-
-    border-radius: 8px;
+    width: calc(100% - 10px);
 
     margin: 10px auto;
 
-    /* SOMBRA DO CARD */
-    box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.30);
+    padding: 8px;
 
-    /* borda leve */
+    background: #f0f0f0;
+
     border: 1px solid #ddd;
 
+    border-radius: 8px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.30);
+
 }
+
+
 .linha-duelo {
 
     display: grid;
 
     grid-template-columns:
-    60px 1fr 1fr 1fr 60px 35px;
+        55px 1fr 1fr 1fr 55px 35px;
 
     align-items: center;
 
@@ -402,26 +436,26 @@ h2 {
 
 .time-nome-img {
 
+    width: 55px;
+
     display: flex;
 
     flex-direction: column;
 
     align-items: center;
 
-    width: 60px;
-
 }
 
 
 .time-nome-img img {
 
-    width: 50px;
+    width: 45px;
 
-    height: 50px;
+    height: 45px;
 
     object-fit: contain;
 
-    background: white;
+    background: #fff;
 
     border-radius: 6px;
 
@@ -430,30 +464,38 @@ h2 {
 
 .nome-time {
 
+    width: 55px;
+
     font-size: 10px;
 
     font-weight: bold;
 
-    max-width: 60px;
+    line-height: 11px;
 
     overflow-wrap: break-word;
 
 }
 
 
+/* =========================================================
+   BOTÕES DE PALPITE
+========================================================= */
+
 .btn {
 
-    border: none;
-
-    background: #008cff;
-
-    color: white;
-
-    border-radius: 6px;
+    width: 100%;
 
     min-height: 42px;
 
-    font-size: 12px;
+    border: none;
+
+    border-radius: 6px;
+
+    background: #000;
+
+    color: #fff;
+
+    font-size: 11px;
 
     font-weight: bold;
 
@@ -462,9 +504,18 @@ h2 {
 }
 
 
+.btn:hover {
+
+    background: #222;
+
+}
+
+
 .btn.selecionado {
 
     background: #00c853 !important;
+
+    color: #fff !important;
 
 }
 
@@ -476,19 +527,23 @@ h2 {
 }
 
 
+/* =========================================================
+   BOTÃO +
+========================================================= */
+
 .toggleExtras {
 
     width: 32px;
 
-    height: 45px;
-
-    background: #008cff;
-
-    color: white;
+    height: 42px;
 
     border: none;
 
     border-radius: 5px;
+
+    background: #008cff;
+
+    color: #fff;
 
     font-size: 20px;
 
@@ -496,6 +551,10 @@ h2 {
 
 }
 
+
+/* =========================================================
+   EXTRAS
+========================================================= */
 
 .extras {
 
@@ -506,6 +565,8 @@ h2 {
     justify-content: center;
 
     gap: 5px;
+
+    margin-top: 7px;
 
 }
 
@@ -525,10 +586,66 @@ h2 {
 
 
 /* =========================================================
-   MODAL DA APOSTA
+   INFORMAÇÕES DO JOGO
 ========================================================= */
 
-.codigo-modal {
+.info-jogo {
+
+    margin-top: 7px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+}
+
+
+.info-principal {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.campeonato {
+
+    color: #fff;
+
+    background: #008000;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+}
+
+
+.data-hora {
+
+    color: #000;
+
+    background: #ddd;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+}
+
+
+/* =========================================================
+   MODAIS
+========================================================= */
+
+.modal {
 
     display: none;
 
@@ -538,20 +655,204 @@ h2 {
 
     background: rgba(0,0,0,.75);
 
-    z-index: 10000;
+    z-index: 20000;
 
     justify-content: center;
 
     align-items: center;
 
-    padding: 20px;
+    padding: 15px;
 
 }
 
 
+/* =========================================================
+   PRÉVIA
+========================================================= */
+
+.preview-conteudo {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+    text-align: left;
+
+}
+
+
+.preview-titulo {
+
+    background: green;
+
+    color: #fff;
+
+    text-align: center;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    margin-bottom: 12px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-jogo {
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-bottom: 8px;
+
+    background: #f5f5f5;
+
+}
+
+
+.preview-times {
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+    margin-bottom: 6px;
+
+}
+
+
+.preview-info {
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+}
+
+
+.preview-escolha {
+
+    display: inline-block;
+
+    background: #000;
+
+    color: #fff;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-resumo {
+
+    background: #eee;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    margin-top: 10px;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+
+}
+
+
+.preview-retorno {
+
+    color: green;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-botoes {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 12px;
+
+}
+
+
+.preview-botoes button {
+
+    flex: 1;
+
+    min-height: 45px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+#btnVoltarPreview {
+
+    background: #555;
+
+}
+
+
+#btnConfirmarPreview {
+
+    background: #00b300;
+
+}
+
+
+#btnConfirmarPreview:disabled {
+
+    background: #777;
+
+}
+
+
+/* =========================================================
+   MODAL CÓDIGO
+========================================================= */
+
 .codigo-conteudo {
 
-    background: white;
+    background: #fff;
 
     width: 100%;
 
@@ -562,20 +863,22 @@ h2 {
     padding: 20px;
 
     box-shadow:
-    0 5px 30px rgba(0,0,0,.5);
-
-    text-align: center;
+        0 5px 30px rgba(0,0,0,.5);
 
 }
 
 
 .codigo-conteudo h2 {
 
-    display: block;
+    background: red;
 
-    margin-bottom: 15px;
+    color: #fff;
 
     padding: 8px;
+
+    border-radius: 6px;
+
+    font-size: 17px;
 
 }
 
@@ -587,8 +890,6 @@ h2 {
     font-weight: bold;
 
     margin: 15px 0;
-
-    color: #111;
 
 }
 
@@ -615,8 +916,6 @@ h2 {
 
     gap: 7px;
 
-    justify-content: center;
-
     flex-wrap: wrap;
 
 }
@@ -624,21 +923,21 @@ h2 {
 
 .modal-botoes button {
 
-    width: auto;
+    flex: 1;
 
-    min-width: 85px;
+    min-width: 90px;
 
-    padding: 10px 15px;
+    padding: 10px;
 
     border: none;
 
     border-radius: 6px;
 
-    color: white;
-
-    cursor: pointer;
+    color: #fff;
 
     font-weight: bold;
+
+    cursor: pointer;
 
 }
 
@@ -665,42 +964,20 @@ h2 {
 
 
 /* =========================================================
-   MODAL CARREGANDO
+   CARREGANDO
 ========================================================= */
-
-.carregando {
-
-    display: none;
-
-    position: fixed;
-
-    inset: 0;
-
-    background: rgba(0,0,0,.75);
-
-    z-index: 9999;
-
-    justify-content: center;
-
-    align-items: center;
-
-}
-
 
 .carregando-box {
 
-    background: white;
+    background: #fff;
 
-    color: black;
+    color: #000;
 
     padding: 25px;
 
     border-radius: 12px;
 
     font-weight: bold;
-
-    box-shadow:
-    0 5px 25px rgba(0,0,0,.4);
 
 }
 
@@ -711,27 +988,6 @@ h2 {
 
 @media(max-width:500px) {
 
-    .linha-duelo {
-
-        grid-template-columns:
-        52px 1fr 1fr 1fr 52px 30px;
-
-    }
-
-    .time-nome-img {
-
-        width: 52px;
-
-    }
-
-    .time-nome-img img {
-
-        width: 43px;
-
-        height: 43px;
-
-    }
-
     .topo-fixo {
 
         gap: 4px;
@@ -740,17 +996,31 @@ h2 {
 
     }
 
-    .topo-fixo input {
+
+    .hamburger {
+
+        width: 34px;
+
+        height: 40px;
+
+    }
+
+
+    #valorUnico {
+
+        width: 65px;
 
         font-size: 13px;
 
     }
 
+
     #totalFinal {
 
-        font-size: 14px;
+        font-size: 12px;
 
     }
+
 
     #apostarBtn {
 
@@ -760,23 +1030,66 @@ h2 {
 
     }
 
+
+    .linha-duelo {
+
+        grid-template-columns:
+            50px 1fr 1fr 1fr 50px 30px;
+
+    }
+
+
+    .time-nome-img {
+
+        width: 50px;
+
+    }
+
+
+    .time-nome-img img {
+
+        width: 42px;
+
+        height: 42px;
+
+    }
+
+
+    .nome-time {
+
+        width: 50px;
+
+        font-size: 9px;
+
+    }
+
+
+    .btn {
+
+        font-size: 10px;
+
+    }
+
+
+    .coluna-botao {
+
+        width: 31%;
+
+    }
+
 }
-.linha-duelo > .btn {
-    background: #000000;
-    color: #ffffff;
+#apostarBtn.pronto {
+    background: #00b300;
+    color: #fff;
 }
 
-.linha-duelo > .btn:hover {
-    background: #222222;
-}
-
-.linha-duelo > .btn.selecionado {
-    background: #00c853 !important;
-    color: #ffffff;
+#apostarBtn.pronto:hover {
+    background: #009900;
 }
 </style>
 
 </head>
+
 
 <body>
 
@@ -797,22 +1110,32 @@ h2 {
         ☰
     </div>
 
+
     <input
         type="number"
         id="valorUnico"
         placeholder="Valor"
         min="1"
+        step="0.01"
     >
 
+
     <div id="totalFinal">
-        Possível Retorno<Br> R$ 0,00
-    </div>    
+
+        Possível Retorno
+        <br>
+        R$ 0,00
+
+    </div>
+
 
     <button
         id="apostarBtn"
         disabled
     >
-        APOSTAS
+
+        Apostar
+
         <br>
 
         <span id="contadorMarcados">
@@ -828,7 +1151,13 @@ h2 {
      MENU
 ===================================================== -->
 
-<div id="menuEsportes">
+<div
+    id="menuEsportes"
+>
+
+    <div class="menu-titulo">
+        FUTEBOL
+    </div>
 
     <ul id="listaEsportes"></ul>
 
@@ -846,16 +1175,36 @@ h2 {
         id="carrossel"
     >
 
-        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png">
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
+        >
 
-        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483513/elllitersapostaonline1.webp">
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483513/elllitersapostaonline1.webp"
+        >
 
-        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483593/images1.jpg">
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483593/images1.jpg"
+        >
 
-        <img src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784505133/07sportsonline-12-mobile.png">
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784505133/07sportsonline-12-mobile.png"
+        >
 
     </div>
 
+</div>
+
+
+<!-- =====================================================
+     TÍTULO
+===================================================== -->
+
+<div
+    class="paginaTitulo"
+    id="tituloPagina"
+>
+    Futebol
 </div>
 
 
@@ -868,38 +1217,31 @@ h2 {
     id="diasContainer"
 >
 
-    <button data-dia="domingo"
-            onclick="mostrarDia('domingo')">
+    <button data-dia="domingo">
         Domingo
     </button>
 
-    <button data-dia="segunda"
-            onclick="mostrarDia('segunda')">
+    <button data-dia="segunda">
         Segunda
     </button>
 
-    <button data-dia="terca"
-            onclick="mostrarDia('terca')">
+    <button data-dia="terca">
         Terça
     </button>
 
-    <button data-dia="quarta"
-            onclick="mostrarDia('quarta')">
+    <button data-dia="quarta">
         Quarta
     </button>
 
-    <button data-dia="quinta"
-            onclick="mostrarDia('quinta')">
+    <button data-dia="quinta">
         Quinta
     </button>
 
-    <button data-dia="sexta"
-            onclick="mostrarDia('sexta')">
+    <button data-dia="sexta">
         Sexta
     </button>
 
-    <button data-dia="sabado"
-            onclick="mostrarDia('sabado')">
+    <button data-dia="sabado">
         Sábado
     </button>
 
@@ -910,67 +1252,167 @@ h2 {
      CONTEÚDOS
 ===================================================== -->
 
-<div id="conteudo-domingo"
-     class="conteudo-dia">
-</div>
+<div
+    id="conteudo-domingo"
+    class="conteudo-dia"
+></div>
 
-<div id="conteudo-segunda"
-     class="conteudo-dia">
-</div>
 
-<div id="conteudo-terca"
-     class="conteudo-dia">
-</div>
+<div
+    id="conteudo-segunda"
+    class="conteudo-dia"
+></div>
 
-<div id="conteudo-quarta"
-     class="conteudo-dia">
-</div>
 
-<div id="conteudo-quinta"
-     class="conteudo-dia">
-</div>
+<div
+    id="conteudo-terca"
+    class="conteudo-dia"
+></div>
 
-<div id="conteudo-sexta"
-     class="conteudo-dia">
-</div>
 
-<div id="conteudo-sabado"
-     class="conteudo-dia">
+<div
+    id="conteudo-quarta"
+    class="conteudo-dia"
+></div>
+
+
+<div
+    id="conteudo-quinta"
+    class="conteudo-dia"
+></div>
+
+
+<div
+    id="conteudo-sexta"
+    class="conteudo-dia"
+></div>
+
+
+<div
+    id="conteudo-sabado"
+    class="conteudo-dia"
+></div>
+
+
+<!-- =====================================================
+     MODAL PRÉVIA
+===================================================== -->
+
+<div
+    id="previewModal"
+    class="modal"
+>
+
+    <div class="preview-conteudo">
+
+        <div class="preview-titulo">
+            Confira sua aposta
+        </div>
+
+
+        <div id="previewJogos"></div>
+
+
+        <div class="preview-resumo">
+
+            <div>
+
+                💰 Valor da aposta:
+
+                <strong id="previewValor">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                🎯 Quantidade de jogos:
+
+                <strong id="previewQuantidade">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                💵 Possível retorno:
+
+                <div
+                    id="previewRetorno"
+                    class="preview-retorno"
+                >
+                    R$ 0,00
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="preview-botoes">
+
+            <button
+                id="btnVoltarPreview"
+            >
+                Voltar
+            </button>
+
+
+            <button
+                id="btnConfirmarPreview"
+            >
+                Confirmar e Enviar
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
 
 
 <!-- =====================================================
-     MODAL DA APOSTA
+     MODAL CÓDIGO
 ===================================================== -->
 
 <div
     id="codigoModal"
-    class="codigo-modal"
+    class="modal"
 >
 
     <div class="codigo-conteudo">
 
         <h2>
-            Envie o Código ao Cambista!
+            Aposta enviada!
         </h2>
+
 
         <p>
             Código da aposta:
         </p>
 
+
         <div id="codigoAposta"></div>
 
+
         <div id="qrPix"></div>
+
 
         <div class="modal-botoes">
 
             <button id="btnCopiar">
-                Copiar Código da Aposta
+                Copiar Aposta
             </button>
 
+
             <button id="btnWhatsapp">
-               Enviar Codigo da Aposta via  WhatsApp
+                WhatsApp
             </button>
+
 
             <button id="btnFechar">
                 Fechar
@@ -989,7 +1431,7 @@ h2 {
 
 <div
     id="modalCarregando"
-    class="carregando"
+    class="modal"
 >
 
     <div class="carregando-box">
@@ -1003,23 +1445,27 @@ h2 {
 
 <script type="module">
 
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
 import {
     initializeApp
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
 
 import {
     getDatabase,
     ref,
     get,
     set
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-
-/* =========================================================
-   FIREBASE
-========================================================= */
 
 const firebaseConfig = {
 
@@ -1050,6 +1496,7 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
+
 const db =
     getDatabase(app);
 
@@ -1060,7 +1507,8 @@ const db =
 
 const LIMITE = 3000;
 
-const chavePix = "a779076a-56a2-46ad-bb37-f0de8b87e2be";
+const chavePix =
+    "a779076a-56a2-46ad-bb37-f0de8b87e2be";
 
 
 const dias = [
@@ -1080,26 +1528,92 @@ let selects = [];
 
 
 /* =========================================================
-   MENU
+   PAÍSES / CAMPEONATOS
 ========================================================= */
 
-const esportes = [
+const paises = [
 
-    "Boxe",
-    "Corrida",
-    "Futebol",
-    "Basquete",
-    "Tênis",
-    "Play Game",
-    "Combate",
-    "Fut Americano",
-    "Hoquei",
-    "Handebol",
-    "x5",
-    "Mjb"
+    {
+        nome: "🇧🇷 Brasil",
+        chave: "brasil"
+    },
+
+    {
+        nome: "🇦🇷 Argentina",
+        chave: "argentina"
+    },
+
+    {
+        nome: "🇬🇧 Inglaterra",
+        chave: "inglaterra"
+    },
+
+    {
+        nome: "🇪🇸 Espanha",
+        chave: "espanha"
+    },
+
+    {
+        nome: "🇮🇹 Itália",
+        chave: "italia"
+    },
+
+    {
+        nome: "🇩🇪 Alemanha",
+        chave: "alemanha"
+    },
+
+    {
+        nome: "🇫🇷 França",
+        chave: "franca"
+    },
+
+    {
+        nome: "🇵🇹 Portugal",
+        chave: "portugal"
+    },
+
+    {
+        nome: "🇳🇱 Holanda",
+        chave: "holanda"
+    },
+
+    {
+        nome: "🇧🇪 Bélgica",
+        chave: "belgica"
+    },
+
+    {
+        nome: "🇺🇸 Estados Unidos",
+        chave: "eua"
+    },
+
+    {
+        nome: "🇲🇽 México",
+        chave: "mexico"
+    },
+
+    {
+        nome: "🇨🇴 Colômbia",
+        chave: "colombia"
+    },
+
+    {
+        nome: "🇨🇱 Chile",
+        chave: "chile"
+    },
+
+    {
+        nome: "🌎 Internacional",
+        chave: "internacional"
+    }
 
 ];
 
+
+/* =========================================================
+   MENU
+========================================================= */
 
 const lista =
     document.getElementById(
@@ -1107,36 +1621,87 @@ const lista =
     );
 
 
-esportes.forEach(esporte => {
+function montarMenu() {
 
-    const li =
+    lista.innerHTML = "";
+
+
+    /* TODOS */
+
+    const todos =
         document.createElement("li");
 
-    li.textContent =
-        esporte;
+    todos.textContent =
+        "🌎 Todos os jogos";
 
-    li.onclick = () => {
+    todos.onclick = () => {
+
+        filtroPais = "";
 
         document.getElementById(
             "tituloPagina"
         ).textContent =
-            "Esporte : " + esporte;
+            "Futebol";
 
-        document.getElementById(
-            "menuEsportes"
-        ).style.display =
-            "none";
+        fecharMenu();
+
+        recarregarDiaAtual();
 
     };
 
-    lista.appendChild(li);
+    lista.appendChild(todos);
 
-});
 
+    /* PAÍSES */
+
+    paises.forEach(
+        pais => {
+
+            const li =
+                document.createElement("li");
+
+            li.textContent =
+                pais.nome;
+
+            li.onclick = () => {
+
+                filtroPais =
+                    pais.chave;
+
+                document.getElementById(
+                    "tituloPagina"
+                ).textContent =
+                    pais.nome;
+
+                fecharMenu();
+
+                recarregarDiaAtual();
+
+            };
+
+            lista.appendChild(li);
+
+        }
+    );
+
+}
+
+
+let filtroPais = "";
+
+
+montarMenu();
+
+
+/* =========================================================
+   MENU ABRIR
+========================================================= */
 
 document.getElementById(
     "hamburger"
-).onclick = () => {
+).onclick = event => {
+
+    event.stopPropagation();
 
     const menu =
         document.getElementById(
@@ -1149,6 +1714,16 @@ document.getElementById(
         : "block";
 
 };
+
+
+function fecharMenu() {
+
+    document.getElementById(
+        "menuEsportes"
+    ).style.display =
+        "none";
+
+}
 
 
 document.addEventListener(
@@ -1183,16 +1758,21 @@ document.addEventListener(
    MOSTRAR DIA
 ========================================================= */
 
-window.mostrarDia = function(dia) {
+window.mostrarDia =
+function(dia) {
 
     document
-        .querySelectorAll(".conteudo-dia")
-        .forEach(el => {
+        .querySelectorAll(
+            ".conteudo-dia"
+        )
+        .forEach(
+            el => {
 
-            el.style.display =
-                "none";
+                el.style.display =
+                    "none";
 
-        });
+            }
+        );
 
 
     const container =
@@ -1209,14 +1789,18 @@ window.mostrarDia = function(dia) {
 
 
     document
-        .querySelectorAll(".dias button")
-        .forEach(btn => {
+        .querySelectorAll(
+            ".dias button"
+        )
+        .forEach(
+            btn => {
 
-            btn.classList.remove(
-                "ativo"
-            );
+                btn.classList.remove(
+                    "ativo"
+                );
 
-        });
+            }
+        );
 
 
     const botao =
@@ -1233,7 +1817,13 @@ window.mostrarDia = function(dia) {
 
     }
 
+
+    diaAtual = dia;
+
 };
+
+
+let diaAtual = "";
 
 
 /* =========================================================
@@ -1280,7 +1870,12 @@ async function carregarJogos(dia) {
             snapshot.val();
 
 
-        if (!Array.isArray(jogos)) {
+        if (Array.isArray(jogos)) {
+
+            jogos =
+                jogos.filter(Boolean);
+
+        } else {
 
             jogos =
                 Object.values(jogos);
@@ -1288,7 +1883,8 @@ async function carregarJogos(dia) {
         }
 
 
-        container.innerHTML = "";
+        container.innerHTML =
+            "";
 
 
         const agora =
@@ -1313,6 +1909,29 @@ async function carregarJogos(dia) {
                 }
 
 
+                /*
+                 * FILTRO DE PAÍS
+                 */
+
+                if (
+                    filtroPais &&
+                    normalizar(
+                        jogo.pais || ""
+                    ) !==
+                    normalizar(
+                        filtroPais
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * DATA E HORA
+                 */
+
                 const dataHora =
                     new Date(
                         `${jogo.data}T${jogo.hora}`
@@ -1320,7 +1939,7 @@ async function carregarJogos(dia) {
 
 
                 /*
-                 * NÃO MOSTRAR EXPIRADOS
+                 * NÃO MOSTRA EXPIRADO
                  */
 
                 if (
@@ -1349,13 +1968,16 @@ async function carregarJogos(dia) {
         if (!encontrou) {
 
             container.innerHTML =
-                "<p>Não há jogos futuros para este dia.</p>";
+                "<p>Não há jogos disponíveis.</p>";
 
         }
 
-    } catch (erro) {
+    }
+
+    catch (erro) {
 
         console.error(
+            "Erro ao carregar jogos:",
             erro
         );
 
@@ -1384,14 +2006,53 @@ function criarJogo(
     const casa =
         Number(cot.casa) || 1.50;
 
+
     const empate =
         Number(cot.empate) || 2.50;
+
 
     const fora =
         Number(cot.fora) || 2.50;
 
+
     const ambas =
         Number(cot.ambasMarcam) || 2.50;
+
+
+    const timeA =
+        jogo.timeA ||
+        extrairNome(
+            jogo.imagemA
+        ) ||
+        "Time A";
+
+
+    const timeB =
+        jogo.timeB ||
+        extrairNome(
+            jogo.imagemB
+        ) ||
+        "Time B";
+
+
+    const imagemA =
+        jogo.imagemA ||
+        "https://via.placeholder.com/50";
+
+
+    const imagemB =
+        jogo.imagemB ||
+        "https://via.placeholder.com/50";
+
+
+    const campeonato =
+        jogo.campeonato ||
+        "Campeonato";
+
+
+    const pais =
+        jogo.pais ||
+        "";
 
 
     const div =
@@ -1409,108 +2070,162 @@ function criarJogo(
 
 
     div.dataset.campeonato =
-    jogo.campeonato || "Campeonato";
-
-div.dataset.data = jogo.data || "";
-div.dataset.hora = jogo.hora || "";
+        campeonato;
 
 
-    const nomeA =
-        extrairNome(
-            jogo.imagemA
-        );
+    div.dataset.pais =
+        pais;
 
 
-    const nomeB =
-        extrairNome(
-            jogo.imagemB
-        );
+    div.dataset.data =
+        jogo.data || "";
+
+
+    div.dataset.hora =
+        jogo.hora || "";
 
 
     div.innerHTML = `
 
         <div class="linha-duelo">
 
+
+            <!-- TIME A -->
+
             <div class="time-nome-img">
 
                 <img
-                    src="${jogo.imagemA}"
-                    alt="${nomeA}"
+                    src="${escapeAttr(imagemA)}"
+                    alt="${escapeAttr(timeA)}"
+                    onerror="this.src='https://via.placeholder.com/50'"
                 >
 
                 <div class="nome-time">
-                    ${nomeA}
+
+                    ${escapeHTML(timeA)}
+
                 </div>
 
             </div>
 
+
+            <!-- CASA -->
 
             <button
                 class="btn"
                 data-valor="${casa}"
+                data-escolha="Casa"
             >
-                Casa<br>
+
+                Casa
+
+                <br>
+
                 <span class="valor-cotacao">
+
                     ${casa.toFixed(2)}
+
                 </span>
+
             </button>
 
+
+            <!-- EMPATE -->
 
             <button
                 class="btn"
                 data-valor="${empate}"
+                data-escolha="Empate"
             >
-                Empate<br>
+
+                Empate
+
+                <br>
+
                 <span class="valor-cotacao">
+
                     ${empate.toFixed(2)}
+
                 </span>
+
             </button>
 
+
+            <!-- FORA -->
 
             <button
                 class="btn"
                 data-valor="${fora}"
+                data-escolha="Fora"
             >
-                Fora<br>
+
+                Fora
+
+                <br>
+
                 <span class="valor-cotacao">
+
                     ${fora.toFixed(2)}
+
                 </span>
+
             </button>
 
+
+            <!-- TIME B -->
 
             <div class="time-nome-img">
 
                 <img
-                    src="${jogo.imagemB}"
-                    alt="${nomeB}"
+                    src="${escapeAttr(imagemB)}"
+                    alt="${escapeAttr(timeB)}"
+                    onerror="this.src='https://via.placeholder.com/50'"
                 >
 
                 <div class="nome-time">
-                    ${nomeB}
+
+                    ${escapeHTML(timeB)}
+
                 </div>
 
             </div>
 
 
-            <button class="toggleExtras">
+            <!-- + -->
+
+            <button
+                class="toggleExtras"
+            >
                 +
             </button>
+
 
         </div>
 
 
+        <!-- EXTRAS -->
+
         <div class="extras">
+
 
             <div class="coluna-botao">
 
                 <button
                     class="btn"
                     data-valor="${ambas}"
+                    data-escolha="Ambas"
                 >
-                    Ambas<br>
+
+                    Ambas
+
+                    <br>
+
                     <span class="valor-cotacao">
+
                         ${ambas.toFixed(2)}
+
                     </span>
+
                 </button>
 
             </div>
@@ -1521,11 +2236,17 @@ div.dataset.hora = jogo.hora || "";
                 <button
                     class="btn"
                     data-valor="2.00"
+                    data-escolha="+2 Gols"
                 >
-                    +2 Gols<br>
+
+                    +2 Gols
+
+                    <br>
+
                     <span class="valor-cotacao">
                         2.00
                     </span>
+
                 </button>
 
             </div>
@@ -1536,11 +2257,17 @@ div.dataset.hora = jogo.hora || "";
                 <button
                     class="btn"
                     data-valor="2.80"
+                    data-escolha="-2 Gols"
                 >
-                    -2 Gols<br>
+
+                    -2 Gols
+
+                    <br>
+
                     <span class="valor-cotacao">
                         2.80
                     </span>
+
                 </button>
 
             </div>
@@ -1551,11 +2278,17 @@ div.dataset.hora = jogo.hora || "";
                 <button
                     class="btn"
                     data-valor="1.50"
+                    data-escolha="Casa/Fora"
                 >
-                    Casa/Fora<br>
+
+                    Casa/Fora
+
+                    <br>
+
                     <span class="valor-cotacao">
                         1.50
                     </span>
+
                 </button>
 
             </div>
@@ -1566,11 +2299,17 @@ div.dataset.hora = jogo.hora || "";
                 <button
                     class="btn"
                     data-valor="2.00"
+                    data-escolha="Casa/Empate"
                 >
-                    Casa/Empate<br>
+
+                    Casa/Empate
+
+                    <br>
+
                     <span class="valor-cotacao">
                         2.00
                     </span>
+
                 </button>
 
             </div>
@@ -1581,31 +2320,54 @@ div.dataset.hora = jogo.hora || "";
                 <button
                     class="btn"
                     data-valor="1.80"
+                    data-escolha="Empate/Fora"
                 >
-                    Empate/Fora<br>
+
+                    Empate/Fora
+
+                    <br>
+
                     <span class="valor-cotacao">
                         1.80
                     </span>
+
                 </button>
 
             </div>
 
+
         </div>
 
 
-        <small>
+        <!-- INFORMAÇÕES -->
 
-            <strong>
-                ${jogo.campeonato || "Campeonato"}
-            </strong>
+        <div class="info-jogo">
 
-            <br>
+            <div class="info-principal">
 
-            ${formatarData(jogo.data)}
-            às
-            ${jogo.hora}
+                <span class="campeonato">
 
-        </small>
+                    🏆
+                    ${escapeHTML(campeonato)}
+
+                </span>
+
+
+                <span class="data-hora">
+
+                    📅
+                    ${formatarData(jogo.data)}
+
+                    &nbsp;
+
+                    ⏰
+                    ${escapeHTML(jogo.hora)}
+
+                </span>
+
+            </div>
+
+        </div>
 
     `;
 
@@ -1616,7 +2378,7 @@ div.dataset.hora = jogo.hora || "";
 
 
     /* =====================================================
-       BOTÃO +
+       ABRIR EXTRAS
     ===================================================== */
 
     const toggle =
@@ -1631,7 +2393,8 @@ div.dataset.hora = jogo.hora || "";
         );
 
 
-    toggle.onclick = () => {
+    toggle.onclick =
+    () => {
 
         const aberto =
             extras.style.display === "flex";
@@ -1652,59 +2415,73 @@ div.dataset.hora = jogo.hora || "";
 
 
     /* =====================================================
-       BOTÕES DE PALPITE
+       SELEÇÃO
     ===================================================== */
 
     div.querySelectorAll(
         ".btn"
-    ).forEach(btn => {
+    ).forEach(
+        btn => {
 
-        btn.onclick = () => {
+            btn.onclick =
+            () => {
 
-            const jaSelecionado =
-                btn.classList.contains(
-                    "selecionado"
+                const jaSelecionado =
+                    btn.classList.contains(
+                        "selecionado"
+                    );
+
+
+                /*
+                 * SOMENTE UM PALPITE
+                 * POR JOGO
+                 */
+
+                div.querySelectorAll(
+                    ".btn"
+                ).forEach(
+                    outro => {
+
+                        outro.classList.remove(
+                            "selecionado"
+                        );
+
+                    }
                 );
 
 
-            div.querySelectorAll(
-                ".btn"
-            ).forEach(b => {
+                if (!jaSelecionado) {
 
-                b.classList.remove(
-                    "selecionado"
-                );
+                    btn.classList.add(
+                        "selecionado"
+                    );
 
-            });
+                }
 
 
-            if (!jaSelecionado) {
+                atualizarSelecoes();
 
-                btn.classList.add(
-                    "selecionado"
-                );
+                atualizarTotal();
 
-            }
+            };
 
-
-            atualizarSelecoes();
-
-            atualizarTotal();
-
-        };
-
-    });
+        }
+    );
 
 }
 
 
 /* =========================================================
-   NOME
+   NOME DO ARQUIVO - COMPATIBILIDADE
 ========================================================= */
 
 function extrairNome(url) {
 
-    if (!url) return "Time";
+    if (!url) {
+
+        return "Time";
+
+    }
 
 
     try {
@@ -1736,11 +2513,35 @@ function extrairNome(url) {
             )
             .trim();
 
-    } catch {
+    }
+
+    catch {
 
         return "Time";
 
     }
+
+}
+
+
+/* =========================================================
+   NORMALIZAR
+========================================================= */
+
+function normalizar(texto) {
+
+    return String(texto || "")
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .replace(
+            /\s+/g,
+            "-"
+        )
+        .trim();
 
 }
 
@@ -1753,12 +2554,18 @@ function formatarData(data) {
 
     if (!data) return "";
 
+
     const partes =
-        data.split("-");
+        String(data).split("-");
 
 
-    if (partes.length !== 3)
+    if (
+        partes.length !== 3
+    ) {
+
         return data;
+
+    }
 
 
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -1767,65 +2574,166 @@ function formatarData(data) {
 
 
 /* =========================================================
-   SELEÇÕES
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text) {
+
+    return String(text || "")
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttr(text) {
+
+    return escapeHTML(text);
+
+}
+
+
+/* =========================================================
+   ATUALIZAR SELEÇÕES
 ========================================================= */
 
 function atualizarSelecoes() {
 
     selects = [];
 
-    document.querySelectorAll(".duelo").forEach(duelo => {
 
-        const btn =
-            duelo.querySelector(".btn.selecionado");
+    document
+        .querySelectorAll(
+            ".duelo"
+        )
+        .forEach(
+            duelo => {
 
-        if (!btn) return;
+                const btn =
+                    duelo.querySelector(
+                        ".btn.selecionado"
+                    );
 
-        const nomes =
-            duelo.querySelectorAll(".nome-time");
 
-        selects.push({
+                if (!btn) return;
 
-            timeA:
-                nomes[0]?.textContent.trim() || "",
 
-            timeB:
-                nomes[1]?.textContent.trim() || "",
+                const nomes =
+                    duelo.querySelectorAll(
+                        ".nome-time"
+                    );
 
-            valor:
-                Number(btn.dataset.valor) || 0,
 
-            escolha:
-                btn.textContent
-                    .trim()
-                    .split("\n")[0]
-                    .trim(),
+                selects.push({
 
-            campeonato:
-                duelo.dataset.campeonato ||
-                "Campeonato",
+                    timeA:
+                        nomes[0]?.textContent
+                        .trim() || "",
 
-            data:
-                duelo.dataset.data || "",
 
-            hora:
-                duelo.dataset.hora || "",
+                    timeB:
+                        nomes[1]?.textContent
+                        .trim() || "",
 
-            dataHora:
-                `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
 
-            status:
-                "aguardando"
+                    valor:
+                        Number(
+                            btn.dataset.valor
+                        ) || 0,
 
-        });
 
-    });
+                    escolha:
+                        btn.dataset.escolha ||
+                        btn.textContent
+                            .trim()
+                            .split("\n")[0]
+                            .trim(),
 
-    document.getElementById(
-        "contadorMarcados"
-    ).textContent =
-        "Times " + selects.length;
+
+                    campeonato:
+                        duelo.dataset.campeonato ||
+                        "Campeonato",
+
+
+                    pais:
+                        duelo.dataset.pais ||
+                        "",
+
+
+                    data:
+                        duelo.dataset.data ||
+                        "",
+
+
+                    hora:
+                        duelo.dataset.hora ||
+                        "",
+
+
+                    dataHora:
+                        `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
+
+
+                    status:
+                        "aguardando"
+
+                });
+
+            }
+        );
+
+
+    atualizarContador();
+
 }
+
+
+/* =========================================================
+   CONTADOR
+========================================================= */
+
+function atualizarContador() {
+
+    const contador =
+        document.getElementById(
+            "contadorMarcados"
+        );
+
+
+    if (contador) {
+
+        contador.textContent =
+            "Times " +
+            selects.length;
+
+    }
+
+}
+
+
 /* =========================================================
    TOTAL
 ========================================================= */
@@ -1836,6 +2744,9 @@ function atualizarTotal() {
         Number(
             document.getElementById("valorUnico").value
         ) || 0;
+
+    const quantidade =
+        selects.length;
 
     let multiplicador = 1;
 
@@ -1848,7 +2759,7 @@ function atualizarTotal() {
 
         });
 
-    const total =
+    const retorno =
         valor * multiplicador;
 
     const totalFinal =
@@ -1857,302 +2768,665 @@ function atualizarTotal() {
     const apostar =
         document.getElementById("apostarBtn");
 
-    const contador =
-        document.getElementById("contadorMarcados");
 
-    /* =========================
-       NENHUMA SELEÇÃO OU VALOR
-    ========================= */
+    /* =====================================================
+       SEM JOGO OU SEM VALOR
+    ===================================================== */
 
     if (
-        valor <= 0 ||
-        selects.length === 0
+        quantidade === 0 ||
+        valor <= 0
     ) {
 
-        totalFinal.textContent =
-            "Total: R$ 0,00";
+        totalFinal.innerHTML = `
+            Possível Retorno
+            <br>
+            R$ 0,00
+        `;
 
         apostar.disabled = true;
+
+        apostar.classList.remove("pronto");
 
         apostar.innerHTML = `
             Apostar
             <br>
             <span id="contadorMarcados">
-                Times ${selects.length}
+                Times ${quantidade}
             </span>
         `;
 
         return;
+
     }
 
-    /* =========================
-       LIMITE
-    ========================= */
 
-    if (total > LIMITE) {
+    /* =====================================================
+       LIMITE DE RETORNO
+    ===================================================== */
 
-        totalFinal.innerHTML =
-            `<span style="color:red">
-                R$ ${total.toFixed(2)}
-            </span>`;
+    if (retorno > LIMITE) {
+
+        totalFinal.innerHTML = `
+            <span style="color:red">
+                Retorno
+                <br>
+                R$ ${retorno.toFixed(2)}
+            </span>
+        `;
 
         apostar.disabled = true;
+
+        apostar.classList.remove("pronto");
 
         apostar.innerHTML = `
             Apostar
             <br>
             <span id="contadorMarcados">
-                Times ${selects.length}
+                Times ${quantidade}
             </span>
         `;
 
         return;
+
     }
 
-    /* =========================
-       TOTAL VÁLIDO
-    ========================= */
 
-    totalFinal.innerHTML =
-        `<span style="color:green">
-            R$ ${total.toFixed(2)}
-        </span>`;
+    /* =====================================================
+       PRONTO PARA ENVIAR
+    ===================================================== */
+
+    totalFinal.innerHTML = `
+        <span style="color:green">
+            Retorno
+            <br>
+            R$ ${retorno.toFixed(2)}
+        </span>
+    `;
 
     apostar.disabled = false;
 
-    /* =========================
-       MUDA PARA ENVIAR
-    ========================= */
+    apostar.classList.add("pronto");
 
     apostar.innerHTML = `
         Enviar
         <br>
         <span id="contadorMarcados">
-            Times ${selects.length}
+            Times ${quantidade}
         </span>
     `;
+
 }
 
 /* =========================================================
-   ENVIO DA APOSTA
+   ABRIR PRÉVIA
 ========================================================= */
 
-document.getElementById("apostarBtn").onclick = async function () {
+function abrirPreview() {
 
-    const botao = this;
+    const campoValor =
+        document.getElementById(
+            "valorUnico"
+        );
+
+
+    const valor =
+        Number(
+            campoValor.value
+        ) || 0;
+
+
+    if (
+        !valor ||
+        valor <= 0
+    ) {
+
+        alert(
+            "Digite um valor válido."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        selects.length === 0
+    ) {
+
+        alert(
+            "Selecione pelo menos um jogo."
+        );
+
+        return;
+
+    }
+
+
+    let multiplicador =
+        1;
+
+
+    selects.forEach(
+        selecao => {
+
+            multiplicador *=
+                Number(
+                    selecao.valor
+                ) || 1;
+
+        }
+    );
+
+
+    const retorno =
+        valor *
+        multiplicador;
+
+
+    if (
+        retorno > LIMITE
+    ) {
+
+        alert(
+            "O possível retorno ultrapassa o limite de R$ " +
+            LIMITE.toFixed(2)
+        );
+
+        return;
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "previewJogos"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    selects.forEach(
+        (selecao, index) => {
+
+            const jogo =
+                document.createElement(
+                    "div"
+                );
+
+
+            jogo.className =
+                "preview-jogo";
+
+
+            jogo.innerHTML = `
+
+                <div class="preview-times">
+
+                    ${index + 1}.
+                    ${escapeHTML(selecao.timeA)}
+                    ×
+                    ${escapeHTML(selecao.timeB)}
+
+                </div>
+
+
+                <div class="preview-info">
+
+                    🏆
+                    <strong>
+
+                        ${escapeHTML(
+                            selecao.campeonato
+                        )}
+
+                    </strong>
+
+
+                    <br>
+
+
+                    📅
+                    ${formatarData(
+                        selecao.data
+                    )}
+
+
+                    &nbsp;
+
+
+                    ⏰
+                    ${escapeHTML(
+                        selecao.hora
+                    )}
+
+
+                    <br>
+
+
+                    🎯 Palpite:
+
+                    <span
+                        class="preview-escolha"
+                    >
+
+                        ${escapeHTML(
+                            selecao.escolha
+                        )}
+
+                        &nbsp;
+
+                        ${Number(
+                            selecao.valor
+                        ).toFixed(2)}
+
+                    </span>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                jogo
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "previewValor"
+    ).textContent =
+        "R$ " +
+        valor.toFixed(2);
+
+
+    document.getElementById(
+        "previewQuantidade"
+    ).textContent =
+        selects.length;
+
+
+    document.getElementById(
+        "previewRetorno"
+    ).textContent =
+        "R$ " +
+        retorno.toFixed(2);
+
+
+    document.getElementById(
+        "previewModal"
+    ).style.display =
+        "flex";
+
+}
+
+
+/* =========================================================
+   BOTÃO ENVIAR
+========================================================= */
+
+document.getElementById(
+    "apostarBtn"
+).onclick =
+function() {
+
+    abrirPreview();
+
+};
+
+
+/* =========================================================
+   VOLTAR
+========================================================= */
+
+document.getElementById(
+    "btnVoltarPreview"
+).onclick =
+function() {
+
+    document.getElementById(
+        "previewModal"
+    ).style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   CONFIRMAR E ENVIAR
+========================================================= */
+
+document.getElementById(
+    "btnConfirmarPreview"
+).onclick =
+async function() {
+
+    const botaoConfirmar =
+        this;
+
+
+    const botaoPrincipal =
+        document.getElementById(
+            "apostarBtn"
+        );
+
+
+    const campoValor =
+        document.getElementById(
+            "valorUnico"
+        );
+
 
     try {
 
-        const campoValor = document.getElementById("valorUnico");
+        const valor =
+            Number(
+                campoValor.value
+            );
 
-        if (!campoValor) {
-            alert("Erro: campo de valor não encontrado.");
+
+        if (
+            !valor ||
+            valor <= 0
+        ) {
+
+            alert(
+                "Digite um valor válido."
+            );
+
             return;
+
         }
 
-        const valor = Number(campoValor.value);
 
-        if (!valor || valor <= 0) {
-            alert("Digite um valor válido.");
+        if (
+            selects.length === 0
+        ) {
+
+            alert(
+                "Selecione pelo menos um jogo."
+            );
+
             return;
+
         }
 
-        if (!selects || selects.length === 0) {
-            alert("Selecione pelo menos um jogo.");
+
+        let multiplicador =
+            1;
+
+
+        selects.forEach(
+            selecao => {
+
+                multiplicador *=
+                    Number(
+                        selecao.valor
+                    ) || 1;
+
+            }
+        );
+
+
+        const retorno =
+            valor *
+            multiplicador;
+
+
+        if (
+            retorno > LIMITE
+        ) {
+
+            alert(
+                "O possível retorno ultrapassa o limite de R$ " +
+                LIMITE.toFixed(2)
+            );
+
             return;
+
         }
 
-        /* ==========================================
-           BLOQUEIA BOTÃO
-        ========================================== */
 
-        botao.disabled = true;
+        /*
+         * BLOQUEIA
+         */
 
-        botao.innerHTML = "Enviando...";
+        botaoConfirmar.disabled =
+            true;
 
-        /* ==========================================
-           CÓDIGO
-        ========================================== */
 
-        const codigo = "MJ" + Date.now();
+        botaoConfirmar.textContent =
+            "Enviando...";
 
-        /* ==========================================
-           MONTA APOSTA
-        ========================================== */
+
+        botaoPrincipal.disabled =
+            true;
+
+
+        /*
+         * CÓDIGO
+         */
+
+        const codigo =
+            "MJ" +
+            Date.now();
+
+
+        /*
+         * APOSTA
+         */
 
         const aposta = {
 
-            codigo: codigo,
+            codigo:
 
-            valorUnico: valor,
+                codigo,
 
-            selecoes: selects.map(s => ({
 
-                timeA: String(s.timeA || ""),
+            valorUnico:
 
-                timeB: String(s.timeB || ""),
+                valor,
 
-                valor: Number(s.valor) || 0,
 
-                escolha: String(s.escolha || ""),
+            possivelRetorno:
 
-                campeonato:
-                    String(
-                        s.campeonato ||
-                        "Campeonato"
-                    ),
+                retorno,
 
-                data:
-                    String(
-                        s.data || ""
-                    ),
 
-                hora:
-                    String(
-                        s.hora || ""
-                    ),
+            quantidadeJogos:
 
-                dataHora:
-                    String(
-                        s.dataHora || ""
-                    ),
+                selects.length,
 
-                status:
-                    "aguardando"
 
-            })),
+            selecoes:
+
+                selects.map(
+                    s => ({
+
+                        timeA:
+                            String(
+                                s.timeA || ""
+                            ),
+
+
+                        timeB:
+                            String(
+                                s.timeB || ""
+                            ),
+
+
+                        valor:
+                            Number(
+                                s.valor
+                            ) || 0,
+
+
+                        escolha:
+                            String(
+                                s.escolha || ""
+                            ),
+
+
+                        campeonato:
+                            String(
+                                s.campeonato ||
+                                "Campeonato"
+                            ),
+
+
+                        pais:
+                            String(
+                                s.pais || ""
+                            ),
+
+
+                        data:
+                            String(
+                                s.data || ""
+                            ),
+
+
+                        hora:
+                            String(
+                                s.hora || ""
+                            ),
+
+
+                        dataHora:
+                            String(
+                                s.dataHora || ""
+                            ),
+
+
+                        status:
+                            "aguardando"
+
+                    })
+                ),
+
 
             dataHora:
-                new Date().toISOString()
+
+                new Date().toISOString(),
+
+            
+            status:
+
+                "aguardando"
 
         };
 
 
-        console.log(
-            "ENVIANDO APOSTA:",
-            aposta
-        );
-
-
-        /* ==========================================
-           SALVA NO FIREBASE
-        ========================================== */
+        /*
+         * SALVA NO FIREBASE
+         */
 
         await set(
+
             ref(
                 db,
                 "apostas/" + codigo
             ),
+
             aposta
+
         );
 
 
         console.log(
             "APOSTA SALVA:",
+            aposta
+        );
+
+
+        /*
+         * FECHA PRÉVIA
+         */
+
+        document.getElementById(
+            "previewModal"
+        ).style.display =
+            "none";
+
+
+        /*
+         * MODAL CÓDIGO
+         */
+
+        abrirModal(
             codigo
         );
 
 
-        /* ==========================================
-           ABRE MODAL
-           IMPORTANTE:
-           O modal NÃO pode impedir o envio
-        ========================================== */
-
-        try {
-
-            abrirModal(codigo);
-
-        } catch (erroModal) {
-
-            console.error(
-                "ERRO AO ABRIR MODAL:",
-                erroModal
-            );
-
-            /*
-             * A aposta já foi salva.
-             * Portanto não mostramos erro de conexão.
-             */
-
-            alert(
-                "Aposta salva com sucesso!\n\n" +
-                "Código: " + codigo
-            );
-
-        }
-
-
-        /* ==========================================
-           LIMPA SELEÇÕES
-        ========================================== */
+        /*
+         * LIMPA SELEÇÕES
+         */
 
         document
             .querySelectorAll(
                 ".btn.selecionado"
             )
-            .forEach(btn => {
+            .forEach(
+                btn => {
 
-                btn.classList.remove(
-                    "selecionado"
-                );
+                    btn.classList.remove(
+                        "selecionado"
+                    );
 
-            });
+                }
+            );
 
 
         selects = [];
 
 
-        /* ==========================================
-           LIMPA VALOR
-        ========================================== */
-
-        campoValor.value = "";
+        campoValor.value =
+            "";
 
 
-        /* ==========================================
-           ATUALIZA CONTADOR
-        ========================================== */
-
-        const contador =
-            document.getElementById(
-                "contadorMarcados"
-            );
-
-        if (contador) {
-
-            contador.textContent =
-                "Times 0";
-
-        }
-
-
-        /* ==========================================
-           ATUALIZA TOTAL
-        ========================================== */
+        atualizarContador();
 
         atualizarTotal();
 
 
-        /* ==========================================
-           RESTAURA BOTÃO
-        ========================================== */
+        /*
+         * RESTAURA BOTÃO
+         */
 
-        botao.disabled = true;
+        botaoPrincipal.disabled =
+            true;
 
-        botao.innerHTML = `
+
+        botaoPrincipal.innerHTML = `
+
             Apostar
+
             <br>
+
             <span id="contadorMarcados">
                 Times 0
             </span>
+
         `;
 
 
-    } catch (erro) {
+        botaoConfirmar.disabled =
+            false;
+
+
+        botaoConfirmar.textContent =
+            "Confirmar e Enviar";
+
+    }
+
+    catch (erro) {
 
         console.error(
-            "ERRO AO ENVIAR APOSTA:",
+            "ERRO AO ENVIAR:",
             erro
         );
 
@@ -2167,21 +3441,24 @@ document.getElementById("apostarBtn").onclick = async function () {
         );
 
 
-        botao.disabled = false;
+        botaoConfirmar.disabled =
+            false;
 
-        botao.innerHTML = `
-            Apostar
-            <br>
-            <span id="contadorMarcados">
-                Times ${selects.length}
-            </span>
-        `;
+
+        botaoConfirmar.textContent =
+            "Confirmar e Enviar";
+
+
+        botaoPrincipal.disabled =
+            false;
 
     }
 
 };
+
+
 /* =========================================================
-   MODAL
+   MODAL DA APOSTA
 ========================================================= */
 
 function abrirModal(codigo) {
@@ -2198,10 +3475,6 @@ function abrirModal(codigo) {
         codigo;
 
 
-    /*
-     * QR CODE
-     */
-
     const pix =
         encodeURIComponent(
             chavePix
@@ -2217,16 +3490,18 @@ function abrirModal(codigo) {
             alt="QR Code PIX"
         >
 
-        <p style="display:none">
-            PIX: <strong>${chavePix}</strong>
+        <p style="display:none;">
+
+            PIX:
+
+            <strong>
+                ${chavePix}
+            </strong>
+
         </p>
 
     `;
 
-
-    /*
-     * MOSTRA MODAL
-     */
 
     modal.style.display =
         "flex";
@@ -2238,7 +3513,8 @@ function abrirModal(codigo) {
 
     document.getElementById(
         "btnCopiar"
-    ).onclick = async () => {
+    ).onclick =
+    async () => {
 
         try {
 
@@ -2246,14 +3522,18 @@ function abrirModal(codigo) {
                 codigo
             );
 
+
             alert(
                 "Código copiado!"
             );
 
-        } catch {
+        }
+
+        catch {
 
             alert(
-                "Código: " + codigo
+                "Código: " +
+                codigo
             );
 
         }
@@ -2267,10 +3547,16 @@ function abrirModal(codigo) {
 
     document.getElementById(
         "btnWhatsapp"
-    ).onclick = () => {
+    ).onclick =
+    () => {
 
         const texto =
-            `Minha aposta MULTI PLAY.BET%0A%0ACódigo: ${codigo}`;
+            encodeURIComponent(
+                "Minha aposta MULTI PLAY.BET\n\n" +
+                "Código: " +
+                codigo
+            );
+
 
         window.open(
             `https://wa.me/?text=${texto}`,
@@ -2288,7 +3574,8 @@ function abrirModal(codigo) {
 
 document.getElementById(
     "btnFechar"
-).onclick = () => {
+).onclick =
+function() {
 
     document.getElementById(
         "codigoModal"
@@ -2319,7 +3606,52 @@ document.getElementById(
 
 
 /* =========================================================
-   CARREGAR SOMENTE 3 DIAS
+   FECHAR PRÉVIA FORA
+========================================================= */
+
+document.getElementById(
+    "previewModal"
+).addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.id ===
+            "previewModal"
+        ) {
+
+            event.target.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RECARREGAR DIA
+========================================================= */
+
+async function recarregarDiaAtual() {
+
+    if (!diaAtual) return;
+
+
+    await carregarJogos(
+        diaAtual
+    );
+
+
+    mostrarDia(
+        diaAtual
+    );
+
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO
 ========================================================= */
 
 async function inicializar() {
@@ -2343,47 +3675,29 @@ async function inicializar() {
 
 
     /*
-     * PRIMEIRO ESCONDE OS 7
+     * ESCONDE TODOS
      */
 
     document
         .querySelectorAll(
             "#diasContainer button"
         )
-        .forEach(btn => {
+        .forEach(
+            btn => {
 
-            btn.style.display =
-                "none";
+                btn.style.display =
+                    "none";
 
-            btn.classList.remove(
-                "ativo"
-            );
+                btn.classList.remove(
+                    "ativo"
+                );
 
-        });
-
-
-    /*
-     * ESCONDE CONTEÚDOS
-     */
-
-    document
-        .querySelectorAll(
-            ".conteudo-dia"
-        )
-        .forEach(el => {
-
-            el.style.display =
-                "none";
-
-        });
+            }
+        );
 
 
     /*
-     * MOSTRA APENAS:
-     *
-     * HOJE
-     * AMANHÃ
-     * DEPOIS DE AMANHÃ
+     * CARREGA HOJE + 2 PRÓXIMOS
      */
 
     for (
@@ -2392,12 +3706,12 @@ async function inicializar() {
         i++
     ) {
 
-        const indiceDia =
+        const indice =
             (indiceHoje + i) % 7;
 
 
         const dia =
-            dias[indiceDia];
+            dias[indice];
 
 
         const botao =
@@ -2409,7 +3723,7 @@ async function inicializar() {
         if (botao) {
 
             botao.style.display =
-                "inline-block";
+                "block";
 
         }
 
@@ -2422,15 +3736,19 @@ async function inicializar() {
 
 
     /*
-     * ABRE HOJE
+     * MOSTRA HOJE
      */
 
-    const diaHoje =
+    const hojeNome =
         dias[indiceHoje];
 
 
+    diaAtual =
+        hojeNome;
+
+
     mostrarDia(
-        diaHoje
+        hojeNome
     );
 
 
@@ -2441,36 +3759,42 @@ async function inicializar() {
 
 
 /* =========================================================
-   CLIQUE NOS 3 DIAS
+   CLIQUE NOS DIAS
 ========================================================= */
 
 document
     .querySelectorAll(
         "#diasContainer button"
     )
-    .forEach(btn => {
+    .forEach(
+        btn => {
 
-        btn.addEventListener(
-            "click",
-            async () => {
+            btn.addEventListener(
+                "click",
+                async () => {
 
-                const dia =
-                    btn.dataset.dia;
-
-
-                await carregarJogos(
-                    dia
-                );
+                    const dia =
+                        btn.dataset.dia;
 
 
-                mostrarDia(
-                    dia
-                );
+                    diaAtual =
+                        dia;
 
-            }
-        );
 
-    });
+                    await carregarJogos(
+                        dia
+                    );
+
+
+                    mostrarDia(
+                        dia
+                    );
+
+                }
+            );
+
+        }
+    );
 
 
 /* =========================================================
@@ -2481,7 +3805,11 @@ document.getElementById(
     "valorUnico"
 ).addEventListener(
     "input",
-    atualizarTotal
+    () => {
+
+        atualizarTotal();
+
+    }
 );
 
 
@@ -2495,27 +3823,34 @@ const carrossel =
     );
 
 
-let slide = 0;
+let slide =
+    0;
 
 
-setInterval(() => {
+setInterval(
+    () => {
 
-    if (!carrossel) return;
-
-
-    const total =
-        carrossel.children.length;
+        if (!carrossel) return;
 
 
-    slide =
-        (slide + 1) %
-        total;
+        const total =
+            carrossel.children.length;
 
 
-    carrossel.style.transform =
-        `translateX(-${slide * 100}%)`;
+        if (!total) return;
 
-}, 3000);
+
+        slide =
+            (slide + 1) %
+            total;
+
+
+        carrossel.style.transform =
+            `translateX(-${slide * 100}%)`;
+
+    },
+    3000
+);
 
 
 /* =========================================================
