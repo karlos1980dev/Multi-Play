@@ -1,0 +1,7345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>MULTI PLAY.BET</title>
+
+<link
+rel="shortcut icon"
+href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
+>
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    font-family: Arial, sans-serif;
+
+    text-align: center;
+
+    padding-top: 78px;
+
+    color: #000;
+
+    background: #f1f1f1;
+
+}
+
+
+/* =========================================================
+   TOPO FIXO
+========================================================= */
+
+.topo-fixo {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    background: #000;
+
+    color: #fff;
+
+    padding: 7px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    z-index: 9999;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.35);
+
+}
+
+
+.hamburger {
+
+    width: 38px;
+    height: 40px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 20px;
+
+    border: 1px solid #777;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    background: #222;
+
+}
+
+
+#saldoJogador {
+
+    width: 105px;
+
+    height: 40px;
+
+    background: #fff;
+
+    color: #008000;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    line-height: 13px;
+
+}
+
+
+#saldoValor {
+
+    font-size: 14px;
+
+}
+
+
+#valorUnico {
+
+    width: 72px;
+
+    height: 40px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    font-size: 15px;
+
+    font-weight: bold;
+    
+    background:Black;
+    color:white;
+
+}
+
+
+#totalFinal {
+
+    flex: 1;
+
+    min-width: 0;
+
+    height: 40px;
+
+    background: #fff;
+
+    color: #000;
+
+    border-radius: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    line-height: 14px;
+
+}
+
+
+#apostarBtn {
+
+    min-width: 90px;
+
+    height: 40px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: #777;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    line-height: 14px;
+
+}
+
+
+#apostarBtn:disabled {
+
+    background: #555;
+
+    cursor: not-allowed;
+
+}
+
+
+#apostarBtn.pronto {
+
+    background: #00b300;
+
+    color: #fff;
+
+}
+
+
+#apostarBtn.pronto:hover {
+
+    background: #009900;
+
+}
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+#menuEsportes {
+
+    display: none;
+
+    position: fixed;
+
+    top: 62px;
+
+    left: 5px;
+
+    width: 250px;
+
+    max-height: 80vh;
+
+    overflow-y: auto;
+
+    background: #222;
+
+    color: white;
+
+    z-index: 10000;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.5);
+
+    text-align: left;
+
+}
+
+
+.menu-titulo {
+
+    background: #008000;
+
+    padding: 12px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+}
+
+
+#listaEsportes {
+
+    list-style: none;
+
+    padding: 0;
+
+    margin: 0;
+
+}
+
+
+#listaEsportes li {
+
+    padding: 12px;
+
+    border-bottom: 1px solid #444;
+
+    cursor: pointer;
+
+}
+
+
+#listaEsportes li:hover {
+
+    background: #333;
+
+}
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+.carrossel-container {
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+
+}
+
+
+.carrossel {
+
+    display: flex;
+
+    transition:
+        transform .5s ease;
+
+}
+
+
+.carrossel img {
+
+    width: 100%;
+
+    height: 133px;
+
+    object-fit: cover;
+
+    flex-shrink: 0;
+
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.paginaTitulo {
+
+    background: green;
+
+    color: white;
+
+    padding: 7px;
+
+    margin-top: 8px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================================
+   DIAS
+========================================================= */
+
+.dias {
+
+    margin-top: 15px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    width: 100%;
+
+    padding: 0 5px;
+
+}
+
+
+.dias button {
+
+    flex: 1;
+
+    min-width: 0;
+
+    height: 44px;
+
+    border: 1px solid #999;
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    color: #000;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.dias button.ativo {
+
+    background: #0072d3;
+
+    color: #fff;
+
+    border-color: #0072d3;
+
+}
+
+
+/* =========================================================
+   CONTEÚDO
+========================================================= */
+
+.conteudo-dia {
+
+    display: none;
+
+    width: 100%;
+
+    max-width: 600px;
+
+    margin: auto;
+
+    padding-bottom: 20px;
+
+}
+
+
+/* =========================================================
+   CARD DO JOGO
+========================================================= */
+
+.duelo {
+
+    width: calc(100% - 10px);
+
+    margin: 10px auto;
+
+    padding: 8px;
+
+    background: #f0f0f0;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.30);
+
+}
+
+
+.linha-duelo {
+
+    display: grid;
+
+    grid-template-columns:
+        55px 1fr 1fr 1fr 55px 35px;
+
+    align-items: center;
+
+    gap: 5px;
+
+    width: 100%;
+
+}
+
+
+.time-nome-img {
+
+    width: 55px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+}
+
+
+.time-nome-img img {
+
+    width: 45px;
+
+    height: 45px;
+
+    object-fit: contain;
+
+    background: #fff;
+
+    border-radius: 6px;
+
+}
+
+
+.nome-time {
+
+    width: 55px;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    line-height: 11px;
+
+    overflow-wrap: break-word;
+
+}
+
+
+/* =========================================================
+   BOTÕES
+========================================================= */
+
+.btn {
+
+    width: 100%;
+
+    min-height: 42px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: #000;
+
+    color: #fff;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.btn:hover {
+
+    background: #222;
+
+}
+
+
+.btn.selecionado {
+
+    background: #00c853 !important;
+
+    color: #fff !important;
+
+}
+
+
+.valor-cotacao {
+
+    font-size: 10px;
+
+}
+
+
+/* =========================================================
+   BOTÃO +
+========================================================= */
+
+.toggleExtras {
+
+    width: 32px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    background: #008cff;
+
+    color: #fff;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   EXTRAS
+========================================================= */
+
+.extras {
+
+    display: none;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-top: 7px;
+
+}
+
+
+.coluna-botao {
+
+    width: 30%;
+
+}
+
+
+.coluna-botao .btn {
+
+    width: 100%;
+
+}
+
+
+/* =========================================================
+   INFORMAÇÕES
+========================================================= */
+
+.info-jogo {
+
+    margin-top: 7px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+}
+
+
+.info-principal {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.campeonato {
+
+    color: #fff;
+
+    background: #008000;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+}
+
+
+.data-hora {
+
+    color: #000;
+
+    background: #ddd;
+
+    padding: 4px 7px;
+
+    border-radius: 4px;
+
+}
+
+
+/* =========================================================
+   MODAL GERAL
+========================================================= */
+
+.modal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 20000;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 15px;
+
+}
+
+
+/* =========================================================
+   MODAL NOME
+========================================================= */
+
+.nome-conteudo {
+
+    width: 100%;
+
+    max-width: 360px;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.nome-conteudo h2 {
+
+    margin-top: 0;
+
+    background: green;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+}
+
+
+#nomeJogadorInput {
+
+    width: 100%;
+
+    height: 48px;
+
+    border: 1px solid #aaa;
+
+    border-radius: 7px;
+
+    padding: 10px;
+
+    font-size: 16px;
+
+    text-align: center;
+
+}
+
+
+#btnSalvarNome {
+
+    width: 100%;
+
+    height: 45px;
+
+    margin-top: 10px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   MODAL SALDO
+========================================================= */
+
+.saldo-conteudo {
+
+    width: 100%;
+
+    max-width: 380px;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.saldo-conteudo h2 {
+
+    background: #d00000;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+}
+
+
+.saldo-atual-modal {
+
+    background: #eee;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    margin: 10px 0;
+
+    font-weight: bold;
+
+}
+
+
+.btnAdicionarSaldo {
+
+    width: 100%;
+
+    min-height: 45px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 7px;
+
+}
+
+
+/* =========================================================
+   PRÉVIA
+========================================================= */
+
+.preview-conteudo {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+    text-align: left;
+
+}
+
+
+.preview-titulo {
+
+    background: green;
+
+    color: #fff;
+
+    text-align: center;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    margin-bottom: 12px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-jogo {
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-bottom: 8px;
+
+    background: #f5f5f5;
+
+}
+
+
+.preview-times {
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+    margin-bottom: 6px;
+
+}
+
+
+.preview-info {
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+}
+
+
+.preview-escolha {
+
+    display: inline-block;
+
+    background: #000;
+
+    color: #fff;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-resumo {
+
+    background: #eee;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    margin-top: 10px;
+
+    font-size: 14px;
+
+    line-height: 1.8;
+
+}
+
+
+.preview-retorno {
+
+    color: green;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+}
+
+
+.preview-botoes {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 12px;
+
+}
+
+
+.preview-botoes button {
+
+    flex: 1;
+
+    min-height: 45px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+#btnVoltarPreview {
+
+    background: #555;
+
+}
+
+
+#btnConfirmarPreview {
+
+    background: #00b300;
+
+}
+
+
+#btnConfirmarPreview:disabled {
+
+    background: #777;
+
+}
+
+
+/* =========================================================
+   MODAL CÓDIGO
+========================================================= */
+
+.codigo-conteudo {
+
+    background: #fff;
+
+    width: 100%;
+
+    max-width: 360px;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.codigo-conteudo h2 {
+
+    background: green;
+
+    color: #fff;
+
+    padding: 8px;
+
+    border-radius: 6px;
+
+    font-size: 17px;
+
+}
+
+
+#codigoAposta {
+
+    font-size: 27px;
+
+    font-weight: bold;
+
+    margin: 15px 0;
+
+}
+
+
+#qrPix {
+
+    margin: 15px 0;
+
+}
+
+
+#qrPix img {
+
+    width: 170px;
+
+    height: 170px;
+
+}
+
+
+.modal-botoes {
+
+    display: flex;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.modal-botoes button {
+
+    flex: 1;
+
+    min-width: 90px;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+#btnCopiar {
+
+    background: #0072d3;
+
+}
+
+
+#btnWhatsapp {
+
+    background: #00a884;
+
+}
+
+
+#btnFechar {
+
+    background: #555;
+
+}
+
+
+/* =========================================================
+   JOGOS FEITOS
+========================================================= */
+
+.jogos-feitos-conteudo {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.jogos-feitos-titulo {
+
+    background: #008000;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+.aposta-card {
+
+    background: #f5f5f5;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-top: 10px;
+
+    text-align: left;
+
+}
+
+
+.aposta-codigo {
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+}
+
+
+.aposta-status {
+
+    display: inline-block;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    font-size: 11px;
+
+    margin-top: 5px;
+
+}
+
+
+.status-aguardando {
+
+    background: #ff9800;
+
+}
+
+
+.status-liberada {
+
+    background: #00a000;
+
+}
+
+
+.status-bloqueada {
+
+    background: #d00000;
+
+}
+
+
+.status-finalizada {
+
+    background: #0072d3;
+
+}
+
+
+.btnFecharLista {
+
+    width: 100%;
+
+    height: 43px;
+
+    margin-top: 12px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #555;
+
+    color: #fff;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================================
+   CARREGANDO
+========================================================= */
+
+.carregando-box {
+
+    background: #fff;
+
+    color: #000;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:500px) {
+
+    .topo-fixo {
+
+        gap: 4px;
+
+        padding: 6px;
+
+    }
+
+
+    .hamburger {
+
+        width: 34px;
+
+        height: 40px;
+
+    }
+
+
+    #saldoJogador {
+
+        width: 82px;
+
+        font-size: 9px;
+
+    }
+
+
+    #saldoValor {
+
+        font-size: 12px;
+
+    }
+
+
+    #valorUnico {
+
+        width: 65px;
+
+        font-size: 13px;
+
+    }
+
+
+    #totalFinal {
+
+        font-size: 10px;
+
+    }
+
+
+    #apostarBtn {
+
+        min-width: 68px;
+
+        font-size: 10px;
+
+    }
+
+
+    .linha-duelo {
+
+        grid-template-columns:
+            50px 1fr 1fr 1fr 50px 30px;
+
+    }
+
+
+    .time-nome-img {
+
+        width: 50px;
+
+    }
+
+
+    .time-nome-img img {
+
+        width: 42px;
+
+        height: 42px;
+
+    }
+
+
+    .nome-time {
+
+        width: 50px;
+
+        font-size: 9px;
+
+    }
+
+
+    .btn {
+
+        font-size: 10px;
+
+    }
+
+
+    .coluna-botao {
+
+        width: 31%;
+
+    }
+
+}
+/* =========================================================
+   JOGOS FEITOS DENTRO DO MENU
+========================================================= */
+
+#jogosFeitosMenu {
+    padding: 8px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.menu-aposta {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 9px;
+    margin-bottom: 8px;
+    text-align: left;
+    font-size: 11px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+.menu-aposta-times {
+    background: #008000;
+    color: #fff;
+    padding: 7px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.menu-aposta-jogo {
+    background: #f1f1f1;
+    border-radius: 5px;
+    padding: 7px;
+    margin-top: 5px;
+}
+
+.menu-aposta-info {
+    line-height: 1.6;
+}
+
+.menu-aposta-palpite {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.menu-aposta-status {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 7px;
+    border-radius: 5px;
+    background: #ff9800;
+    color: #fff;
+    font-weight: bold;
+}
+
+.menu-aposta-status.liberada {
+    background: #00a000;
+}
+
+.menu-aposta-status.bloqueada {
+    background: #d00000;
+}
+
+.menu-aposta-status.finalizada {
+    background: #0072d3;
+}
+
+.menu-aposta-resumo {
+    border-top: 1px solid #ccc;
+    margin-top: 8px;
+    padding-top: 8px;
+    line-height: 1.7;
+}
+.modal-saldo {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-saldo.ativo {
+    display: flex;
+}
+
+.modal-saldo-box {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0,0,0,.3);
+}
+
+.modal-saldo-box h3 {
+    margin: 0 0 10px;
+    font-size: 22px;
+}
+
+.modal-saldo-box p {
+    margin-bottom: 18px;
+    color: #555;
+}
+
+.input-valor {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 0 12px;
+    margin-bottom: 20px;
+}
+
+.input-valor span {
+    font-weight: bold;
+}
+
+.input-valor input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    padding: 13px 8px;
+    font-size: 18px;
+}
+
+.botoes-saldo {
+    display: flex;
+    gap: 10px;
+}
+
+.botoes-saldo button {
+    flex: 1;
+    border: 0;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-solicitar {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-cancelar {
+    background: #ddd;
+    color: #222;
+}
+/* =========================================================
+   MODAL PIX
+========================================================= */
+
+.modal-pix {
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,.75);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 99999;
+
+}
+
+
+.modal-pix-conteudo {
+
+    width: 100%;
+
+    max-width: 400px;
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    position: relative;
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.35);
+
+}
+
+
+.pix-fechar {
+
+    position: absolute;
+
+    right: 12px;
+
+    top: 8px;
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+}
+
+
+.pix-qrcode {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    margin: 15px 0;
+
+}
+
+
+.pix-qrcode img {
+
+    width: 230px;
+
+    height: 230px;
+
+    object-fit: contain;
+
+}
+
+
+.pix-instrucao {
+
+    font-size: 14px;
+
+    color: #555;
+
+}
+
+
+#pixCopiaCola {
+
+    width: 100%;
+
+    min-height: 90px;
+
+    resize: none;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+}
+
+
+.btn-pix-copiar {
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #168f3d;
+
+    color: #fff;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.btn-pix-ticket {
+
+    display: block;
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border-radius: 8px;
+
+    background: #009ee3;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+}
+
+
+.pix-status {
+
+    margin-top: 15px;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background: #f1f1f1;
+
+    font-weight: bold;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>MULTI PLAY.BET</h1>
+
+<!-- =========================================================
+     MODAL PIX
+========================================================= -->
+
+<div id="modalPix" class="modal-pix">
+
+    <div class="pix-box">
+
+        <button
+            class="pix-fechar"
+            onclick="fecharModalPix()"
+        >
+            ×
+        </button>
+
+        <h2>💳 Adicionar Saldo</h2>
+
+        <p id="pixDescricao">
+            Aguarde, gerando seu PIX...
+        </p>
+
+        <div id="pixCarregando">
+            <div class="spinner"></div>
+            <p>Gerando PIX...</p>
+        </div>
+
+        <div
+            id="pixConteudo"
+            style="display:none"
+        >
+
+            <img
+                id="pixQRCode"
+                class="pix-qrcode"
+                alt="QR Code PIX"
+            >
+
+            <p class="pix-label">
+                PIX Copia e Cola
+            </p>
+
+            <textarea
+                id="pixCopiaCola"
+                readonly
+            ></textarea>
+
+            <button
+                class="pix-btn"
+                onclick="copiarPix()"
+            >
+                📋 Copiar PIX
+            </button>
+
+            <div class="pix-status">
+
+                <span id="pixStatusIcon">
+                    ⏳
+                </span>
+
+                <span id="pixStatus">
+                    Aguardando pagamento...
+                </span>
+
+            </div>
+
+            <p class="pix-aviso">
+                Após o pagamento aprovado,
+                o saldo será atualizado automaticamente.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.modal-pix{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.75);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:99999;
+
+    padding:20px;
+
+}
+
+.modal-pix.ativo{
+
+    display:flex;
+
+}
+
+.pix-box{
+
+    width:100%;
+
+    max-width:420px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    text-align:center;
+
+    position:relative;
+
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
+
+}
+
+.pix-box h2{
+
+    margin-top:0;
+
+    color:#111;
+
+}
+
+.pix-fechar{
+
+    position:absolute;
+
+    right:12px;
+
+    top:8px;
+
+    border:0;
+
+    background:none;
+
+    font-size:32px;
+
+    cursor:pointer;
+
+    color:#555;
+
+}
+
+.pix-qrcode{
+
+    width:220px;
+
+    height:220px;
+
+    object-fit:contain;
+
+    display:block;
+
+    margin:15px auto;
+
+}
+
+.pix-label{
+
+    font-weight:bold;
+
+    margin-bottom:6px;
+
+}
+
+#pixCopiaCola{
+
+    width:100%;
+
+    height:90px;
+
+    resize:none;
+
+    border:1px solid #ccc;
+
+    border-radius:10px;
+
+    padding:10px;
+
+    font-size:12px;
+
+}
+
+.pix-btn{
+
+    width:100%;
+
+    border:0;
+
+    border-radius:10px;
+
+    padding:14px;
+
+    margin-top:10px;
+
+    background:#18a558;
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.pix-status{
+
+    margin-top:18px;
+
+    padding:14px;
+
+    background:#f5f5f5;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+}
+
+.pix-aviso{
+
+    font-size:12px;
+
+    color:#777;
+
+}
+
+.spinner{
+
+    width:40px;
+
+    height:40px;
+
+    border:4px solid #ddd;
+
+    border-top:4px solid #18a558;
+
+    border-radius:50%;
+
+    animation:girar .8s linear infinite;
+
+    margin:20px auto;
+
+}
+
+@keyframes girar{
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+</style>
+<!-- =====================================================
+     TOPO
+===================================================== -->
+
+<div class="topo-fixo">
+
+
+    <div
+        class="hamburger"
+        id="hamburger"
+    >
+        ☰
+    </div>
+
+
+    <!-- SALDO -->
+
+    <div id="saldoJogador">
+
+        <span>Saldo</span>
+
+        <span id="saldoValor">
+            R$ 0,00
+        </span>
+
+    </div>
+
+
+    <!-- VALOR DA APOSTA -->
+
+    <input
+        type="number"
+        id="valorUnico"
+        placeholder="Valor"
+        min="1"
+        step="0.01"
+    >
+
+
+    <div id="totalFinal">
+
+        Possível Retorno
+        <br>
+        R$ 0,00
+
+    </div>
+
+
+    <button
+        id="apostarBtn"
+        disabled
+    >
+
+        Apostar
+
+        <br>
+
+        <span id="contadorMarcados">
+            Times 0
+        </span>
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     MENU
+===================================================== -->
+
+<div id="menuEsportes">
+
+    <div class="menu-titulo">
+        MENU
+    </div>
+
+    <ul id="listaEsportes"></ul>
+
+    <div id="jogosFeitosMenu">
+        Carregando...
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CARROSSEL
+===================================================== -->
+
+<div class="carrossel-container">
+
+    <div
+        class="carrossel"
+        id="carrossel"
+    >
+
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
+        >
+
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483513/elllitersapostaonline1.webp"
+        >
+
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483593/images1.jpg"
+        >
+
+        <img
+        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784505133/07sportsonline-12-mobile.png"
+        >
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TÍTULO
+===================================================== -->
+
+<div
+    class="paginaTitulo"
+    id="tituloPagina"
+>
+    Futebol
+</div>
+
+
+<!-- =====================================================
+     DIAS
+===================================================== -->
+
+<div
+    class="dias"
+    id="diasContainer"
+>
+
+    <button data-dia="domingo">
+        Domingo
+    </button>
+
+    <button data-dia="segunda">
+        Segunda
+    </button>
+
+    <button data-dia="terca">
+        Terça
+    </button>
+
+    <button data-dia="quarta">
+        Quarta
+    </button>
+
+    <button data-dia="quinta">
+        Quinta
+    </button>
+
+    <button data-dia="sexta">
+        Sexta
+    </button>
+
+    <button data-dia="sabado">
+        Sábado
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     CONTEÚDOS
+===================================================== -->
+
+<div
+    id="conteudo-domingo"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-segunda"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-terca"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-quarta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-quinta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-sexta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-sabado"
+    class="conteudo-dia"
+></div>
+
+
+<!-- =====================================================
+     MODAL NOME
+===================================================== -->
+<div id="modalSaldo" class="modal-saldo">
+    <div class="modal-saldo-box">
+
+        <h3>Saldo insuficiente</h3>
+
+        <p>Informe o valor que deseja solicitar:</p>
+
+        <div class="input-valor">
+            <span>R$</span>
+            <input
+                type="number"
+                id="valorSolicitado"
+                value="10"
+                min="1"
+                step="0.01"
+            >
+        </div>
+
+        <div class="botoes-saldo">
+            <button
+                type="button"
+                onclick="solicitarSaldo()"
+                class="btn-solicitar"
+            >
+                Solicitar
+            </button>
+
+            <button
+                type="button"
+                onclick="fecharModalSaldo()"
+                class="btn-cancelar"
+            >
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div
+    id="nomeModal"
+    class="modal"
+>
+
+    <div class="nome-conteudo">
+
+        <h2>
+            Bem-vindo!
+        </h2>
+
+        <p>
+            Digite seu nome para continuar.
+        </p>
+
+        <input
+            type="text"
+            id="nomeJogadorInput"
+            placeholder="Seu nome"
+            maxlength="50"
+            autocomplete="name"
+        >
+
+        <button
+            id="btnSalvarNome"
+        >
+            Continuar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL SALDO INSUFICIENTE
+===================================================== -->
+
+<div
+    id="saldoModal"
+    class="modal"
+>
+
+    <div class="saldo-conteudo">
+
+        <h2>
+            Saldo insuficiente
+        </h2>
+
+        <p>
+            Você não possui saldo suficiente
+            para realizar esta aposta.
+        </p>
+
+        <div class="saldo-atual-modal">
+
+            Seu saldo:
+
+            <strong id="saldoModalValor">
+                R$ 0,00
+            </strong>
+
+            <br>
+
+            Valor da aposta:
+
+            <strong id="valorModalAposta">
+                R$ 0,00
+            </strong>
+
+        </div>
+
+        <button
+            class="btnAdicionarSaldo"
+            id="btnFecharSaldo"
+        >
+            Fechar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL PRÉVIA
+===================================================== -->
+
+<div
+    id="previewModal"
+    class="modal"
+>
+
+    <div class="preview-conteudo">
+
+        <div class="preview-titulo">
+            Confira sua aposta
+        </div>
+
+
+        <div id="previewJogos"></div>
+
+
+        <div class="preview-resumo">
+
+            <div>
+
+                👤 Jogador:
+
+                <strong id="previewNome">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                💰 Valor da aposta:
+
+                <strong id="previewValor">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                💳 Saldo após aposta:
+
+                <strong id="previewSaldoRestante">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                🎯 Quantidade de jogos:
+
+                <strong id="previewQuantidade">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                💵 Possível retorno:
+
+                <div
+                    id="previewRetorno"
+                    class="preview-retorno"
+                >
+                    R$ 0,00
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="preview-botoes">
+
+            <button
+                id="btnVoltarPreview"
+            >
+                Voltar
+            </button>
+
+
+            <button
+                id="btnConfirmarPreview"
+            >
+                Confirmar e Enviar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL CÓDIGO
+===================================================== -->
+
+<div
+    id="codigoModal"
+    class="modal"
+>
+
+    <div class="codigo-conteudo">
+
+        <h2>
+            Aposta enviada!
+        </h2>
+
+
+        <p>
+            Código da aposta:
+        </p>
+
+
+        <div id="codigoAposta"></div>
+
+
+        <div id="qrPix"></div>
+
+
+        <div class="modal-botoes">
+
+            <button id="btnCopiar">
+                Copiar Aposta
+            </button>
+
+
+            <button id="btnWhatsapp">
+                WhatsApp
+            </button>
+
+
+            <button id="btnFechar">
+                Fechar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL JOGOS FEITOS
+===================================================== -->
+
+<div
+    id="jogosFeitosModal"
+    class="modal"
+>
+
+    <div class="jogos-feitos-conteudo">
+
+        <div class="jogos-feitos-titulo">
+
+            🎟️ Jogos Feitos
+
+        </div>
+
+        <div id="listaJogosFeitos">
+
+            Carregando...
+
+        </div>
+
+        <button
+            class="btnFecharLista"
+            id="btnFecharJogosFeitos"
+        >
+            Fechar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL CARREGANDO
+===================================================== -->
+
+<div
+    id="modalCarregando"
+    class="modal"
+>
+
+    <div class="carregando-box">
+
+        Carregando jogos...
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+
+    authDomain:
+        "jogo-60a9e.firebaseapp.com",
+
+    projectId:
+        "jogo-60a9e",
+
+    storageBucket:
+        "jogo-60a9e.appspot.com",
+
+    messagingSenderId:
+        "352852303591",
+
+    appId:
+        "1:352852303591:web:8083c950047c9026bd8c42",
+
+    databaseURL:
+        "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getDatabase(app);
+
+
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+const LIMITE = 3000;
+
+const chavePix =
+    "a779076a-56a2-46ad-bb37-f0de8b87e2be";
+
+
+const dias = [
+    "domingo",
+    "segunda",
+    "terca",
+    "quarta",
+    "quinta",
+    "sexta",
+    "sabado"
+];
+
+
+let selects = [];
+
+let diaAtual = "";
+
+let filtroPais = "";
+
+let jogadorId = "";
+
+let nomeJogador = "";
+
+let saldoJogador = 0;
+/* =========================================================
+   CONFIGURAÇÃO DO BACKEND PIX
+========================================================= */
+
+
+let pixPaymentId = "";
+
+let pixSolicitacaoId = "";
+
+let pixValorAtual = 0;
+
+let pixTimer = null;
+
+
+/* =========================================================
+   ABRIR PIX
+========================================================= */
+
+window.abrirPagamentoPix =
+async function(valor){
+
+    valor =
+        Number(
+            valor
+        );
+
+
+    if(
+        !valor ||
+        valor <= 0
+    ){
+
+        alert(
+            "Digite um valor válido."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !jogadorId
+    ){
+
+        alert(
+            "Jogador não identificado."
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "modalPix"
+        );
+
+
+    const carregando =
+        document.getElementById(
+            "pixCarregando"
+        );
+
+
+    const conteudo =
+        document.getElementById(
+            "pixConteudo"
+        );
+
+
+    const descricao =
+        document.getElementById(
+            "pixDescricao"
+        );
+
+
+    modal.classList.add(
+        "ativo"
+    );
+
+
+    carregando.style.display =
+        "block";
+
+
+    conteudo.style.display =
+        "none";
+
+
+    descricao.textContent =
+        "Gerando PIX de " +
+        dinheiro(valor) +
+        "...";
+
+
+    try{
+
+        const resposta =
+            await fetch(
+                PIX_BACKEND_URL,
+                {
+
+                    method:"POST",
+
+                    redirect:"follow",
+
+                    headers:{
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            acao:
+                                "criarPix",
+
+                            jogadorId:
+                                jogadorId,
+
+                            nome:
+                                nomeJogador,
+
+                            valor:
+                                valor
+
+                        })
+
+                }
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        if(
+            !dados.ok
+        ){
+
+            throw new Error(
+                dados.erro ||
+                "Erro ao gerar PIX."
+            );
+
+        }
+
+
+        pixPaymentId =
+            String(
+                dados.paymentId
+            );
+
+
+        pixSolicitacaoId =
+            String(
+                dados.solicitacaoId
+            );
+
+
+        pixValorAtual =
+            valor;
+
+
+        const qr =
+            document.getElementById(
+                "pixQRCode"
+            );
+
+
+        qr.src =
+            "data:image/png;base64," +
+            dados.qrCodeBase64;
+
+
+        document.getElementById(
+            "pixCopiaCola"
+        ).value =
+            dados.qrCode;
+
+
+        document.getElementById(
+            "pixStatus"
+        ).textContent =
+            "Aguardando pagamento...";
+
+
+        document.getElementById(
+            "pixStatusIcon"
+        ).textContent =
+            "⏳";
+
+
+        carregando.style.display =
+            "none";
+
+
+        conteudo.style.display =
+            "block";
+
+
+        iniciarConsultaPix();
+
+    }
+
+    catch(erro){
+
+        console.error(
+            "Erro PIX:",
+            erro
+        );
+
+
+        fecharModalPix();
+
+
+        alert(
+            "Não foi possível gerar o PIX.\n\n" +
+            (
+                erro.message ||
+                erro
+            )
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   CONSULTAR PAGAMENTO
+========================================================= */
+
+function iniciarConsultaPix(){
+
+    if(
+        pixTimer
+    ){
+
+        clearInterval(
+            pixTimer
+        );
+
+    }
+
+
+    pixTimer =
+        setInterval(
+            async () => {
+
+                if(
+                    !pixPaymentId
+                ){
+
+                    return;
+
+                }
+
+
+                try{
+
+                    const url =
+                        PIX_BACKEND_URL +
+                        "?acao=consultarPix" +
+                        "&paymentId=" +
+                        encodeURIComponent(
+                            pixPaymentId
+                        );
+
+
+                    const resposta =
+                        await fetch(
+                            url
+                        );
+
+
+                    const dados =
+                        await resposta.json();
+
+
+                    if(
+                        !dados.ok
+                    ){
+
+                        return;
+
+                    }
+
+
+                    if(
+                        dados.status ===
+                        "approved"
+                    ){
+
+                        clearInterval(
+                            pixTimer
+                        );
+
+
+                        document.getElementById(
+                            "pixStatusIcon"
+                        ).textContent =
+                            "✅";
+
+
+                        document.getElementById(
+                            "pixStatus"
+                        ).textContent =
+                            "Pagamento aprovado!";
+
+
+                        saldoJogador =
+                            Number(
+                                dados.saldo
+                            ) ||
+                            saldoJogador;
+
+
+                        atualizarSaldoTela();
+
+
+                        setTimeout(
+                            () => {
+
+                                fecharModalPix();
+
+                            },
+                            2500
+                        );
+
+                    }
+
+                    else if(
+                        dados.status ===
+                        "rejected"
+                    ){
+
+                        clearInterval(
+                            pixTimer
+                        );
+
+
+                        document.getElementById(
+                            "pixStatusIcon"
+                        ).textContent =
+                            "❌";
+
+
+                        document.getElementById(
+                            "pixStatus"
+                        ).textContent =
+                            "Pagamento rejeitado.";
+
+                    }
+
+                }
+
+                catch(erro){
+
+                    console.error(
+                        "Erro consultando PIX:",
+                        erro
+                    );
+
+                }
+
+            },
+            5000
+        );
+
+}
+
+
+/* =========================================================
+   COPIAR PIX
+========================================================= */
+
+window.copiarPix =
+async function(){
+
+    const campo =
+        document.getElementById(
+            "pixCopiaCola"
+        );
+
+
+    try{
+
+        await navigator.clipboard.writeText(
+            campo.value
+        );
+
+
+        alert(
+            "PIX copiado!"
+        );
+
+    }
+
+    catch{
+
+        campo.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+
+        alert(
+            "PIX copiado!"
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   FECHAR PIX
+========================================================= */
+
+window.fecharModalPix =
+function(){
+
+    if(
+        pixTimer
+    ){
+
+        clearInterval(
+            pixTimer
+        );
+
+        pixTimer =
+            null;
+
+    }
+
+
+    document.getElementById(
+        "modalPix"
+    ).classList.remove(
+        "ativo"
+    );
+
+};
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const lista =
+    document.getElementById(
+        "listaEsportes"
+    );
+
+const nomeModal =
+    document.getElementById(
+        "nomeModal"
+    );
+
+const saldoModal =
+    document.getElementById(
+        "saldoModal"
+    );
+
+const previewModal =
+    document.getElementById(
+        "previewModal"
+    );
+
+const codigoModal =
+    document.getElementById(
+        "codigoModal"
+    );
+
+const jogosFeitosModal =
+    document.getElementById(
+        "jogosFeitosModal"
+    );
+
+
+/* =========================================================
+   GERAR ID DO JOGADOR
+========================================================= */
+
+function obterJogadorId() {
+
+    let id =
+        localStorage.getItem(
+            "multiPlayJogadorId"
+        );
+
+
+    if (!id) {
+
+        id =
+            "J" +
+            Date.now() +
+            Math.random()
+                .toString(36)
+                .substring(2, 8);
+
+        localStorage.setItem(
+            "multiPlayJogadorId",
+            id
+        );
+
+    }
+
+
+    return id;
+
+}
+
+
+/* =========================================================
+   FORMATAR DINHEIRO
+========================================================= */
+
+function dinheiro(valor) {
+
+    return Number(valor || 0)
+        .toLocaleString(
+            "pt-BR",
+            {
+                style: "currency",
+                currency: "BRL"
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ATUALIZAR SALDO NA TELA
+========================================================= */
+
+function atualizarSaldoTela() {
+
+    const campo =
+        document.getElementById(
+            "saldoValor"
+        );
+
+
+    if (campo) {
+
+        campo.textContent =
+            dinheiro(
+                saldoJogador
+            );
+
+    }
+
+
+    const modalSaldoValor =
+        document.getElementById(
+            "saldoModalValor"
+        );
+
+
+    if (modalSaldoValor) {
+
+        modalSaldoValor.textContent =
+            dinheiro(
+                saldoJogador
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR JOGADOR
+========================================================= */
+
+async function carregarJogador() {
+
+    jogadorId =
+        obterJogadorId();
+
+
+    const nomeSalvo =
+        localStorage.getItem(
+            "multiPlayNome"
+        );
+
+
+    if (!nomeSalvo) {
+
+        nomeModal.style.display =
+            "flex";
+
+        return false;
+
+    }
+
+
+    nomeJogador =
+        nomeSalvo;
+
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (snapshot.exists()) {
+
+            const dados =
+                snapshot.val();
+
+
+            saldoJogador =
+                Number(
+                    dados.saldo
+                ) || 0;
+
+
+            if (
+                dados.nome &&
+                dados.nome !== nomeJogador
+            ) {
+
+                nomeJogador =
+                    dados.nome;
+
+                localStorage.setItem(
+                    "multiPlayNome",
+                    nomeJogador
+                );
+
+            }
+
+        }
+
+        else {
+
+            saldoJogador = 0;
+
+
+            await set(
+                jogadorRef,
+                {
+
+                    nome:
+                        nomeJogador,
+
+                    saldo:
+                        0,
+
+                    bloqueado:
+                        false,
+
+                    criadoEm:
+                        new Date()
+                            .toISOString()
+
+                }
+            );
+
+        }
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar jogador:",
+            erro
+        );
+
+        saldoJogador = 0;
+
+    }
+
+
+    atualizarSaldoTela();
+
+    return true;
+
+}
+
+
+/* =========================================================
+   SALVAR NOME
+========================================================= */
+
+document.getElementById(
+    "btnSalvarNome"
+).onclick =
+async function() {
+
+    const campo =
+        document.getElementById(
+            "nomeJogadorInput"
+        );
+
+
+    const nome =
+        campo.value.trim();
+
+
+    if (!nome) {
+
+        alert(
+            "Digite seu nome."
+        );
+
+        campo.focus();
+
+        return;
+
+    }
+
+
+    nomeJogador =
+        nome;
+
+
+    localStorage.setItem(
+        "multiPlayNome",
+        nomeJogador
+    );
+
+
+    jogadorId =
+        obterJogadorId();
+
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (snapshot.exists()) {
+
+            await update(
+                jogadorRef,
+                {
+                    nome:
+                        nomeJogador
+                }
+            );
+
+        }
+
+        else {
+
+            await set(
+                jogadorRef,
+                {
+
+                    nome:
+                        nomeJogador,
+
+                    saldo:
+                        0,
+
+                    bloqueado:
+                        false,
+
+                    criadoEm:
+                        new Date()
+                            .toISOString()
+
+                }
+            );
+
+        }
+
+
+        saldoJogador = 0;
+
+        atualizarSaldoTela();
+
+
+        nomeModal.style.display =
+            "none";
+
+
+        iniciarSistema();
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        alert(
+            "Não foi possível salvar o nome."
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function montarMenu() {
+
+    lista.innerHTML = "";
+
+
+    /* =====================================================
+       JOGOS FEITOS
+    ===================================================== */
+
+    const feitos =
+        document.createElement(
+            "li"
+        );
+
+
+    feitos.textContent =
+        "🎟️ Jogos Feitos";
+
+
+    feitos.onclick =
+    async () => {
+
+        filtroPais = "";
+
+
+        document.getElementById(
+            "tituloPagina"
+        ).textContent =
+            "Jogos Feitos";
+
+
+        await carregarJogosFeitosMenu();
+
+    };
+
+
+    lista.appendChild(
+        feitos
+    );
+
+
+    /* =====================================================
+       TODOS OS JOGOS
+    ===================================================== */
+
+    const todos =
+        document.createElement(
+            "li"
+        );
+
+
+    todos.textContent =
+        "🌎 Todos os jogos";
+
+
+    todos.onclick =
+    async () => {
+
+        filtroPais = "";
+
+
+        document.getElementById(
+            "tituloPagina"
+        ).textContent =
+            "Futebol";
+
+
+        document.getElementById(
+            "jogosFeitosMenu"
+        ).innerHTML = "";
+
+
+        fecharMenu();
+
+
+        if (!diaAtual) {
+
+            const hoje =
+                new Date().getDay();
+
+            diaAtual =
+                dias[hoje];
+
+        }
+
+
+        await recarregarDiaAtual();
+
+    };
+
+
+    lista.appendChild(
+        todos
+    );
+
+}
+
+
+montarMenu();
+
+
+/* =========================================================
+   CARREGAR JOGOS FEITOS NO MENU
+========================================================= */
+
+async function carregarJogosFeitosMenu() {
+
+    const container =
+        document.getElementById(
+            "jogosFeitosMenu"
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "<p style='color:white;text-align:center'>" +
+        "Carregando apostas..." +
+        "</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "apostas"
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            container.innerHTML =
+                "<p style='color:white;text-align:center'>" +
+                "Nenhuma aposta encontrada." +
+                "</p>";
+
+            document.getElementById(
+                "menuEsportes"
+            ).style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        const dados =
+            snapshot.val();
+
+
+        const apostas =
+            Object.values(dados)
+                .filter(
+                    aposta =>
+                        aposta &&
+                        aposta.jogadorId ===
+                        jogadorId
+                )
+                .sort(
+                    (a, b) =>
+                        String(
+                            b.dataHora || ""
+                        ).localeCompare(
+                            String(
+                                a.dataHora || ""
+                            )
+                        )
+                );
+
+
+        if (apostas.length === 0) {
+
+            container.innerHTML =
+                "<p style='color:white;text-align:center'>" +
+                "Você ainda não fez nenhuma aposta." +
+                "</p>";
+
+            document.getElementById(
+                "menuEsportes"
+            ).style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        apostas.forEach(
+            aposta => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "menu-aposta";
+
+
+                const status =
+                    String(
+                        aposta.status ||
+                        "aguardando"
+                    ).toLowerCase();
+
+
+                let textoStatus =
+                    "Aguardando";
+
+
+                let classeStatus =
+                    "";
+
+
+                if (
+                    status === "liberada"
+                ) {
+
+                    textoStatus =
+                        "Liberada";
+
+                    classeStatus =
+                        "liberada";
+
+                }
+
+                else if (
+                    status === "bloqueada"
+                ) {
+
+                    textoStatus =
+                        "Bloqueada";
+
+                    classeStatus =
+                        "bloqueada";
+
+                }
+
+                else if (
+                    status === "finalizada"
+                ) {
+
+                    textoStatus =
+                        "Finalizada";
+
+                    classeStatus =
+                        "finalizada";
+
+                }
+
+
+                let htmlJogos = "";
+
+
+                const selecoes =
+                    Array.isArray(
+                        aposta.selecoes
+                    )
+                    ? aposta.selecoes
+                    : Object.values(
+                        aposta.selecoes || {}
+                    );
+
+
+                selecoes.forEach(
+                    jogo => {
+
+                        htmlJogos += `
+
+                            <div class="menu-aposta-jogo">
+
+                                <div class="menu-aposta-times">
+
+                                    ${escapeHTML(
+                                        jogo.timeA ||
+                                        "Time A"
+                                    )}
+
+                                    ×
+
+                                    ${escapeHTML(
+                                        jogo.timeB ||
+                                        "Time B"
+                                    )}
+
+                                </div>
+
+
+                                <div class="menu-aposta-info">
+
+                                    🏆
+                                    <strong>
+                                        ${escapeHTML(
+                                            jogo.campeonato ||
+                                            "Campeonato"
+                                        )}
+                                    </strong>
+
+                                    <br>
+
+                                    📅
+                                    ${formatarData(
+                                        jogo.data || ""
+                                    )}
+
+                                    &nbsp;
+
+                                    ⏰
+                                    ${escapeHTML(
+                                        jogo.hora || ""
+                                    )}
+
+                                    <br>
+
+                                    🎯 Palpite:
+
+                                    <span
+                                        class="menu-aposta-palpite"
+                                    >
+
+                                        ${escapeHTML(
+                                            jogo.escolha || ""
+                                        )}
+
+                                        &nbsp;
+
+                                        ${Number(
+                                            jogo.valor || 0
+                                        ).toFixed(2)}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+
+                card.innerHTML = `
+
+                    ${htmlJogos}
+
+
+                    <div class="menu-aposta-resumo">
+
+                        🎟️
+                        <strong>
+                            ${escapeHTML(
+                                aposta.codigo || ""
+                            )}
+                        </strong>
+
+                        <br>
+
+                        👤
+                        ${escapeHTML(
+                            aposta.nome ||
+                            nomeJogador
+                        )}
+
+                        <br>
+
+                        💰 Aposta:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.valorUnico
+                            )}
+                        </strong>
+
+                        <br>
+
+                        🎯 Jogos:
+
+                        <strong>
+                            ${
+                                Number(
+                                    aposta.quantidadeJogos
+                                ) ||
+                                selecoes.length
+                            }
+                        </strong>
+
+                        <br>
+
+                        💵 Retorno:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.possivelRetorno
+                            )}
+                        </strong>
+
+                        <br>
+
+                        <span
+                            class="
+                                menu-aposta-status
+                                ${classeStatus}
+                            "
+                        >
+
+                            ${textoStatus}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        document.getElementById(
+            "menuEsportes"
+        ).style.display =
+            "block";
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar jogos feitos:",
+            erro
+        );
+
+
+        container.innerHTML = `
+
+            <p
+                style="
+                    color:white;
+                    text-align:center;
+                "
+            >
+                Erro ao carregar apostas.
+            </p>
+
+        `;
+
+
+        document.getElementById(
+            "menuEsportes"
+        ).style.display =
+            "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   MENU ABRIR / FECHAR
+========================================================= */
+
+document.getElementById(
+    "hamburger"
+).onclick =
+event => {
+
+    event.stopPropagation();
+
+
+    const menu =
+        document.getElementById(
+            "menuEsportes"
+        );
+
+
+    menu.style.display =
+        menu.style.display === "block"
+        ? "none"
+        : "block";
+
+};
+
+
+function fecharMenu() {
+
+    document.getElementById(
+        "menuEsportes"
+    ).style.display =
+        "none";
+
+}
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const menu =
+            document.getElementById(
+                "menuEsportes"
+            );
+
+
+        const hamburger =
+            document.getElementById(
+                "hamburger"
+            );
+
+
+        if (
+            !menu.contains(
+                event.target
+            ) &&
+            !hamburger.contains(
+                event.target
+            )
+        ) {
+
+            menu.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MOSTRAR DIA
+========================================================= */
+
+window.mostrarDia =
+function(dia) {
+
+    document
+        .querySelectorAll(
+            ".conteudo-dia"
+        )
+        .forEach(
+            el => {
+
+                el.style.display =
+                    "none";
+
+            }
+        );
+
+
+    const container =
+        document.getElementById(
+            "conteudo-" +
+            dia
+        );
+
+
+    if (!container) return;
+
+
+    container.style.display =
+        "block";
+
+
+    document
+        .querySelectorAll(
+            ".dias button"
+        )
+        .forEach(
+            btn => {
+
+                btn.classList.remove(
+                    "ativo"
+                );
+
+            }
+        );
+
+
+    const botao =
+        document.querySelector(
+            `.dias button[data-dia="${dia}"]`
+        );
+
+
+    if (botao) {
+
+        botao.classList.add(
+            "ativo"
+        );
+
+    }
+
+
+    diaAtual =
+        dia;
+
+};
+
+
+/* =========================================================
+   CARREGAR JOGOS
+========================================================= */
+
+async function carregarJogos(dia) {
+
+    const container =
+        document.getElementById(
+            "conteudo-" +
+            dia
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "<p>Carregando jogos...</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "jogos/" +
+                    dia
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            container.innerHTML =
+                "<p>Nenhum jogo disponível.</p>";
+
+            return;
+
+        }
+
+
+        let jogos =
+            snapshot.val();
+
+
+        if (Array.isArray(jogos)) {
+
+            jogos =
+                jogos.filter(Boolean);
+
+        }
+
+        else {
+
+            jogos =
+                Object.values(
+                    jogos
+                );
+
+        }
+
+
+        container.innerHTML =
+            "";
+
+
+        const agora =
+            new Date();
+
+
+        let encontrou =
+            false;
+
+
+        jogos.forEach(
+            (jogo, index) => {
+
+                if (
+                    !jogo ||
+                    !jogo.data ||
+                    !jogo.hora
+                ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    filtroPais &&
+                    normalizar(
+                        jogo.pais || ""
+                    ) !==
+                    normalizar(
+                        filtroPais
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const dataHora =
+                    new Date(
+                        `${jogo.data}T${jogo.hora}`
+                    );
+
+
+                if (
+                    dataHora <= agora
+                ) {
+
+                    return;
+
+                }
+
+
+                encontrou =
+                    true;
+
+
+                criarJogo(
+                    container,
+                    jogo,
+                    index
+                );
+
+            }
+        );
+
+
+        if (!encontrou) {
+
+            container.innerHTML =
+                "<p>Não há jogos disponíveis.</p>";
+
+        }
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar jogos:",
+            erro
+        );
+
+
+        container.innerHTML =
+            "<p>Erro ao carregar jogos.</p>";
+
+    }
+
+}
+
+
+/* =========================================================
+   CRIAR JOGO
+========================================================= */
+
+function criarJogo(
+    container,
+    jogo,
+    index
+) {
+
+    const cot =
+        jogo.cotacoes || {};
+
+
+    const casa =
+        Number(cot.casa) || 1.50;
+
+
+    const empate =
+        Number(cot.empate) || 2.50;
+
+
+    const fora =
+        Number(cot.fora) || 2.50;
+
+
+    const ambas =
+        Number(cot.ambasMarcam) || 2.50;
+
+
+    const timeA =
+        jogo.timeA ||
+        extrairNome(
+            jogo.imagemA
+        ) ||
+        "Time A";
+
+
+    const timeB =
+        jogo.timeB ||
+        extrairNome(
+            jogo.imagemB
+        ) ||
+        "Time B";
+
+
+    const imagemA =
+        jogo.imagemA ||
+        "https://via.placeholder.com/50";
+
+
+    const imagemB =
+        jogo.imagemB ||
+        "https://via.placeholder.com/50";
+
+
+    const campeonato =
+        jogo.campeonato ||
+        "Campeonato";
+
+
+    const pais =
+        jogo.pais ||
+        "";
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "duelo";
+
+
+    div.dataset.grupo =
+        "grupo-" +
+        index;
+
+
+    div.dataset.campeonato =
+        campeonato;
+
+
+    div.dataset.pais =
+        pais;
+
+
+    div.dataset.data =
+        jogo.data || "";
+
+
+    div.dataset.hora =
+        jogo.hora || "";
+
+
+    div.innerHTML = `
+
+        <div class="linha-duelo">
+
+            <div class="time-nome-img">
+
+                <img
+                    src="${escapeAttr(imagemA)}"
+                    alt="${escapeAttr(timeA)}"
+                    onerror="this.src='https://via.placeholder.com/50'"
+                >
+
+                <div class="nome-time">
+                    ${escapeHTML(timeA)}
+                </div>
+
+            </div>
+
+
+            <button
+                class="btn"
+                data-valor="${casa}"
+                data-escolha="Casa"
+            >
+
+                Casa
+
+                <br>
+
+                <span class="valor-cotacao">
+                    ${casa.toFixed(2)}
+                </span>
+
+            </button>
+
+
+            <button
+                class="btn"
+                data-valor="${empate}"
+                data-escolha="Empate"
+            >
+
+                Empate
+
+                <br>
+
+                <span class="valor-cotacao">
+                    ${empate.toFixed(2)}
+                </span>
+
+            </button>
+
+
+            <button
+                class="btn"
+                data-valor="${fora}"
+                data-escolha="Fora"
+            >
+
+                Fora
+
+                <br>
+
+                <span class="valor-cotacao">
+                    ${fora.toFixed(2)}
+                </span>
+
+            </button>
+
+
+            <div class="time-nome-img">
+
+                <img
+                    src="${escapeAttr(imagemB)}"
+                    alt="${escapeAttr(timeB)}"
+                    onerror="this.src='https://via.placeholder.com/50'"
+                >
+
+                <div class="nome-time">
+                    ${escapeHTML(timeB)}
+                </div>
+
+            </div>
+
+
+            <button
+                class="toggleExtras"
+            >
+                +
+            </button>
+
+        </div>
+
+
+        <div class="extras">
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="${ambas}"
+                    data-escolha="Ambas"
+                >
+
+                    Ambas
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        ${ambas.toFixed(2)}
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.00"
+                    data-escolha="+2 Gols"
+                >
+
+                    +2 Gols
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        2.00
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.80"
+                    data-escolha="-2 Gols"
+                >
+
+                    -2 Gols
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        2.80
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="1.50"
+                    data-escolha="Casa/Fora"
+                >
+
+                    Casa/Fora
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        1.50
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="2.00"
+                    data-escolha="Casa/Empate"
+                >
+
+                    Casa/Empate
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        2.00
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="coluna-botao">
+
+                <button
+                    class="btn"
+                    data-valor="1.80"
+                    data-escolha="Empate/Fora"
+                >
+
+                    Empate/Fora
+
+                    <br>
+
+                    <span class="valor-cotacao">
+                        1.80
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="info-jogo">
+
+            <div class="info-principal">
+
+                <span class="campeonato">
+
+                    🏆
+                    ${escapeHTML(campeonato)}
+
+                </span>
+
+
+                <span class="data-hora">
+
+                    📅
+                    ${formatarData(jogo.data)}
+
+                    &nbsp;
+
+                    ⏰
+                    ${escapeHTML(jogo.hora)}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(
+        div
+    );
+
+
+    /* =====================================================
+       ABRIR EXTRAS
+    ===================================================== */
+
+    const toggle =
+        div.querySelector(
+            ".toggleExtras"
+        );
+
+
+    const extras =
+        div.querySelector(
+            ".extras"
+        );
+
+
+    toggle.onclick =
+    () => {
+
+        const aberto =
+            extras.style.display ===
+            "flex";
+
+
+        extras.style.display =
+            aberto
+            ? "none"
+            : "flex";
+
+
+        toggle.textContent =
+            aberto
+            ? "+"
+            : "-";
+
+    };
+
+
+    /* =====================================================
+       SELEÇÃO
+    ===================================================== */
+
+    div.querySelectorAll(
+        ".btn"
+    ).forEach(
+        btn => {
+
+            btn.onclick =
+            () => {
+
+                const jaSelecionado =
+                    btn.classList.contains(
+                        "selecionado"
+                    );
+
+
+                div.querySelectorAll(
+                    ".btn"
+                ).forEach(
+                    outro => {
+
+                        outro.classList.remove(
+                            "selecionado"
+                        );
+
+                    }
+                );
+
+
+                if (!jaSelecionado) {
+
+                    btn.classList.add(
+                        "selecionado"
+                    );
+
+                }
+
+
+                atualizarSelecoes();
+
+                atualizarTotal();
+
+            };
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   NOME DO ARQUIVO
+========================================================= */
+
+function extrairNome(url) {
+
+    if (!url) {
+
+        return "Time";
+
+    }
+
+
+    try {
+
+        let nome =
+            decodeURIComponent(
+                url.split("/").pop()
+            );
+
+
+        nome =
+            nome.replace(
+                /\.(png|jpg|jpeg|webp|svg)$/i,
+                ""
+            );
+
+
+        nome =
+            nome.replace(
+                /[_-]/g,
+                " "
+            );
+
+
+        return nome
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim();
+
+    }
+
+    catch {
+
+        return "Time";
+
+    }
+
+}
+
+
+/* =========================================================
+   NORMALIZAR
+========================================================= */
+
+function normalizar(texto) {
+
+    return String(
+        texto || ""
+    )
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .replace(
+            /\s+/g,
+            "-"
+        )
+        .trim();
+
+}
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+function formatarData(data) {
+
+    if (!data) return "";
+
+
+    const partes =
+        String(data).split("-");
+
+
+    if (
+        partes.length !== 3
+    ) {
+
+        return data;
+
+    }
+
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text) {
+
+    return String(
+        text || ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttr(text) {
+
+    return escapeHTML(text);
+
+}
+
+
+/* =========================================================
+   ATUALIZAR SELEÇÕES
+========================================================= */
+
+function atualizarSelecoes() {
+
+    selects = [];
+
+
+    document
+        .querySelectorAll(
+            ".duelo"
+        )
+        .forEach(
+            duelo => {
+
+                const btn =
+                    duelo.querySelector(
+                        ".btn.selecionado"
+                    );
+
+
+                if (!btn) return;
+
+
+                const nomes =
+                    duelo.querySelectorAll(
+                        ".nome-time"
+                    );
+
+
+                selects.push({
+
+                    timeA:
+                        nomes[0]?.textContent
+                            .trim() || "",
+
+                    timeB:
+                        nomes[1]?.textContent
+                            .trim() || "",
+
+                    valor:
+                        Number(
+                            btn.dataset.valor
+                        ) || 0,
+
+                    escolha:
+                        btn.dataset.escolha ||
+                        "",
+
+                    campeonato:
+                        duelo.dataset.campeonato ||
+                        "Campeonato",
+
+                    pais:
+                        duelo.dataset.pais ||
+                        "",
+
+                    data:
+                        duelo.dataset.data ||
+                        "",
+
+                    hora:
+                        duelo.dataset.hora ||
+                        "",
+
+                    dataHora:
+                        `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
+
+                    status:
+                        "aguardando"
+
+                });
+
+            }
+        );
+
+
+    atualizarContador();
+
+}
+
+
+/* =========================================================
+   CONTADOR
+========================================================= */
+
+function atualizarContador() {
+
+    const contador =
+        document.getElementById(
+            "contadorMarcados"
+        );
+
+
+    if (contador) {
+
+        contador.textContent =
+            "Times " +
+            selects.length;
+
+    }
+
+}
+
+
+/* =========================================================
+   ATUALIZAR TOTAL
+========================================================= */
+
+function atualizarTotal() {
+
+    const valor =
+        Number(
+            document.getElementById(
+                "valorUnico"
+            ).value
+        ) || 0;
+
+
+    const quantidade =
+        selects.length;
+
+
+    let multiplicador = 1;
+
+
+    document
+        .querySelectorAll(
+            ".btn.selecionado"
+        )
+        .forEach(
+            btn => {
+
+                multiplicador *=
+                    Number(
+                        btn.dataset.valor
+                    ) || 1;
+
+            }
+        );
+
+
+    const retorno =
+        valor *
+        multiplicador;
+
+
+    const totalFinal =
+        document.getElementById(
+            "totalFinal"
+        );
+
+
+    const apostar =
+        document.getElementById(
+            "apostarBtn"
+        );
+
+
+    if (
+        quantidade === 0 ||
+        valor <= 0
+    ) {
+
+        totalFinal.innerHTML = `
+            Possível Retorno
+            <br>
+            R$ 0,00
+        `;
+
+
+        apostar.disabled =
+            true;
+
+
+        apostar.classList.remove(
+            "pronto"
+        );
+
+
+        apostar.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times ${quantidade}
+            </span>
+        `;
+
+
+        return;
+
+    }
+
+
+    if (
+        retorno > LIMITE
+    ) {
+
+        totalFinal.innerHTML = `
+            <span style="color:red">
+                Retorno
+                <br>
+                ${dinheiro(retorno)}
+            </span>
+        `;
+
+
+        apostar.disabled =
+            true;
+
+
+        apostar.classList.remove(
+            "pronto"
+        );
+
+
+        apostar.innerHTML = `
+            Apostar
+            <br>
+            <span id="contadorMarcados">
+                Times ${quantidade}
+            </span>
+        `;
+
+
+        return;
+
+    }
+
+
+    totalFinal.innerHTML = `
+        <span style="color:green">
+            Retorno
+            <br>
+            ${dinheiro(retorno)}
+        </span>
+    `;
+
+
+    apostar.disabled =
+        false;
+
+
+    apostar.classList.add(
+        "pronto"
+    );
+
+
+    apostar.innerHTML = `
+        Enviar
+        <br>
+        <span id="contadorMarcados">
+            Times ${quantidade}
+        </span>
+    `;
+
+}
+
+
+/* =========================================================
+   VERIFICAR SALDO
+========================================================= */
+
+async function verificarSaldo() {
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (
+            snapshot.exists()
+        ) {
+
+            const dados =
+                snapshot.val();
+
+
+            saldoJogador =
+                Number(
+                    dados.saldo
+                ) || 0;
+
+
+            if (
+                dados.bloqueado === true
+            ) {
+
+                alert(
+                    "Seu jogador está bloqueado."
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        atualizarSaldoTela();
+
+
+        return true;
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        alert(
+            "Não foi possível verificar seu saldo."
+        );
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   ABRIR PRÉVIA
+========================================================= */
+
+async function abrirPreview() {
+
+    if (!nomeJogador) {
+
+        nomeModal.style.display =
+            "flex";
+
+        return;
+
+    }
+
+
+    const campoValor =
+        document.getElementById(
+            "valorUnico"
+        );
+
+
+    const valor =
+        Number(
+            campoValor.value
+        ) || 0;
+
+
+    if (
+        !valor ||
+        valor <= 0
+    ) {
+
+        alert(
+            "Digite o valor da aposta."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        selects.length === 0
+    ) {
+
+        alert(
+            "Selecione pelo menos um jogo."
+        );
+
+        return;
+
+    }
+
+
+    const saldoOK =
+        await verificarSaldo();
+
+
+    if (!saldoOK) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       SALDO INSUFICIENTE
+    ===================================================== */
+
+    if (
+        valor > saldoJogador
+    ) {
+
+        abrirModalSaldo();
+
+        return;
+
+    }
+
+
+    let multiplicador = 1;
+
+
+    selects.forEach(
+        selecao => {
+
+            multiplicador *=
+                Number(
+                    selecao.valor
+                ) || 1;
+
+        }
+    );
+
+
+    const retorno =
+        valor *
+        multiplicador;
+
+
+    if (
+        retorno > LIMITE
+    ) {
+
+        alert(
+            "O possível retorno ultrapassa o limite de " +
+            dinheiro(LIMITE)
+        );
+
+        return;
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "previewJogos"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    selects.forEach(
+        (selecao, index) => {
+
+            const jogo =
+                document.createElement(
+                    "div"
+                );
+
+
+            jogo.className =
+                "preview-jogo";
+
+
+            jogo.innerHTML = `
+
+                <div class="preview-times">
+
+                    ${index + 1}.
+                    ${escapeHTML(
+                        selecao.timeA
+                    )}
+
+                    ×
+
+                    ${escapeHTML(
+                        selecao.timeB
+                    )}
+
+                </div>
+
+
+                <div class="preview-info">
+
+                    🏆
+                    <strong>
+                        ${escapeHTML(
+                            selecao.campeonato
+                        )}
+                    </strong>
+
+                    <br>
+
+                    📅
+                    ${formatarData(
+                        selecao.data
+                    )}
+
+                    &nbsp;
+
+                    ⏰
+                    ${escapeHTML(
+                        selecao.hora
+                    )}
+
+                    <br>
+
+                    🎯 Palpite:
+
+                    <span
+                        class="preview-escolha"
+                    >
+
+                        ${escapeHTML(
+                            selecao.escolha
+                        )}
+
+                        &nbsp;
+
+                        ${Number(
+                            selecao.valor
+                        ).toFixed(2)}
+
+                    </span>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                jogo
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "previewNome"
+    ).textContent =
+        nomeJogador;
+
+
+    document.getElementById(
+        "previewValor"
+    ).textContent =
+        dinheiro(valor);
+
+
+    document.getElementById(
+        "previewSaldoRestante"
+    ).textContent =
+        dinheiro(
+            saldoJogador -
+            valor
+        );
+
+
+    document.getElementById(
+        "previewQuantidade"
+    ).textContent =
+        selects.length;
+
+
+    document.getElementById(
+        "previewRetorno"
+    ).textContent =
+        dinheiro(retorno);
+
+
+    previewModal.style.display =
+        "flex";
+
+}
+
+
+/* =========================================================
+   BOTÃO ENVIAR
+========================================================= */
+
+document.getElementById(
+    "apostarBtn"
+).onclick =
+function() {
+
+    abrirPreview();
+
+};
+
+
+/* =========================================================
+   FECHAR SALDO ANTIGO
+========================================================= */
+
+document.getElementById(
+    "btnFecharSaldo"
+).onclick =
+function() {
+
+    saldoModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   VOLTAR DA PRÉVIA
+========================================================= */
+
+document.getElementById(
+    "btnVoltarPreview"
+).onclick =
+function() {
+
+    previewModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   CONFIRMAR E ENVIAR
+========================================================= */
+
+document.getElementById(
+    "btnConfirmarPreview"
+).onclick =
+async function() {
+
+    const botaoConfirmar =
+        this;
+
+
+    const botaoPrincipal =
+        document.getElementById(
+            "apostarBtn"
+        );
+
+
+    const campoValor =
+        document.getElementById(
+            "valorUnico"
+        );
+
+
+    try {
+
+        const valor =
+            Number(
+                campoValor.value
+            );
+
+
+        if (
+            !valor ||
+            valor <= 0
+        ) {
+
+            alert(
+                "Digite um valor válido."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            selects.length === 0
+        ) {
+
+            alert(
+                "Selecione pelo menos um jogo."
+            );
+
+            return;
+
+        }
+
+
+        const saldoOK =
+            await verificarSaldo();
+
+
+        if (!saldoOK) {
+
+            return;
+
+        }
+
+
+        /* =================================================
+           SALDO INSUFICIENTE
+        ================================================= */
+
+        if (
+            valor > saldoJogador
+        ) {
+
+            previewModal.style.display =
+                "none";
+
+            abrirModalSaldo();
+
+            return;
+
+        }
+
+
+        let multiplicador = 1;
+
+
+        selects.forEach(
+            selecao => {
+
+                multiplicador *=
+                    Number(
+                        selecao.valor
+                    ) || 1;
+
+            }
+        );
+
+
+        const retorno =
+            valor *
+            multiplicador;
+
+
+        if (
+            retorno > LIMITE
+        ) {
+
+            alert(
+                "O possível retorno ultrapassa o limite de " +
+                dinheiro(LIMITE)
+            );
+
+            return;
+
+        }
+
+
+        botaoConfirmar.disabled =
+            true;
+
+
+        botaoConfirmar.textContent =
+            "Enviando...";
+
+
+        botaoPrincipal.disabled =
+            true;
+
+
+        const codigo =
+            "MJ" +
+            Date.now();
+
+
+        const novoSaldo =
+            saldoJogador -
+            valor;
+
+
+        const aposta = {
+
+            codigo:
+                codigo,
+
+            jogadorId:
+                jogadorId,
+
+            nome:
+                nomeJogador,
+
+            valorUnico:
+                valor,
+
+            possivelRetorno:
+                retorno,
+
+            quantidadeJogos:
+                selects.length,
+
+            selecoes:
+                selects.map(
+                    s => ({
+
+                        timeA:
+                            String(
+                                s.timeA ||
+                                ""
+                            ),
+
+                        timeB:
+                            String(
+                                s.timeB ||
+                                ""
+                            ),
+
+                        valor:
+                            Number(
+                                s.valor
+                            ) || 0,
+
+                        escolha:
+                            String(
+                                s.escolha ||
+                                ""
+                            ),
+
+                        campeonato:
+                            String(
+                                s.campeonato ||
+                                "Campeonato"
+                            ),
+
+                        pais:
+                            String(
+                                s.pais ||
+                                ""
+                            ),
+
+                        data:
+                            String(
+                                s.data ||
+                                ""
+                            ),
+
+                        hora:
+                            String(
+                                s.hora ||
+                                ""
+                            ),
+
+                        dataHora:
+                            String(
+                                s.dataHora ||
+                                ""
+                            ),
+
+                        status:
+                            "aguardando"
+
+                    })
+                ),
+
+            dataHora:
+                new Date()
+                    .toISOString(),
+
+            status:
+                "aguardando"
+
+        };
+
+
+        /* =================================================
+           SALVAR APOSTA
+        ================================================= */
+
+        await set(
+
+            ref(
+                db,
+                "apostas/" +
+                codigo
+            ),
+
+            aposta
+
+        );
+
+
+        /* =================================================
+           DESCONTAR SALDO
+        ================================================= */
+
+        await update(
+
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            ),
+
+            {
+
+                saldo:
+                    novoSaldo
+
+            }
+
+        );
+
+
+        saldoJogador =
+            novoSaldo;
+
+
+        atualizarSaldoTela();
+
+
+        previewModal.style.display =
+            "none";
+
+
+        abrirModal(
+            codigo
+        );
+
+
+        /* =================================================
+           LIMPAR SELEÇÕES
+        ================================================= */
+
+        document
+            .querySelectorAll(
+                ".btn.selecionado"
+            )
+            .forEach(
+                btn => {
+
+                    btn.classList.remove(
+                        "selecionado"
+                    );
+
+                }
+            );
+
+
+        selects = [];
+
+
+        campoValor.value = "";
+
+
+        atualizarContador();
+
+        atualizarTotal();
+
+
+        botaoPrincipal.disabled =
+            true;
+
+
+        botaoPrincipal.innerHTML = `
+
+            Apostar
+
+            <br>
+
+            <span id="contadorMarcados">
+                Times 0
+            </span>
+
+        `;
+
+
+        botaoConfirmar.disabled =
+            false;
+
+
+        botaoConfirmar.textContent =
+            "Confirmar e Enviar";
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "ERRO AO ENVIAR:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível enviar a aposta.\n\n" +
+            "Erro: " +
+            (
+                erro?.message ||
+                String(erro)
+            )
+        );
+
+
+        botaoConfirmar.disabled =
+            false;
+
+
+        botaoConfirmar.textContent =
+            "Confirmar e Enviar";
+
+
+        botaoPrincipal.disabled =
+            false;
+
+    }
+
+};
+
+
+/* =========================================================
+   MODAL DA APOSTA
+========================================================= */
+
+function abrirModal(codigo) {
+
+    const modal =
+        codigoModal;
+
+
+    document.getElementById(
+        "codigoAposta"
+    ).textContent =
+        codigo;
+
+
+    const pix =
+        encodeURIComponent(
+            chavePix
+        );
+
+
+    document.getElementById(
+        "qrPix"
+    ).innerHTML = `
+
+        <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${pix}"
+            alt="QR Code PIX"
+        >
+
+    `;
+
+
+    modal.style.display =
+        "flex";
+
+
+    document.getElementById(
+        "btnCopiar"
+    ).onclick =
+    async () => {
+
+        try {
+
+            await navigator.clipboard.writeText(
+                codigo
+            );
+
+
+            alert(
+                "Código copiado!"
+            );
+
+        }
+
+        catch {
+
+            alert(
+                "Código: " +
+                codigo
+            );
+
+        }
+
+    };
+
+
+    document.getElementById(
+        "btnWhatsapp"
+    ).onclick =
+    () => {
+
+        const texto =
+            encodeURIComponent(
+                "Minha aposta MULTI PLAY.BET\n\n" +
+                "Nome: " +
+                nomeJogador +
+                "\n" +
+                "Código: " +
+                codigo
+            );
+
+
+        window.open(
+            `https://wa.me/?text=${texto}`,
+            "_blank"
+        );
+
+    };
+
+}
+
+
+/* =========================================================
+   FECHAR MODAL CÓDIGO
+========================================================= */
+
+document.getElementById(
+    "btnFechar"
+).onclick =
+function() {
+
+    codigoModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   JOGOS FEITOS
+========================================================= */
+
+async function abrirJogosFeitos() {
+
+    jogosFeitosModal.style.display =
+        "flex";
+
+
+    const listaModal =
+        document.getElementById(
+            "listaJogosFeitos"
+        );
+
+
+    listaModal.innerHTML =
+        "<p>Carregando apostas...</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "apostas"
+                )
+            );
+
+
+        if (
+            !snapshot.exists()
+        ) {
+
+            listaModal.innerHTML =
+                "<p>Você ainda não fez nenhuma aposta.</p>";
+
+            return;
+
+        }
+
+
+        const dados =
+            snapshot.val();
+
+
+        const apostas =
+            Object.values(
+                dados
+            )
+            .filter(
+                aposta =>
+                    aposta &&
+                    aposta.jogadorId ===
+                    jogadorId
+            )
+            .sort(
+                (a, b) =>
+                    String(
+                        b.dataHora || ""
+                    ).localeCompare(
+                        String(
+                            a.dataHora || ""
+                        )
+                    )
+            );
+
+
+        if (
+            apostas.length === 0
+        ) {
+
+            listaModal.innerHTML =
+                "<p>Você ainda não fez nenhuma aposta.</p>";
+
+            return;
+
+        }
+
+
+        listaModal.innerHTML = "";
+
+
+        apostas.forEach(
+            aposta => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "aposta-card";
+
+
+                const status =
+                    String(
+                        aposta.status ||
+                        "aguardando"
+                    ).toLowerCase();
+
+
+                let classeStatus =
+                    "status-aguardando";
+
+
+                let textoStatus =
+                    "Aguardando";
+
+
+                if (
+                    status === "liberada"
+                ) {
+
+                    classeStatus =
+                        "status-liberada";
+
+                    textoStatus =
+                        "Liberada";
+
+                }
+
+                else if (
+                    status === "bloqueada"
+                ) {
+
+                    classeStatus =
+                        "status-bloqueada";
+
+                    textoStatus =
+                        "Bloqueada";
+
+                }
+
+                else if (
+                    status === "finalizada"
+                ) {
+
+                    classeStatus =
+                        "status-finalizada";
+
+                    textoStatus =
+                        "Finalizada";
+
+                }
+
+
+                const quantidade =
+                    Number(
+                        aposta.quantidadeJogos
+                    ) || 0;
+
+
+                card.innerHTML = `
+
+                    <div class="aposta-codigo">
+
+                        🎟️
+                        ${escapeHTML(
+                            aposta.codigo || ""
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        👤
+                        ${escapeHTML(
+                            aposta.nome ||
+                            nomeJogador
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        💰 Aposta:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.valorUnico
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        🎯 Jogos:
+
+                        <strong>
+                            ${quantidade}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        💵 Retorno:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.possivelRetorno
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span
+                            class="
+                                aposta-status
+                                ${classeStatus}
+                            "
+                        >
+
+                            ${textoStatus}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                listaModal.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+
+        listaModal.innerHTML =
+            "<p>Erro ao carregar suas apostas.</p>";
+
+    }
+
+}
+
+
+/* =========================================================
+   FECHAR JOGOS FEITOS
+========================================================= */
+
+document.getElementById(
+    "btnFecharJogosFeitos"
+).onclick =
+function() {
+
+    jogosFeitosModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   FECHAR MODAIS CLICANDO FORA
+========================================================= */
+
+codigoModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            codigoModal
+        ) {
+
+            codigoModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+previewModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            previewModal
+        ) {
+
+            previewModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+saldoModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            saldoModal
+        ) {
+
+            saldoModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+jogosFeitosModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            jogosFeitosModal
+        ) {
+
+            jogosFeitosModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RECARREGAR DIA ATUAL
+========================================================= */
+
+async function recarregarDiaAtual() {
+
+    if (!diaAtual) {
+
+        const hoje =
+            new Date().getDay();
+
+        diaAtual =
+            dias[hoje];
+
+    }
+
+
+    await carregarJogos(
+        diaAtual
+    );
+
+
+    mostrarDia(
+        diaAtual
+    );
+
+}
+
+
+/* =========================================================
+   VALOR DA APOSTA
+========================================================= */
+
+document.getElementById(
+    "valorUnico"
+).addEventListener(
+    "input",
+    () => {
+
+        atualizarTotal();
+
+    }
+);
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+const carrossel =
+    document.getElementById(
+        "carrossel"
+    );
+
+
+let slide = 0;
+
+
+setInterval(
+    () => {
+
+        if (!carrossel) return;
+
+
+        const total =
+            carrossel.children.length;
+
+
+        if (!total) return;
+
+
+        slide =
+            (slide + 1) %
+            total;
+
+
+        carrossel.style.transform =
+            `translateX(-${slide * 100}%)`;
+
+    },
+    3000
+);
+
+
+/* =========================================================
+   INICIALIZAÇÃO DOS JOGOS
+========================================================= */
+
+async function inicializarJogos() {
+
+    const modal =
+        document.getElementById(
+            "modalCarregando"
+        );
+
+
+    modal.style.display =
+        "flex";
+
+
+    const hoje =
+        new Date();
+
+
+    const indiceHoje =
+        hoje.getDay();
+
+
+    document
+        .querySelectorAll(
+            "#diasContainer button"
+        )
+        .forEach(
+            btn => {
+
+                btn.style.display =
+                    "none";
+
+                btn.classList.remove(
+                    "ativo"
+                );
+
+            }
+        );
+
+
+    for (
+        let i = 0;
+        i < 3;
+        i++
+    ) {
+
+        const indice =
+            (indiceHoje + i) % 7;
+
+
+        const dia =
+            dias[indice];
+
+
+        const botao =
+            document.querySelector(
+                `#diasContainer button[data-dia="${dia}"]`
+            );
+
+
+        if (botao) {
+
+            botao.style.display =
+                "block";
+
+        }
+
+
+        await carregarJogos(
+            dia
+        );
+
+    }
+
+
+    const hojeNome =
+        dias[indiceHoje];
+
+
+    diaAtual =
+        hojeNome;
+
+
+    mostrarDia(
+        hojeNome
+    );
+
+
+    modal.style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   CLIQUE NOS DIAS
+========================================================= */
+
+document
+    .querySelectorAll(
+        "#diasContainer button"
+    )
+    .forEach(
+        btn => {
+
+            btn.addEventListener(
+                "click",
+                async () => {
+
+                    const dia =
+                        btn.dataset.dia;
+
+
+                    diaAtual =
+                        dia;
+
+
+                    await carregarJogos(
+                        dia
+                    );
+
+
+                    mostrarDia(
+                        dia
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   MODAL DE SOLICITAÇÃO DE SALDO
+   IMPORTANTE:
+   Existe somente UMA definição de cada função.
+========================================================= */
+
+window.abrirModalSaldo =
+function() {
+
+    const modal =
+        document.getElementById(
+            "modalSaldo"
+        );
+
+
+    const input =
+        document.getElementById(
+            "valorSolicitado"
+        );
+
+
+    if (
+        !modal ||
+        !input
+    ) {
+
+        console.error(
+            "Modal de saldo não encontrado."
+        );
+
+        return;
+
+    }
+
+
+    input.value =
+        "10";
+
+
+    modal.classList.add(
+        "ativo"
+    );
+
+
+    setTimeout(
+        () => {
+
+            input.focus();
+
+            input.select();
+
+        },
+        100
+    );
+
+};
+
+
+/* =========================================================
+   FECHAR MODAL SOLICITAR SALDO
+========================================================= */
+
+window.fecharModalSaldo =
+function() {
+
+    const modal =
+        document.getElementById(
+            "modalSaldo"
+        );
+
+
+    if (!modal) return;
+
+
+    modal.classList.remove(
+        "ativo"
+    );
+
+};
+
+
+/* =========================================================
+   SOLICITAR SALDO
+========================================================= */
+
+window.solicitarSaldo = async function() {
+
+    const input =
+        document.getElementById(
+            "valorSolicitado"
+        );
+
+    if (!input) return;
+
+
+    let valor =
+        parseFloat(
+            input.value
+        );
+
+
+    if (
+        isNaN(valor) ||
+        valor <= 0
+    ) {
+
+        alert(
+            "Informe um valor válido."
+        );
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    valor =
+        Number(
+            valor.toFixed(2)
+        );
+
+
+    const jogadorAtual =
+        jogadorId;
+
+
+    if (!jogadorAtual) {
+
+        alert(
+            "Jogador não identificado."
+        );
+
+        return;
+
+    }
+
+
+    const botao =
+        document.querySelector(
+            "#modalSaldo button[onclick*='solicitarSaldo']"
+        );
+
+
+    if (botao) {
+
+        botao.disabled =
+            true;
+
+        botao.textContent =
+            "Gerando PIX...";
+
+    }
+
+
+    try {
+
+        /*
+         * URL da Cloud Function
+         *
+         * Depois de fazer o deploy,
+         * coloque aqui a URL gerada pelo Firebase.
+         */
+
+        const URL_FUNCAO =
+            "https://southamerica-east1-jogo-60a9e.cloudfunctions.net/criarPagamentoPix";
+
+
+        const resposta =
+            await fetch(
+                URL_FUNCAO,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            jogadorId:
+                                jogadorAtual,
+
+                            nome:
+                                nomeJogador,
+
+                            valor:
+                                valor
+
+                        })
+
+                }
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (
+            !resposta.ok ||
+            !dados.sucesso
+        ) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível criar o PIX."
+            );
+
+        }
+
+
+        /*
+         * Guarda os dados da cobrança
+         */
+
+        window.pagamentoAtual = {
+
+            codigo:
+                dados.codigo,
+
+            pagamentoId:
+                dados.pagamentoId,
+
+            valor:
+                dados.valor
+
+        };
+
+
+        /*
+         * Fecha modal antigo
+         */
+
+        fecharModalSaldo();
+
+
+        /*
+         * Abre modal PIX
+         */
+
+        abrirModalPagamentoPix(
+            dados
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao criar PIX:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível gerar o PIX.\n\n" +
+            erro.message
+        );
+
+    }
+
+    finally {
+
+        if (botao) {
+
+            botao.disabled =
+                false;
+
+            botao.textContent =
+                "Solicitar";
+
+        }
+
+    }
+
+};
+/* =========================================================
+   MODAL PAGAMENTO PIX
+========================================================= */
+
+window.abrirModalPagamentoPix =
+function(dados) {
+
+    let modal =
+        document.getElementById(
+            "modalPagamentoPix"
+        );
+
+
+    if (!modal) {
+
+        modal =
+            document.createElement(
+                "div"
+            );
+
+        modal.id =
+            "modalPagamentoPix";
+
+        modal.className =
+            "modal-pix";
+
+        modal.innerHTML = `
+
+            <div class="modal-pix-conteudo">
+
+                <button
+                    class="pix-fechar"
+                    onclick="fecharModalPagamentoPix()"
+                >
+                    ×
+                </button>
+
+                <h2>
+                    💳 Pagamento PIX
+                </h2>
+
+                <p>
+                    Solicitação:
+                    <strong id="pixCodigo">
+                        -
+                    </strong>
+                </p>
+
+                <p>
+                    Valor:
+                    <strong id="pixValor">
+                        R$ 0,00
+                    </strong>
+                </p>
+
+                <div
+                    id="pixQrCode"
+                    class="pix-qrcode"
+                ></div>
+
+                <p class="pix-instrucao">
+                    Escaneie o QR Code
+                    no aplicativo do seu banco.
+                </p>
+
+                <textarea
+                    id="pixCopiaCola"
+                    readonly
+                    placeholder="PIX Copia e Cola"
+                ></textarea>
+
+                <button
+                    class="btn-pix-copiar"
+                    onclick="copiarPixCopiaCola()"
+                >
+                    📋 Copiar PIX
+                </button>
+
+                <a
+                    id="pixTicket"
+                    target="_blank"
+                    class="btn-pix-ticket"
+                    style="display:none"
+                >
+                    Abrir pagamento
+                </a>
+
+                <div
+                    id="pixStatus"
+                    class="pix-status"
+                >
+                    ⏳ Aguardando pagamento...
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            modal
+        );
+
+    }
+
+
+    document.getElementById(
+        "pixCodigo"
+    ).textContent =
+        dados.codigo || "-";
+
+
+    document.getElementById(
+        "pixValor"
+    ).textContent =
+        dinheiro(
+            dados.valor
+        );
+
+
+    const qr =
+        document.getElementById(
+            "pixQrCode"
+        );
+
+
+    qr.innerHTML =
+        "";
+
+
+    if (
+        dados.qrCodeBase64
+    ) {
+
+        const img =
+            document.createElement(
+                "img"
+            );
+
+
+        img.src =
+            "data:image/png;base64," +
+            dados.qrCodeBase64;
+
+
+        img.alt =
+            "QR Code PIX";
+
+
+        qr.appendChild(
+            img
+        );
+
+    }
+
+    else if (
+        dados.qrCode
+    ) {
+
+        const img =
+            document.createElement(
+                "img"
+            );
+
+
+        img.src =
+            "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
+            encodeURIComponent(
+                dados.qrCode
+            );
+
+
+        img.alt =
+            "QR Code PIX";
+
+
+        qr.appendChild(
+            img
+        );
+
+    }
+
+
+    document.getElementById(
+        "pixCopiaCola"
+    ).value =
+        dados.qrCode || "";
+
+
+    const ticket =
+        document.getElementById(
+            "pixTicket"
+        );
+
+
+    if (
+        dados.ticketUrl
+    ) {
+
+        ticket.href =
+            dados.ticketUrl;
+
+        ticket.style.display =
+            "block";
+
+    }
+
+    else {
+
+        ticket.style.display =
+            "none";
+
+    }
+
+
+    document.getElementById(
+        "pixStatus"
+    ).textContent =
+        "⏳ Aguardando pagamento...";
+
+
+    modal.style.display =
+        "flex";
+
+
+    iniciarVerificacaoPagamento(
+        dados.codigo
+    );
+
+};
+
+
+/* =========================================================
+   FECHAR MODAL PIX
+========================================================= */
+
+window.fecharModalPagamentoPix =
+function() {
+
+    const modal =
+        document.getElementById(
+            "modalPagamentoPix"
+        );
+
+
+    if (modal) {
+
+        modal.style.display =
+            "none";
+
+    }
+
+};
+
+
+/* =========================================================
+   COPIAR PIX
+========================================================= */
+
+window.copiarPixCopiaCola =
+async function() {
+
+    const campo =
+        document.getElementById(
+            "pixCopiaCola"
+        );
+
+
+    if (!campo) return;
+
+
+    if (!campo.value) {
+
+        alert(
+            "Código PIX não disponível."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            campo.value
+        );
+
+
+        alert(
+            "PIX copiado!"
+        );
+
+    }
+
+    catch {
+
+        campo.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+
+        alert(
+            "PIX copiado!"
+        );
+
+    }
+
+};
+/* =========================================================
+   VERIFICAR STATUS DA SOLICITAÇÃO
+========================================================= */
+
+let intervaloPagamento = null;
+
+
+function iniciarVerificacaoPagamento(
+    codigo
+) {
+
+    if (
+        intervaloPagamento
+    ) {
+
+        clearInterval(
+            intervaloPagamento
+        );
+
+    }
+
+
+    intervaloPagamento =
+        setInterval(
+            async () => {
+
+                try {
+
+                    const snapshot =
+                        await get(
+                            ref(
+                                db,
+                                "solicitacoesSaldo/" +
+                                codigo
+                            )
+                        );
+
+
+                    if (
+                        !snapshot.exists()
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const dados =
+                        snapshot.val();
+
+
+                    const status =
+                        String(
+                            dados.status ||
+                            ""
+                        ).toLowerCase();
+
+
+                    const elemento =
+                        document.getElementById(
+                            "pixStatus"
+                        );
+
+
+                    if (
+                        status === "pago"
+                    ) {
+
+                        clearInterval(
+                            intervaloPagamento
+                        );
+
+
+                        intervaloPagamento =
+                            null;
+
+
+                        if (elemento) {
+
+                            elemento.innerHTML =
+                                "✅ Pagamento confirmado!<br>Saldo adicionado.";
+
+                        }
+
+
+                        /*
+                         * Atualiza o saldo
+                         */
+
+                        await verificarSaldo();
+
+
+                        setTimeout(
+                            () => {
+
+                                fecharModalPagamentoPix();
+
+                            },
+                            2500
+                        );
+
+                    }
+
+                    else if (
+                        status ===
+                        "valor_divergente"
+                    ) {
+
+                        clearInterval(
+                            intervaloPagamento
+                        );
+
+
+                        intervaloPagamento =
+                            null;
+
+
+                        if (elemento) {
+
+                            elemento.innerHTML =
+                                "⚠️ O valor pago é diferente do solicitado.";
+
+                        }
+
+                    }
+
+                    else {
+
+                        if (elemento) {
+
+                            elemento.innerHTML =
+                                "⏳ Aguardando pagamento...";
+
+                        }
+
+                    }
+
+                }
+
+                catch (erro) {
+
+                    console.error(
+                        "Erro verificando pagamento:",
+                        erro
+                    );
+
+                }
+
+            },
+
+            3000
+        );
+
+}
+/* =========================================================
+   INICIAR SISTEMA
+========================================================= */
+
+async function iniciarSistema() {
+
+    const carregou =
+        await carregarJogador();
+
+
+    if (!carregou) {
+
+        return;
+
+    }
+
+
+    await inicializarJogos();
+
+}
+
+
+iniciarSistema();
+
+</script>
+</body>
+
+</html>
