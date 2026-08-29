@@ -103,6 +103,46 @@ body {
 }
 
 
+#saldoJogador {
+
+    width: 105px;
+
+    height: 40px;
+
+    background: #fff;
+
+    color: #008000;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    line-height: 13px;
+
+}
+
+
+#saldoValor {
+
+    font-size: 14px;
+
+}
+
+
 #valorUnico {
 
     width: 72px;
@@ -126,6 +166,8 @@ body {
 
     flex: 1;
 
+    min-width: 0;
+
     height: 40px;
 
     background: #fff;
@@ -140,11 +182,11 @@ body {
 
     justify-content: center;
 
-    font-size: 14px;
+    font-size: 12px;
 
     font-weight: bold;
 
-    line-height: 15px;
+    line-height: 14px;
 
 }
 
@@ -181,6 +223,22 @@ body {
 }
 
 
+#apostarBtn.pronto {
+
+    background: #00b300;
+
+    color: #fff;
+
+}
+
+
+#apostarBtn.pronto:hover {
+
+    background: #009900;
+
+}
+
+
 /* =========================================================
    MENU
 ========================================================= */
@@ -195,7 +253,7 @@ body {
 
     left: 5px;
 
-    width: 220px;
+    width: 250px;
 
     max-height: 80vh;
 
@@ -478,7 +536,7 @@ body {
 
 
 /* =========================================================
-   BOTÕES DE PALPITE
+   BOTÕES
 ========================================================= */
 
 .btn {
@@ -586,7 +644,7 @@ body {
 
 
 /* =========================================================
-   INFORMAÇÕES DO JOGO
+   INFORMAÇÕES
 ========================================================= */
 
 .info-jogo {
@@ -642,7 +700,7 @@ body {
 
 
 /* =========================================================
-   MODAIS
+   MODAL GERAL
 ========================================================= */
 
 .modal {
@@ -662,6 +720,158 @@ body {
     align-items: center;
 
     padding: 15px;
+
+}
+
+
+/* =========================================================
+   MODAL NOME
+========================================================= */
+
+.nome-conteudo {
+
+    width: 100%;
+
+    max-width: 360px;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.nome-conteudo h2 {
+
+    margin-top: 0;
+
+    background: green;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+}
+
+
+#nomeJogadorInput {
+
+    width: 100%;
+
+    height: 48px;
+
+    border: 1px solid #aaa;
+
+    border-radius: 7px;
+
+    padding: 10px;
+
+    font-size: 16px;
+
+    text-align: center;
+
+}
+
+
+#btnSalvarNome {
+
+    width: 100%;
+
+    height: 45px;
+
+    margin-top: 10px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================================
+   MODAL SALDO
+========================================================= */
+
+.saldo-conteudo {
+
+    width: 100%;
+
+    max-width: 380px;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.saldo-conteudo h2 {
+
+    background: #d00000;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+}
+
+
+.saldo-atual-modal {
+
+    background: #eee;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    margin: 10px 0;
+
+    font-weight: bold;
+
+}
+
+
+.btnAdicionarSaldo {
+
+    width: 100%;
+
+    min-height: 45px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 7px;
 
 }
 
@@ -870,7 +1080,7 @@ body {
 
 .codigo-conteudo h2 {
 
-    background: red;
+    background: green;
 
     color: #fff;
 
@@ -964,6 +1174,143 @@ body {
 
 
 /* =========================================================
+   JOGOS FEITOS
+========================================================= */
+
+.jogos-feitos-conteudo {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 5px 30px rgba(0,0,0,.5);
+
+}
+
+
+.jogos-feitos-titulo {
+
+    background: #008000;
+
+    color: #fff;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+.aposta-card {
+
+    background: #f5f5f5;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 10px;
+
+    margin-top: 10px;
+
+    text-align: left;
+
+}
+
+
+.aposta-codigo {
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+}
+
+
+.aposta-status {
+
+    display: inline-block;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    font-size: 11px;
+
+    margin-top: 5px;
+
+}
+
+
+.status-aguardando {
+
+    background: #ff9800;
+
+}
+
+
+.status-liberada {
+
+    background: #00a000;
+
+}
+
+
+.status-bloqueada {
+
+    background: #d00000;
+
+}
+
+
+.status-finalizada {
+
+    background: #0072d3;
+
+}
+
+
+.btnFecharLista {
+
+    width: 100%;
+
+    height: 43px;
+
+    margin-top: 12px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #555;
+
+    color: #fff;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================================================
    CARREGANDO
 ========================================================= */
 
@@ -1006,6 +1353,22 @@ body {
     }
 
 
+    #saldoJogador {
+
+        width: 82px;
+
+        font-size: 9px;
+
+    }
+
+
+    #saldoValor {
+
+        font-size: 12px;
+
+    }
+
+
     #valorUnico {
 
         width: 65px;
@@ -1017,16 +1380,16 @@ body {
 
     #totalFinal {
 
-        font-size: 12px;
+        font-size: 10px;
 
     }
 
 
     #apostarBtn {
 
-        min-width: 75px;
+        min-width: 68px;
 
-        font-size: 11px;
+        font-size: 10px;
 
     }
 
@@ -1078,13 +1441,85 @@ body {
     }
 
 }
-#apostarBtn.pronto {
-    background: #00b300;
-    color: #fff;
+/* =========================================================
+   JOGOS FEITOS DENTRO DO MENU
+========================================================= */
+
+#jogosFeitosMenu {
+    padding: 8px;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
-#apostarBtn.pronto:hover {
-    background: #009900;
+.menu-aposta {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 9px;
+    margin-bottom: 8px;
+    text-align: left;
+    font-size: 11px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+.menu-aposta-times {
+    background: #008000;
+    color: #fff;
+    padding: 7px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.menu-aposta-jogo {
+    background: #f1f1f1;
+    border-radius: 5px;
+    padding: 7px;
+    margin-top: 5px;
+}
+
+.menu-aposta-info {
+    line-height: 1.6;
+}
+
+.menu-aposta-palpite {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.menu-aposta-status {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 7px;
+    border-radius: 5px;
+    background: #ff9800;
+    color: #fff;
+    font-weight: bold;
+}
+
+.menu-aposta-status.liberada {
+    background: #00a000;
+}
+
+.menu-aposta-status.bloqueada {
+    background: #d00000;
+}
+
+.menu-aposta-status.finalizada {
+    background: #0072d3;
+}
+
+.menu-aposta-resumo {
+    border-top: 1px solid #ccc;
+    margin-top: 8px;
+    padding-top: 8px;
+    line-height: 1.7;
 }
 </style>
 
@@ -1103,6 +1538,7 @@ body {
 
 <div class="topo-fixo">
 
+
     <div
         class="hamburger"
         id="hamburger"
@@ -1111,10 +1547,25 @@ body {
     </div>
 
 
+    <!-- SALDO -->
+
+    <div id="saldoJogador">
+
+        <span>Saldo</span>
+
+        <span id="saldoValor">
+            R$ 0,00
+        </span>
+
+    </div>
+
+
+    <!-- VALOR DA APOSTA -->
+
     <input
         type="number"
         id="valorUnico"
-        placeholder="Valor"
+        placeholder="Aposta"
         min="1"
         step="0.01"
     >
@@ -1151,15 +1602,17 @@ body {
      MENU
 ===================================================== -->
 
-<div
-    id="menuEsportes"
->
+<div id="menuEsportes">
 
     <div class="menu-titulo">
-        FUTEBOL
+        MENU
     </div>
 
     <ul id="listaEsportes"></ul>
+
+    <div id="jogosFeitosMenu">
+        Carregando...
+    </div>
 
 </div>
 
@@ -1257,41 +1710,123 @@ body {
     class="conteudo-dia"
 ></div>
 
-
 <div
     id="conteudo-segunda"
     class="conteudo-dia"
 ></div>
-
 
 <div
     id="conteudo-terca"
     class="conteudo-dia"
 ></div>
 
-
 <div
     id="conteudo-quarta"
     class="conteudo-dia"
 ></div>
-
 
 <div
     id="conteudo-quinta"
     class="conteudo-dia"
 ></div>
 
-
 <div
     id="conteudo-sexta"
     class="conteudo-dia"
 ></div>
 
-
 <div
     id="conteudo-sabado"
     class="conteudo-dia"
 ></div>
+
+
+<!-- =====================================================
+     MODAL NOME
+===================================================== -->
+
+<div
+    id="nomeModal"
+    class="modal"
+>
+
+    <div class="nome-conteudo">
+
+        <h2>
+            Bem-vindo!
+        </h2>
+
+        <p>
+            Digite seu nome para continuar.
+        </p>
+
+        <input
+            type="text"
+            id="nomeJogadorInput"
+            placeholder="Seu nome"
+            maxlength="50"
+            autocomplete="name"
+        >
+
+        <button
+            id="btnSalvarNome"
+        >
+            Continuar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL SALDO INSUFICIENTE
+===================================================== -->
+
+<div
+    id="saldoModal"
+    class="modal"
+>
+
+    <div class="saldo-conteudo">
+
+        <h2>
+            Saldo insuficiente
+        </h2>
+
+        <p>
+            Você não possui saldo suficiente
+            para realizar esta aposta.
+        </p>
+
+        <div class="saldo-atual-modal">
+
+            Seu saldo:
+
+            <strong id="saldoModalValor">
+                R$ 0,00
+            </strong>
+
+            <br>
+
+            Valor da aposta:
+
+            <strong id="valorModalAposta">
+                R$ 0,00
+            </strong>
+
+        </div>
+
+        <button
+            class="btnAdicionarSaldo"
+            id="btnFecharSaldo"
+        >
+            Fechar
+        </button>
+
+    </div>
+
+</div>
 
 
 <!-- =====================================================
@@ -1317,9 +1852,31 @@ body {
 
             <div>
 
+                👤 Jogador:
+
+                <strong id="previewNome">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div>
+
                 💰 Valor da aposta:
 
                 <strong id="previewValor">
+                    R$ 0,00
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                💳 Saldo após aposta:
+
+                <strong id="previewSaldoRestante">
                     R$ 0,00
                 </strong>
 
@@ -1426,6 +1983,41 @@ body {
 
 
 <!-- =====================================================
+     MODAL JOGOS FEITOS
+===================================================== -->
+
+<div
+    id="jogosFeitosModal"
+    class="modal"
+>
+
+    <div class="jogos-feitos-conteudo">
+
+        <div class="jogos-feitos-titulo">
+
+            🎟️ Jogos Feitos
+
+        </div>
+
+        <div id="listaJogosFeitos">
+
+            Carregando...
+
+        </div>
+
+        <button
+            class="btnFecharLista"
+            id="btnFecharJogosFeitos"
+        >
+            Fechar
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
      MODAL CARREGANDO
 ===================================================== -->
 
@@ -1445,60 +2037,52 @@ body {
 
 <script type="module">
 
-
 /* =========================================================
    FIREBASE
 ========================================================= */
 
 import {
     initializeApp
-}
-from
-"https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 
 import {
     getDatabase,
     ref,
     get,
-    set
-}
-from
-"https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+    set,
+    update
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 
 const firebaseConfig = {
 
     apiKey:
-    "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+        "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
 
     authDomain:
-    "jogo-60a9e.firebaseapp.com",
+        "jogo-60a9e.firebaseapp.com",
 
     projectId:
-    "jogo-60a9e",
+        "jogo-60a9e",
 
     storageBucket:
-    "jogo-60a9e.appspot.com",
+        "jogo-60a9e.appspot.com",
 
     messagingSenderId:
-    "352852303591",
+        "352852303591",
 
     appId:
-    "1:352852303591:web:8083c950047c9026bd8c42",
+        "1:352852303591:web:8083c950047c9026bd8c42",
 
     databaseURL:
-    "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+        "https://jogo-60a9e-default-rtdb.firebaseio.com/"
 
 };
 
 
-const app =
-    initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-
-const db =
-    getDatabase(app);
+const db = getDatabase(app);
 
 
 /* =========================================================
@@ -1512,7 +2096,6 @@ const chavePix =
 
 
 const dias = [
-
     "domingo",
     "segunda",
     "terca",
@@ -1520,193 +2103,880 @@ const dias = [
     "quinta",
     "sexta",
     "sabado"
-
 ];
 
 
 let selects = [];
 
+let diaAtual = "";
+
+let filtroPais = "";
+
+let jogadorId = "";
+
+let nomeJogador = "";
+
+let saldoJogador = 0;
+
 
 /* =========================================================
-   PAÍSES / CAMPEONATOS
+   ELEMENTOS
 ========================================================= */
 
-const paises = [
+const lista =
+    document.getElementById("listaEsportes");
 
-    {
-        nome: "🇧🇷 Brasil",
-        chave: "brasil"
-    },
+const nomeModal =
+    document.getElementById("nomeModal");
 
-    {
-        nome: "🇦🇷 Argentina",
-        chave: "argentina"
-    },
+const saldoModal =
+    document.getElementById("saldoModal");
 
-    {
-        nome: "🇬🇧 Inglaterra",
-        chave: "inglaterra"
-    },
+const previewModal =
+    document.getElementById("previewModal");
 
-    {
-        nome: "🇪🇸 Espanha",
-        chave: "espanha"
-    },
+const codigoModal =
+    document.getElementById("codigoModal");
 
-    {
-        nome: "🇮🇹 Itália",
-        chave: "italia"
-    },
+const jogosFeitosModal =
+    document.getElementById("jogosFeitosModal");
 
-    {
-        nome: "🇩🇪 Alemanha",
-        chave: "alemanha"
-    },
 
-    {
-        nome: "🇫🇷 França",
-        chave: "franca"
-    },
+/* =========================================================
+   GERAR ID DO JOGADOR
+========================================================= */
 
-    {
-        nome: "🇵🇹 Portugal",
-        chave: "portugal"
-    },
+function obterJogadorId() {
 
-    {
-        nome: "🇳🇱 Holanda",
-        chave: "holanda"
-    },
+    let id =
+        localStorage.getItem(
+            "multiPlayJogadorId"
+        );
 
-    {
-        nome: "🇧🇪 Bélgica",
-        chave: "belgica"
-    },
 
-    {
-        nome: "🇺🇸 Estados Unidos",
-        chave: "eua"
-    },
+    if (!id) {
 
-    {
-        nome: "🇲🇽 México",
-        chave: "mexico"
-    },
+        id =
+            "J" +
+            Date.now() +
+            Math.random()
+                .toString(36)
+                .substring(2, 8);
 
-    {
-        nome: "🇨🇴 Colômbia",
-        chave: "colombia"
-    },
+        localStorage.setItem(
+            "multiPlayJogadorId",
+            id
+        );
 
-    {
-        nome: "🇨🇱 Chile",
-        chave: "chile"
-    },
-
-    {
-        nome: "🌎 Internacional",
-        chave: "internacional"
     }
 
-];
+
+    return id;
+
+}
+
+
+/* =========================================================
+   FORMATAR DINHEIRO
+========================================================= */
+
+function dinheiro(valor) {
+
+    return Number(valor || 0)
+        .toLocaleString(
+            "pt-BR",
+            {
+                style: "currency",
+                currency: "BRL"
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ATUALIZAR SALDO
+========================================================= */
+
+function atualizarSaldoTela() {
+
+    const campo =
+        document.getElementById(
+            "saldoValor"
+        );
+
+
+    if (campo) {
+
+        campo.textContent =
+            dinheiro(
+                saldoJogador
+            );
+
+    }
+
+
+    const modalSaldo =
+        document.getElementById(
+            "saldoModalValor"
+        );
+
+
+    if (modalSaldo) {
+
+        modalSaldo.textContent =
+            dinheiro(
+                saldoJogador
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR JOGADOR
+========================================================= */
+
+async function carregarJogador() {
+
+    jogadorId =
+        obterJogadorId();
+
+
+    const nomeSalvo =
+        localStorage.getItem(
+            "multiPlayNome"
+        );
+
+
+    if (!nomeSalvo) {
+
+        nomeModal.style.display =
+            "flex";
+
+        return false;
+
+    }
+
+
+    nomeJogador =
+        nomeSalvo;
+
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (snapshot.exists()) {
+
+            const dados =
+                snapshot.val();
+
+
+            saldoJogador =
+                Number(
+                    dados.saldo
+                ) || 0;
+
+
+            if (
+                dados.nome &&
+                dados.nome !== nomeJogador
+            ) {
+
+                nomeJogador =
+                    dados.nome;
+
+                localStorage.setItem(
+                    "multiPlayNome",
+                    nomeJogador
+                );
+
+            }
+
+        }
+
+        else {
+
+            saldoJogador = 0;
+
+
+            await set(
+                jogadorRef,
+                {
+                    nome:
+                        nomeJogador,
+
+                    saldo:
+                        0,
+
+                    bloqueado:
+                        false,
+
+                    criadoEm:
+                        new Date()
+                            .toISOString()
+                }
+            );
+
+        }
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar jogador:",
+            erro
+        );
+
+        saldoJogador = 0;
+
+    }
+
+
+    atualizarSaldoTela();
+
+    return true;
+
+}
+
+
+/* =========================================================
+   SALVAR NOME
+========================================================= */
+
+document.getElementById(
+    "btnSalvarNome"
+).onclick =
+async function() {
+
+    const campo =
+        document.getElementById(
+            "nomeJogadorInput"
+        );
+
+
+    const nome =
+        campo.value.trim();
+
+
+    if (!nome) {
+
+        alert(
+            "Digite seu nome."
+        );
+
+        campo.focus();
+
+        return;
+
+    }
+
+
+    nomeJogador =
+        nome;
+
+
+    localStorage.setItem(
+        "multiPlayNome",
+        nomeJogador
+    );
+
+
+    jogadorId =
+        obterJogadorId();
+
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (snapshot.exists()) {
+
+            await update(
+                jogadorRef,
+                {
+                    nome:
+                        nomeJogador
+                }
+            );
+
+        }
+
+        else {
+
+            await set(
+                jogadorRef,
+                {
+
+                    nome:
+                        nomeJogador,
+
+                    saldo:
+                        0,
+
+                    bloqueado:
+                        false,
+
+                    criadoEm:
+                        new Date()
+                            .toISOString()
+
+                }
+            );
+
+        }
+
+
+        saldoJogador = 0;
+
+        atualizarSaldoTela();
+
+
+        nomeModal.style.display =
+            "none";
+
+
+        iniciarSistema();
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        alert(
+            "Não foi possível salvar o nome."
+        );
+
+    }
+
+};
 
 
 /* =========================================================
    MENU
 ========================================================= */
 
-const lista =
-    document.getElementById(
-        "listaEsportes"
-    );
-
-
 function montarMenu() {
 
     lista.innerHTML = "";
 
 
-    /* TODOS */
+    /* =====================================================
+       JOGOS FEITOS
+    ===================================================== */
+
+    const feitos =
+        document.createElement(
+            "li"
+        );
+
+
+    feitos.textContent =
+        "🎟️ Jogos Feitos";
+
+
+    feitos.onclick =
+    async () => {
+
+        filtroPais = "";
+
+
+        document.getElementById(
+            "tituloPagina"
+        ).textContent =
+            "Jogos Feitos";
+
+
+        await carregarJogosFeitosMenu();
+
+    };
+
+
+    lista.appendChild(
+        feitos
+    );
+
+
+    /* =====================================================
+       TODOS OS JOGOS
+    ===================================================== */
 
     const todos =
-        document.createElement("li");
+        document.createElement(
+            "li"
+        );
+
 
     todos.textContent =
         "🌎 Todos os jogos";
 
-    todos.onclick = () => {
+
+    todos.onclick =
+    async () => {
 
         filtroPais = "";
+
 
         document.getElementById(
             "tituloPagina"
         ).textContent =
             "Futebol";
 
+
+        document.getElementById(
+            "jogosFeitosMenu"
+        ).innerHTML = "";
+
+
         fecharMenu();
 
-        recarregarDiaAtual();
+
+        if (!diaAtual) {
+
+            const hoje =
+                new Date().getDay();
+
+            diaAtual =
+                dias[hoje];
+
+        }
+
+
+        await recarregarDiaAtual();
 
     };
 
-    lista.appendChild(todos);
 
-
-    /* PAÍSES */
-
-    paises.forEach(
-        pais => {
-
-            const li =
-                document.createElement("li");
-
-            li.textContent =
-                pais.nome;
-
-            li.onclick = () => {
-
-                filtroPais =
-                    pais.chave;
-
-                document.getElementById(
-                    "tituloPagina"
-                ).textContent =
-                    pais.nome;
-
-                fecharMenu();
-
-                recarregarDiaAtual();
-
-            };
-
-            lista.appendChild(li);
-
-        }
+    lista.appendChild(
+        todos
     );
 
 }
-
-
-let filtroPais = "";
 
 
 montarMenu();
 
 
 /* =========================================================
-   MENU ABRIR
+   CARREGAR JOGOS FEITOS NO MENU
+========================================================= */
+
+async function carregarJogosFeitosMenu() {
+
+    const container =
+        document.getElementById(
+            "jogosFeitosMenu"
+        );
+
+
+    if (!container) return;
+
+
+    container.innerHTML =
+        "<p style='color:white;text-align:center'>" +
+        "Carregando apostas..." +
+        "</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "apostas"
+                )
+            );
+
+
+        if (!snapshot.exists()) {
+
+            container.innerHTML =
+                "<p style='color:white;text-align:center'>" +
+                "Nenhuma aposta encontrada." +
+                "</p>";
+
+            document.getElementById(
+                "menuEsportes"
+            ).style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        const dados =
+            snapshot.val();
+
+
+        const apostas =
+            Object.values(dados)
+                .filter(
+                    aposta =>
+                        aposta &&
+                        aposta.jogadorId ===
+                        jogadorId
+                )
+                .sort(
+                    (a, b) =>
+                        String(
+                            b.dataHora || ""
+                        ).localeCompare(
+                            String(
+                                a.dataHora || ""
+                            )
+                        )
+                );
+
+
+        if (apostas.length === 0) {
+
+            container.innerHTML =
+                "<p style='color:white;text-align:center'>" +
+                "Você ainda não fez nenhuma aposta." +
+                "</p>";
+
+            document.getElementById(
+                "menuEsportes"
+            ).style.display =
+                "block";
+
+            return;
+
+        }
+
+
+        container.innerHTML = "";
+
+
+        apostas.forEach(
+            aposta => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "menu-aposta";
+
+
+                const status =
+                    String(
+                        aposta.status ||
+                        "aguardando"
+                    ).toLowerCase();
+
+
+                let textoStatus =
+                    "Aguardando";
+
+
+                let classeStatus =
+                    "";
+
+
+                if (
+                    status === "liberada"
+                ) {
+
+                    textoStatus =
+                        "Liberada";
+
+                    classeStatus =
+                        "liberada";
+
+                }
+
+
+                else if (
+                    status === "bloqueada"
+                ) {
+
+                    textoStatus =
+                        "Bloqueada";
+
+                    classeStatus =
+                        "bloqueada";
+
+                }
+
+
+                else if (
+                    status === "finalizada"
+                ) {
+
+                    textoStatus =
+                        "Finalizada";
+
+                    classeStatus =
+                        "finalizada";
+
+                }
+
+
+                let htmlJogos = "";
+
+
+                const selecoes =
+                    Array.isArray(
+                        aposta.selecoes
+                    )
+                    ? aposta.selecoes
+                    : Object.values(
+                        aposta.selecoes || {}
+                    );
+
+
+                selecoes.forEach(
+                    (jogo, index) => {
+
+                        htmlJogos += `
+
+                            <div class="menu-aposta-jogo">
+
+                                <div class="menu-aposta-times">
+
+                                    ${escapeHTML(
+                                        jogo.timeA ||
+                                        "Time A"
+                                    )}
+
+                                    ×
+
+                                    ${escapeHTML(
+                                        jogo.timeB ||
+                                        "Time B"
+                                    )}
+
+                                </div>
+
+
+                                <div class="menu-aposta-info">
+
+                                    🏆
+                                    <strong>
+                                        ${escapeHTML(
+                                            jogo.campeonato ||
+                                            "Campeonato"
+                                        )}
+                                    </strong>
+
+                                    <br>
+
+                                    📅
+                                    ${formatarData(
+                                        jogo.data || ""
+                                    )}
+
+                                    &nbsp;
+
+                                    ⏰
+                                    ${escapeHTML(
+                                        jogo.hora || ""
+                                    )}
+
+                                    <br>
+
+                                    🎯 Palpite:
+
+                                    <span
+                                        class="menu-aposta-palpite"
+                                    >
+
+                                        ${escapeHTML(
+                                            jogo.escolha || ""
+                                        )}
+
+                                        &nbsp;
+
+                                        ${Number(
+                                            jogo.valor || 0
+                                        ).toFixed(2)}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                );
+
+
+                card.innerHTML = `
+
+                    ${htmlJogos}
+
+
+                    <div class="menu-aposta-resumo">
+
+                        🎟️
+                        <strong>
+                            ${escapeHTML(
+                                aposta.codigo || ""
+                            )}
+                        </strong>
+
+                        <br>
+
+                        👤
+                        ${escapeHTML(
+                            aposta.nome ||
+                            nomeJogador
+                        )}
+
+                        <br>
+
+                        💰 Aposta:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.valorUnico
+                            )}
+                        </strong>
+
+                        <br>
+
+                        🎯 Jogos:
+
+                        <strong>
+                            ${Number(
+                                aposta.quantidadeJogos
+                            ) ||
+                            selecoes.length}
+                        </strong>
+
+                        <br>
+
+                        💵 Retorno:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.possivelRetorno
+                            )}
+                        </strong>
+
+                        <br>
+
+                        <span
+                            class="
+                                menu-aposta-status
+                                ${classeStatus}
+                            "
+                        >
+
+                            ${textoStatus}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        /*
+         * MANTÉM O MENU ABERTO
+         */
+
+        document.getElementById(
+            "menuEsportes"
+        ).style.display =
+            "block";
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar jogos feitos:",
+            erro
+        );
+
+
+        container.innerHTML = `
+
+            <p
+                style="
+                    color:white;
+                    text-align:center;
+                "
+            >
+                Erro ao carregar apostas.
+            </p>
+
+        `;
+
+
+        document.getElementById(
+            "menuEsportes"
+        ).style.display =
+            "block";
+
+    }
+
+}
+
+
+/* =========================================================
+   MENU ABRIR / FECHAR
 ========================================================= */
 
 document.getElementById(
     "hamburger"
-).onclick = event => {
+).onclick =
+event => {
 
     event.stopPropagation();
+
 
     const menu =
         document.getElementById(
             "menuEsportes"
         );
+
 
     menu.style.display =
         menu.style.display === "block"
@@ -1735,14 +3005,20 @@ document.addEventListener(
                 "menuEsportes"
             );
 
+
         const hamburger =
             document.getElementById(
                 "hamburger"
             );
 
+
         if (
-            !menu.contains(event.target) &&
-            !hamburger.contains(event.target)
+            !menu.contains(
+                event.target
+            ) &&
+            !hamburger.contains(
+                event.target
+            )
         ) {
 
             menu.style.display =
@@ -1777,7 +3053,8 @@ function(dia) {
 
     const container =
         document.getElementById(
-            "conteudo-" + dia
+            "conteudo-" +
+            dia
         );
 
 
@@ -1818,12 +3095,10 @@ function(dia) {
     }
 
 
-    diaAtual = dia;
+    diaAtual =
+        dia;
 
 };
-
-
-let diaAtual = "";
 
 
 /* =========================================================
@@ -1834,7 +3109,8 @@ async function carregarJogos(dia) {
 
     const container =
         document.getElementById(
-            "conteudo-" + dia
+            "conteudo-" +
+            dia
         );
 
 
@@ -1851,7 +3127,8 @@ async function carregarJogos(dia) {
             await get(
                 ref(
                     db,
-                    "jogos/" + dia
+                    "jogos/" +
+                    dia
                 )
             );
 
@@ -1875,10 +3152,14 @@ async function carregarJogos(dia) {
             jogos =
                 jogos.filter(Boolean);
 
-        } else {
+        }
+
+        else {
 
             jogos =
-                Object.values(jogos);
+                Object.values(
+                    jogos
+                );
 
         }
 
@@ -1909,9 +3190,7 @@ async function carregarJogos(dia) {
                 }
 
 
-                /*
-                 * FILTRO DE PAÍS
-                 */
+                /* FILTRO PAÍS */
 
                 if (
                     filtroPais &&
@@ -1928,19 +3207,13 @@ async function carregarJogos(dia) {
                 }
 
 
-                /*
-                 * DATA E HORA
-                 */
-
                 const dataHora =
                     new Date(
                         `${jogo.data}T${jogo.hora}`
                     );
 
 
-                /*
-                 * NÃO MOSTRA EXPIRADO
-                 */
+                /* NÃO MOSTRA EXPIRADO */
 
                 if (
                     dataHora <= agora
@@ -1980,6 +3253,7 @@ async function carregarJogos(dia) {
             "Erro ao carregar jogos:",
             erro
         );
+
 
         container.innerHTML =
             "<p>Erro ao carregar jogos.</p>";
@@ -2066,7 +3340,8 @@ function criarJogo(
 
 
     div.dataset.grupo =
-        "grupo-" + index;
+        "grupo-" +
+        index;
 
 
     div.dataset.campeonato =
@@ -2089,9 +3364,6 @@ function criarJogo(
 
         <div class="linha-duelo">
 
-
-            <!-- TIME A -->
-
             <div class="time-nome-img">
 
                 <img
@@ -2101,15 +3373,11 @@ function criarJogo(
                 >
 
                 <div class="nome-time">
-
                     ${escapeHTML(timeA)}
-
                 </div>
 
             </div>
 
-
-            <!-- CASA -->
 
             <button
                 class="btn"
@@ -2122,15 +3390,11 @@ function criarJogo(
                 <br>
 
                 <span class="valor-cotacao">
-
                     ${casa.toFixed(2)}
-
                 </span>
 
             </button>
 
-
-            <!-- EMPATE -->
 
             <button
                 class="btn"
@@ -2143,15 +3407,11 @@ function criarJogo(
                 <br>
 
                 <span class="valor-cotacao">
-
                     ${empate.toFixed(2)}
-
                 </span>
 
             </button>
 
-
-            <!-- FORA -->
 
             <button
                 class="btn"
@@ -2164,15 +3424,11 @@ function criarJogo(
                 <br>
 
                 <span class="valor-cotacao">
-
                     ${fora.toFixed(2)}
-
                 </span>
 
             </button>
 
-
-            <!-- TIME B -->
 
             <div class="time-nome-img">
 
@@ -2183,15 +3439,11 @@ function criarJogo(
                 >
 
                 <div class="nome-time">
-
                     ${escapeHTML(timeB)}
-
                 </div>
 
             </div>
 
-
-            <!-- + -->
 
             <button
                 class="toggleExtras"
@@ -2199,14 +3451,10 @@ function criarJogo(
                 +
             </button>
 
-
         </div>
 
 
-        <!-- EXTRAS -->
-
         <div class="extras">
-
 
             <div class="coluna-botao">
 
@@ -2221,9 +3469,7 @@ function criarJogo(
                     <br>
 
                     <span class="valor-cotacao">
-
                         ${ambas.toFixed(2)}
-
                     </span>
 
                 </button>
@@ -2335,11 +3581,8 @@ function criarJogo(
 
             </div>
 
-
         </div>
 
-
-        <!-- INFORMAÇÕES -->
 
         <div class="info-jogo">
 
@@ -2378,7 +3621,7 @@ function criarJogo(
 
 
     /* =====================================================
-       ABRIR EXTRAS
+       EXTRAS
     ===================================================== */
 
     const toggle =
@@ -2397,7 +3640,8 @@ function criarJogo(
     () => {
 
         const aberto =
-            extras.style.display === "flex";
+            extras.style.display ===
+            "flex";
 
 
         extras.style.display =
@@ -2431,11 +3675,6 @@ function criarJogo(
                         "selecionado"
                     );
 
-
-                /*
-                 * SOMENTE UM PALPITE
-                 * POR JOGO
-                 */
 
                 div.querySelectorAll(
                     ".btn"
@@ -2472,7 +3711,7 @@ function criarJogo(
 
 
 /* =========================================================
-   NOME DO ARQUIVO - COMPATIBILIDADE
+   NOME DO ARQUIVO
 ========================================================= */
 
 function extrairNome(url) {
@@ -2530,7 +3769,9 @@ function extrairNome(url) {
 
 function normalizar(texto) {
 
-    return String(texto || "")
+    return String(
+        texto || ""
+    )
         .normalize("NFD")
         .replace(
             /[\u0300-\u036f]/g,
@@ -2579,7 +3820,9 @@ function formatarData(data) {
 
 function escapeHTML(text) {
 
-    return String(text || "")
+    return String(
+        text || ""
+    )
 
         .replace(
             /&/g,
@@ -2651,12 +3894,12 @@ function atualizarSelecoes() {
 
                     timeA:
                         nomes[0]?.textContent
-                        .trim() || "",
+                            .trim() || "",
 
 
                     timeB:
                         nomes[1]?.textContent
-                        .trim() || "",
+                            .trim() || "",
 
 
                     valor:
@@ -2667,10 +3910,7 @@ function atualizarSelecoes() {
 
                     escolha:
                         btn.dataset.escolha ||
-                        btn.textContent
-                            .trim()
-                            .split("\n")[0]
-                            .trim(),
+                        "",
 
 
                     campeonato:
@@ -2695,7 +3935,6 @@ function atualizarSelecoes() {
 
                     dataHora:
                         `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
-
 
                     status:
                         "aguardando"
@@ -2742,36 +3981,51 @@ function atualizarTotal() {
 
     const valor =
         Number(
-            document.getElementById("valorUnico").value
+            document.getElementById(
+                "valorUnico"
+            ).value
         ) || 0;
+
 
     const quantidade =
         selects.length;
 
+
     let multiplicador = 1;
 
+
     document
-        .querySelectorAll(".btn.selecionado")
-        .forEach(btn => {
+        .querySelectorAll(
+            ".btn.selecionado"
+        )
+        .forEach(
+            btn => {
 
-            multiplicador *=
-                Number(btn.dataset.valor) || 1;
+                multiplicador *=
+                    Number(
+                        btn.dataset.valor
+                    ) || 1;
 
-        });
+            }
+        );
+
 
     const retorno =
-        valor * multiplicador;
+        valor *
+        multiplicador;
+
 
     const totalFinal =
-        document.getElementById("totalFinal");
+        document.getElementById(
+            "totalFinal"
+        );
+
 
     const apostar =
-        document.getElementById("apostarBtn");
+        document.getElementById(
+            "apostarBtn"
+        );
 
-
-    /* =====================================================
-       SEM JOGO OU SEM VALOR
-    ===================================================== */
 
     if (
         quantidade === 0 ||
@@ -2784,9 +4038,14 @@ function atualizarTotal() {
             R$ 0,00
         `;
 
+
         apostar.disabled = true;
 
-        apostar.classList.remove("pronto");
+
+        apostar.classList.remove(
+            "pronto"
+        );
+
 
         apostar.innerHTML = `
             Apostar
@@ -2796,28 +4055,32 @@ function atualizarTotal() {
             </span>
         `;
 
+
         return;
 
     }
 
 
-    /* =====================================================
-       LIMITE DE RETORNO
-    ===================================================== */
-
-    if (retorno > LIMITE) {
+    if (
+        retorno > LIMITE
+    ) {
 
         totalFinal.innerHTML = `
             <span style="color:red">
                 Retorno
                 <br>
-                R$ ${retorno.toFixed(2)}
+                ${dinheiro(retorno)}
             </span>
         `;
 
+
         apostar.disabled = true;
 
-        apostar.classList.remove("pronto");
+
+        apostar.classList.remove(
+            "pronto"
+        );
+
 
         apostar.innerHTML = `
             Apostar
@@ -2827,26 +4090,28 @@ function atualizarTotal() {
             </span>
         `;
 
+
         return;
 
     }
 
 
-    /* =====================================================
-       PRONTO PARA ENVIAR
-    ===================================================== */
-
     totalFinal.innerHTML = `
         <span style="color:green">
             Retorno
             <br>
-            R$ ${retorno.toFixed(2)}
+            ${dinheiro(retorno)}
         </span>
     `;
 
+
     apostar.disabled = false;
 
-    apostar.classList.add("pronto");
+
+    apostar.classList.add(
+        "pronto"
+    );
+
 
     apostar.innerHTML = `
         Enviar
@@ -2858,11 +4123,93 @@ function atualizarTotal() {
 
 }
 
+
+/* =========================================================
+   VERIFICAR SALDO
+========================================================= */
+
+async function verificarSaldo() {
+
+    try {
+
+        const jogadorRef =
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            );
+
+
+        const snapshot =
+            await get(
+                jogadorRef
+            );
+
+
+        if (
+            snapshot.exists()
+        ) {
+
+            const dados =
+                snapshot.val();
+
+
+            saldoJogador =
+                Number(
+                    dados.saldo
+                ) || 0;
+
+
+            if (
+                dados.bloqueado === true
+            ) {
+
+                alert(
+                    "Seu jogador está bloqueado."
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        atualizarSaldoTela();
+
+
+        return true;
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        return false;
+
+    }
+
+}
+
+
 /* =========================================================
    ABRIR PRÉVIA
 ========================================================= */
 
-function abrirPreview() {
+async function abrirPreview() {
+
+    if (!nomeJogador) {
+
+        nomeModal.style.display =
+            "flex";
+
+        return;
+
+    }
+
 
     const campoValor =
         document.getElementById(
@@ -2882,7 +4229,7 @@ function abrirPreview() {
     ) {
 
         alert(
-            "Digite um valor válido."
+            "Digite o valor da aposta."
         );
 
         return;
@@ -2903,8 +4250,45 @@ function abrirPreview() {
     }
 
 
-    let multiplicador =
-        1;
+    const saldoOK =
+        await verificarSaldo();
+
+
+    if (!saldoOK) {
+
+        return;
+
+    }
+
+
+    if (
+        valor > saldoJogador
+    ) {
+
+        document.getElementById(
+            "valorModalAposta"
+        ).textContent =
+            dinheiro(valor);
+
+
+        document.getElementById(
+            "saldoModalValor"
+        ).textContent =
+            dinheiro(
+                saldoJogador
+            );
+
+
+        saldoModal.style.display =
+            "flex";
+
+
+        return;
+
+    }
+
+
+    let multiplicador = 1;
 
 
     selects.forEach(
@@ -2929,8 +4313,8 @@ function abrirPreview() {
     ) {
 
         alert(
-            "O possível retorno ultrapassa o limite de R$ " +
-            LIMITE.toFixed(2)
+            "O possível retorno ultrapassa o limite de " +
+            dinheiro(LIMITE)
         );
 
         return;
@@ -2966,9 +4350,15 @@ function abrirPreview() {
                 <div class="preview-times">
 
                     ${index + 1}.
-                    ${escapeHTML(selecao.timeA)}
+                    ${escapeHTML(
+                        selecao.timeA
+                    )}
+
                     ×
-                    ${escapeHTML(selecao.timeB)}
+
+                    ${escapeHTML(
+                        selecao.timeB
+                    )}
 
                 </div>
 
@@ -2977,34 +4367,26 @@ function abrirPreview() {
 
                     🏆
                     <strong>
-
                         ${escapeHTML(
                             selecao.campeonato
                         )}
-
                     </strong>
 
-
                     <br>
-
 
                     📅
                     ${formatarData(
                         selecao.data
                     )}
 
-
                     &nbsp;
-
 
                     ⏰
                     ${escapeHTML(
                         selecao.hora
                     )}
 
-
                     <br>
-
 
                     🎯 Palpite:
 
@@ -3038,10 +4420,24 @@ function abrirPreview() {
 
 
     document.getElementById(
+        "previewNome"
+    ).textContent =
+        nomeJogador;
+
+
+    document.getElementById(
         "previewValor"
     ).textContent =
-        "R$ " +
-        valor.toFixed(2);
+        dinheiro(valor);
+
+
+    document.getElementById(
+        "previewSaldoRestante"
+    ).textContent =
+        dinheiro(
+            saldoJogador -
+            valor
+        );
 
 
     document.getElementById(
@@ -3053,13 +4449,10 @@ function abrirPreview() {
     document.getElementById(
         "previewRetorno"
     ).textContent =
-        "R$ " +
-        retorno.toFixed(2);
+        dinheiro(retorno);
 
 
-    document.getElementById(
-        "previewModal"
-    ).style.display =
+    previewModal.style.display =
         "flex";
 
 }
@@ -3080,7 +4473,22 @@ function() {
 
 
 /* =========================================================
-   VOLTAR
+   FECHAR SALDO
+========================================================= */
+
+document.getElementById(
+    "btnFecharSaldo"
+).onclick =
+function() {
+
+    saldoModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   VOLTAR PRÉVIA
 ========================================================= */
 
 document.getElementById(
@@ -3088,9 +4496,7 @@ document.getElementById(
 ).onclick =
 function() {
 
-    document.getElementById(
-        "previewModal"
-    ).style.display =
+    previewModal.style.display =
         "none";
 
 };
@@ -3156,8 +4562,49 @@ async function() {
         }
 
 
-        let multiplicador =
-            1;
+        const saldoOK =
+            await verificarSaldo();
+
+
+        if (!saldoOK) {
+
+            return;
+
+        }
+
+
+        if (
+            valor > saldoJogador
+        ) {
+
+            previewModal.style.display =
+                "none";
+
+
+            document.getElementById(
+                "valorModalAposta"
+            ).textContent =
+                dinheiro(valor);
+
+
+            document.getElementById(
+                "saldoModalValor"
+            ).textContent =
+                dinheiro(
+                    saldoJogador
+                );
+
+
+            saldoModal.style.display =
+                "flex";
+
+
+            return;
+
+        }
+
+
+        let multiplicador = 1;
 
 
         selects.forEach(
@@ -3182,18 +4629,14 @@ async function() {
         ) {
 
             alert(
-                "O possível retorno ultrapassa o limite de R$ " +
-                LIMITE.toFixed(2)
+                "O possível retorno ultrapassa o limite de " +
+                dinheiro(LIMITE)
             );
 
             return;
 
         }
 
-
-        /*
-         * BLOQUEIA
-         */
 
         botaoConfirmar.disabled =
             true;
@@ -3207,69 +4650,62 @@ async function() {
             true;
 
 
-        /*
-         * CÓDIGO
-         */
-
         const codigo =
             "MJ" +
             Date.now();
 
 
-        /*
-         * APOSTA
-         */
+        const novoSaldo =
+            saldoJogador -
+            valor;
+
 
         const aposta = {
 
             codigo:
-
                 codigo,
 
+            jogadorId:
+                jogadorId,
+
+            nome:
+                nomeJogador,
 
             valorUnico:
-
                 valor,
 
-
             possivelRetorno:
-
                 retorno,
 
-
             quantidadeJogos:
-
                 selects.length,
 
-
             selecoes:
-
                 selects.map(
                     s => ({
 
                         timeA:
                             String(
-                                s.timeA || ""
+                                s.timeA ||
+                                ""
                             ),
-
 
                         timeB:
                             String(
-                                s.timeB || ""
+                                s.timeB ||
+                                ""
                             ),
-
 
                         valor:
                             Number(
                                 s.valor
                             ) || 0,
 
-
                         escolha:
                             String(
-                                s.escolha || ""
+                                s.escolha ||
+                                ""
                             ),
-
 
                         campeonato:
                             String(
@@ -3277,30 +4713,29 @@ async function() {
                                 "Campeonato"
                             ),
 
-
                         pais:
                             String(
-                                s.pais || ""
+                                s.pais ||
+                                ""
                             ),
-
 
                         data:
                             String(
-                                s.data || ""
+                                s.data ||
+                                ""
                             ),
-
 
                         hora:
                             String(
-                                s.hora || ""
+                                s.hora ||
+                                ""
                             ),
-
 
                         dataHora:
                             String(
-                                s.dataHora || ""
+                                s.dataHora ||
+                                ""
                             ),
-
 
                         status:
                             "aguardando"
@@ -3308,28 +4743,26 @@ async function() {
                     })
                 ),
 
-
             dataHora:
+                new Date()
+                    .toISOString(),
 
-                new Date().toISOString(),
-
-            
             status:
-
                 "aguardando"
 
         };
 
 
-        /*
-         * SALVA NO FIREBASE
-         */
+        /* =================================================
+           SALVA APOSTA
+        ================================================= */
 
         await set(
 
             ref(
                 db,
-                "apostas/" + codigo
+                "apostas/" +
+                codigo
             ),
 
             aposta
@@ -3337,34 +4770,47 @@ async function() {
         );
 
 
-        console.log(
-            "APOSTA SALVA:",
-            aposta
+        /* =================================================
+           DESCONTA SALDO
+        ================================================= */
+
+        await update(
+
+            ref(
+                db,
+                "jogadores/" +
+                jogadorId
+            ),
+
+            {
+
+                saldo:
+                    novoSaldo
+
+            }
+
         );
 
 
-        /*
-         * FECHA PRÉVIA
-         */
+        saldoJogador =
+            novoSaldo;
 
-        document.getElementById(
-            "previewModal"
-        ).style.display =
+
+        atualizarSaldoTela();
+
+
+        previewModal.style.display =
             "none";
 
-
-        /*
-         * MODAL CÓDIGO
-         */
 
         abrirModal(
             codigo
         );
 
 
-        /*
-         * LIMPA SELEÇÕES
-         */
+        /* =================================================
+           LIMPAR SELEÇÕES
+        ================================================= */
 
         document
             .querySelectorAll(
@@ -3384,18 +4830,13 @@ async function() {
         selects = [];
 
 
-        campoValor.value =
-            "";
+        campoValor.value = "";
 
 
         atualizarContador();
 
         atualizarTotal();
 
-
-        /*
-         * RESTAURA BOTÃO
-         */
 
         botaoPrincipal.disabled =
             true;
@@ -3464,9 +4905,7 @@ async function() {
 function abrirModal(codigo) {
 
     const modal =
-        document.getElementById(
-            "codigoModal"
-        );
+        codigoModal;
 
 
     document.getElementById(
@@ -3490,26 +4929,12 @@ function abrirModal(codigo) {
             alt="QR Code PIX"
         >
 
-        <p style="display:none;">
-
-            PIX:
-
-            <strong>
-                ${chavePix}
-            </strong>
-
-        </p>
-
     `;
 
 
     modal.style.display =
         "flex";
 
-
-    /*
-     * COPIAR
-     */
 
     document.getElementById(
         "btnCopiar"
@@ -3541,10 +4966,6 @@ function abrirModal(codigo) {
     };
 
 
-    /*
-     * WHATSAPP
-     */
-
     document.getElementById(
         "btnWhatsapp"
     ).onclick =
@@ -3553,6 +4974,9 @@ function abrirModal(codigo) {
         const texto =
             encodeURIComponent(
                 "Minha aposta MULTI PLAY.BET\n\n" +
+                "Nome: " +
+                nomeJogador +
+                "\n" +
                 "Código: " +
                 codigo
             );
@@ -3569,7 +4993,7 @@ function abrirModal(codigo) {
 
 
 /* =========================================================
-   FECHAR MODAL
+   FECHAR MODAL CÓDIGO
 ========================================================= */
 
 document.getElementById(
@@ -3577,50 +5001,354 @@ document.getElementById(
 ).onclick =
 function() {
 
-    document.getElementById(
-        "codigoModal"
-    ).style.display =
+    codigoModal.style.display =
         "none";
 
 };
 
 
-document.getElementById(
-    "codigoModal"
-).addEventListener(
-    "click",
-    event => {
+/* =========================================================
+   JOGOS FEITOS MODAL
+========================================================= */
+
+async function abrirJogosFeitos() {
+
+    jogosFeitosModal.style.display =
+        "flex";
+
+
+    const listaModal =
+        document.getElementById(
+            "listaJogosFeitos"
+        );
+
+
+    listaModal.innerHTML =
+        "<p>Carregando apostas...</p>";
+
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "apostas"
+                )
+            );
+
 
         if (
-            event.target.id ===
-            "codigoModal"
+            !snapshot.exists()
         ) {
 
-            event.target.style.display =
-                "none";
+            listaModal.innerHTML =
+                "<p>Você ainda não fez nenhuma aposta.</p>";
+
+            return;
 
         }
 
+
+        const dados =
+            snapshot.val();
+
+
+        const apostas =
+            Object.values(
+                dados
+            )
+            .filter(
+                aposta =>
+                    aposta &&
+                    aposta.jogadorId ===
+                    jogadorId
+            )
+            .sort(
+                (a, b) =>
+                    String(
+                        b.dataHora || ""
+                    ).localeCompare(
+                        String(
+                            a.dataHora || ""
+                        )
+                    )
+            );
+
+
+        if (
+            apostas.length === 0
+        ) {
+
+            listaModal.innerHTML =
+                "<p>Você ainda não fez nenhuma aposta.</p>";
+
+            return;
+
+        }
+
+
+        listaModal.innerHTML = "";
+
+
+        apostas.forEach(
+            aposta => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "aposta-card";
+
+
+                const status =
+                    String(
+                        aposta.status ||
+                        "aguardando"
+                    ).toLowerCase();
+
+
+                let classeStatus =
+                    "status-aguardando";
+
+
+                let textoStatus =
+                    "Aguardando";
+
+
+                if (
+                    status === "liberada"
+                ) {
+
+                    classeStatus =
+                        "status-liberada";
+
+                    textoStatus =
+                        "Liberada";
+
+                }
+
+
+                else if (
+                    status === "bloqueada"
+                ) {
+
+                    classeStatus =
+                        "status-bloqueada";
+
+                    textoStatus =
+                        "Bloqueada";
+
+                }
+
+
+                else if (
+                    status === "finalizada"
+                ) {
+
+                    classeStatus =
+                        "status-finalizada";
+
+                    textoStatus =
+                        "Finalizada";
+
+                }
+
+
+                const quantidade =
+                    Number(
+                        aposta.quantidadeJogos
+                    ) || 0;
+
+
+                card.innerHTML = `
+
+                    <div class="aposta-codigo">
+
+                        🎟️
+                        ${escapeHTML(
+                            aposta.codigo || ""
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        👤
+                        ${escapeHTML(
+                            aposta.nome ||
+                            nomeJogador
+                        )}
+
+                    </div>
+
+
+                    <div>
+
+                        💰 Aposta:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.valorUnico
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        🎯 Jogos:
+
+                        <strong>
+                            ${quantidade}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        💵 Retorno:
+
+                        <strong>
+                            ${dinheiro(
+                                aposta.possivelRetorno
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span
+                            class="
+                                aposta-status
+                                ${classeStatus}
+                            "
+                        >
+
+                            ${textoStatus}
+
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                listaModal.appendChild(
+                    card
+                );
+
+            }
+        );
+
     }
-);
+
+    catch (erro) {
+
+        console.error(
+            erro
+        );
+
+
+        listaModal.innerHTML =
+            "<p>Erro ao carregar suas apostas.</p>";
+
+    }
+
+}
 
 
 /* =========================================================
-   FECHAR PRÉVIA FORA
+   FECHAR JOGOS FEITOS
 ========================================================= */
 
 document.getElementById(
-    "previewModal"
-).addEventListener(
+    "btnFecharJogosFeitos"
+).onclick =
+function() {
+
+    jogosFeitosModal.style.display =
+        "none";
+
+};
+
+
+/* =========================================================
+   FECHAR MODAIS CLICANDO FORA
+========================================================= */
+
+codigoModal.addEventListener(
     "click",
     event => {
 
         if (
-            event.target.id ===
-            "previewModal"
+            event.target ===
+            codigoModal
         ) {
 
-            event.target.style.display =
+            codigoModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+previewModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            previewModal
+        ) {
+
+            previewModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+saldoModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            saldoModal
+        ) {
+
+            saldoModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
+
+jogosFeitosModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            jogosFeitosModal
+        ) {
+
+            jogosFeitosModal.style.display =
                 "none";
 
         }
@@ -3630,12 +5358,20 @@ document.getElementById(
 
 
 /* =========================================================
-   RECARREGAR DIA
+   RECARREGAR DIA ATUAL
 ========================================================= */
 
 async function recarregarDiaAtual() {
 
-    if (!diaAtual) return;
+    if (!diaAtual) {
+
+        const hoje =
+            new Date().getDay();
+
+        diaAtual =
+            dias[hoje];
+
+    }
 
 
     await carregarJogos(
@@ -3651,10 +5387,65 @@ async function recarregarDiaAtual() {
 
 
 /* =========================================================
-   INICIALIZAÇÃO
+   VALOR DA APOSTA
 ========================================================= */
 
-async function inicializar() {
+document.getElementById(
+    "valorUnico"
+).addEventListener(
+    "input",
+    () => {
+
+        atualizarTotal();
+
+    }
+);
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+const carrossel =
+    document.getElementById(
+        "carrossel"
+    );
+
+
+let slide = 0;
+
+
+setInterval(
+    () => {
+
+        if (!carrossel) return;
+
+
+        const total =
+            carrossel.children.length;
+
+
+        if (!total) return;
+
+
+        slide =
+            (slide + 1) %
+            total;
+
+
+        carrossel.style.transform =
+            `translateX(-${slide * 100}%)`;
+
+    },
+    3000
+);
+
+
+/* =========================================================
+   INICIALIZAÇÃO DOS JOGOS
+========================================================= */
+
+async function inicializarJogos() {
 
     const modal =
         document.getElementById(
@@ -3674,10 +5465,6 @@ async function inicializar() {
         hoje.getDay();
 
 
-    /*
-     * ESCONDE TODOS
-     */
-
     document
         .querySelectorAll(
             "#diasContainer button"
@@ -3695,10 +5482,6 @@ async function inicializar() {
             }
         );
 
-
-    /*
-     * CARREGA HOJE + 2 PRÓXIMOS
-     */
 
     for (
         let i = 0;
@@ -3734,10 +5517,6 @@ async function inicializar() {
 
     }
 
-
-    /*
-     * MOSTRA HOJE
-     */
 
     const hojeNome =
         dias[indiceHoje];
@@ -3798,69 +5577,34 @@ document
 
 
 /* =========================================================
-   VALOR
+   INICIAR SISTEMA
 ========================================================= */
 
-document.getElementById(
-    "valorUnico"
-).addEventListener(
-    "input",
-    () => {
+async function iniciarSistema() {
 
-        atualizarTotal();
+    const carregou =
+        await carregarJogador();
+
+
+    if (!carregou) {
+
+        return;
 
     }
-);
 
 
-/* =========================================================
-   CARROSSEL
-========================================================= */
+    await inicializarJogos();
 
-const carrossel =
-    document.getElementById(
-        "carrossel"
-    );
-
-
-let slide =
-    0;
-
-
-setInterval(
-    () => {
-
-        if (!carrossel) return;
-
-
-        const total =
-            carrossel.children.length;
-
-
-        if (!total) return;
-
-
-        slide =
-            (slide + 1) %
-            total;
-
-
-        carrossel.style.transform =
-            `translateX(-${slide * 100}%)`;
-
-    },
-    3000
-);
+}
 
 
 /* =========================================================
    INICIAR
 ========================================================= */
 
-inicializar();
+iniciarSistema();
 
 </script>
-
 </body>
 
 </html>
