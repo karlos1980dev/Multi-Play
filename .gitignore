@@ -1,0 +1,1 @@
+# Dependências node_modules/ # Variáveis secretas .env # Chave privada do Firebase firebase-service-account.json # Logs npm-debug.log* yarn-debug.log* *.log # Arquivos temporários .DS_Store Thumbs.db 
