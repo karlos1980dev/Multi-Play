@@ -158,6 +158,9 @@ body {
     font-size: 15px;
 
     font-weight: bold;
+    
+    background:Black;
+    color:white;
 
 }
 
@@ -1521,6 +1524,86 @@ body {
     padding-top: 8px;
     line-height: 1.7;
 }
+.modal-saldo {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-saldo.ativo {
+    display: flex;
+}
+
+.modal-saldo-box {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0,0,0,.3);
+}
+
+.modal-saldo-box h3 {
+    margin: 0 0 10px;
+    font-size: 22px;
+}
+
+.modal-saldo-box p {
+    margin-bottom: 18px;
+    color: #555;
+}
+
+.input-valor {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 0 12px;
+    margin-bottom: 20px;
+}
+
+.input-valor span {
+    font-weight: bold;
+}
+
+.input-valor input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    padding: 13px 8px;
+    font-size: 18px;
+}
+
+.botoes-saldo {
+    display: flex;
+    gap: 10px;
+}
+
+.botoes-saldo button {
+    flex: 1;
+    border: 0;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-solicitar {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-cancelar {
+    background: #ddd;
+    color: #222;
+}
 </style>
 
 </head>
@@ -1744,6 +1827,44 @@ body {
 <!-- =====================================================
      MODAL NOME
 ===================================================== -->
+<div id="modalSaldo" class="modal-saldo">
+    <div class="modal-saldo-box">
+
+        <h3>Saldo insuficiente</h3>
+
+        <p>Informe o valor que deseja solicitar:</p>
+
+        <div class="input-valor">
+            <span>R$</span>
+            <input
+                type="number"
+                id="valorSolicitado"
+                value="10"
+                min="1"
+                step="0.01"
+            >
+        </div>
+
+        <div class="botoes-saldo">
+            <button
+                type="button"
+                onclick="solicitarSaldo()"
+                class="btn-solicitar"
+            >
+                Solicitar
+            </button>
+
+            <button
+                type="button"
+                onclick="fecharModalSaldo()"
+                class="btn-cancelar"
+            >
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <div
     id="nomeModal"
@@ -2080,9 +2201,11 @@ const firebaseConfig = {
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getDatabase(app);
+const db =
+    getDatabase(app);
 
 
 /* =========================================================
@@ -2124,22 +2247,34 @@ let saldoJogador = 0;
 ========================================================= */
 
 const lista =
-    document.getElementById("listaEsportes");
+    document.getElementById(
+        "listaEsportes"
+    );
 
 const nomeModal =
-    document.getElementById("nomeModal");
+    document.getElementById(
+        "nomeModal"
+    );
 
 const saldoModal =
-    document.getElementById("saldoModal");
+    document.getElementById(
+        "saldoModal"
+    );
 
 const previewModal =
-    document.getElementById("previewModal");
+    document.getElementById(
+        "previewModal"
+    );
 
 const codigoModal =
-    document.getElementById("codigoModal");
+    document.getElementById(
+        "codigoModal"
+    );
 
 const jogosFeitosModal =
-    document.getElementById("jogosFeitosModal");
+    document.getElementById(
+        "jogosFeitosModal"
+    );
 
 
 /* =========================================================
@@ -2195,7 +2330,7 @@ function dinheiro(valor) {
 
 
 /* =========================================================
-   ATUALIZAR SALDO
+   ATUALIZAR SALDO NA TELA
 ========================================================= */
 
 function atualizarSaldoTela() {
@@ -2216,15 +2351,15 @@ function atualizarSaldoTela() {
     }
 
 
-    const modalSaldo =
+    const modalSaldoValor =
         document.getElementById(
             "saldoModalValor"
         );
 
 
-    if (modalSaldo) {
+    if (modalSaldoValor) {
 
-        modalSaldo.textContent =
+        modalSaldoValor.textContent =
             dinheiro(
                 saldoJogador
             );
@@ -2317,6 +2452,7 @@ async function carregarJogador() {
             await set(
                 jogadorRef,
                 {
+
                     nome:
                         nomeJogador,
 
@@ -2329,6 +2465,7 @@ async function carregarJogador() {
                     criadoEm:
                         new Date()
                             .toISOString()
+
                 }
             );
 
@@ -2720,7 +2857,6 @@ async function carregarJogosFeitosMenu() {
 
                 }
 
-
                 else if (
                     status === "bloqueada"
                 ) {
@@ -2732,7 +2868,6 @@ async function carregarJogosFeitosMenu() {
                         "bloqueada";
 
                 }
-
 
                 else if (
                     status === "finalizada"
@@ -2761,7 +2896,7 @@ async function carregarJogosFeitosMenu() {
 
 
                 selecoes.forEach(
-                    (jogo, index) => {
+                    jogo => {
 
                         htmlJogos += `
 
@@ -2875,10 +3010,12 @@ async function carregarJogosFeitosMenu() {
                         🎯 Jogos:
 
                         <strong>
-                            ${Number(
-                                aposta.quantidadeJogos
-                            ) ||
-                            selecoes.length}
+                            ${
+                                Number(
+                                    aposta.quantidadeJogos
+                                ) ||
+                                selecoes.length
+                            }
                         </strong>
 
                         <br>
@@ -2916,10 +3053,6 @@ async function carregarJogosFeitosMenu() {
             }
         );
 
-
-        /*
-         * MANTÉM O MENU ABERTO
-         */
 
         document.getElementById(
             "menuEsportes"
@@ -3190,8 +3323,6 @@ async function carregarJogos(dia) {
                 }
 
 
-                /* FILTRO PAÍS */
-
                 if (
                     filtroPais &&
                     normalizar(
@@ -3212,8 +3343,6 @@ async function carregarJogos(dia) {
                         `${jogo.data}T${jogo.hora}`
                     );
 
-
-                /* NÃO MOSTRA EXPIRADO */
 
                 if (
                     dataHora <= agora
@@ -3621,7 +3750,7 @@ function criarJogo(
 
 
     /* =====================================================
-       EXTRAS
+       ABRIR EXTRAS
     ===================================================== */
 
     const toggle =
@@ -3823,27 +3952,22 @@ function escapeHTML(text) {
     return String(
         text || ""
     )
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
@@ -3896,42 +4020,34 @@ function atualizarSelecoes() {
                         nomes[0]?.textContent
                             .trim() || "",
 
-
                     timeB:
                         nomes[1]?.textContent
                             .trim() || "",
-
 
                     valor:
                         Number(
                             btn.dataset.valor
                         ) || 0,
 
-
                     escolha:
                         btn.dataset.escolha ||
                         "",
-
 
                     campeonato:
                         duelo.dataset.campeonato ||
                         "Campeonato",
 
-
                     pais:
                         duelo.dataset.pais ||
                         "",
-
 
                     data:
                         duelo.dataset.data ||
                         "",
 
-
                     hora:
                         duelo.dataset.hora ||
                         "",
-
 
                     dataHora:
                         `${duelo.dataset.data || ""} ${duelo.dataset.hora || ""}`,
@@ -3974,7 +4090,7 @@ function atualizarContador() {
 
 
 /* =========================================================
-   TOTAL
+   ATUALIZAR TOTAL
 ========================================================= */
 
 function atualizarTotal() {
@@ -4039,7 +4155,8 @@ function atualizarTotal() {
         `;
 
 
-        apostar.disabled = true;
+        apostar.disabled =
+            true;
 
 
         apostar.classList.remove(
@@ -4074,7 +4191,8 @@ function atualizarTotal() {
         `;
 
 
-        apostar.disabled = true;
+        apostar.disabled =
+            true;
 
 
         apostar.classList.remove(
@@ -4105,7 +4223,8 @@ function atualizarTotal() {
     `;
 
 
-    apostar.disabled = false;
+    apostar.disabled =
+        false;
 
 
     apostar.classList.add(
@@ -4188,6 +4307,10 @@ async function verificarSaldo() {
             erro
         );
 
+        alert(
+            "Não foi possível verificar seu saldo."
+        );
+
         return false;
 
     }
@@ -4261,27 +4384,15 @@ async function abrirPreview() {
     }
 
 
+    /* =====================================================
+       SALDO INSUFICIENTE
+    ===================================================== */
+
     if (
         valor > saldoJogador
     ) {
 
-        document.getElementById(
-            "valorModalAposta"
-        ).textContent =
-            dinheiro(valor);
-
-
-        document.getElementById(
-            "saldoModalValor"
-        ).textContent =
-            dinheiro(
-                saldoJogador
-            );
-
-
-        saldoModal.style.display =
-            "flex";
-
+        abrirModalSaldo();
 
         return;
 
@@ -4473,7 +4584,7 @@ function() {
 
 
 /* =========================================================
-   FECHAR SALDO
+   FECHAR SALDO ANTIGO
 ========================================================= */
 
 document.getElementById(
@@ -4488,7 +4599,7 @@ function() {
 
 
 /* =========================================================
-   VOLTAR PRÉVIA
+   VOLTAR DA PRÉVIA
 ========================================================= */
 
 document.getElementById(
@@ -4573,6 +4684,10 @@ async function() {
         }
 
 
+        /* =================================================
+           SALDO INSUFICIENTE
+        ================================================= */
+
         if (
             valor > saldoJogador
         ) {
@@ -4580,24 +4695,7 @@ async function() {
             previewModal.style.display =
                 "none";
 
-
-            document.getElementById(
-                "valorModalAposta"
-            ).textContent =
-                dinheiro(valor);
-
-
-            document.getElementById(
-                "saldoModalValor"
-            ).textContent =
-                dinheiro(
-                    saldoJogador
-                );
-
-
-            saldoModal.style.display =
-                "flex";
-
+            abrirModalSaldo();
 
             return;
 
@@ -4754,7 +4852,7 @@ async function() {
 
 
         /* =================================================
-           SALVA APOSTA
+           SALVAR APOSTA
         ================================================= */
 
         await set(
@@ -4771,7 +4869,7 @@ async function() {
 
 
         /* =================================================
-           DESCONTA SALDO
+           DESCONTAR SALDO
         ================================================= */
 
         await update(
@@ -5008,7 +5106,7 @@ function() {
 
 
 /* =========================================================
-   JOGOS FEITOS MODAL
+   JOGOS FEITOS
 ========================================================= */
 
 async function abrirJogosFeitos() {
@@ -5131,7 +5229,6 @@ async function abrirJogosFeitos() {
 
                 }
 
-
                 else if (
                     status === "bloqueada"
                 ) {
@@ -5143,7 +5240,6 @@ async function abrirJogosFeitos() {
                         "Bloqueada";
 
                 }
-
 
                 else if (
                     status === "finalizada"
@@ -5577,6 +5673,229 @@ document
 
 
 /* =========================================================
+   MODAL DE SOLICITAÇÃO DE SALDO
+   IMPORTANTE:
+   Existe somente UMA definição de cada função.
+========================================================= */
+
+window.abrirModalSaldo =
+function() {
+
+    const modal =
+        document.getElementById(
+            "modalSaldo"
+        );
+
+
+    const input =
+        document.getElementById(
+            "valorSolicitado"
+        );
+
+
+    if (
+        !modal ||
+        !input
+    ) {
+
+        console.error(
+            "Modal de saldo não encontrado."
+        );
+
+        return;
+
+    }
+
+
+    input.value =
+        "10";
+
+
+    modal.classList.add(
+        "ativo"
+    );
+
+
+    setTimeout(
+        () => {
+
+            input.focus();
+
+            input.select();
+
+        },
+        100
+    );
+
+};
+
+
+/* =========================================================
+   FECHAR MODAL SOLICITAR SALDO
+========================================================= */
+
+window.fecharModalSaldo =
+function() {
+
+    const modal =
+        document.getElementById(
+            "modalSaldo"
+        );
+
+
+    if (!modal) return;
+
+
+    modal.classList.remove(
+        "ativo"
+    );
+
+};
+
+
+/* =========================================================
+   SOLICITAR SALDO
+========================================================= */
+
+window.solicitarSaldo =
+async function() {
+
+    const input =
+        document.getElementById(
+            "valorSolicitado"
+        );
+
+
+    if (!input) return;
+
+
+    let valor =
+        parseFloat(
+            input.value
+        );
+
+
+    if (
+        isNaN(valor) ||
+        valor <= 0
+    ) {
+
+        alert(
+            "Informe um valor válido."
+        );
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    valor =
+        Number(
+            valor.toFixed(2)
+        );
+
+
+    try {
+
+        /*
+         * Gera um código para a solicitação
+         */
+
+        const codigoSolicitacao =
+            "SOL" +
+            Date.now();
+
+
+        /*
+         * Salva a solicitação no Firebase
+         */
+
+        await set(
+
+            ref(
+                db,
+                "solicitacoesSaldo/" +
+                codigoSolicitacao
+            ),
+
+            {
+
+                codigo:
+                    codigoSolicitacao,
+
+                jogadorId:
+                    jogadorId,
+
+                nome:
+                    nomeJogador,
+
+                valor:
+                    valor,
+
+                status:
+                    "aguardando",
+
+                dataHora:
+                    new Date()
+                        .toISOString()
+
+            }
+
+        );
+
+
+        /*
+         * Fecha modal
+         */
+
+        fecharModalSaldo();
+
+
+        /*
+         * Mostra confirmação
+         */
+
+        alert(
+
+            "Solicitação enviada!\n\n" +
+
+            "Valor: " +
+            dinheiro(valor) +
+            "\n\n" +
+
+            "Aguarde a liberação do saldo."
+
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao solicitar saldo:",
+            erro
+        );
+
+
+        alert(
+
+            "Não foi possível enviar a solicitação.\n\n" +
+
+            (
+                erro?.message ||
+                String(erro)
+            )
+
+        );
+
+    }
+
+};
+
+
+/* =========================================================
    INICIAR SISTEMA
 ========================================================= */
 
@@ -5597,10 +5916,6 @@ async function iniciarSistema() {
 
 }
 
-
-/* =========================================================
-   INICIAR
-========================================================= */
 
 iniciarSistema();
 
