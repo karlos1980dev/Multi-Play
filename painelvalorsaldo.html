@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo - MULTI PLAY.BET</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f1f1f1;color:#111;padding-bottom:40px}
+.topo{position:sticky;top:0;z-index:9999;background:#000;color:#fff;min-height:60px;padding:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.topo h1{margin:0;font-size:19px}.topo span{font-size:11px;color:#00ff55}
+.menu{display:flex;gap:5px;padding:8px;background:#222;overflow-x:auto;position:sticky;top:60px;z-index:999}
+.menu button{border:none;border-radius:6px;background:#444;color:#fff;padding:11px 14px;font-weight:bold;white-space:nowrap;cursor:pointer}
+.menu button.ativo{background:#00a000}
+.container{width:100%;max-width:1100px;margin:auto;padding:10px}
+.secao{display:none}.secao.ativa{display:block}
+.titulo{background:green;color:white;padding:12px;border-radius:7px;margin-bottom:10px;font-weight:bold;font-size:18px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px}
+.card{background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,.15);text-align:center}
+.card strong{display:block;font-size:22px;margin-top:5px}.card small{color:#666}
+.tabela-box{background:#fff;border-radius:8px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.15);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th{background:#111;color:#fff;padding:9px;font-size:12px}
+td{border-bottom:1px solid #ddd;padding:8px;font-size:12px;text-align:center}
+tr:hover{background:#f5f5f5}
+.status{display:inline-block;padding:5px 8px;border-radius:5px;color:#fff;font-weight:bold;font-size:11px}
+.status.liberado{background:#00a000}.status.bloqueado{background:#d00000}.status.aguardando{background:#777}
+.status.pago{background:#008cff}.status.pendente{background:#f08a00}.status.cancelado{background:#d00000}
+.status.atendido{background:#00a000}
+.btn{border:none;border-radius:5px;padding:8px 10px;color:#fff;font-weight:bold;cursor:pointer;margin:2px}
+.btn-verde{background:#00a000}.btn-vermelho{background:#d00000}.btn-azul{background:#0072d3}
+.btn-laranja{background:#f08a00}.btn-cinza{background:#555}.btn-preto{background:#000}
+.formulario{background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-bottom:15px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.campo{display:flex;flex-direction:column;gap:4px}.campo label{font-weight:bold;font-size:12px}
+.campo input,.campo select{width:100%;height:40px;border:1px solid #bbb;border-radius:6px;padding:8px;font-size:14px}
+.campo.destaque input{border:2px solid #00a000;font-weight:bold;font-size:16px}
+.aviso{background:#eaffea;border:1px solid #00a000;border-radius:7px;padding:10px;margin:10px 0;font-size:13px}
+.jogo-admin{background:#fff;border-radius:9px;padding:12px;margin-bottom:12px;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.jogo-topo{display:flex;justify-content:space-between;align-items:center;background:#111;color:#fff;padding:9px;border-radius:6px;margin-bottom:10px}
+.jogo-times{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;gap:8px;text-align:center}
+.time-admin{display:flex;flex-direction:column;align-items:center;gap:5px}
+.time-admin img{width:55px;height:55px;object-fit:contain;border-radius:7px;border:1px solid #ddd;background:#fff}
+.placar{font-size:25px;font-weight:bold}.jogo-acoes{margin-top:10px;text-align:center}
+.aposta-card{background:#fff;border-radius:8px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.aposta-cabecalho{display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;background:#111;color:#fff;padding:9px;border-radius:6px}
+.aposta-jogo{border:1px solid #ddd;border-radius:6px;padding:8px;margin-top:7px;background:#f7f7f7}
+.aposta-resumo{margin-top:8px;padding:10px;background:#eee;border-radius:6px;font-weight:bold}
+.busca{width:100%;height:42px;border:1px solid #aaa;border-radius:7px;padding:8px;margin-bottom:10px}
+.solicitacao-card{background:#fff;border-radius:9px;padding:13px;margin-bottom:10px;box-shadow:0 2px 9px rgba(0,0,0,.15);border-left:5px solid #f08a00}
+.solicitacao-valor{font-size:25px;font-weight:bold;color:#00a000;margin:8px 0}
+.solicitacao-acoes{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.modal{display:none;position:fixed;inset:0;z-index:30000;background:rgba(0,0,0,.75);justify-content:center;align-items:center;padding:12px}
+.modal-conteudo{background:#fff;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;border-radius:10px;padding:15px}
+.modal-titulo{background:#000;color:#fff;padding:10px;border-radius:6px;font-weight:bold;text-align:center;margin-bottom:10px}
+.modal-botoes{display:flex;gap:5px;margin-top:12px}.modal-botoes button{flex:1}
+.carregando{position:fixed;inset:0;z-index:50000;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;color:#fff;font-size:18px;font-weight:bold}
+.badge-nova{display:inline-block;background:#d00000;color:#fff;border-radius:20px;padding:3px 7px;font-size:10px;margin-left:4px}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.topo h1{font-size:15px}.jogo-times{grid-template-columns:1fr 45px 1fr}}
+</style>
+</head>
+<body>
+
+<div class="topo">
+    <h1>MULTI PLAY.BET</h1>
+    <span>PAINEL ADMINISTRATIVO</span>
+</div>
+
+<div class="menu">
+    <button class="ativo" onclick="abrirSecao('inicio',this)">🏠 Início</button>
+    <button onclick="abrirSecao('jogadores',this)">👤 Jogadores</button>
+    <button onclick="abrirSecao('solicitacoes',this)">💰 Solicitações <span id="badgeSolicitacoes" class="badge-nova" style="display:none">0</span></button>
+    <button onclick="abrirSecao('apostas',this)">🎟️ Apostas</button>
+    <button onclick="abrirSecao('jogos',this)">⚽ Jogos</button>
+    <button onclick="abrirSecao('novoJogo',this)">➕ Novo Jogo</button>
+</div>
+
+<div class="container">
+
+<section id="inicio" class="secao ativa">
+    <div class="titulo">📊 Resumo</div>
+    <div class="cards">
+        <div class="card"><small>Jogadores</small><strong id="totalJogadores">0</strong></div>
+        <div class="card"><small>Jogadores liberados</small><strong id="jogadoresLiberados">0</strong></div>
+        <div class="card"><small>Apostas</small><strong id="totalApostas">0</strong></div>
+        <div class="card"><small>Valor apostado</small><strong id="valorApostado">R$ 0,00</strong></div>
+    </div>
+    <div class="titulo">⚡ Ações rápidas</div>
+    <div class="formulario">
+        <button class="btn btn-azul" onclick="abrirSecaoPorNome('jogadores')">👤 Jogadores</button>
+        <button class="btn btn-laranja" onclick="abrirSecaoPorNome('solicitacoes')">💰 Solicitações</button>
+        <button class="btn btn-verde" onclick="abrirSecaoPorNome('jogos')">⚽ Editar Jogos</button>
+        <button class="btn btn-laranja" onclick="abrirSecaoPorNome('apostas')">🎟️ Ver Apostas</button>
+        <button class="btn btn-preto" onclick="carregarTudo()">🔄 Atualizar</button>
+    </div>
+</section>
+
+<section id="jogadores" class="secao">
+    <div class="titulo">👤 Jogadores</div>
+    <input id="buscaJogador" class="busca" placeholder="🔎 Procurar jogador..." oninput="renderizarJogadores()">
+    <div class="tabela-box">
+        <table>
+            <thead><tr><th>Nome</th><th>Saldo</th><th>Valor a liberar</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="tabelaJogadores"></tbody>
+        </table>
+    </div>
+</section>
+
+<section id="solicitacoes" class="secao">
+    <div class="titulo">💰 Solicitações de saldo</div>
+    <div class="aviso">
+        Solicitações feitas pela INDEX aparecem automaticamente aqui.
+        Ao clicar em <strong>Liberar</strong>, o valor é acrescentado ao saldo do jogador.
+    </div>
+    <div id="listaSolicitacoes"></div>
+</section>
+
+<section id="apostas" class="secao">
+    <div class="titulo">🎟️ Apostas recebidas</div>
+    <input id="buscaAposta" class="busca" placeholder="🔎 Código ou nome do jogador..." oninput="renderizarApostas()">
+    <div id="listaApostas"></div>
+</section>
+
+<section id="jogos" class="secao">
+    <div class="titulo">⚽ Jogos cadastrados</div>
+    <div class="formulario">
+        <div class="campo">
+            <label>Dia</label>
+            <select id="filtroDiaJogos" onchange="renderizarJogos()">
+                <option value="">Todos</option><option value="domingo">Domingo</option><option value="segunda">Segunda</option>
+                <option value="terca">Terça</option><option value="quarta">Quarta</option><option value="quinta">Quinta</option>
+                <option value="sexta">Sexta</option><option value="sabado">Sábado</option>
+            </select>
+        </div>
+    </div>
+    <div id="listaJogos"></div>
+</section>
+
+<section id="novoJogo" class="secao">
+    <div class="titulo">➕ Cadastrar novo jogo</div>
+    <div class="formulario">
+        <div class="form-grid">
+            <div class="campo"><label>Dia</label><select id="novoDia">
+                <option value="domingo">Domingo</option><option value="segunda">Segunda</option><option value="terca">Terça</option>
+                <option value="quarta">Quarta</option><option value="quinta">Quinta</option><option value="sexta">Sexta</option><option value="sabado">Sábado</option>
+            </select></div>
+            <div class="campo"><label>Campeonato</label><input id="novoCampeonato" placeholder="Ex: Brasileirão"></div>
+            <div class="campo"><label>País</label><input id="novoPais" placeholder="Ex: brasil"></div>
+            <div class="campo"><label>Data</label><input type="date" id="novoData"></div>
+            <div class="campo"><label>Hora</label><input type="time" id="novoHora"></div>
+            <div class="campo"><label>Time A</label><input id="novoTimeA"></div>
+            <div class="campo"><label>Escudo Time A</label><input id="novoImagemA" placeholder="URL da imagem"></div>
+            <div class="campo"><label>Time B</label><input id="novoTimeB"></div>
+            <div class="campo"><label>Escudo Time B</label><input id="novoImagemB" placeholder="URL da imagem"></div>
+            <div class="campo"><label>Cotação Casa</label><input type="number" step="0.01" id="novoCasa" value="1.50"></div>
+            <div class="campo"><label>Cotação Empate</label><input type="number" step="0.01" id="novoEmpate" value="2.50"></div>
+            <div class="campo"><label>Cotação Fora</label><input type="number" step="0.01" id="novoFora" value="2.50"></div>
+            <div class="campo"><label>Ambas Marcam</label><input type="number" step="0.01" id="novoAmbas" value="2.50"></div>
+        </div><br>
+        <button class="btn btn-verde" onclick="criarNovoJogo()">➕ Salvar Jogo</button>
+    </div>
+</section>
+</div>
+
+<!-- MODAL JOGADOR -->
+<div id="modalJogador" class="modal"><div class="modal-conteudo">
+<div class="modal-titulo">👤 Editar jogador</div>
+<input type="hidden" id="editarJogadorId">
+<div class="campo"><label>Nome</label><input id="editarJogadorNome"></div><br>
+<div class="campo"><label>Saldo atual</label><input type="number" step="0.01" id="editarJogadorSaldo"></div><br>
+<div class="campo destaque"><label>💰 Valor a liberar</label><input type="number" min="0" step="0.01" id="editarJogadorValorLiberar"></div>
+<div class="aviso">O valor a liberar fica separado do saldo. Ao clicar em <strong>💸 Liberar valor</strong>, ele entra no saldo.</div>
+<div class="campo"><label>Status</label><select id="editarJogadorStatus"><option value="liberado">Liberado</option><option value="bloqueado">Bloqueado</option></select></div>
+<div class="modal-botoes">
+<button class="btn btn-cinza" onclick="fecharModal('modalJogador')">Cancelar</button>
+<button class="btn btn-azul" onclick="salvarJogador()">💾 Salvar</button>
+<button class="btn btn-verde" onclick="liberarValorJogador()">💸 Liberar valor</button>
+</div></div></div>
+
+<!-- MODAL JOGO -->
+<div id="modalJogo" class="modal"><div class="modal-conteudo">
+<div class="modal-titulo">⚽ Editar jogo</div>
+<input type="hidden" id="editarJogoDia"><input type="hidden" id="editarJogoId">
+<div class="form-grid">
+<div class="campo"><label>Campeonato</label><input id="editarCampeonato"></div>
+<div class="campo"><label>País</label><input id="editarPais"></div>
+<div class="campo"><label>Data</label><input type="date" id="editarData"></div>
+<div class="campo"><label>Hora</label><input type="time" id="editarHora"></div>
+<div class="campo"><label>Time A</label><input id="editarTimeA"></div>
+<div class="campo"><label>Imagem A</label><input id="editarImagemA"></div>
+<div class="campo"><label>Time B</label><input id="editarTimeB"></div>
+<div class="campo"><label>Imagem B</label><input id="editarImagemB"></div>
+<div class="campo"><label>Cotação Casa</label><input type="number" step="0.01" id="editarCasa"></div>
+<div class="campo"><label>Cotação Empate</label><input type="number" step="0.01" id="editarEmpate"></div>
+<div class="campo"><label>Cotação Fora</label><input type="number" step="0.01" id="editarFora"></div>
+<div class="campo"><label>Ambas Marcam</label><input type="number" step="0.01" id="editarAmbas"></div>
+<div class="campo"><label>Placar Time A</label><input type="number" min="0" id="editarPlacarA"></div>
+<div class="campo"><label>Placar Time B</label><input type="number" min="0" id="editarPlacarB"></div>
+</div>
+<div class="modal-botoes"><button class="btn btn-cinza" onclick="fecharModal('modalJogo')">Cancelar</button><button class="btn btn-verde" onclick="salvarJogo()">Salvar</button></div>
+</div></div>
+
+<div id="carregando" class="carregando">Carregando...</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import {getDatabase,ref,get,set,update,remove,onValue} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+ authDomain:"jogo-60a9e.firebaseapp.com",
+ projectId:"jogo-60a9e",
+ storageBucket:"jogo-60a9e.appspot.com",
+ messagingSenderId:"352852303591",
+ appId:"1:352852303591:web:8083c950047c9026bd8c42",
+ databaseURL:"https://jogo-60a9e-default-rtdb.firebaseio.com/"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+const dias=["domingo","segunda","terca","quarta","quinta","sexta","sabado"];
+
+let jogadores={},apostas={},jogos={},solicitacoesSaldo={};
+
+function mostrarCarregando(v){document.getElementById("carregando").style.display=v?"flex":"none"}
+function dinheiro(v){return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function escapar(t){return String(t??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function valorNumerico(v){
+ if(typeof v==="number")return v;
+ const s=String(v??"").trim();
+ if(s.includes(","))return Number(s.replace(/\./g,"").replace(",", "."))||0;
+ return Number(s)||0;
+}
+
+window.abrirSecao=function(nome,botao){
+ document.querySelectorAll(".secao").forEach(s=>s.classList.remove("ativa"));
+ const sec=document.getElementById(nome);if(sec)sec.classList.add("ativa");
+ document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("ativo"));
+ if(botao)botao.classList.add("ativo");
+ if(nome==="jogadores")renderizarJogadores();
+ if(nome==="solicitacoes")renderizarSolicitacoesSaldo();
+ if(nome==="apostas")renderizarApostas();
+ if(nome==="jogos")renderizarJogos();
+};
+window.abrirSecaoPorNome=function(nome){
+ const b=[...document.querySelectorAll(".menu button")].find(x=>x.getAttribute("onclick")?.includes(`'${nome}'`));
+ abrirSecao(nome,b);
+};
+
+async function carregarJogadores(){const s=await get(ref(db,"jogadores"));jogadores=s.exists()?s.val():{}}
+async function carregarApostas(){const s=await get(ref(db,"apostas"));apostas=s.exists()?s.val():{}}
+async function carregarJogos(){
+ jogos={};for(const dia of dias){const s=await get(ref(db,"jogos/"+dia));jogos[dia]=s.exists()?s.val():{}}
+}
+function ouvirSolicitacoesSaldo(){
+ onValue(ref(db,"solicitacoesSaldo"),snap=>{
+   solicitacoesSaldo=snap.exists()?snap.val():{};
+   renderizarSolicitacoesSaldo();
+   atualizarBadgeSolicitacoes();
+ },err=>console.error(err));
+}
+function atualizarBadgeSolicitacoes(){
+ const n=Object.values(solicitacoesSaldo||{}).filter(s=>s?.status==="aguardando"||s?.status==="pendente").length;
+ const b=document.getElementById("badgeSolicitacoes");
+ b.textContent=n;b.style.display=n?"inline-block":"none";
+}
+
+window.carregarTudo=async function(){
+ try{mostrarCarregando(true);await Promise.all([carregarJogadores(),carregarApostas(),carregarJogos()]);atualizarResumo();renderizarJogadores();renderizarApostas();renderizarJogos();renderizarSolicitacoesSaldo();atualizarBadgeSolicitacoes()}
+ catch(e){console.error(e);alert("Erro ao carregar os dados:\\n"+e.message)}
+ finally{mostrarCarregando(false)}
+};
+
+function atualizarResumo(){
+ const lj=Object.values(jogadores||{}),la=Object.values(apostas||{});
+ document.getElementById("totalJogadores").textContent=lj.length;
+ document.getElementById("jogadoresLiberados").textContent=lj.filter(j=>j.status!=="bloqueado").length;
+ document.getElementById("totalApostas").textContent=la.length;
+ let total=0;la.forEach(a=>total+=valorNumerico(a.valorUnico??a.valor));
+ document.getElementById("valorApostado").textContent=dinheiro(total);
+}
+
+/* JOGADORES */
+window.renderizarJogadores=function(){
+ const tb=document.getElementById("tabelaJogadores"),busca=(document.getElementById("buscaJogador")?.value||"").toLowerCase().trim();
+ tb.innerHTML="";
+ Object.entries(jogadores||{}).filter(([id,j])=>{
+   const n=String(j.nome||j.name||"").toLowerCase();return !busca||n.includes(busca)||id.toLowerCase().includes(busca);
+ }).forEach(([id,j])=>{
+   const saldo=valorNumerico(j.saldo),vl=valorNumerico(j.valorLiberado??j.valorLiberar),bloq=j.status==="bloqueado";
+   const tr=document.createElement("tr");
+   tr.innerHTML=`<td><strong>${escapar(j.nome||j.name||"Sem nome")}</strong><br><small>ID: ${escapar(id)}</small></td>
+   <td><strong>${dinheiro(saldo)}</strong></td>
+   <td><strong style="color:${vl>0?"#00a000":"#777"}">${dinheiro(vl)}</strong></td>
+   <td><span class="status ${bloq?"bloqueado":"liberado"}">${bloq?"Bloqueado":"Liberado"}</span></td>
+   <td><button class="btn btn-azul" onclick="editarJogador('${escapar(id)}')">✏️ Editar</button>
+   ${vl>0?`<button class="btn btn-verde" onclick="liberarValorDireto('${escapar(id)}')">💸 Liberar ${dinheiro(vl)}</button>`:""}
+   ${bloq?`<button class="btn btn-verde" onclick="alterarStatusJogador('${escapar(id)}','liberado')">🟢 Liberar</button>`:`<button class="btn btn-vermelho" onclick="alterarStatusJogador('${escapar(id)}','bloqueado')">🔴 Bloquear</button>`}
+   <button class="btn btn-laranja" onclick="alterarSaldo('${escapar(id)}')">💰 Saldo</button>
+   <button class="btn btn-vermelho" onclick="excluirJogador('${escapar(id)}')">🗑️</button></td>`;
+   tb.appendChild(tr);
+ });
+};
+
+window.editarJogador=function(id){
+ const j=jogadores[id];if(!j)return;
+ document.getElementById("editarJogadorId").value=id;
+ document.getElementById("editarJogadorNome").value=j.nome||j.name||"";
+ document.getElementById("editarJogadorSaldo").value=valorNumerico(j.saldo);
+ document.getElementById("editarJogadorValorLiberar").value=valorNumerico(j.valorLiberado??j.valorLiberar);
+ document.getElementById("editarJogadorStatus").value=j.status==="bloqueado"?"bloqueado":"liberado";
+ document.getElementById("modalJogador").style.display="flex";
+};
+
+window.salvarJogador=async function(){
+ const id=document.getElementById("editarJogadorId").value;if(!id||!jogadores[id])return;
+ const nome=document.getElementById("editarJogadorNome").value.trim(),saldo=valorNumerico(document.getElementById("editarJogadorSaldo").value),vl=valorNumerico(document.getElementById("editarJogadorValorLiberar").value),status=document.getElementById("editarJogadorStatus").value;
+ if(!nome){alert("Digite o nome.");return}if(vl<0){alert("Valor inválido.");return}
+ try{mostrarCarregando(true);await update(ref(db,"jogadores/"+id),{nome,saldo,valorLiberado:vl,status});jogadores[id]={...jogadores[id],nome,saldo,valorLiberado:vl,status};fecharModal("modalJogador");renderizarJogadores();atualizarResumo();alert("Jogador atualizado!")}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+
+async function liberarValor(id,valor){
+ const j=jogadores[id];if(!j)return false;
+ const saldo=valorNumerico(j.saldo),novo=saldo+valor;
+ await update(ref(db,"jogadores/"+id),{saldo:novo});
+ jogadores[id]={...j,saldo:novo};
+ return novo;
+}
+window.liberarValorJogador=async function(){
+ const id=document.getElementById("editarJogadorId").value,j=jogadores[id];if(!j)return;
+ const vl=valorNumerico(document.getElementById("editarJogadorValorLiberar").value);if(vl<=0){alert("Digite um valor.");return}
+ if(!confirm("Liberar "+dinheiro(vl)+" para "+(j.nome||"jogador")+"?"))return;
+ try{mostrarCarregando(true);const novo=await liberarValor(id,vl);await update(ref(db,"jogadores/"+id),{valorLiberado:0});jogadores[id].valorLiberado=0;document.getElementById("editarJogadorSaldo").value=novo;document.getElementById("editarJogadorValorLiberar").value=0;renderizarJogadores();alert("Valor liberado. Novo saldo: "+dinheiro(novo))}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+window.liberarValorDireto=async function(id){
+ const j=jogadores[id],vl=valorNumerico(j?.valorLiberado??j?.valorLiberar);if(!j||vl<=0)return;
+ if(!confirm("Liberar "+dinheiro(vl)+" para "+(j.nome||"jogador")+"?"))return;
+ try{mostrarCarregando(true);const novo=await liberarValor(id,vl);await update(ref(db,"jogadores/"+id),{valorLiberado:0});jogadores[id].valorLiberado=0;renderizarJogadores();alert("Valor liberado. Novo saldo: "+dinheiro(novo))}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+window.alterarStatusJogador=async function(id,status){
+ const j=jogadores[id];if(!j)return;if(!confirm(`Deseja ${status==="bloqueado"?"bloquear":"liberar"} ${j.nome||""}?`))return;
+ try{await update(ref(db,"jogadores/"+id),{status});jogadores[id].status=status;renderizarJogadores();atualizarResumo()}catch(e){alert(e.message)}
+};
+window.alterarSaldo=async function(id){
+ const j=jogadores[id];if(!j)return;const atual=valorNumerico(j.saldo),r=prompt("Novo saldo:\\nSaldo atual: "+dinheiro(atual));if(r===null)return;const novo=valorNumerico(r);if(novo<0){alert("Saldo inválido.");return}
+ try{await update(ref(db,"jogadores/"+id),{saldo:novo});jogadores[id].saldo=novo;renderizarJogadores();atualizarResumo();alert("Saldo atualizado.")}catch(e){alert(e.message)}
+};
+window.excluirJogador=async function(id){
+ const j=jogadores[id];if(!j||!confirm("Excluir "+(j.nome||"jogador")+"?"))return;
+ try{mostrarCarregando(true);await remove(ref(db,"jogadores/"+id));delete jogadores[id];renderizarJogadores();atualizarResumo();alert("Jogador excluído.")}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+
+/* SOLICITAÇÕES DE SALDO */
+window.renderizarSolicitacoesSaldo=function(){
+ const c=document.getElementById("listaSolicitacoes");if(!c)return;c.innerHTML="";
+ const lista=Object.entries(solicitacoesSaldo||{}).filter(([id,s])=>s&&["aguardando","pendente"].includes(String(s.status||"aguardando"))).reverse();
+ if(!lista.length){c.innerHTML='<div class="formulario"><strong>✅ Nenhuma solicitação de saldo pendente.</strong></div>';return}
+ lista.forEach(([id,s])=>{
+   const valor=valorNumerico(s.valorSolicitado??s.valor),jid=s.jogadorId||s.usuarioId||s.uid||"",j=jogadores[jid],nome=s.nome||s.jogadorNome||j?.nome||"Jogador";
+   const card=document.createElement("div");card.className="solicitacao-card";
+   card.innerHTML=`<div style="display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap"><strong>💰 Solicitação de saldo</strong><span class="status pendente">AGUARDANDO</span></div>
+   <p>👤 Jogador: <strong>${escapar(nome)}</strong></p>
+   <p>🆔 ID: <strong>${escapar(jid)}</strong></p>
+   <div class="solicitacao-valor">${dinheiro(valor)}</div>
+   <small>📅 ${escapar(s.data||"")} ${s.hora?"⏰ "+escapar(s.hora):""}</small>
+   <div class="solicitacao-acoes"><button class="btn btn-verde" onclick="aprovarSolicitacaoSaldo('${escapar(id)}')">💰 Liberar ${dinheiro(valor)}</button><button class="btn btn-vermelho" onclick="recusarSolicitacaoSaldo('${escapar(id)}')">❌ Recusar</button></div>`;
+   c.appendChild(card);
+ });
+};
+
+window.aprovarSolicitacaoSaldo=async function(id){
+ const s=solicitacoesSaldo[id];if(!s)return;
+ const valor=valorNumerico(s.valorSolicitado??s.valor),jid=s.jogadorId||s.usuarioId||s.uid;
+ if(valor<=0){alert("Valor solicitado inválido.");return}
+ if(!jid){alert("A solicitação não possui jogadorId/uid.");return}
+ const j=jogadores[jid];
+ if(!j){alert("Jogador não encontrado no nó jogadores.\\nID: "+jid);return}
+ const saldo=valorNumerico(j.saldo),novo=saldo+valor;
+ if(!confirm("CONFIRMAR LIBERAÇÃO\\n\\nJogador: "+(j.nome||s.nome||"")+"\\nValor: "+dinheiro(valor)+"\\nSaldo atual: "+dinheiro(saldo)+"\\nNovo saldo: "+dinheiro(novo)))return;
+ try{
+   mostrarCarregando(true);
+   /* Primeiro atualiza o saldo */
+   await update(ref(db,"jogadores/"+jid),{saldo:novo});
+   /* Depois marca a solicitação como atendida */
+   await update(ref(db,"solicitacoesSaldo/"+id),{
+      status:"atendido",valorAtendido:valor,atendidoEm:new Date().toISOString(),
+      saldoAnterior:saldo,saldoNovo:novo
+   });
+   jogadores[jid]={...j,saldo:novo};
+   solicitacoesSaldo[id]={...s,status:"atendido",valorAtendido:valor,saldoAnterior:saldo,saldoNovo:novo};
+   renderizarSolicitacoesSaldo();renderizarJogadores();atualizarResumo();atualizarBadgeSolicitacoes();
+   alert("Saldo liberado com sucesso!\\n\\nValor: "+dinheiro(valor)+"\\nNovo saldo: "+dinheiro(novo));
+ }catch(e){alert("Erro ao liberar saldo:\\n"+e.message)}finally{mostrarCarregando(false)}
+};
+window.recusarSolicitacaoSaldo=async function(id){
+ const s=solicitacoesSaldo[id];if(!s)return;
+ if(!confirm("Deseja recusar esta solicitação?"))return;
+ try{
+   await update(ref(db,"solicitacoesSaldo/"+id),{status:"cancelado",recusadoEm:new Date().toISOString()});
+   solicitacoesSaldo[id]={...s,status:"cancelado"};renderizarSolicitacoesSaldo();atualizarBadgeSolicitacoes();
+   alert("Solicitação recusada.");
+ }catch(e){alert(e.message)}
+};
+
+/* APOSTAS */
+window.renderizarApostas=function(){
+ const c=document.getElementById("listaApostas"),busca=(document.getElementById("buscaAposta")?.value||"").toLowerCase().trim();c.innerHTML="";
+ const lista=Object.entries(apostas||{}).reverse().filter(([cod,a])=>(!busca||(cod+" "+(a.nome||a.jogadorNome||"")).toLowerCase().includes(busca)));
+ if(!lista.length){c.innerHTML="<p>Nenhuma aposta encontrada.</p>";return}
+ lista.forEach(([cod,a])=>{
+  const card=document.createElement("div");card.className="aposta-card";
+  const sel=Array.isArray(a.selecoes)?a.selecoes:Object.values(a.selecoes||{});let jogosHTML="";
+  sel.forEach((s,i)=>jogosHTML+=`<div class="aposta-jogo"><strong>${i+1}. ${escapar(s.timeA)} × ${escapar(s.timeB)}</strong><br>🏆 ${escapar(s.campeonato||"Campeonato")}<br>📅 ${escapar(s.data||"")} ⏰ ${escapar(s.hora||"")}<br>🎯 Palpite: <strong>${escapar(s.escolha||"")}</strong></div>`);
+  card.innerHTML=`<div class="aposta-cabecalho"><div>🎟️ Código: <strong>${escapar(cod)}</strong></div><div>🟢 Aguardando</div></div><p>👤 Jogador: <strong>${escapar(a.nome||a.jogadorNome||"Não informado")}</strong></p>${jogosHTML}<div class="aposta-resumo">💰 Valor: ${dinheiro(a.valorUnico??a.valor)}<br>🎯 Jogos: ${a.quantidadeJogos||sel.length}<br>💵 Possível retorno: ${dinheiro(a.possivelRetorno)}</div><button class="btn btn-vermelho" onclick="excluirAposta('${escapar(cod)}')">🗑️ Excluir aposta</button>`;
+  c.appendChild(card);
+ });
+};
+window.excluirAposta=async function(cod){if(!confirm("Deseja excluir esta aposta?"))return;try{await remove(ref(db,"apostas/"+cod));delete apostas[cod];renderizarApostas();atualizarResumo()}catch(e){alert(e.message)}};
+
+/* JOGOS */
+window.renderizarJogos=function(){
+ const c=document.getElementById("listaJogos"),f=document.getElementById("filtroDiaJogos").value;c.innerHTML="";
+ dias.forEach(dia=>{if(f&&f!==dia)return;Object.entries(jogos[dia]||{}).forEach(([id,j])=>{
+  const card=document.createElement("div");card.className="jogo-admin";const a=j.placarA??j.resultadoA??"-",b=j.placarB??j.resultadoB??"-";
+  card.innerHTML=`<div class="jogo-topo"><strong>${escapar(dia)}</strong><span>${escapar(j.campeonato||"Campeonato")}</span></div>
+  <div class="jogo-times"><div class="time-admin"><img src="${escapar(j.imagemA||"https://via.placeholder.com/55")}" onerror="this.src='https://via.placeholder.com/55'"><strong>${escapar(j.timeA||"Time A")}</strong></div><div class="placar">${a} × ${b}</div><div class="time-admin"><img src="${escapar(j.imagemB||"https://via.placeholder.com/55")}" onerror="this.src='https://via.placeholder.com/55'"><strong>${escapar(j.timeB||"Time B")}</strong></div></div>
+  <p style="text-align:center">📅 ${escapar(j.data||"")} ⏰ ${escapar(j.hora||"")}<br>🌎 ${escapar(j.pais||"")}</p>
+  <div class="jogo-acoes"><button class="btn btn-azul" onclick="editarJogo('${dia}','${escapar(id)}')">✏️ Editar</button><button class="btn btn-verde" onclick="definirPlacar('${dia}','${escapar(id)}')">⚽ Placar</button><button class="btn btn-vermelho" onclick="excluirJogo('${dia}','${escapar(id)}')">🗑️ Excluir</button></div>`;
+  c.appendChild(card);
+ })});
+ if(!c.children.length)c.innerHTML="<p>Nenhum jogo cadastrado.</p>";
+};
+window.editarJogo=function(dia,id){
+ const j=jogos[dia]?.[id];if(!j)return;
+ document.getElementById("editarJogoDia").value=dia;document.getElementById("editarJogoId").value=id;
+ document.getElementById("editarCampeonato").value=j.campeonato||"";document.getElementById("editarPais").value=j.pais||"";
+ document.getElementById("editarData").value=j.data||"";document.getElementById("editarHora").value=j.hora||"";
+ document.getElementById("editarTimeA").value=j.timeA||"";document.getElementById("editarImagemA").value=j.imagemA||"";
+ document.getElementById("editarTimeB").value=j.timeB||"";document.getElementById("editarImagemB").value=j.imagemB||"";
+ document.getElementById("editarCasa").value=j.cotacoes?.casa||1.5;document.getElementById("editarEmpate").value=j.cotacoes?.empate||2.5;
+ document.getElementById("editarFora").value=j.cotacoes?.fora||2.5;document.getElementById("editarAmbas").value=j.cotacoes?.ambasMarcam||2.5;
+ document.getElementById("editarPlacarA").value=j.placarA??"";document.getElementById("editarPlacarB").value=j.placarB??"";
+ document.getElementById("modalJogo").style.display="flex";
+};
+window.salvarJogo=async function(){
+ const dia=document.getElementById("editarJogoDia").value,id=document.getElementById("editarJogoId").value,j=jogos[dia]?.[id];if(!j)return;
+ const novo={...j,campeonato:document.getElementById("editarCampeonato").value.trim(),pais:document.getElementById("editarPais").value.trim(),data:document.getElementById("editarData").value,hora:document.getElementById("editarHora").value,timeA:document.getElementById("editarTimeA").value.trim(),imagemA:document.getElementById("editarImagemA").value.trim(),timeB:document.getElementById("editarTimeB").value.trim(),imagemB:document.getElementById("editarImagemB").value.trim(),cotacoes:{casa:Number(document.getElementById("editarCasa").value)||1.5,empate:Number(document.getElementById("editarEmpate").value)||2.5,fora:Number(document.getElementById("editarFora").value)||2.5,ambasMarcam:Number(document.getElementById("editarAmbas").value)||2.5}};
+ const pa=document.getElementById("editarPlacarA").value,pb=document.getElementById("editarPlacarB").value;if(pa!=="")novo.placarA=Number(pa);if(pb!=="")novo.placarB=Number(pb);
+ try{mostrarCarregando(true);await set(ref(db,"jogos/"+dia+"/"+id),novo);jogos[dia][id]=novo;fecharModal("modalJogo");renderizarJogos();alert("Jogo atualizado!")}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+window.definirPlacar=async function(dia,id){
+ const j=jogos[dia]?.[id];if(!j)return;const p=prompt(`Placar de ${j.timeA||"Time A"} x ${j.timeB||"Time B"}\\nExemplo: 2x1`);if(!p)return;const x=p.toLowerCase().split("x");if(x.length!==2){alert("Use 2x1.");return}const a=Number(x[0]),b=Number(x[1]);if(Number.isNaN(a)||Number.isNaN(b)||a<0||b<0){alert("Placar inválido.");return}
+ try{await update(ref(db,"jogos/"+dia+"/"+id),{placarA:a,placarB:b,resultado:`${a}x${b}`,finalizado:true});jogos[dia][id]={...jogos[dia][id],placarA:a,placarB:b,resultado:`${a}x${b}`,finalizado:true};renderizarJogos();alert("Placar salvo!")}catch(e){alert(e.message)}
+};
+window.excluirJogo=async function(dia,id){const j=jogos[dia]?.[id];if(!j||!confirm("Excluir "+(j.timeA||"")+" x "+(j.timeB||"")+"?"))return;try{mostrarCarregando(true);await remove(ref(db,"jogos/"+dia+"/"+id));delete jogos[dia][id];renderizarJogos();alert("Jogo excluído.")}catch(e){alert(e.message)}finally{mostrarCarregando(false)}};
+window.criarNovoJogo=async function(){
+ const dia=document.getElementById("novoDia").value,j={campeonato:document.getElementById("novoCampeonato").value.trim()||"Campeonato",pais:document.getElementById("novoPais").value.trim(),data:document.getElementById("novoData").value,hora:document.getElementById("novoHora").value,timeA:document.getElementById("novoTimeA").value.trim(),imagemA:document.getElementById("novoImagemA").value.trim(),timeB:document.getElementById("novoTimeB").value.trim(),imagemB:document.getElementById("novoImagemB").value.trim(),cotacoes:{casa:Number(document.getElementById("novoCasa").value)||1.5,empate:Number(document.getElementById("novoEmpate").value)||2.5,fora:Number(document.getElementById("novoFora").value)||2.5,ambasMarcam:Number(document.getElementById("novoAmbas").value)||2.5},finalizado:false};
+ if(!j.data||!j.hora||!j.timeA||!j.timeB){alert("Preencha data, hora e os dois times.");return}
+ try{mostrarCarregando(true);const id="jogo_"+Date.now();await set(ref(db,"jogos/"+dia+"/"+id),j);if(!jogos[dia])jogos[dia]={};jogos[dia][id]=j;alert("Jogo cadastrado!");["novoCampeonato","novoPais","novoData","novoHora","novoTimeA","novoImagemA","novoTimeB","novoImagemB"].forEach(x=>document.getElementById(x).value="");renderizarJogos();abrirSecaoPorNome("jogos")}catch(e){alert(e.message)}finally{mostrarCarregando(false)}
+};
+window.fecharModal=function(id){document.getElementById(id).style.display="none"};
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.style.display="none"}));
+
+carregarTudo();
+ouvirSolicitacoesSaldo();
+</script>
+</body>
+</html>
