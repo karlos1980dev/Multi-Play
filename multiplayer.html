@@ -32,17 +32,32 @@ body {
 }
 
 body {
-
     font-family: Arial, sans-serif;
-
     text-align: center;
-
     padding-top: 78px;
-
     color: #000;
-
     background: #f1f1f1;
+    transition: background-color 0.8s ease;
+}
 
+body.cor1 {
+    background-color: #f1f1f1;
+}
+
+body.cor2 {
+    background-color: #e8f5e9;
+} 
+
+body.cor3 {
+    background-color: #e3f2fd;
+}
+
+body.cor4 {
+    background-color: #fff3e0;
+}
+
+body.cor5 {
+    background-color: #fce4ec;
 }
 
 
@@ -5916,6 +5931,27 @@ async function iniciarSistema() {
 
 }
 
+/* =========================================================
+   MUDANÇA AUTOMÁTICA DE COR DO BODY
+========================================================= */
+function gerarCorAleatoria() {
+    const letras = '0123456789ABCDEF';
+    let cor = '#';
+
+    for (let i = 0; i < 6; i++) {
+        cor += letras[
+            Math.floor(
+                Math.random() * 16
+            )
+        ];
+    }
+
+    return cor;
+}
+
+// Aplica uma cor aleatória ao body
+document.body.style.backgroundColor =
+    gerarCorAleatoria();
 
 iniciarSistema();
 
