@@ -165,7 +165,34 @@ button:hover {
   color: #64748b;
   padding: 20px;
 }
+.pesquisa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0 12px;
+  margin-bottom: 15px;
+}
 
+.pesquisa span {
+  font-size: 18px;
+}
+
+.pesquisa input {
+  width: 100%;
+  padding: 12px 5px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 14px;
+}
+
+.pesquisa input::placeholder {
+  color: #64748b;
+}
 </style>
 
 </head>
@@ -199,7 +226,15 @@ button:hover {
   </button>
 
   <div class="lista">
-
+<div class="pesquisa">
+  <span>🔍</span>
+  <input
+    type="text"
+    id="pesquisaTime"
+    placeholder="Pesquisar time pelo nome..."
+    oninput="pesquisarTimes()"
+  >
+</div>
     <h3>📌 Lista de Times</h3>
 
     <button
@@ -288,39 +323,38 @@ function salvarLista() {
    ATUALIZAR LISTA
 ========================= */
 
-function atualizarLista() {
+function atualizarLista(listaExibida = lista) {
 
   const container =
     document.getElementById("listaLinks");
 
   container.innerHTML = "";
 
-  if (lista.length === 0) {
+  if (listaExibida.length === 0) {
 
     container.innerHTML = `
       <div class="empty">
-        Nenhuma imagem salva ainda.
+        Nenhum time encontrado.
       </div>
     `;
 
     return;
   }
 
+  listaExibida.forEach((item) => {
 
-  lista.forEach((item, index) => {
+    const index = lista.indexOf(item);
 
     const div =
       document.createElement("div");
 
     div.className = "item";
 
-
     const nome =
       escaparHTML(item.nome);
 
     const url =
       escaparHTML(item.url);
-
 
     div.innerHTML = `
 
@@ -354,14 +388,37 @@ function atualizarLista() {
 
     `;
 
-
     container.appendChild(div);
 
   });
 
 }
+function pesquisarTimes() {
 
+  const texto =
+    document
+      .getElementById("pesquisaTime")
+      .value
+      .toLowerCase()
+      .trim();
 
+  if (!texto) {
+
+    atualizarLista(lista);
+
+    return;
+  }
+
+  const resultados =
+    lista.filter(item =>
+      item.nome
+        .toLowerCase()
+        .includes(texto)
+    );
+
+  atualizarLista(resultados);
+
+}
 /* =========================
    ENVIAR IMAGEM
 ========================= */
@@ -624,54 +681,38 @@ function copiarItem(index) {
 
 function excluirItem(index) {
 
-  const item =
-    lista[index];
-
+  const item = lista[index];
 
   if (!item) return;
-
 
   const confirmar =
     confirm(
       `Excluir "${item.nome}" da lista?`
     );
 
-
   if (!confirmar) return;
 
-
-  lista.splice(
-    index,
-    1
-  );
-
+  lista.splice(index, 1);
 
   salvarLista();
 
-  atualizarLista();
+  // Mantém a pesquisa ativa
+  pesquisarTimes();
 
-
-  /* Se excluiu o último link */
-
-  if (
-    lista.length === 0
-  ) {
+  // Se não houver mais nenhum time
+  if (lista.length === 0) {
 
     urlFinal = "";
 
     document.getElementById("preview")
-      .style.display =
-      "none";
+      .style.display = "none";
 
     document.getElementById("link")
       .innerText = "";
 
   }
 
-
 }
-
-
 /* =========================
    LIMPAR TODA A LISTA
 ========================= */
