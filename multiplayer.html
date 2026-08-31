@@ -16,6 +16,152 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
 >
 
 <style>
+#codigoModal {
+    display: none !important;
+}
+
+/* =====================================================
+   MODAL JOGO FEITO COM SUCESSO
+===================================================== */
+
+.modal-sucesso {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 999999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+.modal-sucesso.ativo {
+
+    display: flex;
+
+}
+
+
+.modal-sucesso-box {
+
+    width: 100%;
+
+    max-width: 360px;
+
+    background: #fff;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.4);
+
+    animation:
+        aparecerSucesso .25s ease;
+
+}
+
+
+@keyframes aparecerSucesso {
+
+    from {
+
+        transform: scale(.8);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform: scale(1);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.sucesso-icone {
+
+    font-size: 55px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.modal-sucesso-box h2 {
+
+    margin: 5px 0 10px;
+
+    color: #008000;
+
+    font-size: 21px;
+
+}
+
+
+.modal-sucesso-box p {
+
+    color: #555;
+
+    margin-bottom: 15px;
+
+}
+
+
+.sucesso-codigo {
+
+    background: #f1f1f1;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+
+}
+
+
+.btn-sucesso {
+
+    width: 100%;
+
+    height: 45px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+}
 
 /* =========================================================
    RESET
@@ -1725,7 +1871,40 @@ body.cor5 {
 
 </div>
 
+<!-- =====================================================
+     MODAL JOGO FEITO COM SUCESSO
+===================================================== -->
 
+<div id="modalSucesso" class="modal-sucesso">
+
+    <div class="modal-sucesso-box">
+
+        <div class="sucesso-icone">
+            ✅
+        </div>
+
+        <h2>
+            Jogo feito com sucesso!
+        </h2>
+
+        <p>
+            Sua aposta foi registrada.
+        </p>
+
+        <div class="sucesso-codigo">
+            🎟️ <span id="codigoSucesso">---</span>
+        </div>
+
+        <button
+            id="btnFecharSucesso"
+            class="btn-sucesso"
+        >
+            OK
+        </button>
+
+    </div>
+
+</div>
 <!-- =====================================================
      MENU
 ===================================================== -->
@@ -2320,7 +2499,25 @@ const jogosFeitosModal =
     document.getElementById(
         "jogosFeitosModal"
     );
+const modalSucesso =
+    document.getElementById(
+        "modalSucesso"
+    );
 
+const codigoSucesso =
+    document.getElementById(
+        "codigoSucesso"
+    );
+
+document.getElementById(
+    "btnFecharSucesso"
+).onclick = function() {
+
+    modalSucesso.classList.remove(
+        "ativo"
+    );
+
+};
 
 /* =========================================================
    GERAR ID DO JOGADOR
@@ -4658,19 +4855,6 @@ function() {
 };
 
 
-/* =========================================================
-   FECHAR SALDO ANTIGO
-========================================================= */
-
-document.getElementById(
-    "btnFecharSaldo"
-).onclick =
-function() {
-
-    saldoModal.style.display =
-        "none";
-
-};
 
 
 /* =========================================================
@@ -4976,9 +5160,12 @@ async function() {
             "none";
 
 
-        abrirModal(
-            codigo
-        );
+        codigoSucesso.textContent =
+    codigo;
+
+modalSucesso.classList.add(
+    "ativo"
+);
 
 
         /* =================================================
@@ -5832,151 +6019,7 @@ function() {
    SOLICITAR SALDO
 ========================================================= */
 
-window.solicitarSaldo =
-async function() {
-
-    const input =
-        document.getElementById(
-            "valorSolicitado"
-        );
-
-
-    if (!input) return;
-
-
-    let valor =
-        parseFloat(
-            input.value
-        );
-
-
-    if (
-        isNaN(valor) ||
-        valor <= 0
-    ) {
-
-        alert(
-            "Informe um valor válido."
-        );
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    valor =
-        Number(
-            valor.toFixed(2)
-        );
-
-
-    try {
-
-        /*
-         * Gera um código para a solicitação
-         */
-
-        const codigoSolicitacao =
-            "SOL" +
-            Date.now();
-
-
-        /*
-         * Salva a solicitação no Firebase
-         */
-
-        await set(
-
-            ref(
-                db,
-                "solicitacoesSaldo/" +
-                codigoSolicitacao
-            ),
-
-            {
-
-                codigo:
-                    codigoSolicitacao,
-
-                jogadorId:
-                    jogadorId,
-
-                nome:
-                    nomeJogador,
-
-                valor:
-                    valor,
-
-                dataHora:
-    String(
-        s.dataHora ||
-        ""
-    ),
-
-placarA: null,
-
-placarB: null,
-
-resultado:
-    "aguardando",
-
-status:
-    "aguardando"
-            }
-
-        );
-
-
-        /*
-         * Fecha modal
-         */
-
-        fecharModalSaldo();
-
-
-        /*
-         * Mostra confirmação
-         */
-
-        alert(
-
-            "Solicitação enviada!\n\n" +
-
-            "Valor: " +
-            dinheiro(valor) +
-            "\n\n" +
-
-            "Aguarde a liberação do saldo."
-
-        );
-
-    }
-
-    catch (erro) {
-
-        console.error(
-            "Erro ao solicitar saldo:",
-            erro
-        );
-
-
-        alert(
-
-            "Não foi possível enviar a solicitação.\n\n" +
-
-            (
-                erro?.message ||
-                String(erro)
-            )
-
-        );
-
-    }
-
-};
-
+window.solicitarSaldo = async function() { const input = document.getElementById( "valorSolicitado" ); if (!input) return; let valor = parseFloat( input.value ); if ( isNaN(valor) || valor <= 0 ) { alert( "Informe um valor válido." ); input.focus(); return; } valor = Number( valor.toFixed(2) ); try { /* * Gera código da solicitação */ const codigoSolicitacao = "SOL" + Date.now(); /* * Dados da solicitação */ const solicitacao = { codigo: codigoSolicitacao, jogadorId: jogadorId, nome: nomeJogador, valor: valor, dataHora: new Date() .toISOString(), status: "aguardando" }; /* * Salva no Firebase */ await set( ref( db, "solicitacoesSaldo/" + codigoSolicitacao ), solicitacao ); /* * Fecha o modal */ fecharModalSaldo(); /* * Confirma para o jogador */ alert( "Solicitação enviada!\n\n" + "Código: " + codigoSolicitacao + "\n\n" + "Valor: " + dinheiro(valor) + "\n\n" + "Aguarde a liberação do saldo." ); } catch (erro) { console.error( "Erro ao solicitar saldo:", erro ); alert( "Não foi possível enviar a solicitação.\n\n" + ( erro?.message || String(erro) ) ); } }; 
 
 /* =========================================================
    INICIAR SISTEMA
