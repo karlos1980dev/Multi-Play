@@ -16,6 +16,152 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
 >
 
 <style>
+#codigoModal {
+    display: none !important;
+}
+
+/* =====================================================
+   MODAL JOGO FEITO COM SUCESSO
+===================================================== */
+
+.modal-sucesso {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.75);
+
+    z-index: 999999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+.modal-sucesso.ativo {
+
+    display: flex;
+
+}
+
+
+.modal-sucesso-box {
+
+    width: 100%;
+
+    max-width: 360px;
+
+    background: #fff;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.4);
+
+    animation:
+        aparecerSucesso .25s ease;
+
+}
+
+
+@keyframes aparecerSucesso {
+
+    from {
+
+        transform: scale(.8);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform: scale(1);
+
+        opacity: 1;
+
+    }
+
+}
+
+
+.sucesso-icone {
+
+    font-size: 55px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.modal-sucesso-box h2 {
+
+    margin: 5px 0 10px;
+
+    color: #008000;
+
+    font-size: 21px;
+
+}
+
+
+.modal-sucesso-box p {
+
+    color: #555;
+
+    margin-bottom: 15px;
+
+}
+
+
+.sucesso-codigo {
+
+    background: #f1f1f1;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+
+}
+
+
+.btn-sucesso {
+
+    width: 100%;
+
+    height: 45px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #00b300;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+}
 
 /* =========================================================
    RESET
@@ -32,17 +178,32 @@ body {
 }
 
 body {
-
     font-family: Arial, sans-serif;
-
     text-align: center;
-
     padding-top: 78px;
-
     color: #000;
-
     background: #f1f1f1;
+    transition: background-color 0.8s ease;
+}
 
+body.cor1 {
+    background-color: #f1f1f1;
+}
+
+body.cor2 {
+    background-color: #e8f5e9;
+} 
+
+body.cor3 {
+    background-color: #e3f2fd;
+}
+
+body.cor4 {
+    background-color: #fff3e0;
+}
+
+body.cor5 {
+    background-color: #fce4ec;
 }
 
 
@@ -1604,188 +1765,38 @@ body {
     background: #ddd;
     color: #222;
 }
-/* =========================================================
-   MODAL PIX
-========================================================= */
-
-.modal-pix {
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(0,0,0,.75);
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-    z-index: 99999;
-
-}
-
-
-.modal-pix-conteudo {
-
-    width: 100%;
-
-    max-width: 400px;
-
-    background: #fff;
-
-    border-radius: 18px;
-
-    padding: 22px;
-
+.menu-aposta-placar {
+    margin-top: 7px;
+    padding: 7px;
+    background: #ddd;
+    color: #000;
+    border-radius: 5px;
     text-align: center;
-
-    position: relative;
-
-    box-shadow:
-        0 15px 50px
-        rgba(0,0,0,.35);
-
-}
-
-
-.pix-fechar {
-
-    position: absolute;
-
-    right: 12px;
-
-    top: 8px;
-
-    border: 0;
-
-    background: transparent;
-
-    font-size: 30px;
-
-    cursor: pointer;
-
-}
-
-
-.pix-qrcode {
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    margin: 15px 0;
-
-}
-
-
-.pix-qrcode img {
-
-    width: 230px;
-
-    height: 230px;
-
-    object-fit: contain;
-
-}
-
-
-.pix-instrucao {
-
     font-size: 14px;
-
-    color: #555;
-
+    font-weight: bold;
 }
 
-
-#pixCopiaCola {
-
-    width: 100%;
-
-    min-height: 90px;
-
-    resize: none;
-
-    padding: 10px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 8px;
-
-    font-size: 12px;
-
-}
-
-
-.btn-pix-copiar {
-
-    width: 100%;
-
-    margin-top: 10px;
-
-    padding: 13px;
-
-    border: 0;
-
-    border-radius: 8px;
-
-    background: #168f3d;
-
+.menu-aposta-resultado {
+    margin-top: 5px;
+    padding: 6px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
     color: #fff;
-
-    font-size: 16px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
+    background: #ff9800;
 }
 
-
-.btn-pix-ticket {
-
-    display: block;
-
-    width: 100%;
-
-    margin-top: 10px;
-
-    padding: 13px;
-
-    border-radius: 8px;
-
-    background: #009ee3;
-
-    color: #fff;
-
-    text-decoration: none;
-
-    font-weight: bold;
-
+.menu-aposta-resultado.ganhou {
+    background: #00a000;
 }
 
-
-.pix-status {
-
-    margin-top: 15px;
-
-    padding: 12px;
-
-    border-radius: 8px;
-
-    background: #f1f1f1;
-
-    font-weight: bold;
-
+.menu-aposta-resultado.perdeu {
+    background: #d00000;
 }
 
+.menu-aposta-resultado.aguardando {
+    background: #ff9800;
+}
 </style>
 
 </head>
@@ -1794,276 +1805,7 @@ body {
 <body>
 
 
-<h1>MULTI PLAY.BET</h1>
 
-<!-- =========================================================
-     MODAL PIX
-========================================================= -->
-
-<div id="modalPix" class="modal-pix">
-
-    <div class="pix-box">
-
-        <button
-            class="pix-fechar"
-            onclick="fecharModalPix()"
-        >
-            ×
-        </button>
-
-        <h2>💳 Adicionar Saldo</h2>
-
-        <p id="pixDescricao">
-            Aguarde, gerando seu PIX...
-        </p>
-
-        <div id="pixCarregando">
-            <div class="spinner"></div>
-            <p>Gerando PIX...</p>
-        </div>
-
-        <div
-            id="pixConteudo"
-            style="display:none"
-        >
-
-            <img
-                id="pixQRCode"
-                class="pix-qrcode"
-                alt="QR Code PIX"
-            >
-
-            <p class="pix-label">
-                PIX Copia e Cola
-            </p>
-
-            <textarea
-                id="pixCopiaCola"
-                readonly
-            ></textarea>
-
-            <button
-                class="pix-btn"
-                onclick="copiarPix()"
-            >
-                📋 Copiar PIX
-            </button>
-
-            <div class="pix-status">
-
-                <span id="pixStatusIcon">
-                    ⏳
-                </span>
-
-                <span id="pixStatus">
-                    Aguardando pagamento...
-                </span>
-
-            </div>
-
-            <p class="pix-aviso">
-                Após o pagamento aprovado,
-                o saldo será atualizado automaticamente.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<style>
-
-.modal-pix{
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,.75);
-
-    display:none;
-
-    align-items:center;
-
-    justify-content:center;
-
-    z-index:99999;
-
-    padding:20px;
-
-}
-
-.modal-pix.ativo{
-
-    display:flex;
-
-}
-
-.pix-box{
-
-    width:100%;
-
-    max-width:420px;
-
-    background:#fff;
-
-    border-radius:18px;
-
-    padding:25px;
-
-    text-align:center;
-
-    position:relative;
-
-    box-shadow:0 20px 60px rgba(0,0,0,.4);
-
-}
-
-.pix-box h2{
-
-    margin-top:0;
-
-    color:#111;
-
-}
-
-.pix-fechar{
-
-    position:absolute;
-
-    right:12px;
-
-    top:8px;
-
-    border:0;
-
-    background:none;
-
-    font-size:32px;
-
-    cursor:pointer;
-
-    color:#555;
-
-}
-
-.pix-qrcode{
-
-    width:220px;
-
-    height:220px;
-
-    object-fit:contain;
-
-    display:block;
-
-    margin:15px auto;
-
-}
-
-.pix-label{
-
-    font-weight:bold;
-
-    margin-bottom:6px;
-
-}
-
-#pixCopiaCola{
-
-    width:100%;
-
-    height:90px;
-
-    resize:none;
-
-    border:1px solid #ccc;
-
-    border-radius:10px;
-
-    padding:10px;
-
-    font-size:12px;
-
-}
-
-.pix-btn{
-
-    width:100%;
-
-    border:0;
-
-    border-radius:10px;
-
-    padding:14px;
-
-    margin-top:10px;
-
-    background:#18a558;
-
-    color:#fff;
-
-    font-size:16px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-}
-
-.pix-status{
-
-    margin-top:18px;
-
-    padding:14px;
-
-    background:#f5f5f5;
-
-    border-radius:10px;
-
-    font-weight:bold;
-
-}
-
-.pix-aviso{
-
-    font-size:12px;
-
-    color:#777;
-
-}
-
-.spinner{
-
-    width:40px;
-
-    height:40px;
-
-    border:4px solid #ddd;
-
-    border-top:4px solid #18a558;
-
-    border-radius:50%;
-
-    animation:girar .8s linear infinite;
-
-    margin:20px auto;
-
-}
-
-@keyframes girar{
-
-    to{
-
-        transform:rotate(360deg);
-
-    }
-
-}
-
-</style>
 <!-- =====================================================
      TOPO
 ===================================================== -->
@@ -2097,7 +1839,7 @@ body {
     <input
         type="number"
         id="valorUnico"
-        placeholder="Valor"
+        placeholder="Aposta"
         min="1"
         step="0.01"
     >
@@ -2129,7 +1871,40 @@ body {
 
 </div>
 
+<!-- =====================================================
+     MODAL JOGO FEITO COM SUCESSO
+===================================================== -->
 
+<div id="modalSucesso" class="modal-sucesso">
+
+    <div class="modal-sucesso-box">
+
+        <div class="sucesso-icone">
+            ✅
+        </div>
+
+        <h2>
+            Jogo feito com sucesso!
+        </h2>
+
+        <p>
+            Sua aposta foi registrada.
+        </p>
+
+        <div class="sucesso-codigo">
+            🎟️ <span id="codigoSucesso">---</span>
+        </div>
+
+        <button
+            id="btnFecharSucesso"
+            class="btn-sucesso"
+        >
+            OK
+        </button>
+
+    </div>
+
+</div>
 <!-- =====================================================
      MENU
 ===================================================== -->
@@ -2689,453 +2464,7 @@ let jogadorId = "";
 let nomeJogador = "";
 
 let saldoJogador = 0;
-/* =========================================================
-   CONFIGURAÇÃO DO BACKEND PIX
-========================================================= */
 
-
-let pixPaymentId = "";
-
-let pixSolicitacaoId = "";
-
-let pixValorAtual = 0;
-
-let pixTimer = null;
-
-
-/* =========================================================
-   ABRIR PIX
-========================================================= */
-
-window.abrirPagamentoPix =
-async function(valor){
-
-    valor =
-        Number(
-            valor
-        );
-
-
-    if(
-        !valor ||
-        valor <= 0
-    ){
-
-        alert(
-            "Digite um valor válido."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        !jogadorId
-    ){
-
-        alert(
-            "Jogador não identificado."
-        );
-
-        return;
-
-    }
-
-
-    const modal =
-        document.getElementById(
-            "modalPix"
-        );
-
-
-    const carregando =
-        document.getElementById(
-            "pixCarregando"
-        );
-
-
-    const conteudo =
-        document.getElementById(
-            "pixConteudo"
-        );
-
-
-    const descricao =
-        document.getElementById(
-            "pixDescricao"
-        );
-
-
-    modal.classList.add(
-        "ativo"
-    );
-
-
-    carregando.style.display =
-        "block";
-
-
-    conteudo.style.display =
-        "none";
-
-
-    descricao.textContent =
-        "Gerando PIX de " +
-        dinheiro(valor) +
-        "...";
-
-
-    try{
-
-        const resposta =
-            await fetch(
-                PIX_BACKEND_URL,
-                {
-
-                    method:"POST",
-
-                    redirect:"follow",
-
-                    headers:{
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            acao:
-                                "criarPix",
-
-                            jogadorId:
-                                jogadorId,
-
-                            nome:
-                                nomeJogador,
-
-                            valor:
-                                valor
-
-                        })
-
-                }
-            );
-
-
-        const dados =
-            await resposta.json();
-
-
-        if(
-            !dados.ok
-        ){
-
-            throw new Error(
-                dados.erro ||
-                "Erro ao gerar PIX."
-            );
-
-        }
-
-
-        pixPaymentId =
-            String(
-                dados.paymentId
-            );
-
-
-        pixSolicitacaoId =
-            String(
-                dados.solicitacaoId
-            );
-
-
-        pixValorAtual =
-            valor;
-
-
-        const qr =
-            document.getElementById(
-                "pixQRCode"
-            );
-
-
-        qr.src =
-            "data:image/png;base64," +
-            dados.qrCodeBase64;
-
-
-        document.getElementById(
-            "pixCopiaCola"
-        ).value =
-            dados.qrCode;
-
-
-        document.getElementById(
-            "pixStatus"
-        ).textContent =
-            "Aguardando pagamento...";
-
-
-        document.getElementById(
-            "pixStatusIcon"
-        ).textContent =
-            "⏳";
-
-
-        carregando.style.display =
-            "none";
-
-
-        conteudo.style.display =
-            "block";
-
-
-        iniciarConsultaPix();
-
-    }
-
-    catch(erro){
-
-        console.error(
-            "Erro PIX:",
-            erro
-        );
-
-
-        fecharModalPix();
-
-
-        alert(
-            "Não foi possível gerar o PIX.\n\n" +
-            (
-                erro.message ||
-                erro
-            )
-        );
-
-    }
-
-};
-
-
-/* =========================================================
-   CONSULTAR PAGAMENTO
-========================================================= */
-
-function iniciarConsultaPix(){
-
-    if(
-        pixTimer
-    ){
-
-        clearInterval(
-            pixTimer
-        );
-
-    }
-
-
-    pixTimer =
-        setInterval(
-            async () => {
-
-                if(
-                    !pixPaymentId
-                ){
-
-                    return;
-
-                }
-
-
-                try{
-
-                    const url =
-                        PIX_BACKEND_URL +
-                        "?acao=consultarPix" +
-                        "&paymentId=" +
-                        encodeURIComponent(
-                            pixPaymentId
-                        );
-
-
-                    const resposta =
-                        await fetch(
-                            url
-                        );
-
-
-                    const dados =
-                        await resposta.json();
-
-
-                    if(
-                        !dados.ok
-                    ){
-
-                        return;
-
-                    }
-
-
-                    if(
-                        dados.status ===
-                        "approved"
-                    ){
-
-                        clearInterval(
-                            pixTimer
-                        );
-
-
-                        document.getElementById(
-                            "pixStatusIcon"
-                        ).textContent =
-                            "✅";
-
-
-                        document.getElementById(
-                            "pixStatus"
-                        ).textContent =
-                            "Pagamento aprovado!";
-
-
-                        saldoJogador =
-                            Number(
-                                dados.saldo
-                            ) ||
-                            saldoJogador;
-
-
-                        atualizarSaldoTela();
-
-
-                        setTimeout(
-                            () => {
-
-                                fecharModalPix();
-
-                            },
-                            2500
-                        );
-
-                    }
-
-                    else if(
-                        dados.status ===
-                        "rejected"
-                    ){
-
-                        clearInterval(
-                            pixTimer
-                        );
-
-
-                        document.getElementById(
-                            "pixStatusIcon"
-                        ).textContent =
-                            "❌";
-
-
-                        document.getElementById(
-                            "pixStatus"
-                        ).textContent =
-                            "Pagamento rejeitado.";
-
-                    }
-
-                }
-
-                catch(erro){
-
-                    console.error(
-                        "Erro consultando PIX:",
-                        erro
-                    );
-
-                }
-
-            },
-            5000
-        );
-
-}
-
-
-/* =========================================================
-   COPIAR PIX
-========================================================= */
-
-window.copiarPix =
-async function(){
-
-    const campo =
-        document.getElementById(
-            "pixCopiaCola"
-        );
-
-
-    try{
-
-        await navigator.clipboard.writeText(
-            campo.value
-        );
-
-
-        alert(
-            "PIX copiado!"
-        );
-
-    }
-
-    catch{
-
-        campo.select();
-
-        document.execCommand(
-            "copy"
-        );
-
-
-        alert(
-            "PIX copiado!"
-        );
-
-    }
-
-};
-
-
-/* =========================================================
-   FECHAR PIX
-========================================================= */
-
-window.fecharModalPix =
-function(){
-
-    if(
-        pixTimer
-    ){
-
-        clearInterval(
-            pixTimer
-        );
-
-        pixTimer =
-            null;
-
-    }
-
-
-    document.getElementById(
-        "modalPix"
-    ).classList.remove(
-        "ativo"
-    );
-
-};
 
 /* =========================================================
    ELEMENTOS
@@ -3170,7 +2499,25 @@ const jogosFeitosModal =
     document.getElementById(
         "jogosFeitosModal"
     );
+const modalSucesso =
+    document.getElementById(
+        "modalSucesso"
+    );
 
+const codigoSucesso =
+    document.getElementById(
+        "codigoSucesso"
+    );
+
+document.getElementById(
+    "btnFecharSucesso"
+).onclick = function() {
+
+    modalSucesso.classList.remove(
+        "ativo"
+    );
+
+};
 
 /* =========================================================
    GERAR ID DO JOGADOR
@@ -3857,7 +3204,37 @@ async function carregarJogosFeitosMenu() {
                                         ).toFixed(2)}
 
                                     </span>
+<br>
 
+<div class="menu-aposta-placar">
+
+    ⚽ Placar:
+
+    ${escapeHTML(
+        String(jogo.placarA ?? "-")
+    )}
+
+    ×
+
+    ${escapeHTML(
+        String(jogo.placarB ?? "-")
+    )}
+
+</div>
+
+<div class="menu-aposta-resultado ${String(jogo.resultado || "aguardando").toLowerCase()}">
+
+    Status:
+
+    ${
+        String(jogo.resultado || "aguardando").toLowerCase() === "ganhou"
+            ? "Ganhou"
+            : String(jogo.resultado || "").toLowerCase() === "perdeu"
+                ? "Perdeu"
+                : "Aguardando"
+    }
+
+</div>
                                 </div>
 
                             </div>
@@ -5478,19 +4855,6 @@ function() {
 };
 
 
-/* =========================================================
-   FECHAR SALDO ANTIGO
-========================================================= */
-
-document.getElementById(
-    "btnFecharSaldo"
-).onclick =
-function() {
-
-    saldoModal.style.display =
-        "none";
-
-};
 
 
 /* =========================================================
@@ -5796,9 +5160,12 @@ async function() {
             "none";
 
 
-        abrirModal(
-            codigo
-        );
+        codigoSucesso.textContent =
+    codigo;
+
+modalSucesso.classList.add(
+    "ativo"
+);
 
 
         /* =================================================
@@ -6652,669 +6019,8 @@ function() {
    SOLICITAR SALDO
 ========================================================= */
 
-window.solicitarSaldo = async function() {
+window.solicitarSaldo = async function() { const input = document.getElementById( "valorSolicitado" ); if (!input) return; let valor = parseFloat( input.value ); if ( isNaN(valor) || valor <= 0 ) { alert( "Informe um valor válido." ); input.focus(); return; } valor = Number( valor.toFixed(2) ); try { /* * Gera código da solicitação */ const codigoSolicitacao = "SOL" + Date.now(); /* * Dados da solicitação */ const solicitacao = { codigo: codigoSolicitacao, jogadorId: jogadorId, nome: nomeJogador, valor: valor, dataHora: new Date() .toISOString(), status: "aguardando" }; /* * Salva no Firebase */ await set( ref( db, "solicitacoesSaldo/" + codigoSolicitacao ), solicitacao ); /* * Fecha o modal */ fecharModalSaldo(); /* * Confirma para o jogador */ alert( "Solicitação enviada!\n\n" + "Código: " + codigoSolicitacao + "\n\n" + "Valor: " + dinheiro(valor) + "\n\n" + "Aguarde a liberação do saldo." ); } catch (erro) { console.error( "Erro ao solicitar saldo:", erro ); alert( "Não foi possível enviar a solicitação.\n\n" + ( erro?.message || String(erro) ) ); } }; 
 
-    const input =
-        document.getElementById(
-            "valorSolicitado"
-        );
-
-    if (!input) return;
-
-
-    let valor =
-        parseFloat(
-            input.value
-        );
-
-
-    if (
-        isNaN(valor) ||
-        valor <= 0
-    ) {
-
-        alert(
-            "Informe um valor válido."
-        );
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    valor =
-        Number(
-            valor.toFixed(2)
-        );
-
-
-    const jogadorAtual =
-        jogadorId;
-
-
-    if (!jogadorAtual) {
-
-        alert(
-            "Jogador não identificado."
-        );
-
-        return;
-
-    }
-
-
-    const botao =
-        document.querySelector(
-            "#modalSaldo button[onclick*='solicitarSaldo']"
-        );
-
-
-    if (botao) {
-
-        botao.disabled =
-            true;
-
-        botao.textContent =
-            "Gerando PIX...";
-
-    }
-
-
-    try {
-
-        /*
-         * URL da Cloud Function
-         *
-         * Depois de fazer o deploy,
-         * coloque aqui a URL gerada pelo Firebase.
-         */
-
-        const URL_FUNCAO =
-            "https://southamerica-east1-jogo-60a9e.cloudfunctions.net/criarPagamentoPix";
-
-
-        const resposta =
-            await fetch(
-                URL_FUNCAO,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            jogadorId:
-                                jogadorAtual,
-
-                            nome:
-                                nomeJogador,
-
-                            valor:
-                                valor
-
-                        })
-
-                }
-            );
-
-
-        const dados =
-            await resposta.json();
-
-
-        if (
-            !resposta.ok ||
-            !dados.sucesso
-        ) {
-
-            throw new Error(
-                dados.erro ||
-                "Não foi possível criar o PIX."
-            );
-
-        }
-
-
-        /*
-         * Guarda os dados da cobrança
-         */
-
-        window.pagamentoAtual = {
-
-            codigo:
-                dados.codigo,
-
-            pagamentoId:
-                dados.pagamentoId,
-
-            valor:
-                dados.valor
-
-        };
-
-
-        /*
-         * Fecha modal antigo
-         */
-
-        fecharModalSaldo();
-
-
-        /*
-         * Abre modal PIX
-         */
-
-        abrirModalPagamentoPix(
-            dados
-        );
-
-    }
-
-    catch (erro) {
-
-        console.error(
-            "Erro ao criar PIX:",
-            erro
-        );
-
-
-        alert(
-            "Não foi possível gerar o PIX.\n\n" +
-            erro.message
-        );
-
-    }
-
-    finally {
-
-        if (botao) {
-
-            botao.disabled =
-                false;
-
-            botao.textContent =
-                "Solicitar";
-
-        }
-
-    }
-
-};
-/* =========================================================
-   MODAL PAGAMENTO PIX
-========================================================= */
-
-window.abrirModalPagamentoPix =
-function(dados) {
-
-    let modal =
-        document.getElementById(
-            "modalPagamentoPix"
-        );
-
-
-    if (!modal) {
-
-        modal =
-            document.createElement(
-                "div"
-            );
-
-        modal.id =
-            "modalPagamentoPix";
-
-        modal.className =
-            "modal-pix";
-
-        modal.innerHTML = `
-
-            <div class="modal-pix-conteudo">
-
-                <button
-                    class="pix-fechar"
-                    onclick="fecharModalPagamentoPix()"
-                >
-                    ×
-                </button>
-
-                <h2>
-                    💳 Pagamento PIX
-                </h2>
-
-                <p>
-                    Solicitação:
-                    <strong id="pixCodigo">
-                        -
-                    </strong>
-                </p>
-
-                <p>
-                    Valor:
-                    <strong id="pixValor">
-                        R$ 0,00
-                    </strong>
-                </p>
-
-                <div
-                    id="pixQrCode"
-                    class="pix-qrcode"
-                ></div>
-
-                <p class="pix-instrucao">
-                    Escaneie o QR Code
-                    no aplicativo do seu banco.
-                </p>
-
-                <textarea
-                    id="pixCopiaCola"
-                    readonly
-                    placeholder="PIX Copia e Cola"
-                ></textarea>
-
-                <button
-                    class="btn-pix-copiar"
-                    onclick="copiarPixCopiaCola()"
-                >
-                    📋 Copiar PIX
-                </button>
-
-                <a
-                    id="pixTicket"
-                    target="_blank"
-                    class="btn-pix-ticket"
-                    style="display:none"
-                >
-                    Abrir pagamento
-                </a>
-
-                <div
-                    id="pixStatus"
-                    class="pix-status"
-                >
-                    ⏳ Aguardando pagamento...
-                </div>
-
-            </div>
-
-        `;
-
-
-        document.body.appendChild(
-            modal
-        );
-
-    }
-
-
-    document.getElementById(
-        "pixCodigo"
-    ).textContent =
-        dados.codigo || "-";
-
-
-    document.getElementById(
-        "pixValor"
-    ).textContent =
-        dinheiro(
-            dados.valor
-        );
-
-
-    const qr =
-        document.getElementById(
-            "pixQrCode"
-        );
-
-
-    qr.innerHTML =
-        "";
-
-
-    if (
-        dados.qrCodeBase64
-    ) {
-
-        const img =
-            document.createElement(
-                "img"
-            );
-
-
-        img.src =
-            "data:image/png;base64," +
-            dados.qrCodeBase64;
-
-
-        img.alt =
-            "QR Code PIX";
-
-
-        qr.appendChild(
-            img
-        );
-
-    }
-
-    else if (
-        dados.qrCode
-    ) {
-
-        const img =
-            document.createElement(
-                "img"
-            );
-
-
-        img.src =
-            "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" +
-            encodeURIComponent(
-                dados.qrCode
-            );
-
-
-        img.alt =
-            "QR Code PIX";
-
-
-        qr.appendChild(
-            img
-        );
-
-    }
-
-
-    document.getElementById(
-        "pixCopiaCola"
-    ).value =
-        dados.qrCode || "";
-
-
-    const ticket =
-        document.getElementById(
-            "pixTicket"
-        );
-
-
-    if (
-        dados.ticketUrl
-    ) {
-
-        ticket.href =
-            dados.ticketUrl;
-
-        ticket.style.display =
-            "block";
-
-    }
-
-    else {
-
-        ticket.style.display =
-            "none";
-
-    }
-
-
-    document.getElementById(
-        "pixStatus"
-    ).textContent =
-        "⏳ Aguardando pagamento...";
-
-
-    modal.style.display =
-        "flex";
-
-
-    iniciarVerificacaoPagamento(
-        dados.codigo
-    );
-
-};
-
-
-/* =========================================================
-   FECHAR MODAL PIX
-========================================================= */
-
-window.fecharModalPagamentoPix =
-function() {
-
-    const modal =
-        document.getElementById(
-            "modalPagamentoPix"
-        );
-
-
-    if (modal) {
-
-        modal.style.display =
-            "none";
-
-    }
-
-};
-
-
-/* =========================================================
-   COPIAR PIX
-========================================================= */
-
-window.copiarPixCopiaCola =
-async function() {
-
-    const campo =
-        document.getElementById(
-            "pixCopiaCola"
-        );
-
-
-    if (!campo) return;
-
-
-    if (!campo.value) {
-
-        alert(
-            "Código PIX não disponível."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        await navigator.clipboard.writeText(
-            campo.value
-        );
-
-
-        alert(
-            "PIX copiado!"
-        );
-
-    }
-
-    catch {
-
-        campo.select();
-
-        document.execCommand(
-            "copy"
-        );
-
-
-        alert(
-            "PIX copiado!"
-        );
-
-    }
-
-};
-/* =========================================================
-   VERIFICAR STATUS DA SOLICITAÇÃO
-========================================================= */
-
-let intervaloPagamento = null;
-
-
-function iniciarVerificacaoPagamento(
-    codigo
-) {
-
-    if (
-        intervaloPagamento
-    ) {
-
-        clearInterval(
-            intervaloPagamento
-        );
-
-    }
-
-
-    intervaloPagamento =
-        setInterval(
-            async () => {
-
-                try {
-
-                    const snapshot =
-                        await get(
-                            ref(
-                                db,
-                                "solicitacoesSaldo/" +
-                                codigo
-                            )
-                        );
-
-
-                    if (
-                        !snapshot.exists()
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    const dados =
-                        snapshot.val();
-
-
-                    const status =
-                        String(
-                            dados.status ||
-                            ""
-                        ).toLowerCase();
-
-
-                    const elemento =
-                        document.getElementById(
-                            "pixStatus"
-                        );
-
-
-                    if (
-                        status === "pago"
-                    ) {
-
-                        clearInterval(
-                            intervaloPagamento
-                        );
-
-
-                        intervaloPagamento =
-                            null;
-
-
-                        if (elemento) {
-
-                            elemento.innerHTML =
-                                "✅ Pagamento confirmado!<br>Saldo adicionado.";
-
-                        }
-
-
-                        /*
-                         * Atualiza o saldo
-                         */
-
-                        await verificarSaldo();
-
-
-                        setTimeout(
-                            () => {
-
-                                fecharModalPagamentoPix();
-
-                            },
-                            2500
-                        );
-
-                    }
-
-                    else if (
-                        status ===
-                        "valor_divergente"
-                    ) {
-
-                        clearInterval(
-                            intervaloPagamento
-                        );
-
-
-                        intervaloPagamento =
-                            null;
-
-
-                        if (elemento) {
-
-                            elemento.innerHTML =
-                                "⚠️ O valor pago é diferente do solicitado.";
-
-                        }
-
-                    }
-
-                    else {
-
-                        if (elemento) {
-
-                            elemento.innerHTML =
-                                "⏳ Aguardando pagamento...";
-
-                        }
-
-                    }
-
-                }
-
-                catch (erro) {
-
-                    console.error(
-                        "Erro verificando pagamento:",
-                        erro
-                    );
-
-                }
-
-            },
-
-            3000
-        );
-
-}
 /* =========================================================
    INICIAR SISTEMA
 ========================================================= */
@@ -7336,6 +6042,27 @@ async function iniciarSistema() {
 
 }
 
+/* =========================================================
+   MUDANÇA AUTOMÁTICA DE COR DO BODY
+========================================================= */
+function gerarCorAleatoria() {
+    const letras = '0123456789ABCDEF';
+    let cor = '#';
+
+    for (let i = 0; i < 6; i++) {
+        cor += letras[
+            Math.floor(
+                Math.random() * 16
+            )
+        ];
+    }
+
+    return cor;
+}
+
+// Aplica uma cor aleatória ao body
+document.body.style.backgroundColor =
+    gerarCorAleatoria();
 
 iniciarSistema();
 
