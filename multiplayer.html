@@ -8,7 +8,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>MULTI PLAYER.BET</title>
+<title>MULTI PLAY.BET</title>
 
 <link
 rel="shortcut icon"
@@ -1619,12 +1619,46 @@ body.cor5 {
     background: #ddd;
     color: #222;
 }
+.menu-aposta-placar {
+    margin-top: 7px;
+    padding: 7px;
+    background: #ddd;
+    color: #000;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.menu-aposta-resultado {
+    margin-top: 5px;
+    padding: 6px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    background: #ff9800;
+}
+
+.menu-aposta-resultado.ganhou {
+    background: #00a000;
+}
+
+.menu-aposta-resultado.perdeu {
+    background: #d00000;
+}
+
+.menu-aposta-resultado.aguardando {
+    background: #ff9800;
+}
 </style>
 
 </head>
 
 
 <body>
+
+
 
 <!-- =====================================================
      TOPO
@@ -2223,7 +2257,7 @@ const db =
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 5000;
+const LIMITE = 3000;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
@@ -2973,7 +3007,37 @@ async function carregarJogosFeitosMenu() {
                                         ).toFixed(2)}
 
                                     </span>
+<br>
 
+<div class="menu-aposta-placar">
+
+    ⚽ Placar:
+
+    ${escapeHTML(
+        String(jogo.placarA ?? "-")
+    )}
+
+    ×
+
+    ${escapeHTML(
+        String(jogo.placarB ?? "-")
+    )}
+
+</div>
+
+<div class="menu-aposta-resultado ${String(jogo.resultado || "aguardando").toLowerCase()}">
+
+    Status:
+
+    ${
+        String(jogo.resultado || "aguardando").toLowerCase() === "ganhou"
+            ? "Ganhou"
+            : String(jogo.resultado || "").toLowerCase() === "perdeu"
+                ? "Perdeu"
+                : "Aguardando"
+    }
+
+</div>
                                 </div>
 
                             </div>
@@ -5845,13 +5909,21 @@ async function() {
                 valor:
                     valor,
 
-                status:
-                    "aguardando",
-
                 dataHora:
-                    new Date()
-                        .toISOString()
+    String(
+        s.dataHora ||
+        ""
+    ),
 
+placarA: null,
+
+placarB: null,
+
+resultado:
+    "aguardando",
+
+status:
+    "aguardando"
             }
 
         );
