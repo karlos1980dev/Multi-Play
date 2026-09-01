@@ -1,0 +1,5119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo - MULTI PLAY.BET</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f1f1f1;color:#111;padding-bottom:40px}
+.topo{position:sticky;top:0;z-index:9999;background:#000;color:#fff;min-height:60px;padding:10px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.topo h1{margin:0;font-size:19px}.topo span{font-size:11px;color:#00ff55}
+.menu{display:flex;gap:5px;padding:8px;background:#222;overflow-x:auto;position:sticky;top:60px;z-index:999}
+.menu button{border:none;border-radius:6px;background:#444;color:#fff;padding:11px 14px;font-weight:bold;white-space:nowrap;cursor:pointer}
+.menu button.ativo{background:#00a000}
+.container{width:100%;max-width:1100px;margin:auto;padding:10px}
+.secao{display:none}.secao.ativa{display:block}
+.titulo{background:green;color:white;padding:12px;border-radius:7px;margin-bottom:10px;font-weight:bold;font-size:18px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px}
+.card{background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,.15);text-align:center}
+.card strong{display:block;font-size:22px;margin-top:5px}.card small{color:#666}
+.tabela-box{background:#fff;border-radius:8px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.15);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th{background:#111;color:#fff;padding:9px;font-size:12px}
+td{border-bottom:1px solid #ddd;padding:8px;font-size:12px;text-align:center}
+tr:hover{background:#f5f5f5}
+.status{display:inline-block;padding:5px 8px;border-radius:5px;color:#fff;font-weight:bold;font-size:11px}
+.status.liberado{background:#00a000}.status.bloqueado{background:#d00000}.status.aguardando{background:#777}
+.status.pago{background:#008cff}.status.pendente{background:#f08a00}.status.cancelado{background:#d00000}
+.status.atendido{background:#00a000}
+.btn{border:none;border-radius:5px;padding:8px 10px;color:#fff;font-weight:bold;cursor:pointer;margin:2px}
+.btn-verde{background:#00a000}.btn-vermelho{background:#d00000}.btn-azul{background:#0072d3}
+.btn-laranja{background:#f08a00}.btn-cinza{background:#555}.btn-preto{background:#000}
+.formulario{background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,.15);margin-bottom:15px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.campo{display:flex;flex-direction:column;gap:4px}.campo label{font-weight:bold;font-size:12px}
+.campo input,.campo select{width:100%;height:40px;border:1px solid #bbb;border-radius:6px;padding:8px;font-size:14px}
+.campo.destaque input{border:2px solid #00a000;font-weight:bold;font-size:16px}
+.aviso{background:#eaffea;border:1px solid #00a000;border-radius:7px;padding:10px;margin:10px 0;font-size:13px}
+.jogo-admin{background:#fff;border-radius:9px;padding:12px;margin-bottom:12px;box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.jogo-topo{display:flex;justify-content:space-between;align-items:center;background:#111;color:#fff;padding:9px;border-radius:6px;margin-bottom:10px}
+.jogo-times{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;gap:8px;text-align:center}
+.time-admin{display:flex;flex-direction:column;align-items:center;gap:5px}
+.time-admin img{width:55px;height:55px;object-fit:contain;border-radius:7px;border:1px solid #ddd;background:#fff}
+.placar{font-size:25px;font-weight:bold}.jogo-acoes{margin-top:10px;text-align:center}
+.aposta-card{background:#fff;border-radius:8px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.aposta-cabecalho{display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;background:#111;color:#fff;padding:9px;border-radius:6px}
+.aposta-jogo{border:1px solid #ddd;border-radius:6px;padding:8px;margin-top:7px;background:#f7f7f7}
+.aposta-resumo{margin-top:8px;padding:10px;background:#eee;border-radius:6px;font-weight:bold}
+.busca{width:100%;height:42px;border:1px solid #aaa;border-radius:7px;padding:8px;margin-bottom:10px}
+.solicitacao-card{background:#fff;border-radius:9px;padding:13px;margin-bottom:10px;box-shadow:0 2px 9px rgba(0,0,0,.15);border-left:5px solid #f08a00}
+.solicitacao-valor{font-size:25px;font-weight:bold;color:#00a000;margin:8px 0}
+.solicitacao-acoes{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.modal{display:none;position:fixed;inset:0;z-index:30000;background:rgba(0,0,0,.75);justify-content:center;align-items:center;padding:12px}
+.modal-conteudo{background:#fff;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;border-radius:10px;padding:15px}
+.modal-titulo{background:#000;color:#fff;padding:10px;border-radius:6px;font-weight:bold;text-align:center;margin-bottom:10px}
+.modal-botoes{display:flex;gap:5px;margin-top:12px}.modal-botoes button{flex:1}
+.carregando{position:fixed;inset:0;z-index:50000;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;color:#fff;font-size:18px;font-weight:bold}
+.badge-nova{display:inline-block;background:#d00000;color:#fff;border-radius:20px;padding:3px 7px;font-size:10px;margin-left:4px}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.topo h1{font-size:15px}.jogo-times{grid-template-columns:1fr 45px 1fr}}
+</style>
+</head>
+<body>
+
+<div class="topo">
+    <h1>MULTI PLAY.BET</h1>
+    <span>PAINEL ADMINISTRATIVO</span>
+</div>
+
+<div class="menu">
+    <button class="ativo" onclick="abrirSecao('inicio',this)">🏠 Início</button>
+    <button onclick="abrirSecao('jogadores',this)">👤 Jogadores</button>
+    <button onclick="abrirSecao('solicitacoes',this)">💰 Solicitações <span id="badgeSolicitacoes" class="badge-nova" style="display:none">0</span></button>
+    <button onclick="abrirSecao('apostas',this)">🎟️ Apostas</button>
+    <button onclick="abrirSecao('jogos',this)">⚽ Jogos</button>
+    <button onclick="abrirSecao('novoJogo',this)">➕ Novo Jogo</button>
+</div>
+
+<div class="container">
+
+<section id="inicio" class="secao ativa">
+    <div class="titulo">📊 Resumo</div>
+    <div class="cards">
+        <div class="card"><small>Jogadores</small><strong id="totalJogadores">0</strong></div>
+        <div class="card"><small>Jogadores liberados</small><strong id="jogadoresLiberados">0</strong></div>
+        <div class="card"><small>Apostas</small><strong id="totalApostas">0</strong></div>
+        <div class="card"><small>Valor apostado</small><strong id="valorApostado">R$ 0,00</strong></div>
+    </div>
+    <div class="titulo">⚡ Ações rápidas</div>
+    <div class="formulario">
+        <button class="btn btn-azul" onclick="abrirSecaoPorNome('jogadores')">👤 Jogadores</button>
+        <button class="btn btn-laranja" onclick="abrirSecaoPorNome('solicitacoes')">💰 Solicitações</button>
+        <button class="btn btn-verde" onclick="abrirSecaoPorNome('jogos')">⚽ Editar Jogos</button>
+        <button class="btn btn-laranja" onclick="abrirSecaoPorNome('apostas')">🎟️ Ver Apostas</button>
+        <button class="btn btn-preto" onclick="carregarTudo()">🔄 Atualizar</button>
+    </div>
+</section>
+
+<section id="jogadores" class="secao">
+    <div class="titulo">👤 Jogadores</div>
+    <input id="buscaJogador" class="busca" placeholder="🔎 Procurar jogador..." oninput="renderizarJogadores()">
+    <div class="tabela-box">
+        <table>
+            <thead><tr><th>Nome</th><th>Saldo</th><th>Valor a liberar</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="tabelaJogadores"></tbody>
+        </table>
+    </div>
+</section>
+
+<section id="solicitacoes" class="secao">
+    <div class="titulo">💰 Solicitações de saldo</div>
+    <div class="aviso">
+        Solicitações feitas pela INDEX aparecem automaticamente aqui.
+        Ao clicar em <strong>Liberar</strong>, o valor é acrescentado ao saldo do jogador.
+    </div>
+    <div id="listaSolicitacoes"></div>
+</section>
+
+<section id="apostas" class="secao">
+    <div class="titulo">🎟️ Apostas recebidas</div>
+    <input id="buscaAposta" class="busca" placeholder="🔎 Código ou nome do jogador..." oninput="renderizarApostas()">
+    <div id="listaApostas"></div>
+</section>
+
+<section id="jogos" class="secao">
+    <div class="titulo">⚽ Jogos cadastrados</div>
+    <div class="formulario">
+        <div class="campo">
+            <label>Dia</label>
+            <select id="filtroDiaJogos" onchange="renderizarJogos()">
+                <option value="">Todos</option><option value="domingo">Domingo</option><option value="segunda">Segunda</option>
+                <option value="terca">Terça</option><option value="quarta">Quarta</option><option value="quinta">Quinta</option>
+                <option value="sexta">Sexta</option><option value="sabado">Sábado</option>
+            </select>
+        </div>
+    </div>
+    <div id="listaJogos"></div>
+</section>
+
+<section id="novoJogo" class="secao">
+    <div class="titulo">➕ Cadastrar novo jogo</div>
+    <div class="formulario">
+        <div class="form-grid">
+            <div class="campo"><label>Dia</label><select id="novoDia">
+                <option value="domingo">Domingo</option><option value="segunda">Segunda</option><option value="terca">Terça</option>
+                <option value="quarta">Quarta</option><option value="quinta">Quinta</option><option value="sexta">Sexta</option><option value="sabado">Sábado</option>
+            </select></div>
+            <div class="campo"><label>Campeonato</label><input id="novoCampeonato" placeholder="Ex: Brasileirão"></div>
+            <div class="campo"><label>País</label><input id="novoPais" placeholder="Ex: brasil"></div>
+            <div class="campo"><label>Data</label><input type="date" id="novoData"></div>
+            <div class="campo"><label>Hora</label><input type="time" id="novoHora"></div>
+            <div class="campo"><label>Time A</label><input id="novoTimeA"></div>
+            <div class="campo"><label>Escudo Time A</label><input id="novoImagemA" placeholder="URL da imagem"></div>
+            <div class="campo"><label>Time B</label><input id="novoTimeB"></div>
+            <div class="campo"><label>Escudo Time B</label><input id="novoImagemB" placeholder="URL da imagem"></div>
+            <div class="campo"><label>Cotação Casa</label><input type="number" step="0.01" id="novoCasa" value="1.50"></div>
+            <div class="campo"><label>Cotação Empate</label><input type="number" step="0.01" id="novoEmpate" value="2.50"></div>
+            <div class="campo"><label>Cotação Fora</label><input type="number" step="0.01" id="novoFora" value="2.50"></div>
+            <div class="campo"><label>Ambas Marcam</label><input type="number" step="0.01" id="novoAmbas" value="2.50"></div>
+        </div><br>
+        <button class="btn btn-verde" onclick="criarNovoJogo()">➕ Salvar Jogo</button>
+    </div>
+</section>
+</div>
+
+<!-- MODAL JOGADOR -->
+<div id="modalJogador" class="modal"><div class="modal-conteudo">
+<div class="modal-titulo">👤 Editar jogador</div>
+<input type="hidden" id="editarJogadorId">
+<div class="campo"><label>Nome</label><input id="editarJogadorNome"></div><br>
+<div class="campo"><label>Saldo atual</label><input type="number" step="0.01" id="editarJogadorSaldo"></div><br>
+<div class="campo destaque"><label>💰 Valor a liberar</label><input type="number" min="0" step="0.01" id="editarJogadorValorLiberar"></div>
+<div class="aviso">O valor a liberar fica separado do saldo. Ao clicar em <strong>💸 Liberar valor</strong>, ele entra no saldo.</div>
+<div class="campo"><label>Status</label><select id="editarJogadorStatus"><option value="liberado">Liberado</option><option value="bloqueado">Bloqueado</option></select></div>
+<div class="modal-botoes">
+<button class="btn btn-cinza" onclick="fecharModal('modalJogador')">Cancelar</button>
+<button class="btn btn-azul" onclick="salvarJogador()">💾 Salvar</button>
+<button class="btn btn-verde" onclick="liberarValorJogador()">💸 Liberar valor</button>
+</div></div></div>
+
+<!-- MODAL JOGO -->
+<div id="modalJogo" class="modal"><div class="modal-conteudo">
+<div class="modal-titulo">⚽ Editar jogo</div>
+<input type="hidden" id="editarJogoDia"><input type="hidden" id="editarJogoId">
+<div class="form-grid">
+<div class="campo"><label>Campeonato</label><input id="editarCampeonato"></div>
+<div class="campo"><label>País</label><input id="editarPais"></div>
+<div class="campo"><label>Data</label><input type="date" id="editarData"></div>
+<div class="campo"><label>Hora</label><input type="time" id="editarHora"></div>
+<div class="campo"><label>Time A</label><input id="editarTimeA"></div>
+<div class="campo"><label>Imagem A</label><input id="editarImagemA"></div>
+<div class="campo"><label>Time B</label><input id="editarTimeB"></div>
+<div class="campo"><label>Imagem B</label><input id="editarImagemB"></div>
+<div class="campo"><label>Cotação Casa</label><input type="number" step="0.01" id="editarCasa"></div>
+<div class="campo"><label>Cotação Empate</label><input type="number" step="0.01" id="editarEmpate"></div>
+<div class="campo"><label>Cotação Fora</label><input type="number" step="0.01" id="editarFora"></div>
+<div class="campo"><label>Ambas Marcam</label><input type="number" step="0.01" id="editarAmbas"></div>
+<div class="campo"><label>Placar Time A</label><input type="number" min="0" id="editarPlacarA"></div>
+<div class="campo"><label>Placar Time B</label><input type="number" min="0" id="editarPlacarB"></div>
+</div>
+<div class="modal-botoes"><button class="btn btn-cinza" onclick="fecharModal('modalJogo')">Cancelar</button><button class="btn btn-verde" onclick="salvarJogo()">Salvar</button></div>
+</div></div>
+
+<div id="carregando" class="carregando">Carregando...</div>
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    update,
+    remove,
+    onValue
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+
+/* =========================================================
+   CONFIGURAÇÃO FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyA5-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+
+    authDomain:
+        "jogo-60a9e.firebaseapp.com",
+
+    projectId:
+        "jogo-60a9e",
+
+    storageBucket:
+        "jogo-60a9e.appspot.com",
+
+    messagingSenderId:
+        "352852303591",
+
+    appId:
+        "1:352852303591:web:8083c950047c9026bd8c42",
+
+    databaseURL:
+        "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+
+/* =========================================================
+   API-FOOTBALL
+========================================================= */
+
+/*
+   COLOQUE SUA CHAVE AQUI
+*/
+
+const API_FOOTBALL_KEY = "COLOQUE_SUA_API_KEY_AQUI";
+
+
+const API_FOOTBALL_URL =
+    "https://v3.football.api-sports.io";
+
+
+/*
+   Fuso utilizado para as datas dos jogos
+*/
+
+const API_TIMEZONE =
+    "America/Sao_Paulo";
+
+
+/*
+   Intervalo da atualização.
+
+   60 segundos evita gastar requisições
+   desnecessariamente.
+
+   A API atualiza partidas ao vivo
+   a cada aproximadamente 15 segundos.
+*/
+
+const INTERVALO_API =
+    60 * 1000;
+
+
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
+
+const dias = [
+    "domingo",
+    "segunda",
+    "terca",
+    "quarta",
+    "quinta",
+    "sexta",
+    "sabado"
+];
+
+
+let jogadores = {};
+
+let apostas = {};
+
+let jogos = {};
+
+let solicitacoesSaldo = {};
+
+let atualizacaoAPIAtiva = false;
+
+let timerAPI = null;
+
+
+/*
+   Cache dos jogos encontrados na API.
+
+   Evita procurar o mesmo jogo novamente
+   pelo nome dos times.
+*/
+
+const cacheFixtures = {};
+
+
+/* =========================================================
+   UTILITÁRIOS
+========================================================= */
+
+function mostrarCarregando(valor) {
+
+    const elemento =
+        document.getElementById("carregando");
+
+    if (!elemento) return;
+
+    elemento.style.display =
+        valor ? "flex" : "none";
+}
+
+
+function dinheiro(valor) {
+
+    return Number(valor || 0).toLocaleString(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
+}
+
+
+function escapar(texto) {
+
+    return String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function valorNumerico(valor) {
+
+    if (typeof valor === "number") {
+
+        return valor;
+
+    }
+
+    const texto =
+        String(valor ?? "").trim();
+
+    if (texto.includes(",")) {
+
+        return Number(
+            texto
+                .replace(/\./g, "")
+                .replace(",", ".")
+        ) || 0;
+
+    }
+
+    return Number(texto) || 0;
+}
+
+
+/* =========================================================
+   NORMALIZAR NOME DE TIME
+========================================================= */
+
+function normalizarNome(nome) {
+
+    return String(nome || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+}
+
+
+/* =========================================================
+   COMPARAR TIMES
+========================================================= */
+
+function timesCorrespondem(nome1, nome2) {
+
+    const a =
+        normalizarNome(nome1);
+
+    const b =
+        normalizarNome(nome2);
+
+    if (!a || !b) return false;
+
+    if (a === b) return true;
+
+    /*
+       Alguns nomes podem possuir diferenças.
+    */
+
+    if (a.includes(b)) return true;
+
+    if (b.includes(a)) return true;
+
+    return false;
+}
+
+
+/* =========================================================
+   DATA PARA API
+========================================================= */
+
+function dataParaAPI(data) {
+
+    if (!data) return null;
+
+    /*
+       Se já estiver YYYY-MM-DD
+    */
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+
+        return data;
+
+    }
+
+    /*
+       Caso esteja DD/MM/YYYY
+    */
+
+    const partes =
+        String(data).split("/");
+
+    if (partes.length === 3) {
+
+        return `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}`;
+
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   REQUEST API
+========================================================= */
+
+async function consultarAPI(endpoint, parametros = {}) {
+
+    if (
+        !API_FOOTBALL_KEY ||
+        API_FOOTBALL_KEY ===
+        "COLOQUE_SUA_API_KEY_AQUI"
+    ) {
+
+        throw new Error(
+            "API-Football: coloque sua API Key."
+        );
+    }
+
+
+    const url =
+        new URL(
+            API_FOOTBALL_URL + endpoint
+        );
+
+
+    Object.entries(parametros).forEach(
+        ([chave, valor]) => {
+
+            if (
+                valor !== undefined &&
+                valor !== null &&
+                valor !== ""
+            ) {
+
+                url.searchParams.set(
+                    chave,
+                    valor
+                );
+
+            }
+
+        }
+    );
+
+
+    const resposta =
+        await fetch(
+            url.toString(),
+            {
+                method: "GET",
+
+                headers: {
+
+                    "x-apisports-key":
+                        API_FOOTBALL_KEY,
+
+                    "Accept":
+                        "application/json"
+
+                }
+            }
+        );
+
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            `API-Football HTTP ${resposta.status}`
+        );
+
+    }
+
+
+    const dados =
+        await resposta.json();
+
+
+    if (
+        dados.errors &&
+        Object.keys(dados.errors).length
+    ) {
+
+        console.error(
+            "ERROS API:",
+            dados.errors
+        );
+
+        throw new Error(
+            JSON.stringify(dados.errors)
+        );
+
+    }
+
+
+    return dados;
+
+}
+
+
+/* =========================================================
+   PROCURAR JOGO NA API
+========================================================= */
+
+async function procurarFixture(jogo) {
+
+    if (!jogo) return null;
+
+
+    /*
+       Se já temos fixture ID,
+       não precisamos procurar pelo nome.
+    */
+
+    if (jogo.apiFixtureId) {
+
+        try {
+
+            const dados =
+                await consultarAPI(
+                    "/fixtures",
+                    {
+                        id:
+                            jogo.apiFixtureId
+                    }
+                );
+
+
+            if (
+                dados.response &&
+                dados.response.length
+            ) {
+
+                return dados.response[0];
+
+            }
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao buscar fixture salvo:",
+                erro
+            );
+
+        }
+
+    }
+
+
+    const data =
+        dataParaAPI(jogo.data);
+
+
+    if (!data) {
+
+        console.warn(
+            "Jogo sem data:",
+            jogo
+        );
+
+        return null;
+
+    }
+
+
+    const chaveCache =
+        `${data}|${normalizarNome(jogo.timeA)}|${normalizarNome(jogo.timeB)}`;
+
+
+    if (
+        cacheFixtures[chaveCache]
+    ) {
+
+        return cacheFixtures[chaveCache];
+
+    }
+
+
+    console.log(
+        "🔎 Procurando na API:",
+        jogo.timeA,
+        "x",
+        jogo.timeB,
+        data
+    );
+
+
+    /*
+       Busca todos os jogos daquele dia.
+    */
+
+    const dados =
+        await consultarAPI(
+            "/fixtures",
+            {
+                date: data,
+                timezone:
+                    API_TIMEZONE
+            }
+        );
+
+
+    const lista =
+        dados.response || [];
+
+
+    /*
+       Procura mandante + visitante.
+    */
+
+    let encontrado =
+        lista.find(fixture => {
+
+            const casa =
+                fixture?.teams?.home?.name;
+
+            const fora =
+                fixture?.teams?.away?.name;
+
+
+            return (
+
+                timesCorrespondem(
+                    casa,
+                    jogo.timeA
+                )
+
+                &&
+
+                timesCorrespondem(
+                    fora,
+                    jogo.timeB
+                )
+
+            );
+
+        });
+
+
+    /*
+       Caso o cadastro tenha os times
+       invertidos, tenta também.
+    */
+
+    if (!encontrado) {
+
+        encontrado =
+            lista.find(fixture => {
+
+                const casa =
+                    fixture?.teams?.home?.name;
+
+                const fora =
+                    fixture?.teams?.away?.name;
+
+
+                return (
+
+                    timesCorrespondem(
+                        casa,
+                        jogo.timeB
+                    )
+
+                    &&
+
+                    timesCorrespondem(
+                        fora,
+                        jogo.timeA
+                    )
+
+                );
+
+            });
+
+    }
+
+
+    if (encontrado) {
+
+        cacheFixtures[chaveCache] =
+            encontrado;
+
+    }
+
+
+    return encontrado || null;
+
+}
+
+
+/* =========================================================
+   SALVAR DADOS DA API NO JOGO
+========================================================= */
+
+async function salvarDadosFixture(
+    dia,
+    jogoId,
+    jogo,
+    fixture
+) {
+
+    if (!fixture) return;
+
+
+    const fixtureId =
+        fixture.fixture?.id;
+
+
+    const timeCasa =
+        fixture.teams?.home;
+
+
+    const timeFora =
+        fixture.teams?.away;
+
+
+    const placarCasa =
+        fixture.goals?.home;
+
+
+    const placarFora =
+        fixture.goals?.away;
+
+
+    const status =
+        fixture.fixture?.status;
+
+
+    const dadosAtualizados = {
+
+        apiFixtureId:
+            fixtureId,
+
+        apiTimeAId:
+            timeCasa?.id ?? null,
+
+        apiTimeBId:
+            timeFora?.id ?? null,
+
+        apiTimeA:
+            timeCasa?.name ?? null,
+
+        apiTimeB:
+            timeFora?.name ?? null,
+
+        apiStatus:
+            status?.short ?? null,
+
+        apiStatusLong:
+            status?.long ?? null,
+
+        apiAtualizadoEm:
+            new Date().toISOString()
+
+    };
+
+
+    /*
+       Salva placar somente quando
+       a API possui o placar.
+    */
+
+    if (
+        placarCasa !== null &&
+        placarCasa !== undefined
+    ) {
+
+        dadosAtualizados.placarA =
+            Number(placarCasa);
+
+    }
+
+
+    if (
+        placarFora !== null &&
+        placarFora !== undefined
+    ) {
+
+        dadosAtualizados.placarB =
+            Number(placarFora);
+
+    }
+
+
+    /*
+       Verifica se acabou.
+    */
+
+    const terminou =
+        ["FT", "AET", "PEN"]
+            .includes(
+                String(status?.short || "")
+                    .toUpperCase()
+            );
+
+
+    dadosAtualizados.finalizado =
+        terminou;
+
+
+    if (
+        terminou &&
+        placarCasa !== null &&
+        placarFora !== null
+    ) {
+
+        dadosAtualizados.resultado =
+            `${placarCasa}x${placarFora}`;
+
+    }
+
+
+    await update(
+        ref(
+            db,
+            `jogos/${dia}/${jogoId}`
+        ),
+        dadosAtualizados
+    );
+
+
+    /*
+       Atualiza memória local.
+    */
+
+    jogos[dia][jogoId] = {
+
+        ...jogo,
+
+        ...dadosAtualizados
+
+    };
+
+
+    return dadosAtualizados;
+
+}
+
+
+/* =========================================================
+   RESULTADO DE UMA SELEÇÃO
+========================================================= */
+
+function calcularResultadoSelecao(
+    selecao,
+    fixture
+) {
+
+    if (!selecao || !fixture) {
+
+        return "aguardando";
+
+    }
+
+
+    const status =
+        String(
+            fixture.fixture?.status?.short || ""
+        ).toUpperCase();
+
+
+    /*
+       Ainda não terminou.
+    */
+
+    if (
+        !["FT", "AET", "PEN"].includes(status)
+    ) {
+
+        return "aguardando";
+
+    }
+
+
+    const home =
+        Number(
+            fixture.goals?.home
+        );
+
+
+    const away =
+        Number(
+            fixture.goals?.away
+        );
+
+
+    if (
+        Number.isNaN(home) ||
+        Number.isNaN(away)
+    ) {
+
+        return "aguardando";
+
+    }
+
+
+    const escolha =
+        String(
+            selecao.escolha ??
+            selecao.palpite ??
+            selecao.tipo ??
+            ""
+        )
+        .trim();
+
+
+    const escolhaNormalizada =
+        normalizarNome(escolha);
+
+
+    const timeA =
+        String(
+            selecao.timeA || ""
+        );
+
+
+    const timeB =
+        String(
+            selecao.timeB || ""
+        );
+
+
+    const gols =
+        `${home}x${away}`;
+
+
+    /*
+       =====================================================
+       PLACAR EXATO
+       Exemplos:
+       2x1
+       2 X 1
+       =====================================================
+    */
+
+    const placarExato =
+        escolha
+            .replace(/\s/g, "")
+            .match(/^(\d+)x(\d+)$/i);
+
+
+    if (placarExato) {
+
+        const a =
+            Number(placarExato[1]);
+
+        const b =
+            Number(placarExato[2]);
+
+
+        return (
+            home === a &&
+            away === b
+        )
+            ? "ganhou"
+            : "perdeu";
+
+    }
+
+
+    /*
+       =====================================================
+       CASA / MANDANTE
+       =====================================================
+    */
+
+    if (
+
+        [
+            "casa",
+            "mandante",
+            "1",
+            "vitoria casa",
+            "vitoriadacasa"
+        ].some(x =>
+            escolhaNormalizada ===
+            normalizarNome(x)
+        )
+
+        ||
+
+        timesCorrespondem(
+            escolha,
+            timeA
+        )
+
+    ) {
+
+        return home > away
+            ? "ganhou"
+            : "perdeu";
+
+    }
+
+
+    /*
+       =====================================================
+       EMPATE
+       =====================================================
+    */
+
+    if (
+
+        [
+            "empate",
+            "x",
+            "draw"
+        ].some(x =>
+            escolhaNormalizada ===
+            normalizarNome(x)
+        )
+
+    ) {
+
+        return home === away
+            ? "ganhou"
+            : "perdeu";
+
+    }
+
+
+    /*
+       =====================================================
+       FORA / VISITANTE
+       =====================================================
+    */
+
+    if (
+
+        [
+            "fora",
+            "visitante",
+            "2",
+            "vitoria fora",
+            "vitoriadofora"
+        ].some(x =>
+            escolhaNormalizada ===
+            normalizarNome(x)
+        )
+
+        ||
+
+        timesCorrespondem(
+            escolha,
+            timeB
+        )
+
+    ) {
+
+        return away > home
+            ? "ganhou"
+            : "perdeu";
+
+    }
+
+
+    /*
+       =====================================================
+       AMBAS MARCAM
+       =====================================================
+    */
+
+    if (
+        escolhaNormalizada.includes(
+            "ambas"
+        )
+
+        ||
+
+        escolhaNormalizada.includes(
+            "ambasmarcam"
+        )
+
+        ||
+
+        escolhaNormalizada.includes(
+            "btts"
+        )
+
+    ) {
+
+        const ambas =
+            home > 0 &&
+            away > 0;
+
+
+        if (
+            escolhaNormalizada.includes("nao") ||
+            escolhaNormalizada.includes("não")
+        ) {
+
+            return ambas
+                ? "perdeu"
+                : "ganhou";
+
+        }
+
+
+        return ambas
+            ? "ganhou"
+            : "perdeu";
+
+    }
+
+
+    /*
+       =====================================================
+       MAIS / MENOS GOLS
+       Exemplos:
+       Mais de 2.5
+       Menos de 2.5
+       Over 2.5
+       Under 2.5
+       =====================================================
+    */
+
+    const totalGols =
+        home + away;
+
+
+    const linha =
+        escolha.match(
+            /(\d+(?:[.,]\d+)?)/
+        );
+
+
+    if (linha) {
+
+        const valorLinha =
+            Number(
+                linha[1]
+                    .replace(",", ".")
+            );
+
+
+        const ehMais =
+            /mais|over|acima|maior/i
+                .test(escolha);
+
+
+        const ehMenos =
+            /menos|under|abaixo|menor/i
+                .test(escolha);
+
+
+        if (ehMais) {
+
+            return totalGols > valorLinha
+                ? "ganhou"
+                : "perdeu";
+
+        }
+
+
+        if (ehMenos) {
+
+            return totalGols < valorLinha
+                ? "ganhou"
+                : "perdeu";
+
+        }
+
+    }
+
+
+    /*
+       =====================================================
+       CASO NÃO RECONHEÇA O PALPITE
+       NÃO MARCA ERRADO.
+
+       Fica aguardando.
+       =====================================================
+    */
+
+    console.warn(
+        "⚠️ Palpite não reconhecido:",
+        escolha
+    );
+
+
+    return "aguardando";
+
+}
+
+
+/* =========================================================
+   ATUALIZAR UMA APOSTA
+========================================================= */
+
+async function atualizarAposta(
+    codigo,
+    aposta
+) {
+
+    const selecoes =
+        Array.isArray(aposta.selecoes)
+
+            ? aposta.selecoes
+
+            : Object.values(
+                aposta.selecoes || {}
+            );
+
+
+    if (!selecoes.length) {
+
+        return;
+
+    }
+
+
+    let todosGanharam = true;
+
+    let algumPerdeu = false;
+
+    let existeAguardando = false;
+
+
+    const selecoesAtualizadas =
+        [];
+
+
+    for (
+        let i = 0;
+        i < selecoes.length;
+        i++
+    ) {
+
+        const selecao =
+            selecoes[i];
+
+
+        /*
+           Já ganhou/perdeu?
+           Mesmo assim tentamos localizar
+           o jogo para manter o placar atualizado.
+        */
+
+        let fixture = null;
+
+
+        /*
+           Se já temos fixtureId
+           usamos diretamente.
+        */
+
+        if (
+            selecao.apiFixtureId
+        ) {
+
+            try {
+
+                const resposta =
+                    await consultarAPI(
+                        "/fixtures",
+                        {
+                            id:
+                                selecao.apiFixtureId
+                        }
+                    );
+
+
+                fixture =
+                    resposta.response?.[0]
+                    || null;
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro fixture:",
+                    erro
+                );
+
+            }
+
+        }
+
+
+        /*
+           Se não temos ID,
+           procuramos pelos times/data.
+        */
+
+        if (!fixture) {
+
+            fixture =
+                await procurarFixture(
+                    selecao
+                );
+
+        }
+
+
+        /*
+           Jogo não encontrado.
+        */
+
+        if (!fixture) {
+
+            console.warn(
+                "JOGO NÃO ENCONTRADO:",
+                selecao
+            );
+
+
+            existeAguardando =
+                true;
+
+            todosGanharam =
+                false;
+
+
+            selecoesAtualizadas.push({
+
+                ...selecao,
+
+                resultado:
+                    "aguardando"
+
+            });
+
+
+            continue;
+
+        }
+
+
+        /*
+           Dados da API.
+        */
+
+        const apiFixtureId =
+            fixture.fixture?.id;
+
+
+        const apiTimeA =
+            fixture.teams?.home;
+
+
+        const apiTimeB =
+            fixture.teams?.away;
+
+
+        const golsA =
+            fixture.goals?.home;
+
+
+        const golsB =
+            fixture.goals?.away;
+
+
+        const status =
+            fixture.fixture?.status;
+
+
+        /*
+           Salva dados da API
+           dentro da seleção.
+        */
+
+        const selecaoComAPI = {
+
+            ...selecao,
+
+            apiFixtureId:
+                apiFixtureId,
+
+            apiTimeAId:
+                apiTimeA?.id ?? null,
+
+            apiTimeBId:
+                apiTimeB?.id ?? null,
+
+            apiTimeA:
+                apiTimeA?.name ?? null,
+
+            apiTimeB:
+                apiTimeB?.name ?? null,
+
+            apiStatus:
+                status?.short ?? null,
+
+            apiStatusLong:
+                status?.long ?? null
+
+        };
+
+
+        if (
+            golsA !== null &&
+            golsA !== undefined
+        ) {
+
+            selecaoComAPI.placarA =
+                Number(golsA);
+
+        }
+
+
+        if (
+            golsB !== null &&
+            golsB !== undefined
+        ) {
+
+            selecaoComAPI.placarB =
+                Number(golsB);
+
+        }
+
+
+        /*
+           Calcula resultado.
+        */
+
+        const resultado =
+            calcularResultadoSelecao(
+                selecaoComAPI,
+                fixture
+            );
+
+
+        selecaoComAPI.resultado =
+            resultado;
+
+
+        /*
+           Se terminou, marca.
+        */
+
+        if (
+            ["FT", "AET", "PEN"]
+                .includes(
+                    String(
+                        status?.short || ""
+                    ).toUpperCase()
+                )
+        ) {
+
+            selecaoComAPI.finalizado =
+                true;
+
+            if (
+                golsA !== null &&
+                golsB !== null
+            ) {
+
+                selecaoComAPI.resultadoPlacar =
+                    `${golsA}x${golsB}`;
+
+            }
+
+        }
+
+
+        if (
+            resultado === "perdeu"
+        ) {
+
+            algumPerdeu =
+                true;
+
+            todosGanharam =
+                false;
+
+        }
+
+
+        else if (
+            resultado === "aguardando"
+        ) {
+
+            existeAguardando =
+                true;
+
+            todosGanharam =
+                false;
+
+        }
+
+
+        selecoesAtualizadas.push(
+            selecaoComAPI
+        );
+
+    }
+
+
+    /*
+       =====================================================
+       RESULTADO DA APOSTA INTEIRA
+       =====================================================
+    */
+
+    let resultadoAposta =
+        "aguardando";
+
+
+    if (algumPerdeu) {
+
+        resultadoAposta =
+            "perdeu";
+
+    }
+
+    else if (
+        todosGanharam &&
+        !existeAguardando
+    ) {
+
+        resultadoAposta =
+            "ganhou";
+
+    }
+
+
+    /*
+       =====================================================
+       SALVAR NO FIREBASE
+       =====================================================
+    */
+
+    const dadosAposta = {
+
+        ...aposta,
+
+        selecoes:
+            selecoesAtualizadas,
+
+        resultado:
+            resultadoAposta,
+
+        status:
+            resultadoAposta,
+
+        apiAtualizadoEm:
+            new Date().toISOString()
+
+    };
+
+
+    await update(
+        ref(
+            db,
+            `apostas/${codigo}`
+        ),
+        {
+
+            selecoes:
+                selecoesAtualizadas,
+
+            resultado:
+                resultadoAposta,
+
+            status:
+                resultadoAposta,
+
+            apiAtualizadoEm:
+                dadosAposta.apiAtualizadoEm
+
+        }
+    );
+
+
+    /*
+       Atualiza memória local.
+    */
+
+    apostas[codigo] =
+        dadosAposta;
+
+
+    console.log(
+        `🎟️ APOSTA ${codigo}: ${resultadoAposta}`
+    );
+
+
+    return resultadoAposta;
+
+}
+
+
+/* =========================================================
+   ATUALIZAR TODOS OS JOGOS
+========================================================= */
+
+async function atualizarJogosAPI() {
+
+    console.log(
+        "🔄 Atualizando API-Football..."
+    );
+
+
+    const apostasLista =
+        Object.entries(
+            apostas || {}
+        );
+
+
+    /*
+       Primeiro atualiza os jogos cadastrados
+       no painel.
+    */
+
+    for (
+        const dia of dias
+    ) {
+
+        const listaJogos =
+            jogos[dia] || {};
+
+
+        for (
+            const [jogoId, jogo]
+            of Object.entries(listaJogos)
+        ) {
+
+            try {
+
+                const fixture =
+                    await procurarFixture(
+                        jogo
+                    );
+
+
+                if (!fixture) {
+
+                    console.warn(
+                        "⚠️ Jogo não encontrado:",
+                        jogo.timeA,
+                        "x",
+                        jogo.timeB
+                    );
+
+                    continue;
+
+                }
+
+
+                await salvarDadosFixture(
+                    dia,
+                    jogoId,
+                    jogo,
+                    fixture
+                );
+
+
+            } catch (erro) {
+
+                console.error(
+                    "Erro atualizando jogo:",
+                    jogo,
+                    erro
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /*
+       Depois atualiza as apostas.
+    */
+
+    for (
+        const [codigo, aposta]
+        of apostasLista
+    ) {
+
+        try {
+
+            await atualizarAposta(
+                codigo,
+                aposta
+            );
+
+        } catch (erro) {
+
+            console.error(
+                `Erro na aposta ${codigo}:`,
+                erro
+            );
+
+        }
+
+    }
+
+
+    /*
+       Recarrega os dados do Firebase
+       para a tela administrativa.
+    */
+
+    try {
+
+        await carregarJogos();
+
+        await carregarApostas();
+
+        atualizarResumo();
+
+        renderizarJogos();
+
+        renderizarApostas();
+
+    } catch (erro) {
+
+        console.error(
+            "Erro recarregando dados:",
+            erro
+        );
+
+    }
+
+
+    console.log(
+        "✅ API-Football atualizada."
+    );
+
+}
+
+
+/* =========================================================
+   INICIAR ATUALIZAÇÃO AUTOMÁTICA
+========================================================= */
+
+window.iniciarAtualizacaoAPI =
+    function () {
+
+        if (
+            atualizacaoAPIAtiva
+        ) {
+
+            console.log(
+                "API já está ativa."
+            );
+
+            return;
+
+        }
+
+
+        atualizacaoAPIAtiva =
+            true;
+
+
+        console.log(
+            "🚀 Atualização automática API iniciada."
+        );
+
+
+        /*
+           Executa imediatamente.
+        */
+
+        atualizarJogosAPI()
+            .catch(console.error);
+
+
+        /*
+           Depois continua automaticamente.
+        */
+
+        timerAPI =
+            setInterval(
+                () => {
+
+                    atualizarJogosAPI()
+                        .catch(console.error);
+
+                },
+                INTERVALO_API
+            );
+
+    };
+
+
+/* =========================================================
+   PARAR API
+========================================================= */
+
+window.pararAtualizacaoAPI =
+    function () {
+
+        if (timerAPI) {
+
+            clearInterval(
+                timerAPI
+            );
+
+            timerAPI =
+                null;
+
+        }
+
+
+        atualizacaoAPIAtiva =
+            false;
+
+
+        console.log(
+            "⛔ Atualização API parada."
+        );
+
+    };
+
+
+/* =========================================================
+   BOTÃO TESTAR API
+========================================================= */
+
+window.testarAPI =
+    async function () {
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            const dados =
+                await consultarAPI(
+                    "/fixtures",
+                    {
+                        date:
+                            new Date()
+                                .toISOString()
+                                .slice(0, 10),
+
+                        timezone:
+                            API_TIMEZONE
+                    }
+                );
+
+
+            console.log(
+                "RESPOSTA API:",
+                dados
+            );
+
+
+            alert(
+                "API-Football funcionando!\n\n" +
+                "Jogos encontrados: " +
+                (dados.response?.length || 0)
+            );
+
+
+        } catch (erro) {
+
+            console.error(erro);
+
+            alert(
+                "Erro na API-Football:\n\n" +
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   JOGADORES
+========================================================= */
+
+async function carregarJogadores() {
+
+    const snap =
+        await get(
+            ref(db, "jogadores")
+        );
+
+
+    jogadores =
+        snap.exists()
+            ? snap.val()
+            : {};
+
+}
+
+
+/* =========================================================
+   APOSTAS
+========================================================= */
+
+async function carregarApostas() {
+
+    const snap =
+        await get(
+            ref(db, "apostas")
+        );
+
+
+    apostas =
+        snap.exists()
+            ? snap.val()
+            : {};
+
+}
+
+
+/* =========================================================
+   JOGOS
+========================================================= */
+
+async function carregarJogos() {
+
+    jogos = {};
+
+
+    for (
+        const dia of dias
+    ) {
+
+        const snap =
+            await get(
+                ref(
+                    db,
+                    "jogos/" + dia
+                )
+            );
+
+
+        jogos[dia] =
+            snap.exists()
+                ? snap.val()
+                : {};
+
+    }
+
+}
+
+
+/* =========================================================
+   SOLICITAÇÕES
+========================================================= */
+
+function ouvirSolicitacoesSaldo() {
+
+    onValue(
+        ref(
+            db,
+            "solicitacoesSaldo"
+        ),
+
+        snap => {
+
+            solicitacoesSaldo =
+                snap.exists()
+                    ? snap.val()
+                    : {};
+
+
+            renderizarSolicitacoesSaldo();
+
+            atualizarBadgeSolicitacoes();
+
+        },
+
+        erro => {
+
+            console.error(
+                erro
+            );
+
+        }
+    );
+
+}
+
+
+function atualizarBadgeSolicitacoes() {
+
+    const quantidade =
+        Object.values(
+            solicitacoesSaldo || {}
+        )
+        .filter(
+            s =>
+                s?.status === "aguardando" ||
+                s?.status === "pendente"
+        )
+        .length;
+
+
+    const badge =
+        document.getElementById(
+            "badgeSolicitacoes"
+        );
+
+
+    if (!badge) return;
+
+
+    badge.textContent =
+        quantidade;
+
+
+    badge.style.display =
+        quantidade
+            ? "inline-block"
+            : "none";
+
+}
+
+
+/* =========================================================
+   CARREGAR TUDO
+========================================================= */
+
+window.carregarTudo =
+    async function () {
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await Promise.all([
+
+                carregarJogadores(),
+
+                carregarApostas(),
+
+                carregarJogos()
+
+            ]);
+
+
+            atualizarResumo();
+
+            renderizarJogadores();
+
+            renderizarApostas();
+
+            renderizarJogos();
+
+            renderizarSolicitacoesSaldo();
+
+            atualizarBadgeSolicitacoes();
+
+
+        } catch (erro) {
+
+            console.error(
+                erro
+            );
+
+
+            alert(
+                "Erro ao carregar dados:\n" +
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   RESUMO
+========================================================= */
+
+function atualizarResumo() {
+
+    const listaJogadores =
+        Object.values(
+            jogadores || {}
+        );
+
+
+    const listaApostas =
+        Object.values(
+            apostas || {}
+        );
+
+
+    document.getElementById(
+        "totalJogadores"
+    ).textContent =
+        listaJogadores.length;
+
+
+    document.getElementById(
+        "jogadoresLiberados"
+    ).textContent =
+        listaJogadores.filter(
+            j =>
+                j.status !==
+                "bloqueado"
+        ).length;
+
+
+    document.getElementById(
+        "totalApostas"
+    ).textContent =
+        listaApostas.length;
+
+
+    let total =
+        0;
+
+
+    listaApostas.forEach(
+        aposta => {
+
+            total +=
+                valorNumerico(
+                    aposta.valorUnico ??
+                    aposta.valor
+                );
+
+        }
+    );
+
+
+    document.getElementById(
+        "valorApostado"
+    ).textContent =
+        dinheiro(total);
+
+}
+
+
+/* =========================================================
+   RENDERIZAR JOGADORES
+========================================================= */
+
+window.renderizarJogadores =
+    function () {
+
+        const tabela =
+            document.getElementById(
+                "tabelaJogadores"
+            );
+
+
+        if (!tabela) return;
+
+
+        const busca =
+            (
+                document.getElementById(
+                    "buscaJogador"
+                )?.value || ""
+            )
+            .toLowerCase()
+            .trim();
+
+
+        tabela.innerHTML = "";
+
+
+        Object.entries(
+            jogadores || {}
+        )
+        .filter(
+            ([id, jogador]) => {
+
+                const nome =
+                    String(
+                        jogador.nome ||
+                        jogador.name ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                return (
+                    !busca ||
+
+                    nome.includes(
+                        busca
+                    ) ||
+
+                    id.toLowerCase()
+                        .includes(busca)
+                );
+
+            }
+        )
+        .forEach(
+            ([id, jogador]) => {
+
+                const saldo =
+                    valorNumerico(
+                        jogador.saldo
+                    );
+
+
+                const valorLiberar =
+                    valorNumerico(
+                        jogador.valorLiberado ??
+                        jogador.valorLiberar
+                    );
+
+
+                const bloqueado =
+                    jogador.status ===
+                    "bloqueado";
+
+
+                const tr =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                tr.innerHTML = `
+
+<td>
+
+<strong>
+${escapar(
+    jogador.nome ||
+    jogador.name ||
+    "Sem nome"
+)}
+</strong>
+
+<br>
+
+<small>
+ID: ${escapar(id)}
+</small>
+
+</td>
+
+<td>
+<strong>
+${dinheiro(saldo)}
+</strong>
+</td>
+
+<td>
+<strong
+style="color:${valorLiberar > 0 ? "#00a000" : "#777"}">
+
+${dinheiro(valorLiberar)}
+
+</strong>
+</td>
+
+<td>
+
+<span class="status ${
+    bloqueado
+        ? "bloqueado"
+        : "liberado"
+}">
+
+${
+    bloqueado
+        ? "Bloqueado"
+        : "Liberado"
+}
+
+</span>
+
+</td>
+
+<td>
+
+<button
+class="btn btn-azul"
+onclick="editarJogador('${escapar(id)}')">
+
+✏️ Editar
+
+</button>
+
+${
+valorLiberar > 0
+
+? `
+
+<button
+class="btn btn-verde"
+onclick="liberarValorDireto('${escapar(id)}')">
+
+💸 Liberar ${dinheiro(valorLiberar)}
+
+</button>
+
+`
+
+: ""
+
+}
+
+<button
+class="btn ${
+    bloqueado
+        ? "btn-verde"
+        : "btn-vermelho"
+}"
+onclick="alterarStatusJogador(
+'${escapar(id)}',
+'${bloqueado ? "liberado" : "bloqueado"}'
+)">
+
+${
+    bloqueado
+        ? "🟢 Liberar"
+        : "🔴 Bloquear"
+}
+
+</button>
+
+<button
+class="btn btn-laranja"
+onclick="alterarSaldo('${escapar(id)}')">
+
+💰 Saldo
+
+</button>
+
+<button
+class="btn btn-vermelho"
+onclick="excluirJogador('${escapar(id)}')">
+
+🗑️
+
+</button>
+
+</td>
+
+`;
+
+
+                tabela.appendChild(
+                    tr
+                );
+
+            }
+        );
+
+    };
+
+
+/* =========================================================
+   EDITAR JOGADOR
+========================================================= */
+
+window.editarJogador =
+    function (id) {
+
+        const jogador =
+            jogadores[id];
+
+
+        if (!jogador) return;
+
+
+        document.getElementById(
+            "editarJogadorId"
+        ).value = id;
+
+
+        document.getElementById(
+            "editarJogadorNome"
+        ).value =
+            jogador.nome ||
+            jogador.name ||
+            "";
+
+
+        document.getElementById(
+            "editarJogadorSaldo"
+        ).value =
+            valorNumerico(
+                jogador.saldo
+            );
+
+
+        document.getElementById(
+            "editarJogadorValorLiberar"
+        ).value =
+            valorNumerico(
+                jogador.valorLiberado ??
+                jogador.valorLiberar
+            );
+
+
+        document.getElementById(
+            "editarJogadorStatus"
+        ).value =
+            jogador.status ===
+            "bloqueado"
+                ? "bloqueado"
+                : "liberado";
+
+
+        document.getElementById(
+            "modalJogador"
+        ).style.display =
+            "flex";
+
+    };
+
+
+/* =========================================================
+   SALVAR JOGADOR
+========================================================= */
+
+window.salvarJogador =
+    async function () {
+
+        const id =
+            document.getElementById(
+                "editarJogadorId"
+            ).value;
+
+
+        if (
+            !id ||
+            !jogadores[id]
+        ) return;
+
+
+        const nome =
+            document.getElementById(
+                "editarJogadorNome"
+            ).value.trim();
+
+
+        const saldo =
+            valorNumerico(
+                document.getElementById(
+                    "editarJogadorSaldo"
+                ).value
+            );
+
+
+        const valorLiberado =
+            valorNumerico(
+                document.getElementById(
+                    "editarJogadorValorLiberar"
+                ).value
+            );
+
+
+        const status =
+            document.getElementById(
+                "editarJogadorStatus"
+            ).value;
+
+
+        if (!nome) {
+
+            alert(
+                "Digite o nome."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" + id
+                ),
+                {
+                    nome,
+                    saldo,
+                    valorLiberado,
+                    status
+                }
+            );
+
+
+            jogadores[id] = {
+
+                ...jogadores[id],
+
+                nome,
+
+                saldo,
+
+                valorLiberado,
+
+                status
+
+            };
+
+
+            fecharModal(
+                "modalJogador"
+            );
+
+
+            renderizarJogadores();
+
+            atualizarResumo();
+
+
+            alert(
+                "Jogador atualizado!"
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   LIBERAR VALOR
+========================================================= */
+
+async function liberarValor(
+    id,
+    valor
+) {
+
+    const jogador =
+        jogadores[id];
+
+
+    if (!jogador)
+        return false;
+
+
+    const saldoAtual =
+        valorNumerico(
+            jogador.saldo
+        );
+
+
+    const novoSaldo =
+        saldoAtual + valor;
+
+
+    await update(
+        ref(
+            db,
+            "jogadores/" + id
+        ),
+        {
+            saldo:
+                novoSaldo
+        }
+    );
+
+
+    jogadores[id] = {
+
+        ...jogador,
+
+        saldo:
+            novoSaldo
+
+    };
+
+
+    return novoSaldo;
+
+}
+
+
+window.liberarValorJogador =
+    async function () {
+
+        const id =
+            document.getElementById(
+                "editarJogadorId"
+            ).value;
+
+
+        const jogador =
+            jogadores[id];
+
+
+        if (!jogador) return;
+
+
+        const valor =
+            valorNumerico(
+                document.getElementById(
+                    "editarJogadorValorLiberar"
+                ).value
+            );
+
+
+        if (valor <= 0) {
+
+            alert(
+                "Digite um valor."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "Liberar " +
+                dinheiro(valor) +
+                " para " +
+                (
+                    jogador.nome ||
+                    "jogador"
+                ) +
+                "?"
+            )
+        ) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            const novoSaldo =
+                await liberarValor(
+                    id,
+                    valor
+                );
+
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" + id
+                ),
+                {
+                    valorLiberado:
+                        0
+                }
+            );
+
+
+            jogadores[id].valorLiberado =
+                0;
+
+
+            document.getElementById(
+                "editarJogadorSaldo"
+            ).value =
+                novoSaldo;
+
+
+            document.getElementById(
+                "editarJogadorValorLiberar"
+            ).value =
+                0;
+
+
+            renderizarJogadores();
+
+
+            alert(
+                "Valor liberado!\n\n" +
+                "Novo saldo: " +
+                dinheiro(novoSaldo)
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+window.liberarValorDireto =
+    async function (id) {
+
+        const jogador =
+            jogadores[id];
+
+
+        if (!jogador) return;
+
+
+        const valor =
+            valorNumerico(
+                jogador.valorLiberado ??
+                jogador.valorLiberar
+            );
+
+
+        if (valor <= 0) return;
+
+
+        if (
+            !confirm(
+                "Liberar " +
+                dinheiro(valor) +
+                " para " +
+                (
+                    jogador.nome ||
+                    "jogador"
+                ) +
+                "?"
+            )
+        ) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            const novoSaldo =
+                await liberarValor(
+                    id,
+                    valor
+                );
+
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" + id
+                ),
+                {
+                    valorLiberado:
+                        0
+                }
+            );
+
+
+            jogadores[id].valorLiberado =
+                0;
+
+
+            renderizarJogadores();
+
+
+            atualizarResumo();
+
+
+            alert(
+                "Valor liberado!\n\n" +
+                "Novo saldo: " +
+                dinheiro(novoSaldo)
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   STATUS JOGADOR
+========================================================= */
+
+window.alterarStatusJogador =
+    async function (
+        id,
+        status
+    ) {
+
+        const jogador =
+            jogadores[id];
+
+
+        if (!jogador) return;
+
+
+        if (
+            !confirm(
+                `Deseja ${
+                    status === "bloqueado"
+                        ? "bloquear"
+                        : "liberar"
+                } ${jogador.nome || ""}?`
+            )
+        ) return;
+
+
+        try {
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" + id
+                ),
+                {
+                    status
+                }
+            );
+
+
+            jogadores[id].status =
+                status;
+
+
+            renderizarJogadores();
+
+            atualizarResumo();
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   ALTERAR SALDO
+========================================================= */
+
+window.alterarSaldo =
+    async function (id) {
+
+        const jogador =
+            jogadores[id];
+
+
+        if (!jogador) return;
+
+
+        const atual =
+            valorNumerico(
+                jogador.saldo
+            );
+
+
+        const resposta =
+            prompt(
+                "Novo saldo:\n\n" +
+                "Saldo atual: " +
+                dinheiro(atual)
+            );
+
+
+        if (resposta === null)
+            return;
+
+
+        const novoSaldo =
+            valorNumerico(
+                resposta
+            );
+
+
+        if (novoSaldo < 0) {
+
+            alert(
+                "Saldo inválido."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" + id
+                ),
+                {
+                    saldo:
+                        novoSaldo
+                }
+            );
+
+
+            jogadores[id].saldo =
+                novoSaldo;
+
+
+            renderizarJogadores();
+
+            atualizarResumo();
+
+
+            alert(
+                "Saldo atualizado."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   EXCLUIR JOGADOR
+========================================================= */
+
+window.excluirJogador =
+    async function (id) {
+
+        const jogador =
+            jogadores[id];
+
+
+        if (
+            !jogador ||
+            !confirm(
+                "Excluir " +
+                (
+                    jogador.nome ||
+                    "jogador"
+                ) +
+                "?"
+            )
+        ) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await remove(
+                ref(
+                    db,
+                    "jogadores/" + id
+                )
+            );
+
+
+            delete jogadores[id];
+
+
+            renderizarJogadores();
+
+            atualizarResumo();
+
+
+            alert(
+                "Jogador excluído."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   SOLICITAÇÕES
+========================================================= */
+
+window.renderizarSolicitacoesSaldo =
+    function () {
+
+        const container =
+            document.getElementById(
+                "listaSolicitacoes"
+            );
+
+
+        if (!container)
+            return;
+
+
+        container.innerHTML = "";
+
+
+        const lista =
+            Object.entries(
+                solicitacoesSaldo || {}
+            )
+            .filter(
+                ([id, solicitacao]) =>
+                    solicitacao &&
+                    [
+                        "aguardando",
+                        "pendente"
+                    ].includes(
+                        String(
+                            solicitacao.status ||
+                            "aguardando"
+                        )
+                    )
+            )
+            .reverse();
+
+
+        if (!lista.length) {
+
+            container.innerHTML =
+                `
+                <div class="formulario">
+
+                <strong>
+                ✅ Nenhuma solicitação de saldo pendente.
+                </strong>
+
+                </div>
+                `;
+
+            return;
+
+        }
+
+
+        lista.forEach(
+            ([id, solicitacao]) => {
+
+                const valor =
+                    valorNumerico(
+                        solicitacao.valorSolicitado ??
+                        solicitacao.valor
+                    );
+
+
+                const jogadorId =
+                    solicitacao.jogadorId ||
+                    solicitacao.usuarioId ||
+                    solicitacao.uid ||
+                    "";
+
+
+                const jogador =
+                    jogadores[jogadorId];
+
+
+                const nome =
+                    solicitacao.nome ||
+                    solicitacao.jogadorNome ||
+                    jogador?.nome ||
+                    "Jogador";
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "solicitacao-card";
+
+
+                card.innerHTML = `
+
+<div style="
+display:flex;
+justify-content:space-between;
+gap:5px;
+flex-wrap:wrap
+">
+
+<strong>
+💰 Solicitação de saldo
+</strong>
+
+<span class="status pendente">
+AGUARDANDO
+</span>
+
+</div>
+
+<p>
+👤 Jogador:
+<strong>
+${escapar(nome)}
+</strong>
+</p>
+
+<p>
+🆔 ID:
+<strong>
+${escapar(jogadorId)}
+</strong>
+</p>
+
+<div class="solicitacao-valor">
+
+${dinheiro(valor)}
+
+</div>
+
+<small>
+
+📅 ${escapar(
+    solicitacao.data || ""
+)}
+
+${
+    solicitacao.hora
+        ? " ⏰ " +
+          escapar(
+              solicitacao.hora
+          )
+        : ""
+}
+
+</small>
+
+<div class="solicitacao-acoes">
+
+<button
+class="btn btn-verde"
+onclick="aprovarSolicitacaoSaldo('${escapar(id)}')">
+
+💰 Liberar ${dinheiro(valor)}
+
+</button>
+
+<button
+class="btn btn-vermelho"
+onclick="recusarSolicitacaoSaldo('${escapar(id)}')">
+
+❌ Recusar
+
+</button>
+
+</div>
+
+`;
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    };
+
+
+window.aprovarSolicitacaoSaldo =
+    async function (id) {
+
+        const solicitacao =
+            solicitacoesSaldo[id];
+
+
+        if (!solicitacao)
+            return;
+
+
+        const valor =
+            valorNumerico(
+                solicitacao.valorSolicitado ??
+                solicitacao.valor
+            );
+
+
+        const jogadorId =
+            solicitacao.jogadorId ||
+            solicitacao.usuarioId ||
+            solicitacao.uid;
+
+
+        if (valor <= 0) {
+
+            alert(
+                "Valor solicitado inválido."
+            );
+
+            return;
+
+        }
+
+
+        if (!jogadorId) {
+
+            alert(
+                "A solicitação não possui jogadorId."
+            );
+
+            return;
+
+        }
+
+
+        const jogador =
+            jogadores[jogadorId];
+
+
+        if (!jogador) {
+
+            alert(
+                "Jogador não encontrado."
+            );
+
+            return;
+
+        }
+
+
+        const saldo =
+            valorNumerico(
+                jogador.saldo
+            );
+
+
+        const novoSaldo =
+            saldo + valor;
+
+
+        if (
+            !confirm(
+                "CONFIRMAR LIBERAÇÃO\n\n" +
+                "Jogador: " +
+                (
+                    jogador.nome ||
+                    "Jogador"
+                ) +
+                "\nValor: " +
+                dinheiro(valor) +
+                "\nSaldo atual: " +
+                dinheiro(saldo) +
+                "\nNovo saldo: " +
+                dinheiro(novoSaldo)
+            )
+        ) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await update(
+                ref(
+                    db,
+                    "jogadores/" +
+                    jogadorId
+                ),
+                {
+                    saldo:
+                        novoSaldo
+                }
+            );
+
+
+            await update(
+                ref(
+                    db,
+                    "solicitacoesSaldo/" +
+                    id
+                ),
+                {
+
+                    status:
+                        "atendido",
+
+                    valorAtendido:
+                        valor,
+
+                    atendidoEm:
+                        new Date()
+                            .toISOString(),
+
+                    saldoAnterior:
+                        saldo,
+
+                    saldoNovo:
+                        novoSaldo
+
+                }
+            );
+
+
+            jogadores[jogadorId] = {
+
+                ...jogador,
+
+                saldo:
+                    novoSaldo
+
+            };
+
+
+            solicitacoesSaldo[id] = {
+
+                ...solicitacao,
+
+                status:
+                    "atendido"
+
+            };
+
+
+            renderizarSolicitacoesSaldo();
+
+            renderizarJogadores();
+
+            atualizarResumo();
+
+            atualizarBadgeSolicitacoes();
+
+
+            alert(
+                "Saldo liberado com sucesso!"
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                "Erro:\n" +
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+window.recusarSolicitacaoSaldo =
+    async function (id) {
+
+        if (
+            !confirm(
+                "Deseja recusar esta solicitação?"
+            )
+        ) return;
+
+
+        try {
+
+            await update(
+                ref(
+                    db,
+                    "solicitacoesSaldo/" +
+                    id
+                ),
+                {
+
+                    status:
+                        "cancelado",
+
+                    recusadoEm:
+                        new Date()
+                            .toISOString()
+
+                }
+            );
+
+
+            solicitacoesSaldo[id] = {
+
+                ...solicitacoesSaldo[id],
+
+                status:
+                    "cancelado"
+
+            };
+
+
+            renderizarSolicitacoesSaldo();
+
+            atualizarBadgeSolicitacoes();
+
+
+            alert(
+                "Solicitação recusada."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   RENDERIZAR APOSTAS
+========================================================= */
+
+window.renderizarApostas =
+    function () {
+
+        const container =
+            document.getElementById(
+                "listaApostas"
+            );
+
+
+        if (!container)
+            return;
+
+
+        const busca =
+            (
+                document.getElementById(
+                    "buscaAposta"
+                )?.value || ""
+            )
+            .toLowerCase()
+            .trim();
+
+
+        container.innerHTML = "";
+
+
+        const lista =
+            Object.entries(
+                apostas || {}
+            )
+            .reverse()
+            .filter(
+                ([codigo, aposta]) => {
+
+                    const texto =
+                        (
+                            codigo +
+                            " " +
+                            (
+                                aposta.nome ||
+                                aposta.jogadorNome ||
+                                ""
+                            )
+                        )
+                        .toLowerCase();
+
+
+                    return (
+                        !busca ||
+                        texto.includes(busca)
+                    );
+
+                }
+            );
+
+
+        if (!lista.length) {
+
+            container.innerHTML =
+                "<p>Nenhuma aposta encontrada.</p>";
+
+            return;
+
+        }
+
+
+        lista.forEach(
+            ([codigo, aposta]) => {
+
+                const selecoes =
+                    Array.isArray(
+                        aposta.selecoes
+                    )
+
+                    ?
+
+                    aposta.selecoes
+
+                    :
+
+                    Object.values(
+                        aposta.selecoes || {}
+                    );
+
+
+                const resultado =
+                    aposta.resultado ||
+                    aposta.status ||
+                    "aguardando";
+
+
+                let classeStatus =
+                    "aguardando";
+
+
+                let textoStatus =
+                    "AGUARDANDO";
+
+
+                if (
+                    resultado === "ganhou"
+                ) {
+
+                    classeStatus =
+                        "liberado";
+
+                    textoStatus =
+                        "GANHOU";
+
+                }
+
+
+                if (
+                    resultado === "perdeu"
+                ) {
+
+                    classeStatus =
+                        "bloqueado";
+
+                    textoStatus =
+                        "PERDEU";
+
+                }
+
+
+                let jogosHTML =
+                    "";
+
+
+                selecoes.forEach(
+                    (selecao, indice) => {
+
+                        const resultadoSelecao =
+                            selecao.resultado ||
+                            "aguardando";
+
+
+                        let cor =
+                            "#777";
+
+
+                        if (
+                            resultadoSelecao ===
+                            "ganhou"
+                        ) {
+
+                            cor =
+                                "#00a000";
+
+                        }
+
+
+                        if (
+                            resultadoSelecao ===
+                            "perdeu"
+                        ) {
+
+                            cor =
+                                "#d00000";
+
+                        }
+
+
+                        const placar =
+                            (
+                                selecao.placarA !==
+                                undefined &&
+
+                                selecao.placarB !==
+                                undefined
+                            )
+
+                            ?
+
+                            `⚽ ${selecao.placarA} × ${selecao.placarB}`
+
+                            :
+
+                            "⚽ Placar aguardando API";
+
+
+                        jogosHTML += `
+
+<div class="aposta-jogo">
+
+<strong>
+
+${indice + 1}.
+${escapar(
+    selecao.timeA ||
+    "Time A"
+)}
+
+×
+
+${escapar(
+    selecao.timeB ||
+    "Time B"
+)}
+
+</strong>
+
+<br>
+
+🏆
+${escapar(
+    selecao.campeonato ||
+    "Campeonato"
+)}
+
+<br>
+
+📅
+${escapar(
+    selecao.data ||
+    ""
+)}
+
+⏰
+${escapar(
+    selecao.hora ||
+    ""
+)}
+
+<br>
+
+🎯 Palpite:
+<strong>
+${escapar(
+    selecao.escolha ||
+    ""
+)}
+</strong>
+
+<br>
+
+${placar}
+
+<br>
+
+Resultado:
+
+<strong
+style="color:${cor}">
+
+${
+    resultadoSelecao === "ganhou"
+        ? "✅ GANHOU"
+        : resultadoSelecao === "perdeu"
+        ? "❌ PERDEU"
+        : "⏳ AGUARDANDO"
+}
+
+</strong>
+
+<br>
+
+<small>
+
+API:
+${
+    escapar(
+        selecao.apiStatusLong ||
+        selecao.apiStatus ||
+        "Não encontrado"
+    )
+}
+
+</small>
+
+</div>
+
+`;
+
+                    });
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "aposta-card";
+
+
+                card.innerHTML = `
+
+<div class="aposta-cabecalho">
+
+<div>
+
+🎟️ Código:
+<strong>
+${escapar(codigo)}
+</strong>
+
+</div>
+
+<div>
+
+<span class="status ${classeStatus}">
+
+${textoStatus}
+
+</span>
+
+</div>
+
+</div>
+
+<p>
+
+👤 Jogador:
+<strong>
+${escapar(
+    aposta.nome ||
+    aposta.jogadorNome ||
+    "Não informado"
+)}
+</strong>
+
+</p>
+
+${jogosHTML}
+
+<div class="aposta-resumo">
+
+💰 Valor:
+${dinheiro(
+    aposta.valorUnico ??
+    aposta.valor
+)}
+
+<br>
+
+🎯 Jogos:
+${aposta.quantidadeJogos ||
+    selecoes.length}
+
+<br>
+
+💵 Possível retorno:
+${dinheiro(
+    aposta.possivelRetorno
+)}
+
+<br>
+
+📊 Resultado:
+<strong>
+${textoStatus}
+</strong>
+
+</div>
+
+<button
+class="btn btn-vermelho"
+onclick="excluirAposta('${escapar(codigo)}')">
+
+🗑️ Excluir aposta
+
+</button>
+
+`;
+
+
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    };
+
+
+window.excluirAposta =
+    async function (codigo) {
+
+        if (
+            !confirm(
+                "Deseja excluir esta aposta?"
+            )
+        ) return;
+
+
+        try {
+
+            await remove(
+                ref(
+                    db,
+                    "apostas/" +
+                    codigo
+                )
+            );
+
+
+            delete apostas[codigo];
+
+
+            renderizarApostas();
+
+            atualizarResumo();
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   RENDERIZAR JOGOS
+========================================================= */
+
+window.renderizarJogos =
+    function () {
+
+        const container =
+            document.getElementById(
+                "listaJogos"
+            );
+
+
+        if (!container)
+            return;
+
+
+        const filtro =
+            document.getElementById(
+                "filtroDiaJogos"
+            ).value;
+
+
+        container.innerHTML = "";
+
+
+        dias.forEach(
+            dia => {
+
+                if (
+                    filtro &&
+                    filtro !== dia
+                ) return;
+
+
+                Object.entries(
+                    jogos[dia] || {}
+                )
+                .forEach(
+                    ([id, jogo]) => {
+
+                        const placarA =
+                            jogo.placarA ??
+                            "-";
+
+
+                        const placarB =
+                            jogo.placarB ??
+                            "-";
+
+
+                        const apiStatus =
+                            jogo.apiStatus ||
+                            "Não localizado";
+
+
+                        const finalizado =
+                            jogo.finalizado ===
+                            true;
+
+
+                        const card =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        card.className =
+                            "jogo-admin";
+
+
+                        card.innerHTML = `
+
+<div class="jogo-topo">
+
+<strong>
+${escapar(dia)}
+</strong>
+
+<span>
+
+${escapar(
+    jogo.campeonato ||
+    "Campeonato"
+)}
+
+</span>
+
+</div>
+
+<div class="jogo-times">
+
+<div class="time-admin">
+
+<img
+src="${escapar(
+    jogo.imagemA ||
+    "https://via.placeholder.com/55"
+)}"
+
+onerror="
+this.src='https://via.placeholder.com/55'
+">
+
+<strong>
+
+${escapar(
+    jogo.timeA ||
+    "Time A"
+)}
+
+</strong>
+
+</div>
+
+
+<div class="placar">
+
+${placarA}
+×
+${placarB}
+
+</div>
+
+
+<div class="time-admin">
+
+<img
+src="${escapar(
+    jogo.imagemB ||
+    "https://via.placeholder.com/55"
+)}"
+
+onerror="
+this.src='https://via.placeholder.com/55'
+">
+
+<strong>
+
+${escapar(
+    jogo.timeB ||
+    "Time B"
+)}
+
+</strong>
+
+</div>
+
+</div>
+
+
+<p style="text-align:center">
+
+📅
+${escapar(
+    jogo.data ||
+    ""
+)}
+
+⏰
+${escapar(
+    jogo.hora ||
+    ""
+)}
+
+<br>
+
+🌎
+${escapar(
+    jogo.pais ||
+    ""
+)}
+
+<br>
+
+📡 API:
+<strong>
+
+${escapar(
+    jogo.apiStatusLong ||
+    apiStatus
+)}
+
+</strong>
+
+<br>
+
+${
+    finalizado
+
+    ?
+
+    '<span class="status liberado">✅ FINALIZADO PELA API</span>'
+
+    :
+
+    '<span class="status aguardando">⏳ AGUARDANDO RESULTADO</span>'
+}
+
+</p>
+
+
+<div class="jogo-acoes">
+
+<button
+class="btn btn-azul"
+onclick="editarJogo(
+'${dia}',
+'${escapar(id)}'
+)">
+
+✏️ Editar
+
+</button>
+
+
+<button
+class="btn btn-verde"
+onclick="atualizarJogoIndividual(
+'${dia}',
+'${escapar(id)}'
+)">
+
+🔄 Atualizar API
+
+</button>
+
+
+<button
+class="btn btn-vermelho"
+onclick="excluirJogo(
+'${dia}',
+'${escapar(id)}'
+)">
+
+🗑️ Excluir
+
+</button>
+
+</div>
+
+`;
+
+
+                        container.appendChild(
+                            card
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        if (
+            !container.children.length
+        ) {
+
+            container.innerHTML =
+                "<p>Nenhum jogo cadastrado.</p>";
+
+        }
+
+    };
+
+
+/* =========================================================
+   ATUALIZAR JOGO INDIVIDUAL
+========================================================= */
+
+window.atualizarJogoIndividual =
+    async function (
+        dia,
+        id
+    ) {
+
+        const jogo =
+            jogos[dia]?.[id];
+
+
+        if (!jogo) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            const fixture =
+                await procurarFixture(
+                    jogo
+                );
+
+
+            if (!fixture) {
+
+                alert(
+                    "A API não encontrou:\n\n" +
+                    jogo.timeA +
+                    " x " +
+                    jogo.timeB +
+                    "\n\n" +
+                    "Verifique a data e os nomes dos times."
+                );
+
+
+                return;
+
+            }
+
+
+            await salvarDadosFixture(
+                dia,
+                id,
+                jogo,
+                fixture
+            );
+
+
+            /*
+               Atualiza apostas depois de
+               atualizar o jogo.
+            */
+
+            for (
+                const [codigo, aposta]
+                of Object.entries(
+                    apostas || {}
+                )
+            ) {
+
+                await atualizarAposta(
+                    codigo,
+                    aposta
+                );
+
+            }
+
+
+            await carregarJogos();
+
+            await carregarApostas();
+
+
+            renderizarJogos();
+
+            renderizarApostas();
+
+
+            alert(
+                "Jogo atualizado pela API!\n\n" +
+
+                fixture.teams.home.name +
+
+                " " +
+
+                (
+                    fixture.goals.home ??
+                    0
+                ) +
+
+                " × " +
+
+                (
+                    fixture.goals.away ??
+                    0
+                ) +
+
+                " " +
+
+                fixture.teams.away.name
+            );
+
+
+        } catch (erro) {
+
+            console.error(
+                erro
+            );
+
+
+            alert(
+                "Erro ao atualizar:\n\n" +
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   EDITAR JOGO
+========================================================= */
+
+window.editarJogo =
+    function (
+        dia,
+        id
+    ) {
+
+        const jogo =
+            jogos[dia]?.[id];
+
+
+        if (!jogo) return;
+
+
+        document.getElementById(
+            "editarJogoDia"
+        ).value =
+            dia;
+
+
+        document.getElementById(
+            "editarJogoId"
+        ).value =
+            id;
+
+
+        document.getElementById(
+            "editarCampeonato"
+        ).value =
+            jogo.campeonato || "";
+
+
+        document.getElementById(
+            "editarPais"
+        ).value =
+            jogo.pais || "";
+
+
+        document.getElementById(
+            "editarData"
+        ).value =
+            jogo.data || "";
+
+
+        document.getElementById(
+            "editarHora"
+        ).value =
+            jogo.hora || "";
+
+
+        document.getElementById(
+            "editarTimeA"
+        ).value =
+            jogo.timeA || "";
+
+
+        document.getElementById(
+            "editarImagemA"
+        ).value =
+            jogo.imagemA || "";
+
+
+        document.getElementById(
+            "editarTimeB"
+        ).value =
+            jogo.timeB || "";
+
+
+        document.getElementById(
+            "editarImagemB"
+        ).value =
+            jogo.imagemB || "";
+
+
+        document.getElementById(
+            "editarCasa"
+        ).value =
+            jogo.cotacoes?.casa ||
+            1.5;
+
+
+        document.getElementById(
+            "editarEmpate"
+        ).value =
+            jogo.cotacoes?.empate ||
+            2.5;
+
+
+        document.getElementById(
+            "editarFora"
+        ).value =
+            jogo.cotacoes?.fora ||
+            2.5;
+
+
+        document.getElementById(
+            "editarAmbas"
+        ).value =
+            jogo.cotacoes?.ambasMarcam ||
+            2.5;
+
+
+        document.getElementById(
+            "editarPlacarA"
+        ).value =
+            jogo.placarA ??
+            "";
+
+
+        document.getElementById(
+            "editarPlacarB"
+        ).value =
+            jogo.placarB ??
+            "";
+
+
+        document.getElementById(
+            "modalJogo"
+        ).style.display =
+            "flex";
+
+    };
+
+
+/* =========================================================
+   SALVAR JOGO
+========================================================= */
+
+window.salvarJogo =
+    async function () {
+
+        const dia =
+            document.getElementById(
+                "editarJogoDia"
+            ).value;
+
+
+        const id =
+            document.getElementById(
+                "editarJogoId"
+            ).value;
+
+
+        const jogo =
+            jogos[dia]?.[id];
+
+
+        if (!jogo) return;
+
+
+        const novoJogo = {
+
+            ...jogo,
+
+            campeonato:
+                document.getElementById(
+                    "editarCampeonato"
+                ).value.trim(),
+
+            pais:
+                document.getElementById(
+                    "editarPais"
+                ).value.trim(),
+
+            data:
+                document.getElementById(
+                    "editarData"
+                ).value,
+
+            hora:
+                document.getElementById(
+                    "editarHora"
+                ).value,
+
+            timeA:
+                document.getElementById(
+                    "editarTimeA"
+                ).value.trim(),
+
+            imagemA:
+                document.getElementById(
+                    "editarImagemA"
+                ).value.trim(),
+
+            timeB:
+                document.getElementById(
+                    "editarTimeB"
+                ).value.trim(),
+
+            imagemB:
+                document.getElementById(
+                    "editarImagemB"
+                ).value.trim(),
+
+            cotacoes: {
+
+                casa:
+                    Number(
+                        document.getElementById(
+                            "editarCasa"
+                        ).value
+                    ) || 1.5,
+
+                empate:
+                    Number(
+                        document.getElementById(
+                            "editarEmpate"
+                        ).value
+                    ) || 2.5,
+
+                fora:
+                    Number(
+                        document.getElementById(
+                            "editarFora"
+                        ).value
+                    ) || 2.5,
+
+                ambasMarcam:
+                    Number(
+                        document.getElementById(
+                            "editarAmbas"
+                        ).value
+                    ) || 2.5
+
+            }
+
+        };
+
+
+        /*
+           NÃO usamos mais o placar digitado
+           como resultado oficial.
+
+           A API será responsável.
+        */
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await set(
+                ref(
+                    db,
+                    `jogos/${dia}/${id}`
+                ),
+                novoJogo
+            );
+
+
+            jogos[dia][id] =
+                novoJogo;
+
+
+            fecharModal(
+                "modalJogo"
+            );
+
+
+            renderizarJogos();
+
+
+            alert(
+                "Jogo salvo.\n\n" +
+                "O placar oficial será buscado pela API-Football."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   DESATIVAR PLACAR MANUAL
+========================================================= */
+
+window.definirPlacar =
+    function () {
+
+        alert(
+            "O placar agora é automático.\n\n" +
+            "A API-Football irá buscar o resultado oficial."
+        );
+
+    };
+
+
+/* =========================================================
+   EXCLUIR JOGO
+========================================================= */
+
+window.excluirJogo =
+    async function (
+        dia,
+        id
+    ) {
+
+        const jogo =
+            jogos[dia]?.[id];
+
+
+        if (
+            !jogo ||
+            !confirm(
+                "Excluir " +
+                (
+                    jogo.timeA ||
+                    ""
+                ) +
+                " x " +
+                (
+                    jogo.timeB ||
+                    ""
+                ) +
+                "?"
+            )
+        ) return;
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            await remove(
+                ref(
+                    db,
+                    `jogos/${dia}/${id}`
+                )
+            );
+
+
+            delete jogos[dia][id];
+
+
+            renderizarJogos();
+
+
+            alert(
+                "Jogo excluído."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   CRIAR NOVO JOGO
+========================================================= */
+
+window.criarNovoJogo =
+    async function () {
+
+        const dia =
+            document.getElementById(
+                "novoDia"
+            ).value;
+
+
+        const jogo = {
+
+            campeonato:
+                document.getElementById(
+                    "novoCampeonato"
+                ).value.trim()
+                ||
+                "Campeonato",
+
+            pais:
+                document.getElementById(
+                    "novoPais"
+                ).value.trim(),
+
+            data:
+                document.getElementById(
+                    "novoData"
+                ).value,
+
+            hora:
+                document.getElementById(
+                    "novoHora"
+                ).value,
+
+            timeA:
+                document.getElementById(
+                    "novoTimeA"
+                ).value.trim(),
+
+            imagemA:
+                document.getElementById(
+                    "novoImagemA"
+                ).value.trim(),
+
+            timeB:
+                document.getElementById(
+                    "novoTimeB"
+                ).value.trim(),
+
+            imagemB:
+                document.getElementById(
+                    "novoImagemB"
+                ).value.trim(),
+
+            cotacoes: {
+
+                casa:
+                    Number(
+                        document.getElementById(
+                            "novoCasa"
+                        ).value
+                    ) || 1.5,
+
+                empate:
+                    Number(
+                        document.getElementById(
+                            "novoEmpate"
+                        ).value
+                    ) || 2.5,
+
+                fora:
+                    Number(
+                        document.getElementById(
+                            "novoFora"
+                        ).value
+                    ) || 2.5,
+
+                ambasMarcam:
+                    Number(
+                        document.getElementById(
+                            "novoAmbas"
+                        ).value
+                    ) || 2.5
+
+            },
+
+            finalizado:
+                false,
+
+            apiFixtureId:
+                null,
+
+            apiStatus:
+                "NS"
+
+        };
+
+
+        if (
+            !jogo.data ||
+            !jogo.hora ||
+            !jogo.timeA ||
+            !jogo.timeB
+        ) {
+
+            alert(
+                "Preencha data, hora e os dois times."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            mostrarCarregando(true);
+
+
+            const id =
+                "jogo_" +
+                Date.now();
+
+
+            await set(
+                ref(
+                    db,
+                    `jogos/${dia}/${id}`
+                ),
+                jogo
+            );
+
+
+            if (
+                !jogos[dia]
+            ) {
+
+                jogos[dia] = {};
+
+            }
+
+
+            jogos[dia][id] =
+                jogo;
+
+
+            [
+                "novoCampeonato",
+                "novoPais",
+                "novoData",
+                "novoHora",
+                "novoTimeA",
+                "novoImagemA",
+                "novoTimeB",
+                "novoImagemB"
+            ]
+            .forEach(
+                idCampo => {
+
+                    document.getElementById(
+                        idCampo
+                    ).value = "";
+
+                }
+            );
+
+
+            renderizarJogos();
+
+
+            abrirSecaoPorNome(
+                "jogos"
+            );
+
+
+            alert(
+                "Jogo cadastrado!\n\n" +
+                "A API-Football irá localizar a partida automaticamente."
+            );
+
+
+        } catch (erro) {
+
+            alert(
+                erro.message
+            );
+
+        }
+
+        finally {
+
+            mostrarCarregando(false);
+
+        }
+
+    };
+
+
+/* =========================================================
+   MODAIS
+========================================================= */
+
+window.fecharModal =
+    function (id) {
+
+        const modal =
+            document.getElementById(
+                id
+            );
+
+
+        if (modal) {
+
+            modal.style.display =
+                "none";
+
+        }
+
+    };
+
+
+document
+    .querySelectorAll(".modal")
+    .forEach(
+        modal => {
+
+            modal.addEventListener(
+                "click",
+                evento => {
+
+                    if (
+                        evento.target ===
+                        modal
+                    ) {
+
+                        modal.style.display =
+                            "none";
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+window.abrirSecao =
+    function (
+        nome,
+        botao
+    ) {
+
+        document
+            .querySelectorAll(
+                ".secao"
+            )
+            .forEach(
+                secao =>
+                    secao.classList
+                        .remove("ativa")
+            );
+
+
+        const secao =
+            document.getElementById(
+                nome
+            );
+
+
+        if (secao) {
+
+            secao.classList
+                .add("ativa");
+
+        }
+
+
+        document
+            .querySelectorAll(
+                ".menu button"
+            )
+            .forEach(
+                button =>
+                    button.classList
+                        .remove("ativo")
+            );
+
+
+        if (botao) {
+
+            botao.classList
+                .add("ativo");
+
+        }
+
+
+        if (
+            nome === "jogadores"
+        )
+            renderizarJogadores();
+
+
+        if (
+            nome === "solicitacoes"
+        )
+            renderizarSolicitacoesSaldo();
+
+
+        if (
+            nome === "apostas"
+        )
+            renderizarApostas();
+
+
+        if (
+            nome === "jogos"
+        )
+            renderizarJogos();
+
+    };
+
+
+window.abrirSecaoPorNome =
+    function (nome) {
+
+        const botao =
+            [
+                ...document.querySelectorAll(
+                    ".menu button"
+                )
+            ]
+            .find(
+                button =>
+                    button
+                        .getAttribute(
+                            "onclick"
+                        )
+                        ?.includes(
+                            `'${nome}'`
+                        )
+            );
+
+
+        abrirSecao(
+            nome,
+            botao
+        );
+
+    };
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+async function iniciarSistema() {
+
+    console.log(
+        "🚀 MULTI PLAY.BET iniciando..."
+    );
+
+
+    await carregarTudo();
+
+
+    ouvirSolicitacoesSaldo();
+
+
+    /*
+       IMPORTANTE:
+       inicia a API depois de carregar
+       Firebase.
+    */
+
+    iniciarAtualizacaoAPI();
+
+
+    console.log(
+        "✅ Sistema iniciado."
+    );
+
+}
+
+
+iniciarSistema();
+
+
+</script>
+</body>
+</html>
