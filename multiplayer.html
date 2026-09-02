@@ -3415,38 +3415,28 @@ async function atualizarResultados() {
    ⏰ INICIAR AUTOMÁTICO
 ========================================================= */
 
-function iniciarAtualizacaoAPI(
-    minutos = 5
-) {
+function iniciarAtualizacaoAPI(minutos = 180) {
 
-    pararAtualizacaoAPI();
+    // Cancela intervalo anterior
+    if (intervaloAtualizacao) {
+        clearInterval(intervaloAtualizacao);
+    }
 
-
-    /*
-       Executa imediatamente
-    */
-
+    // Primeira atualização imediatamente
     atualizarResultados();
 
-
-    /*
-       Depois executa de tempos em tempos
-    */
-
-    intervaloAtualizacao =
-        setInterval(
-            atualizarResultados,
-            minutos * 60 * 1000
-        );
-
-
-    console.log(
-        `⏰ Atualização automática a cada ${minutos} minutos`
+    // Depois atualiza a cada 3 horas
+    intervaloAtualizacao = setInterval(
+        atualizarResultados,
+        minutos * 60 * 1000
     );
 
+    console.log(
+        "⏰ API configurada para atualizar a cada " +
+        minutos / 60 +
+        " horas."
+    );
 }
-
-
 /* =========================================================
    ⏹️ PARAR AUTOMÁTICO
 ========================================================= */
@@ -3907,47 +3897,54 @@ function montarMenu() {
 
     lista.innerHTML = "";
 
+    /* =====================================================
+       💰 BOTÃO DEPÓSITO
+    ===================================================== */
+
+    const deposito =
+        document.createElement("li");
+
+    deposito.textContent =
+        "💰 Depósito";
+
+    deposito.onclick = () => {
+
+        fecharMenu();
+
+        abrirModalSaldo();
+
+    };
+
+    lista.appendChild(deposito);
+
 
     /* =====================================================
-       JOGOS FEITOS
+       🎟️ JOGOS FEITOS
     ===================================================== */
 
     const feitos =
-        document.createElement(
-            "li"
-        );
-
+        document.createElement("li");
 
     feitos.textContent =
         "🎟️ Jogos Feitos";
-
 
     feitos.onclick =
     async () => {
 
         filtroPais = "";
 
-
         document.getElementById(
             "tituloPagina"
         ).textContent =
             "Jogos Feitos";
 
-
         await carregarJogosFeitosMenu();
 
     };
 
-
-    lista.appendChild(
-        feitos
-    );
-
-
-    
+    lista.appendChild(feitos);
 
 }
-
 
 montarMenu();
 
@@ -6638,17 +6635,11 @@ window.solicitarSaldo = async function() { const input = document.getElementById
 
 async function iniciarSistema() {
 
-    const carregou =
-        await carregarJogador();
+    await carregarJogador();
 
-    if (!carregou) {
-        return;
-    }
+    inicializarJogos();
 
-    await inicializarJogos();
-
-    // 🔄 Inicia atualização dos resultados
-    iniciarAtualizacaoAPI(5);
+    iniciarAtualizacaoAPI(180);
 }
 /* =========================================================
    MODAL DE SAQUE PIX
