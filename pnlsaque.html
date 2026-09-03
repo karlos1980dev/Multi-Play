@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Painel de Saques - MULTI PLAY.BET</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+    background:#101010;
+    color:#fff;
+}
+
+body{
+    padding:20px;
+}
+
+.painel{
+    max-width:1100px;
+    margin:auto;
+}
+
+.titulo{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.titulo h1{
+    margin:0;
+    font-size:25px;
+}
+
+.titulo p{
+    color:#aaa;
+    font-size:13px;
+}
+
+.resumo{
+    display:grid;
+    grid-template-columns:
+        repeat(3,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.resumo-card{
+    background:#1d1d1d;
+    border-radius:10px;
+    padding:15px;
+    text-align:center;
+    border:1px solid #333;
+}
+
+.resumo-card strong{
+    display:block;
+    font-size:22px;
+    margin-top:5px;
+}
+
+.filtros{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.filtros button{
+    border:0;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+    background:#292929;
+    color:#fff;
+    font-weight:bold;
+}
+
+.filtros button.ativo{
+    background:#00a86b;
+}
+
+.lista{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.saque{
+    background:#1c1c1c;
+    border:1px solid #333;
+    border-radius:12px;
+    padding:18px;
+}
+
+.saque-topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.saque-codigo{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.status{
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.status.aguardando{
+    background:#705b00;
+    color:#fff;
+}
+
+.status.pago{
+    background:#087a4b;
+    color:#fff;
+}
+
+.status.cancelado{
+    background:#8b2020;
+    color:#fff;
+}
+
+.informacoes{
+    display:grid;
+    grid-template-columns:
+        repeat(2,1fr);
+    gap:10px;
+}
+
+.info{
+    background:#121212;
+    padding:11px;
+    border-radius:7px;
+}
+
+.info span{
+    display:block;
+    color:#999;
+    font-size:11px;
+    margin-bottom:4px;
+}
+
+.info strong{
+    font-size:14px;
+    word-break:break-word;
+}
+
+.valor{
+    color:#00e676;
+    font-size:20px !important;
+}
+
+.acoes{
+    margin-top:15px;
+    display:flex;
+    gap:10px;
+}
+
+.btn-pagar,
+.btn-cancelar{
+    border:0;
+    padding:11px 15px;
+    border-radius:7px;
+    cursor:pointer;
+    color:#fff;
+    font-weight:bold;
+}
+
+.btn-pagar{
+    background:#00a86b;
+}
+
+.btn-cancelar{
+    background:#9d2525;
+}
+
+.carregando,
+.vazio,
+.erro{
+    text-align:center;
+    padding:30px;
+    color:#aaa;
+}
+
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+    }
+
+    .resumo{
+        grid-template-columns:1fr;
+    }
+
+    .informacoes{
+        grid-template-columns:1fr;
+    }
+
+    .saque-topo{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="painel">
+
+    <div class="titulo">
+
+        <h1>
+            💰 PAINEL DE SAQUES
+        </h1>
+
+        <p>
+            MULTI PLAY.BET
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         RESUMO
+    ====================================================== -->
+
+    <div class="resumo">
+
+        <div class="resumo-card">
+
+            Aguardando
+
+            <strong id="totalAguardando">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="resumo-card">
+
+            Pagos
+
+            <strong id="totalPagos">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="resumo-card">
+
+            Valor pendente
+
+            <strong id="valorPendente">
+                R$ 0,00
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTROS
+    ====================================================== -->
+
+    <div class="filtros">
+
+        <button
+            class="ativo"
+            onclick="filtrarSaques('todos', this)"
+        >
+            Todos
+        </button>
+
+
+        <button
+            onclick="filtrarSaques('aguardando', this)"
+        >
+            Aguardando
+        </button>
+
+
+        <button
+            onclick="filtrarSaques('pago', this)"
+        >
+            Pagos
+        </button>
+
+
+        <button
+            onclick="filtrarSaques('cancelado', this)"
+        >
+            Cancelados
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         LISTA
+    ====================================================== -->
+
+    <div
+        id="listaSaques"
+        class="lista"
+    >
+
+        <div class="carregando">
+
+            Carregando saques...
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import {
+    initializeApp
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+
+import {
+    getDatabase,
+    ref,
+    get,
+    update
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+
+/* =========================================================
+   CONFIGURAÇÃO FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "SUA_API_KEY",
+
+    authDomain:
+        "jogo-60a9e.firebaseapp.com",
+
+    databaseURL:
+        "https://jogo-60a9e-default-rtdb.firebaseio.com",
+
+    projectId:
+        "jogo-60a9e",
+
+    storageBucket:
+        "jogo-60a9e.firebasestorage.app",
+
+    messagingSenderId:
+        "SEU_MESSAGING_SENDER_ID",
+
+    appId:
+        "SEU_APP_ID"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const db =
+    getDatabase(app);
+
+
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
+
+let todosSaques = [];
+
+let filtroAtual = "todos";
+
+
+/* =========================================================
+   FORMATAR DINHEIRO
+========================================================= */
+
+function dinheiro(valor){
+
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "pt-BR",
+        {
+            style:"currency",
+            currency:"BRL"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPAR HTML
+========================================================= */
+
+function escapeHTML(valor){
+
+    return String(valor ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   FORMATAR DATA
+========================================================= */
+
+function formatarData(valor){
+
+    if(!valor){
+        return "-";
+    }
+
+    const data =
+        new Date(valor);
+
+    if(
+        Number.isNaN(
+            data.getTime()
+        )
+    ){
+
+        return escapeHTML(valor);
+
+    }
+
+    return data.toLocaleString(
+        "pt-BR"
+    );
+
+}
+
+
+/* =========================================================
+   CARREGAR SAQUES
+========================================================= */
+
+async function carregarSaques(){
+
+    const container =
+        document.getElementById(
+            "listaSaques"
+        );
+
+
+    container.innerHTML =
+        `<div class="carregando">
+            Carregando saques...
+        </div>`;
+
+
+    try{
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "solicitacoesSaque"
+                )
+            );
+
+
+        if(
+            !snapshot.exists()
+        ){
+
+            todosSaques = [];
+
+            atualizarResumo();
+
+            renderizarSaques();
+
+            return;
+
+        }
+
+
+        const dados =
+            snapshot.val();
+
+
+        todosSaques =
+            Object.entries(
+                dados
+            ).map(
+                ([id, saque]) => {
+
+                    return {
+
+                        id:id,
+
+                        ...saque
+
+                    };
+
+                }
+            );
+
+
+        /* =================================================
+           MAIS RECENTES PRIMEIRO
+        ================================================= */
+
+        todosSaques.sort(
+            (a,b) => {
+
+                const dataA =
+                    new Date(
+                        a.dataHora ||
+                        a.data ||
+                        0
+                    ).getTime();
+
+
+                const dataB =
+                    new Date(
+                        b.dataHora ||
+                        b.data ||
+                        0
+                    ).getTime();
+
+
+                return dataB - dataA;
+
+            }
+        );
+
+
+        atualizarResumo();
+
+        renderizarSaques();
+
+    }
+
+    catch(erro){
+
+        console.error(
+            "Erro ao carregar saques:",
+            erro
+        );
+
+
+        container.innerHTML =
+            `<div class="erro">
+
+                ❌ Erro ao carregar
+                as solicitações de saque.
+
+            </div>`;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESUMO
+========================================================= */
+
+function atualizarResumo(){
+
+    let aguardando = 0;
+
+    let pagos = 0;
+
+    let valorPendente = 0;
+
+
+    todosSaques.forEach(
+        saque => {
+
+            const status =
+                String(
+                    saque.status ||
+                    "aguardando"
+                ).toLowerCase();
+
+
+            if(
+                status === "aguardando"
+            ){
+
+                aguardando++;
+
+                valorPendente +=
+                    Number(
+                        saque.valor || 0
+                    );
+
+            }
+
+
+            if(
+                status === "pago"
+            ){
+
+                pagos++;
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "totalAguardando"
+    ).textContent =
+        aguardando;
+
+
+    document.getElementById(
+        "totalPagos"
+    ).textContent =
+        pagos;
+
+
+    document.getElementById(
+        "valorPendente"
+    ).textContent =
+        dinheiro(
+            valorPendente
+        );
+
+}
+
+
+/* =========================================================
+   RENDERIZAR
+========================================================= */
+
+function renderizarSaques(){
+
+    const container =
+        document.getElementById(
+            "listaSaques"
+        );
+
+
+    let lista =
+        todosSaques;
+
+
+    if(
+        filtroAtual !== "todos"
+    ){
+
+        lista =
+            todosSaques.filter(
+                saque => {
+
+                    return String(
+                        saque.status ||
+                        "aguardando"
+                    ).toLowerCase()
+                    ===
+                    filtroAtual;
+
+                }
+            );
+
+    }
+
+
+    if(
+        lista.length === 0
+    ){
+
+        container.innerHTML =
+            `<div class="vazio">
+
+                Nenhum saque encontrado.
+
+            </div>`;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    lista.forEach(
+        saque => {
+
+            const status =
+                String(
+                    saque.status ||
+                    "aguardando"
+                ).toLowerCase();
+
+
+            let textoStatus =
+                "Aguardando";
+
+
+            if(
+                status === "pago"
+            ){
+
+                textoStatus =
+                    "Pago";
+
+            }
+
+            else if(
+                status === "cancelado"
+            ){
+
+                textoStatus =
+                    "Cancelado";
+
+            }
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "saque";
+
+
+            card.innerHTML = `
+
+                <div class="saque-topo">
+
+                    <div class="saque-codigo">
+
+                        🧾 Solicitação:
+                        ${escapeHTML(
+                            saque.id
+                        )}
+
+                    </div>
+
+
+                    <div
+                        class="status ${status}"
+                    >
+
+                        ${textoStatus}
+
+                    </div>
+
+                </div>
+
+
+                <div class="informacoes">
+
+
+                    <!-- NOME -->
+
+                    <div class="info">
+
+                        <span>
+                            👤 Nome do jogador
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                saque.nome ||
+                                saque.jogador ||
+                                "-"
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- VALOR -->
+
+                    <div class="info">
+
+                        <span>
+                            💰 Valor do saque
+                        </span>
+
+                        <strong class="valor">
+
+                            ${dinheiro(
+                                saque.valor
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- DATA -->
+
+                    <div class="info">
+
+                        <span>
+                            📅 Data e hora
+                        </span>
+
+                        <strong>
+
+                            ${formatarData(
+                                saque.dataHora ||
+                                saque.data
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- CÓDIGO DA PULE -->
+
+                    <div class="info">
+
+                        <span>
+                            🎟️ Código da pule
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                saque.codigoAposta ||
+                                saque.codigoPule ||
+                                saque.codigo ||
+                                "-"
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- CHAVE PIX -->
+
+                    <div class="info">
+
+                        <span>
+                            🔑 Chave PIX
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                saque.chavePix ||
+                                "-"
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                    <!-- JOGADOR ID -->
+
+                    <div class="info">
+
+                        <span>
+                            🆔 ID do jogador
+                        </span>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                saque.jogadorId ||
+                                "-"
+                            )}
+
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                ${
+                    status === "aguardando"
+
+                    ?
+
+                    `<div class="acoes">
+
+                        <button
+                            class="btn-pagar"
+                            onclick="marcarComoPago(
+                                '${escapeHTML(
+                                    saque.id
+                                )}'
+                            )"
+                        >
+
+                            ✅ Marcar como pago
+
+                        </button>
+
+
+                        <button
+                            class="btn-cancelar"
+                            onclick="cancelarSaque(
+                                '${escapeHTML(
+                                    saque.id
+                                )}'
+                            )"
+                        >
+
+                            ❌ Cancelar
+
+                        </button>
+
+                    </div>`
+
+                    :
+
+                    ""
+
+                }
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FILTRO
+========================================================= */
+
+window.filtrarSaques =
+function(
+    filtro,
+    botao
+){
+
+    filtroAtual =
+        filtro;
+
+
+    document
+        .querySelectorAll(
+            ".filtros button"
+        )
+        .forEach(
+            btn =>
+                btn.classList.remove(
+                    "ativo"
+                )
+        );
+
+
+    if(botao){
+
+        botao.classList.add(
+            "ativo"
+        );
+
+    }
+
+
+    renderizarSaques();
+
+};
+
+
+/* =========================================================
+   MARCAR COMO PAGO
+========================================================= */
+
+window.marcarComoPago =
+async function(id){
+
+    const confirmar =
+        confirm(
+            "Confirma que este saque foi pago?"
+        );
+
+
+    if(!confirmar){
+        return;
+    }
+
+
+    try{
+
+        await update(
+            ref(
+                db,
+                "solicitacoesSaque/" + id
+            ),
+            {
+
+                status:"pago",
+
+                dataPagamento:
+                    new Date()
+                    .toISOString()
+
+            }
+        );
+
+
+        alert(
+            "Saque marcado como pago."
+        );
+
+
+        await carregarSaques();
+
+    }
+
+    catch(erro){
+
+        console.error(
+            erro
+        );
+
+
+        alert(
+            "Não foi possível atualizar o saque."
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   CANCELAR SAQUE
+========================================================= */
+
+window.cancelarSaque =
+async function(id){
+
+    const confirmar =
+        confirm(
+            "Confirma o cancelamento deste saque?"
+        );
+
+
+    if(!confirmar){
+        return;
+    }
+
+
+    try{
+
+        await update(
+            ref(
+                db,
+                "solicitacoesSaque/" + id
+            ),
+            {
+
+                status:"cancelado",
+
+                dataCancelamento:
+                    new Date()
+                    .toISOString()
+
+            }
+        );
+
+
+        alert(
+            "Saque cancelado."
+        );
+
+
+        await carregarSaques();
+
+    }
+
+    catch(erro){
+
+        console.error(
+            erro
+        );
+
+
+        alert(
+            "Não foi possível cancelar o saque."
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+carregarSaques();
+
+</script>
+
+</body>
+
+</html>
