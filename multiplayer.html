@@ -1942,8 +1942,8 @@ body.cor5 {
     <input
     type="number"
     id="valorUnico"
-    placeholder="Aposta mín. R$ 2,00"
-    min="2"
+    placeholder="Aposta mín. R$ 1,00"
+    min="1"
     step="0.01"
 >
 
@@ -8562,11 +8562,11 @@ async function abrirPreview() {
 
     if (
         !valor ||
-        valor < 2
+        valor < 1
     ) {
 
         alert(
-            "A aposta mínima é de R$ 2,00."
+            "A aposta mínima é de R$ 1,00."
         );
 
 
@@ -8948,11 +8948,11 @@ obterElemento(
 
             if (
                 !valor ||
-                valor < 2
+                valor < 1
             ) {
 
                 alert(
-                    "A aposta mínima é de R$ 2,00."
+                    "A aposta mínima é de R$ 1,00."
                 );
 
 
@@ -9939,11 +9939,11 @@ obterElemento(
 
         if (
             valor > 0 &&
-            valor < 2
+            valor < 1
         ) {
 
             this.setCustomValidity(
-                "A aposta mínima é R$ 2,00."
+                "A aposta mínima é R$ ,00."
             );
 
         }
