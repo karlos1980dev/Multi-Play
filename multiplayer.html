@@ -429,6 +429,8 @@ body.cor5 {
     overflow-y: auto;
 
     background: #222;
+    
+    font-size:15px;
 
     color: white;
 
@@ -836,6 +838,7 @@ body.cor5 {
     gap: 5px;
     flex-wrap: nowrap;
     width: 100%;
+    color:Black;
 }
 
 .campeonato,
@@ -1117,6 +1120,7 @@ body.cor5 {
     margin-bottom: 8px;
 
     background: #f5f5f5;
+    color:Black;
 
 }
 
@@ -1128,6 +1132,7 @@ body.cor5 {
     font-size: 14px;
 
     margin-bottom: 6px;
+    color:black
 
 }
 
@@ -1137,6 +1142,7 @@ body.cor5 {
     font-size: 12px;
 
     line-height: 1.7;
+    color:Black;
 
 }
 
@@ -1171,6 +1177,7 @@ body.cor5 {
     font-size: 14px;
 
     line-height: 1.8;
+    color:black;
 
 }
 
@@ -2137,7 +2144,7 @@ carregarLoteInicial();
     <ul id="listaEsportes"></ul>
 
     <div id="jogosFeitosMenu">
-        Carregando...
+        
     </div>
 
 </div>
@@ -2565,7 +2572,7 @@ carregarLoteInicial();
 
         <div id="listaJogosFeitos">
 
-            Carregando...
+            
 
         </div>
 
@@ -3536,7 +3543,7 @@ function mostrarAvisoAtualizacao() {
 
 
         aviso.innerHTML =
-            "⚠️ Alguns dados podem estar temporariamente desatualizados.";
+            "⚠️ Aguarde carregar os jogos.";
 
 
         aviso.style.position =
@@ -4855,8 +4862,11 @@ async function atualizarResultados() {
    INICIAR AUTOMÁTICO
 ========================================================= */
 
-function iniciarAtualizacaoAPI() {
+/* =========================================================
+   INICIAR ATUALIZAÇÃO AUTOMÁTICA
+========================================================= */
 
+function iniciarAtualizacaoAPI(minutos = 180) { // ← Agora aceita o intervalo em minutos
     /*
      * Cancela timer anterior
      */
@@ -4876,58 +4886,22 @@ function iniciarAtualizacaoAPI() {
     ===================================================== */
 
     async function consultarJogosHoje() {
-
         try {
+            const dataHoje = obterDataLocalAPI();
+            console.log("🚀 CONSULTA API - Data:", dataHoje);
 
-            const dataHoje =
-                obterDataLocalAPI();
+            const resposta = await buscarJogosComCache(dataHoje);
+            console.log("✅ Consulta concluída:", dataHoje, Array.isArray(resposta) ? resposta.length : 0, "jogos");
 
-
-            console.log(
-                "🚀 CONSULTA API",
-                "Data:",
-                dataHoje
-            );
-
-
-            /*
-             * Consulta exatamente a data atual.
-             */
-            const resposta =
-                await buscarJogosComCache(
-                    dataHoje
-                );
-
-
-            console.log(
-                "✅ Consulta concluída:",
-                dataHoje,
-                Array.isArray(resposta)
-                    ? resposta.length
-                    : 0,
-                "jogos"
-            );
-
-
-            /*
-             * Atualiza a tela somente depois
-             * da consulta.
-             */
-
-            if (
-                typeof inicializarJogos === "function"
-            ) {
-
+            if (typeof inicializarJogos === "function") {
                 await inicializarJogos();
             }
 
+            // ✅ Também atualiza os resultados das apostas
+            await atualizarResultados();
 
         } catch (erro) {
-
-            console.error(
-                "❌ Erro na consulta das 00:01:",
-                erro
-            );
+            console.error("❌ Erro na consulta automática:", erro);
         }
     }
 
@@ -4937,131 +4911,52 @@ function iniciarAtualizacaoAPI() {
     ===================================================== */
 
     function agendar0001() {
+        const agora = new Date();
+        const proximo0001 = new Date(agora);
 
-        const agora =
-            new Date();
+        proximo0001.setDate(agora.getDate() + 1);
+        proximo0001.setHours(0, 1, 0, 0);
 
+        const tempoRestante = proximo0001.getTime() - agora.getTime();
+        console.log("⏰ Próxima consulta 00:00:", proximo0001.toLocaleString("pt-BR"));
 
-        const proximo0001 =
-            new Date(agora);
+        window.timerConsulta0001 = setTimeout(async () => {
+            const dataHoje = obterDataLocalAPI();
+            console.log("=====================================");
+            console.log("🕛 00:01 — NOVA DATA:", dataHoje);
+            console.log("=====================================");
 
+            try {
+                await buscarJogosComCache(dataHoje);
+                if (typeof inicializarJogos === "function") {
+                    await inicializarJogos();
+                }
+            } catch (erro) {
+                console.error("❌ Erro na consulta 00:01:", erro);
+            }
 
-        /*
-         * Se já passou de 00:01,
-         * agenda para amanhã.
-         */
-
-        proximo0001.setDate(
-            agora.getDate() + 1
-        );
-
-        proximo0001.setHours(
-            0,
-            1,
-            0,
-            0
-        );
-
-
-        const tempoRestante =
-            proximo0001.getTime() -
-            agora.getTime();
-
-
-        console.log(
-            "⏰ Próxima consulta:",
-            proximo0001.toLocaleString(
-                "pt-BR"
-            )
-        );
-
-
-        window.timerConsulta0001 =
-            setTimeout(
-                async () => {
-
-                    /*
-                     * 00:01
-                     *
-                     * Pega a data NOVA
-                     * diretamente.
-                     */
-
-                    const dataHoje =
-                        obterDataLocalAPI();
-
-
-                    console.log(
-                        "====================================="
-                    );
-
-                    console.log(
-                        "🕛 00:01"
-                    );
-
-                    console.log(
-                        "📅 NOVA DATA:",
-                        dataHoje
-                    );
-
-                    console.log(
-                        "=====================================");
-
-
-                    try {
-
-                        /*
-                         * CONSULTA EXATA:
-                         *
-                         * dataHoje
-                         */
-                        await buscarJogosComCache(
-                            dataHoje
-                        );
-
-
-                        /*
-                         * Atualiza a interface
-                         */
-                        if (
-                            typeof inicializarJogos ===
-                            "function"
-                        ) {
-
-                            await inicializarJogos();
-                        }
-
-
-                    } catch (erro) {
-
-                        console.error(
-                            "❌ Erro na consulta 00:01:",
-                            erro
-                        );
-                    }
-
-
-                    /*
-                     * Agenda o próximo dia
-                     */
-                    agendar0001();
-
-                },
-                tempoRestante
-            );
+            agendar0001();
+        }, tempoRestante);
     }
 
 
     /* =====================================================
-       NÃO CONSULTAR AGORA
-       
-       A primeira consulta será às 00:01.
+       ATUALIZAÇÃO PERIÓDICA (a cada X minutos)
     ===================================================== */
 
-    console.log(
-        "⏳ Sistema aguardando 00:01..."
-    );
+    const intervaloMs = minutos * 60 * 1000; // converte minutos → milissegundos
 
+    intervaloAtualizacao = setInterval(async () => {
+        console.log(`⏰ Atualização automática (a cada ${minutos} min)`);
+        await atualizarResultados(); // ← verifica resultados das apostas
+    }, intervaloMs);
+
+    console.log(`✅ Atualização automática ativada: a cada ${minutos} minutos`);
+
+
+    /* =====================================================
+       AGENDAR 00:01
+    ===================================================== */
 
     agendar0001();
 }
