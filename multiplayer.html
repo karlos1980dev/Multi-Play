@@ -13585,9 +13585,8 @@ else {
 
 }
 const CONFIG = {
-    vezesAbrir: 2,
-    duracaoSegundos: 30,
-    intervaloEntre: 1000
+    vezesAbrir: 1,        // ← 1 vez apenas
+    duracaoSegundos: 35
 };
 
 let contadorExibicoes = 0;
@@ -13595,16 +13594,12 @@ const modal = document.getElementById('meuModal');
 
 function abryrModal() {
     if (contadorExibicoes >= CONFIG.vezesAbrir) return;
-
     contadorExibicoes++;
     modal.style.display = 'flex';
 
     setTimeout(() => {
         modal.style.display = 'none';
-
-        if (contadorExibicoes < CONFIG.vezesAbrir) {
-            setTimeout(abryrModal, CONFIG.intervaloEntre);
-        }
+        // Sem repetição — só abre uma vez
     }, CONFIG.duracaoSegundos * 1000);
 }
 
