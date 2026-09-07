@@ -16,6 +16,40 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
 >
 
 <style>
+ .carrossel-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border-radius: 12px;
+
+    /* evita mudança de layout enquanto carrega */
+    aspect-ratio: 16 / 6;
+}
+
+.carrossel {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    transition:
+        transform .5s ease;
+
+    will-change: transform;
+}
+
+.carrossel img {
+    flex: 0 0 100%;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    /* melhora renderização */
+    backface-visibility: hidden;
+}   
 #codigoModal {
     display: none !important;
 }
@@ -2210,25 +2244,36 @@ body.cor5 {
 
 <div class="carrossel-container">
 
-    <div
-        class="carrossel"
-        id="carrossel"
-    >
+    <div class="carrossel" id="carrossel">
 
+        <!-- PRIMEIRA IMAGEM: carrega imediatamente -->
         <img
-        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
+            src="https://res.cloudinary.com/dtw3turzb/image/upload/f_auto,q_auto,w_900/v1784485917/looogi.png"
+            alt="Banner"
+            fetchpriority="high"
+            decoding="async"
+        >
+
+        <!-- OUTRAS: carregam depois -->
+        <img
+            src="https://res.cloudinary.com/dtw3turzb/image/upload/f_auto,q_auto,w_900/v1784483513/elllitersapostaonline1.webp"
+            alt="Banner"
+            loading="lazy"
+            decoding="async"
         >
 
         <img
-        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483513/elllitersapostaonline1.webp"
+            src="https://res.cloudinary.com/dtw3turzb/image/upload/f_auto,q_auto,w_900/v1784483593/images1.jpg"
+            alt="Banner"
+            loading="lazy"
+            decoding="async"
         >
 
         <img
-        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784483593/images1.jpg"
-        >
-
-        <img
-        src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784505133/07sportsonline-12-mobile.png"
+            src="https://res.cloudinary.com/dtw3turzb/image/upload/f_auto,q_auto,w_900/v1784505133/07sportsonline-12-mobile.png"
+            alt="Banner"
+            loading="lazy"
+            decoding="async"
         >
 
     </div>
@@ -2856,7 +2901,27 @@ function obterDiaDaSemanaDoJogo(jogo) {
         data.getDay()
     ];
 }
+/* =========================================================
+   DATA UTC PARA CONTROLE DA API
+========================================================= */
 
+function obterDataUTCControle() {
+
+    const agora = new Date();
+
+    const ano =
+        agora.getUTCFullYear();
+
+    const mes =
+        String(agora.getUTCMonth() + 1)
+            .padStart(2, "0");
+
+    const dia =
+        String(agora.getUTCDate())
+            .padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+}
 /* =========================================================
    DATA UTC PARA CONTROLE DA API
 ========================================================= */
@@ -3140,17 +3205,7 @@ const API_BASE =
    CACHE
 ========================================================= */
 
-const CACHE_FIREBASE_PATH =
-    "cacheMultiPlay";
-
-const CACHE_TEMPO_JOGOS =
-    6 * 60 * 60 * 1000;
-
-const CACHE_TEMPO_COTACOES =
-    12 * 60 * 60 * 1000;
-
-const CACHE_TEMPO_RESULTADOS =
-    3 * 60 * 60 * 1000;
+/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const CACHE_TEMPO_RESULTADOS = 30 * 60 * 1000; // 30 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
 
 
 /* =========================================================
@@ -4062,44 +4117,66 @@ async function buscarResultadosAPI(
    PRIMEIRO USA fixtureId
 ========================================================= */
 
+/* =========================================================
+   ENCONTRAR JOGO NA RESPOSTA DA API
+========================================================= */
+
 function encontrarJogoAPI(
     selecao,
     resultados
 ) {
 
     if (
-        !Array.isArray(resultados)
+        !selecao ||
+        !Array.isArray(resultados) ||
+        resultados.length === 0
     ) {
-
         return null;
-
     }
 
 
     /* =====================================================
-       1. FIXTURE ID EXATO
+       1. TENTAR PELO FIXTURE ID
     ===================================================== */
 
-    const fixtureId =
-        String(
-            selecao?.fixtureId || ""
-        ).trim();
+    const idsPossiveis = [
+
+        selecao.fixtureId,
+
+        selecao.idAPI,
+
+        selecao.jogoId,
+
+        selecao?.fixture?.id
+
+    ]
+    .map(id =>
+        String(id || "").trim()
+    )
+    .filter(Boolean);
 
 
-    if (fixtureId) {
+    if (idsPossiveis.length > 0) {
 
-        const jogoPorId =
-            resultados.find(
-                jogo =>
-                    String(
-                        jogo?.fixture?.id || ""
-                    ) === fixtureId
-            );
+        const encontrado =
+            resultados.find(jogo => {
+
+                const idAPI = String(
+                    jogo?.fixture?.id ||
+                    jogo?.id ||
+                    ""
+                ).trim();
+
+                return idsPossiveis.includes(
+                    idAPI
+                );
+
+            });
 
 
-        if (jogoPorId) {
+        if (encontrado) {
 
-            return jogoPorId;
+            return encontrado;
 
         }
 
@@ -4107,17 +4184,21 @@ function encontrarJogoAPI(
 
 
     /* =====================================================
-       2. FALLBACK POR TIMES
+       2. TENTAR PELO NOME DOS TIMES
     ===================================================== */
 
     const timeA =
-        nomeTimeSeguro(
-            selecao?.timeA
+        normalizarNome(
+            selecao.timeA ||
+            selecao.casa ||
+            ""
         );
 
     const timeB =
-        nomeTimeSeguro(
-            selecao?.timeB
+        normalizarNome(
+            selecao.timeB ||
+            selecao.fora ||
+            ""
         );
 
 
@@ -4128,101 +4209,151 @@ function encontrarJogoAPI(
     }
 
 
-    return (
-        resultados.find(
-            jogo => {
+    const encontradoPorTimes =
+        resultados.find(jogo => {
 
-                const casa =
+            const casa =
+                normalizarNome(
                     nomeTimeSeguro(
                         jogo?.teams?.home
-                    );
-
-                const fora =
-                    nomeTimeSeguro(
-                        jogo?.teams?.away
-                    );
-
-
-                return (
-                    compararTimes(
-                        timeA,
-                        casa
-                    ) &&
-                    compararTimes(
-                        timeB,
-                        fora
                     )
                 );
 
+            const fora =
+                normalizarNome(
+                    nomeTimeSeguro(
+                        jogo?.teams?.away
+                    )
+                );
+
+
+            if (
+                !casa ||
+                !fora
+            ) {
+                return false;
             }
-        ) || null
-    );
 
+
+            return (
+                (
+                    compararTimes(
+                        casa,
+                        timeA
+                    ) &&
+                    compararTimes(
+                        fora,
+                        timeB
+                    )
+                )
+            );
+
+        });
+
+
+    if (encontradoPorTimes) {
+
+        return encontradoPorTimes;
+
+    }
+
+
+    return null;
 }
-
 
 /* =========================================================
    VERIFICAR SE JOGO TERMINOU
 ========================================================= */
 
+/* =========================================================
+   VERIFICAR SE O JOGO TERMINOU
+========================================================= */
+
 function jogoFinalizado(jogo) {
 
-    const status =
-        String(
-            jogo?.fixture?.status?.short ||
-            ""
-        ).toUpperCase();
+    if (!jogo) {
+        return false;
+    }
 
+    const status = String(
+        jogo?.fixture?.status?.short ||
+        jogo?.status?.short ||
+        jogo?.fixture?.status?.long ||
+        jogo?.status ||
+        ""
+    )
+    .trim()
+    .toUpperCase();
 
-    return [
+    /*
+       Status considerados encerrados pela API-Football.
+    */
+
+    const finalizados = [
         "FT",
         "AET",
-        "PEN"
-    ].includes(status);
+        "PEN",
+        "AWD",
+        "WO"
+    ];
 
+    if (finalizados.includes(status)) {
+        return true;
+    }
+
+    return false;
 }
-
-
 /* =========================================================
-   PEGAR PLACAR
+   PEGAR PLACAR DA API
 ========================================================= */
 
 function pegarPlacar(jogo) {
 
-    const golsCasa =
-        jogo?.goals?.home;
-
-    const golsFora =
-        jogo?.goals?.away;
-
-
-    if (
-        golsCasa === null ||
-        golsCasa === undefined ||
-        golsFora === null ||
-        golsFora === undefined
-    ) {
-
+    if (!jogo) {
         return null;
-
     }
 
+    const home =
+        jogo?.goals?.home ??
+        jogo?.score?.fulltime?.home ??
+        jogo?.score?.fullTime?.home;
+
+    const away =
+        jogo?.goals?.away ??
+        jogo?.score?.fulltime?.away ??
+        jogo?.score?.fullTime?.away;
+
+    if (
+        home === null ||
+        home === undefined ||
+        away === null ||
+        away === undefined
+    ) {
+        return null;
+    }
+
+    const golsCasa = Number(home);
+    const golsFora = Number(away);
+
+    if (
+        !Number.isFinite(golsCasa) ||
+        !Number.isFinite(golsFora)
+    ) {
+        return null;
+    }
 
     return {
-
-        casa:
-            Number(golsCasa),
-
-        fora:
-            Number(golsFora)
-
+        casa: golsCasa,
+        fora: golsFora
     };
-
 }
-
 
 /* =========================================================
    RESULTADO DO PALPITE
+========================================================= */
+
+/* =========================================================
+   CALCULAR RESULTADO DO PALPITE
 ========================================================= */
 
 function calcularResultadoPalpite(
@@ -4231,10 +4362,26 @@ function calcularResultadoPalpite(
     golsFora
 ) {
 
-    const palpite =
-        normalizarNome(
-            escolha
-        );
+    const palpite = String(
+        escolha || ""
+    )
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+    const casa = Number(golsCasa);
+    const fora = Number(golsFora);
+
+    if (
+        !Number.isFinite(casa) ||
+        !Number.isFinite(fora)
+    ) {
+        return "aguardando";
+    }
+
+    const total =
+        casa + fora;
 
 
     /* =====================================================
@@ -4246,10 +4393,9 @@ function calcularResultadoPalpite(
         palpite === "1"
     ) {
 
-        return golsCasa > golsFora
+        return casa > fora
             ? "ganhou"
             : "perdeu";
-
     }
 
 
@@ -4262,10 +4408,9 @@ function calcularResultadoPalpite(
         palpite === "x"
     ) {
 
-        return golsCasa === golsFora
+        return casa === fora
             ? "ganhou"
             : "perdeu";
-
     }
 
 
@@ -4278,10 +4423,9 @@ function calcularResultadoPalpite(
         palpite === "2"
     ) {
 
-        return golsFora > golsCasa
+        return fora > casa
             ? "ganhou"
             : "perdeu";
-
     }
 
 
@@ -4292,121 +4436,114 @@ function calcularResultadoPalpite(
     if (
         palpite === "ambas" ||
         palpite === "ambas marcam" ||
-        palpite === "ambas marcam sim"
+        palpite === "ambas marcam sim" ||
+        palpite === "btts"
     ) {
 
         return (
-            golsCasa > 0 &&
-            golsFora > 0
+            casa > 0 &&
+            fora > 0
         )
             ? "ganhou"
             : "perdeu";
-
     }
 
 
     /* =====================================================
        +2 GOLS
+       Considera Over 2.5:
+       3 ou mais gols = ganhou
     ===================================================== */
 
     if (
-        palpite.includes("+2") ||
-        palpite.includes("mais de 2") ||
-        palpite.includes("mais 2")
+        palpite === "+2" ||
+        palpite === "+2 gols" ||
+        palpite === "mais de 2 gols" ||
+        palpite === "over 2.5"
     ) {
 
-        return (
-            golsCasa + golsFora > 2
-        )
+        return total >= 3
             ? "ganhou"
             : "perdeu";
-
     }
 
 
     /* =====================================================
        -2 GOLS
+       Considera Under 2.5:
+       0, 1 ou 2 gols = ganhou
     ===================================================== */
 
     if (
-        palpite.includes("-2") ||
-        palpite.includes("menos de 2") ||
-        palpite.includes("menos 2")
+        palpite === "-2" ||
+        palpite === "-2 gols" ||
+        palpite === "menos de 2 gols" ||
+        palpite === "under 2.5"
     ) {
 
-        return (
-            golsCasa + golsFora < 2
-        )
+        return total <= 2
             ? "ganhou"
             : "perdeu";
-
     }
 
 
     /* =====================================================
-       CASA / EMPATE
+       CASA/FORA
+       Não pode haver empate
     ===================================================== */
 
     if (
-        palpite.includes("casa/empate") ||
-        palpite.includes("casa ou empate")
+        palpite === "casa/fora" ||
+        palpite === "casa ou fora"
     ) {
 
-        return (
-            golsCasa >= golsFora
-        )
+        return casa !== fora
             ? "ganhou"
             : "perdeu";
-
     }
 
 
     /* =====================================================
-       CASA / FORA
+       CASA/EMPATE
     ===================================================== */
 
     if (
-        palpite.includes("casa/fora") ||
-        palpite.includes("casa ou fora")
+        palpite === "casa/empate" ||
+        palpite === "casa ou empate"
     ) {
 
-        return (
-            golsCasa !== golsFora
-        )
+        return casa >= fora
             ? "ganhou"
             : "perdeu";
-
     }
 
 
     /* =====================================================
-       EMPATE / FORA
+       EMPATE/FORA
     ===================================================== */
 
     if (
-        palpite.includes("empate/fora") ||
-        palpite.includes("empate ou fora")
+        palpite === "empate/fora" ||
+        palpite === "empate ou fora"
     ) {
 
-        return (
-            golsFora >= golsCasa
-        )
+        return fora >= casa
             ? "ganhou"
             : "perdeu";
-
     }
 
 
-    console.log(
-        "⚠️ Palpite não reconhecido:",
+    console.warn(
+        "⚠️ PALPITE NÃO RECONHECIDO:",
         escolha
     );
 
-
     return "aguardando";
-
 }
 
+/* =========================================================
+   ATUALIZAR UMA APOSTA
+========================================================= */
 
 /* =========================================================
    ATUALIZAR UMA APOSTA
@@ -4419,34 +4556,35 @@ async function atualizarUmaAposta(
 ) {
 
     if (
+        !codigo ||
         !aposta ||
         !Array.isArray(aposta.selecoes)
     ) {
 
-        return;
+        return false;
 
     }
 
 
-    /* =====================================================
-       APOSTA JÁ PERDIDA
-       NÃO PRECISA MAIS CONSULTAR
-    ===================================================== */
-
-    if (
-        String(
-            aposta.status || ""
-        ).toLowerCase() === "perdeu"
-    ) {
-
-        return;
-
-    }
+    const selecoesOriginais =
+        aposta.selecoes;
 
 
     const novasSelecoes =
-        [...aposta.selecoes];
+        selecoesOriginais.map(
+            selecao => ({
+                ...selecao
+            })
+        );
 
+
+    let houveAlteracao =
+        false;
+
+
+    /* =====================================================
+       PROCESSAR CADA JOGO
+    ===================================================== */
 
     for (
         let i = 0;
@@ -4458,49 +4596,188 @@ async function atualizarUmaAposta(
             novasSelecoes[i];
 
 
-        if (
-            selecao.resultado === "ganhou" ||
-            selecao.resultado === "perdeu"
-        ) {
-
+        if (!selecao) {
             continue;
-
         }
 
 
-        const jogo =
+        const jogoAPI =
             encontrarJogoAPI(
                 selecao,
                 resultadosAPI
             );
 
 
-        if (!jogo) {
+        if (!jogoAPI) {
+
+            console.warn(
+                "⚠️ JOGO NÃO ENCONTRADO:",
+                {
+                    codigo,
+                    fixtureId:
+                        selecao.fixtureId,
+                    timeA:
+                        selecao.timeA,
+                    timeB:
+                        selecao.timeB
+                }
+            );
 
             continue;
 
         }
 
 
-        if (
-            !jogoFinalizado(jogo)
-        ) {
+        const fixtureId =
+            String(
+                jogoAPI?.fixture?.id ||
+                ""
+            );
 
-            continue;
 
-        }
+        const statusAPI =
+            String(
+                jogoAPI?.fixture?.status?.short ||
+                ""
+            )
+            .toUpperCase();
 
+
+        console.log(
+            "🎯 VERIFICANDO JOGO:",
+            {
+                codigo,
+                fixtureId,
+                timeA:
+                    selecao.timeA,
+                timeB:
+                    selecao.timeB,
+                escolha:
+                    selecao.escolha,
+                statusAPI
+            }
+        );
+
+
+        /* =================================================
+           PEGAR PLACAR
+        ================================================= */
 
         const placar =
-            pegarPlacar(jogo);
+            pegarPlacar(
+                jogoAPI
+            );
 
+
+        /*
+           Se já terminou e a API trouxe o placar,
+           salvamos o placar mesmo que o resultado
+           já esteja preenchido.
+        */
+
+        if (
+            placar &&
+            jogoFinalizado(jogoAPI)
+        ) {
+
+            if (
+                Number(
+                    selecao.placarCasa
+                ) !== placar.casa
+            ) {
+
+                novasSelecoes[i].placarCasa =
+                    placar.casa;
+
+                houveAlteracao =
+                    true;
+
+            }
+
+
+            if (
+                Number(
+                    selecao.placarFora
+                ) !== placar.fora
+            ) {
+
+                novasSelecoes[i].placarFora =
+                    placar.fora;
+
+                houveAlteracao =
+                    true;
+
+            }
+
+
+            /*
+               Também salva nomes alternativos,
+               caso alguma parte antiga do sistema
+               utilize esses campos.
+            */
+
+            if (
+                selecao.placarA !==
+                placar.casa
+            ) {
+
+                novasSelecoes[i].placarA =
+                    placar.casa;
+
+            }
+
+
+            if (
+                selecao.placarB !==
+                placar.fora
+            ) {
+
+                novasSelecoes[i].placarB =
+                    placar.fora;
+
+            }
+
+        }
+
+
+        /* =================================================
+           JOGO AINDA NÃO TERMINOU
+        ================================================= */
+
+        if (
+            !jogoFinalizado(jogoAPI)
+        ) {
+
+            console.log(
+                "⏳ JOGO AINDA NÃO FINALIZADO:",
+                fixtureId,
+                statusAPI
+            );
+
+            continue;
+
+        }
+
+
+        /* =================================================
+           SEM PLACAR
+        ================================================= */
 
         if (!placar) {
 
+            console.warn(
+                "⚠️ JOGO FINALIZADO SEM PLACAR:",
+                fixtureId
+            );
+
             continue;
 
         }
 
+
+        /* =================================================
+           CALCULAR RESULTADO
+        ================================================= */
 
         const resultado =
             calcularResultadoPalpite(
@@ -4510,8 +4787,22 @@ async function atualizarUmaAposta(
             );
 
 
+        console.log(
+            "📊 RESULTADO CALCULADO:",
+            {
+                fixtureId,
+                escolha:
+                    selecao.escolha,
+                placar:
+                    `${placar.casa} x ${placar.fora}`,
+                resultado
+            }
+        );
+
+
         if (
-            resultado === "aguardando"
+            resultado ===
+            "aguardando"
         ) {
 
             continue;
@@ -4519,118 +4810,161 @@ async function atualizarUmaAposta(
         }
 
 
-        novasSelecoes[i] = {
+        if (
+            selecao.resultado !==
+            resultado
+        ) {
 
-            ...selecao,
+            novasSelecoes[i].resultado =
+                resultado;
 
-            resultado:
-                resultado,
+            houveAlteracao =
+                true;
 
-            placarCasa:
-                placar.casa,
+        }
 
-            placarFora:
-                placar.fora
 
-        };
+        if (
+            selecao.status !==
+            resultado
+        ) {
+
+            novasSelecoes[i].status =
+                resultado;
+
+            houveAlteracao =
+                true;
+
+        }
 
     }
 
 
     /* =====================================================
-       VERIFICAR RESULTADO DA APOSTA INTEIRA
+       CALCULAR STATUS DA APOSTA
     ===================================================== */
 
-    const todosGanharam =
-        novasSelecoes.length > 0 &&
-        novasSelecoes.every(
+    const resultados =
+        novasSelecoes.map(
             selecao =>
-                selecao.resultado === "ganhou"
+                String(
+                    selecao.resultado ||
+                    "aguardando"
+                ).toLowerCase()
         );
 
 
-    const algumPerdeu =
-        novasSelecoes.some(
-            selecao =>
-                selecao.resultado === "perdeu"
-        );
-
-
-    let statusAposta =
+    let novoStatus =
         "aguardando";
 
 
     if (
-        algumPerdeu
+        resultados.some(
+            resultado =>
+                resultado === "perdeu"
+        )
     ) {
 
-        statusAposta =
+        novoStatus =
             "perdeu";
 
     }
 
     else if (
-        todosGanharam
+        resultados.length > 0 &&
+        resultados.every(
+            resultado =>
+                resultado === "ganhou"
+        )
     ) {
 
-        statusAposta =
+        novoStatus =
             "ganhou";
 
     }
 
 
-    /* =====================================================
-       VERIFICAR ALTERAÇÃO
-    ===================================================== */
-
-    const houveAlteracao =
-        JSON.stringify(
-            aposta.selecoes
-        ) !==
-        JSON.stringify(
-            novasSelecoes
-        ) ||
-        aposta.status !==
-        statusAposta;
+    console.log(
+        "🏁 STATUS DA APOSTA:",
+        {
+            codigo,
+            antigo:
+                aposta.status,
+            novo:
+                novoStatus,
+            resultados
+        }
+    );
 
 
-    if (!houveAlteracao) {
+    if (
+        String(
+            aposta.status ||
+            "aguardando"
+        ).toLowerCase() !==
+        novoStatus
+    ) {
 
-        return;
+        houveAlteracao =
+            true;
 
     }
 
 
     /* =====================================================
-       SALVAR
+       SALVAR NO FIREBASE
     ===================================================== */
 
+    if (!houveAlteracao) {
+
+        return false;
+
+    }
+
+
+    const atualizacao = {
+
+        selecoes:
+            novasSelecoes,
+
+        status:
+            novoStatus,
+
+        ultimaAtualizacao:
+            new Date().toISOString()
+
+    };
+
+
     await update(
+
         ref(
             db,
-            `apostas/${codigo}`
+            "apostas/" +
+            codigo
         ),
-        {
 
-            selecoes:
-                novasSelecoes,
+        atualizacao
 
-            status:
-                statusAposta
-
-        }
     );
 
 
     console.log(
-        "💾 Aposta atualizada:",
-        codigo,
-        "→",
-        statusAposta
+        "✅ APOSTA ATUALIZADA NO FIREBASE:",
+        {
+            codigo,
+            status:
+                novoStatus
+        }
     );
 
+
+    return true;
 }
 
+/* =========================================================
+   ATUALIZAR TODAS AS APOSTAS
+========================================================= */
 
 /* =========================================================
    ATUALIZAR TODAS AS APOSTAS
@@ -4640,72 +4974,94 @@ async function atualizarResultadosApostas(
     resultadosAPI
 ) {
 
-    try {
+    if (
+        !Array.isArray(resultadosAPI) ||
+        resultadosAPI.length === 0
+    ) {
 
-        const snapshot =
-            await get(
-                ref(
-                    db,
-                    "apostas"
-                )
-            );
+        console.warn(
+            "⚠️ Nenhum resultado disponível para comparar."
+        );
+
+        return;
+
+    }
 
 
-        if (
-            !snapshot.exists()
-        ) {
+    const snapshot =
+        await get(
+            ref(
+                db,
+                "apostas"
+            )
+        );
 
-            console.log(
-                "🎟️ Nenhuma aposta encontrada."
-            );
 
-            return;
+    if (!snapshot.exists()) {
 
+        console.log(
+            "ℹ️ Nenhuma aposta cadastrada."
+        );
+
+        return;
+
+    }
+
+
+    const apostas =
+        snapshot.val();
+
+
+    for (
+        const codigo in apostas
+    ) {
+
+        const aposta =
+            apostas[codigo];
+
+
+        if (!aposta) {
+            continue;
         }
 
 
-        const apostas =
-            snapshot.val();
-
-
-        for (
-            const codigo in apostas
-        ) {
+        try {
 
             await atualizarUmaAposta(
                 codigo,
-                apostas[codigo],
+                aposta,
                 resultadosAPI
             );
 
         }
 
-    }
+        catch (erro) {
 
-    catch (erro) {
+            console.error(
+                "❌ Erro atualizando aposta:",
+                codigo,
+                erro
+            );
 
-        console.error(
-            "❌ Erro atualizando apostas:",
-            erro
-        );
+        }
 
     }
 
 }
-
-
 /* =========================================================
    ATUALIZAÇÃO COMPLETA
 ========================================================= */
 
+/* =========================================================
+   ATUALIZAR RESULTADOS
+========================================================= */
+
 async function atualizarResultados() {
 
-    if (
-        atualizacaoEmAndamento
-    ) {
+    if (atualizacaoEmAndamento) {
 
         console.log(
-            "⏳ Atualização já está acontecendo."
+            "⏳ Atualização de resultados já está em andamento."
         );
 
         return;
@@ -4720,14 +5076,9 @@ async function atualizarResultados() {
     try {
 
         console.log(
-            "🚀 Iniciando atualização..."
+            "🔄 INICIANDO ATUALIZAÇÃO DOS RESULTADOS..."
         );
 
-
-        /* =================================================
-           PRIMEIRO LÊ AS APOSTAS
-           PARA DESCOBRIR AS DATAS NECESSÁRIAS
-        ================================================= */
 
         const snapshot =
             await get(
@@ -4738,12 +5089,10 @@ async function atualizarResultados() {
             );
 
 
-        if (
-            !snapshot.exists()
-        ) {
+        if (!snapshot.exists()) {
 
             console.log(
-                "🎟️ Nenhuma aposta para atualizar."
+                "ℹ️ Nenhuma aposta encontrada."
             );
 
             return;
@@ -4759,43 +5108,87 @@ async function atualizarResultados() {
             new Set();
 
 
+        /* =====================================================
+           DESCOBRIR AS DATAS DAS APOSTAS
+        ===================================================== */
+
         Object.values(
             apostas
-        ).forEach(
+        )
+        .forEach(
             aposta => {
 
-                if (
-                    !aposta ||
-                    !Array.isArray(
+                if (!aposta) {
+                    return;
+                }
+
+
+                const selecoes =
+                    Array.isArray(
                         aposta.selecoes
                     )
-                ) {
-
-                    return;
-
-                }
-
-
-                if (
-                    aposta.status === "perdeu" ||
-                    aposta.status === "ganhou"
-                ) {
-
-                    return;
-
-                }
+                        ? aposta.selecoes
+                        : Object.values(
+                            aposta.selecoes || {}
+                        );
 
 
-                aposta.selecoes.forEach(
+                selecoes.forEach(
                     selecao => {
 
+                        if (!selecao) {
+                            return;
+                        }
+
+
+                        let data =
+                            String(
+                                selecao.data ||
+                                ""
+                            ).trim();
+
+
+                        /*
+                           Se não tiver data,
+                           tenta recuperar de dataHora.
+                        */
+
                         if (
-                            selecao &&
-                            selecao.data
+                            !/^\d{4}-\d{2}-\d{2}$/.test(
+                                data
+                            )
+                        ) {
+
+                            const dataHora =
+                                String(
+                                    selecao.dataHora ||
+                                    ""
+                                ).trim();
+
+
+                            if (
+                                dataHora.length >= 10
+                            ) {
+
+                                data =
+                                    dataHora.substring(
+                                        0,
+                                        10
+                                    );
+
+                            }
+
+                        }
+
+
+                        if (
+                            /^\d{4}-\d{2}-\d{2}$/.test(
+                                data
+                            )
                         ) {
 
                             datas.add(
-                                selecao.data
+                                data
                             );
 
                         }
@@ -4807,28 +5200,31 @@ async function atualizarResultados() {
         );
 
 
-        /* =================================================
-           SE NÃO HOUVER DATA
-        ================================================= */
+        /*
+           Caso não encontre nenhuma data,
+           consulta hoje.
+        */
 
         if (
             datas.size === 0
         ) {
 
-            const hoje =
-                obterDataLocalAPI();
-
             datas.add(
-                hoje
+                obterDataLocalAPI()
             );
 
         }
 
 
-        /* =================================================
-           BUSCAR CADA DATA
-           UMA ÚNICA VEZ
-        ================================================= */
+        console.log(
+            "📅 DATAS DOS RESULTADOS:",
+            [...datas]
+        );
+
+
+        /* =====================================================
+           BUSCAR RESULTADOS
+        ===================================================== */
 
         const resultadosTodos = [];
 
@@ -4836,6 +5232,12 @@ async function atualizarResultados() {
         for (
             const data of datas
         ) {
+
+            console.log(
+                "📡 BUSCANDO RESULTADOS:",
+                data
+            );
+
 
             const resultados =
                 await buscarResultadosAPI(
@@ -4858,29 +5260,72 @@ async function atualizarResultados() {
         }
 
 
+        /* =====================================================
+           REMOVER DUPLICADOS
+        ===================================================== */
+
+        const mapa =
+            new Map();
+
+
+        resultadosTodos.forEach(
+            jogo => {
+
+                const id =
+                    String(
+                        jogo?.fixture?.id ||
+                        ""
+                    );
+
+
+                if (id) {
+
+                    mapa.set(
+                        id,
+                        jogo
+                    );
+
+                }
+
+            }
+        );
+
+
+        const resultadosUnicos =
+            [...mapa.values()];
+
+
+        console.log(
+            "📊 TOTAL DE JOGOS RECEBIDOS:",
+            resultadosUnicos.length
+        );
+
+
         if (
-            resultadosTodos.length === 0
+            resultadosUnicos.length === 0
         ) {
 
-            mostrarAvisoAtualizacao();
+            console.warn(
+                "⚠️ A API não retornou resultados."
+            );
 
             return;
 
         }
 
 
-        /* =================================================
-           ATUALIZAR APOSTAS
-        ================================================= */
+        /* =====================================================
+           COMPARAR COM AS APOSTAS
+        ===================================================== */
 
         await atualizarResultadosApostas(
-            resultadosTodos
+            resultadosUnicos
         );
 
 
-        /* =================================================
-           ATUALIZAR MENU
-        ================================================= */
+        /* =====================================================
+           RECARREGAR MENU
+        ===================================================== */
 
         if (
             typeof carregarJogosFeitosMenu ===
@@ -4891,12 +5336,17 @@ async function atualizarResultados() {
 
         }
 
+
+        console.log(
+            "✅ RESULTADOS ATUALIZADOS COM SUCESSO."
+        );
+
     }
 
     catch (erro) {
 
         console.error(
-            "❌ Erro na atualização:",
+            "❌ ERRO ATUALIZANDO RESULTADOS:",
             erro
         );
 
@@ -4911,7 +5361,6 @@ async function atualizarResultados() {
 
 }
 
-
 /* =========================================================
    INICIAR AUTOMÁTICO
 ========================================================= */
@@ -4920,110 +5369,15 @@ async function atualizarResultados() {
    INICIAR ATUALIZAÇÃO AUTOMÁTICA
 ========================================================= */
 
-function iniciarAtualizacaoAPI(minutos = 180) { // ← Agora aceita o intervalo em minutos
-    /*
-     * Cancela timer anterior
-     */
-    if (intervaloAtualizacao) {
-        clearInterval(intervaloAtualizacao);
-        intervaloAtualizacao = null;
-    }
-
-    if (window.timerConsulta0001) {
-        clearTimeout(window.timerConsulta0001);
-        window.timerConsulta0001 = null;
-    }
-
-
-    /* =====================================================
-       CONSULTAR JOGOS DO DIA ATUAL
-    ===================================================== */
-
-    async function consultarJogosHoje() {
-        try {
-            const dataHoje = obterDataLocalAPI();
-            console.log("🚀 CONSULTA API - Data:", dataHoje);
-
-            const resposta = await buscarJogosComCache(dataHoje);
-            console.log("✅ Consulta concluída:", dataHoje, Array.isArray(resposta) ? resposta.length : 0, "jogos");
-
-            if (typeof inicializarJogos === "function") {
-                await inicializarJogos();
-            }
-
-            // ✅ Também atualiza os resultados das apostas
-            await atualizarResultados();
-
-        } catch (erro) {
-            console.error("❌ Erro na consulta automática:", erro);
-        }
-    }
-
-
-    /* =====================================================
-       CALCULAR PRÓXIMO 00:01
-    ===================================================== */
-
-    function agendar0001() {
-        const agora = new Date();
-        const proximo0001 = new Date(agora);
-
-        proximo0001.setDate(agora.getDate() + 1);
-        proximo0001.setHours(0, 1, 0, 0);
-
-        const tempoRestante = proximo0001.getTime() - agora.getTime();
-        console.log("⏰ Próxima consulta 00:00:", proximo0001.toLocaleString("pt-BR"));
-
-        window.timerConsulta0001 = setTimeout(async () => {
-            const dataHoje = obterDataLocalAPI();
-            console.log("=====================================");
-            console.log("🕛 00:01 — NOVA DATA:", dataHoje);
-            console.log("=====================================");
-
-            try {
-                await buscarJogosComCache(dataHoje);
-                if (typeof inicializarJogos === "function") {
-                    await inicializarJogos();
-                }
-            } catch (erro) {
-                console.error("❌ Erro na consulta 00:01:", erro);
-            }
-
-            agendar0001();
-        }, tempoRestante);
-    }
-
-
-    /* =====================================================
-       ATUALIZAÇÃO PERIÓDICA (a cada X minutos)
-    ===================================================== */
-
-    const intervaloMs = minutos * 60 * 1000; // converte minutos → milissegundos
-
-    intervaloAtualizacao = setInterval(async () => {
-        console.log(`⏰ Atualização automática (a cada ${minutos} min)`);
-        await atualizarResultados(); // ← verifica resultados das apostas
-    }, intervaloMs);
-
-    console.log(`✅ Atualização automática ativada: a cada ${minutos} minutos`);
-
-
-    /* =====================================================
-       AGENDAR 00:01
-    ===================================================== */
-
-    agendar0001();
-}
-
 /* =========================================================
-   PARAR AUTOMÁTICO
+   ATUALIZAÇÃO AUTOMÁTICA DOS RESULTADOS
 ========================================================= */
 
-function pararAtualizacaoAPI() {
+function iniciarAtualizacaoAPI(
+    minutos = 30
+) {
 
-    if (
-        intervaloAtualizacao !== null
-    ) {
+    if (intervaloAtualizacao) {
 
         clearInterval(
             intervaloAtualizacao
@@ -5034,8 +5388,90 @@ function pararAtualizacaoAPI() {
 
     }
 
-}
 
+    /*
+       Atualiza imediatamente ao iniciar.
+    */
+
+    setTimeout(
+        async () => {
+
+            console.log(
+                "🚀 PRIMEIRA ATUALIZAÇÃO DE RESULTADOS"
+            );
+
+            try {
+
+                await atualizarResultados();
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "❌ ERRO NA PRIMEIRA ATUALIZAÇÃO:",
+                    erro
+                );
+
+            }
+
+        },
+        1000
+    );
+
+
+    const intervaloMs =
+        Math.max(
+            5,
+            Number(minutos) || 30
+        ) *
+        60 *
+        1000;
+
+
+    intervaloAtualizacao =
+        setInterval(
+            async () => {
+
+                if (
+                    atualizacaoEmAndamento
+                ) {
+
+                    return;
+
+                }
+
+
+                console.log(
+                    "🔄 ATUALIZAÇÃO AUTOMÁTICA DOS RESULTADOS"
+                );
+
+
+                try {
+
+                    await atualizarResultados();
+
+                }
+
+                catch (erro) {
+
+                    console.error(
+                        "❌ ERRO NA ATUALIZAÇÃO AUTOMÁTICA:",
+                        erro
+                    );
+
+                }
+
+            },
+            intervaloMs
+        );
+
+
+    console.log(
+        `⏰ Atualização automática configurada para cada ${minutos} minutos.`
+    );
+
+}
 
 /* =========================================================
    GERAR ID DO JOGADOR
@@ -6676,11 +7112,11 @@ async function carregarJogosFeitosMenu() {
                     jogo => {
 
                         const resultado =
-                            String(
-                                jogo.resultado ||
-                                "aguardando"
-                            ).toLowerCase();
-
+    String(
+        jogo.resultado ||
+        jogo.status ||
+        "aguardando"
+    ).toLowerCase();
 
                         let textoResultado =
                             "Aguardando";
@@ -12018,43 +12454,42 @@ obterElemento(
 ========================================================= */
 
 const carrossel =
-    obterElemento(
-        "carrossel"
-    );
+    obterElemento("carrossel");
 
 
-let slide =
-    0;
+let slide = 0;
 
+
+function proximoSlide() {
+
+    if (!carrossel) return;
+
+
+    const total =
+        carrossel.children.length;
+
+
+    if (!total) return;
+
+
+    slide =
+        (slide + 1) % total;
+
+
+    carrossel.style.transform =
+        `translate3d(-${slide * 100}%, 0, 0)`;
+
+}
+
+
+/* =========================================================
+   TROCA AUTOMÁTICA
+========================================================= */
 
 setInterval(
-    () => {
-
-        if (!carrossel) return;
-
-
-        const total =
-            carrossel.children.length;
-
-
-        if (!total) return;
-
-
-        slide =
-            (
-                slide + 1
-            ) %
-            total;
-
-
-        carrossel.style.transform =
-            `translateX(-${slide * 100}%)`;
-
-    },
+    proximoSlide,
     3000
 );
-
-
 /* =========================================================
    INICIALIZAÇÃO DOS JOGOS
 ========================================================= */
@@ -13499,8 +13934,8 @@ async function iniciarSistema() {
         ================================================ */
 
         iniciarAtualizacaoAPI(
-            180
-        );
+    30
+);
 
     }
 
@@ -13586,7 +14021,7 @@ else {
 }
 const CONFIG = {
     vezesAbrir: 1,        // ← 1 vez apenas
-    duracaoSegundos: 35
+    duracaoSegundos: 20
 };
 
 let contadorExibicoes = 0;
@@ -13604,7 +14039,7 @@ function abryrModal() {
 }
 
 window.addEventListener('load', () => {
-    setTimeout(abryrModal, 500);
+    setTimeout(abryrModal, 300);
 });
 
 </script>
