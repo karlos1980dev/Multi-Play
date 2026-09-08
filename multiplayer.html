@@ -2832,14 +2832,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 100;
+const LIMITE_API_DIA = 200;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 80 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 80;
+const LIMITE_SEGURANCA = 150;
 
 
 
@@ -3205,7 +3205,7 @@ const API_BASE =
    CACHE
 ========================================================= */
 
-/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const const CACHE_TEMPO_RESULTADOS = 10 * 60 * 1000; // 10 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
+/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const CACHE_TEMPO_RESULTADOS = 2 * 60 * 1000; // 10 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
 
 
 /* =========================================================
@@ -14097,7 +14097,7 @@ function abryrModal() {
 window.addEventListener('load', () => {
     setTimeout(abryrModal, 300);
 });
-
+iniciarAtualizacaoResultados(3);
 </script>
 </body>
 
