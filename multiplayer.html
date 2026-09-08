@@ -5144,12 +5144,19 @@ async function atualizarResultadosApostas(
    ATUALIZAR RESULTADOS
 ========================================================= */
 
+// =========================================================
+// ATUALIZAR RESULTADOS
+// =========================================================
+
+let atualizacaoResultadosEmAndamento = false;
+
+
 async function atualizarResultados() {
 
-    if (atualizacaoEmAndamento) {
+    if (atualizacaoResultadosEmAndamento) {
 
         console.log(
-            "⏳ Atualização de resultados já está em andamento."
+            "⏳ Atualização já está em andamento."
         );
 
         return;
@@ -5157,8 +5164,7 @@ async function atualizarResultados() {
     }
 
 
-    atualizacaoEmAndamento =
-        true;
+    atualizacaoResultadosEmAndamento = true;
 
 
     try {
@@ -5180,7 +5186,7 @@ async function atualizarResultados() {
         if (!snapshot.exists()) {
 
             console.log(
-                "ℹ️ Nenhuma aposta encontrada."
+                "ℹ️ Nenhuma aposta para atualizar."
             );
 
             return;
@@ -5196,106 +5202,84 @@ async function atualizarResultados() {
             new Set();
 
 
-        /* =====================================================
-           DESCOBRIR AS DATAS DAS APOSTAS
-        ===================================================== */
+        // =================================================
+        // DESCOBRIR TODAS AS DATAS DAS APOSTAS
+        // =================================================
 
-        Object.values(
-            apostas
-        )
-        .forEach(
-            aposta => {
+        for (
+            const codigo in apostas
+        ) {
 
-                if (!aposta) {
-                    return;
+            const aposta =
+                apostas[codigo];
+
+
+            if (
+                !Array.isArray(
+                    aposta?.selecoes
+                )
+            ) {
+
+                continue;
+
+            }
+
+
+            for (
+                const selecao of
+                aposta.selecoes
+            ) {
+
+                if (!selecao) {
+                    continue;
                 }
 
 
-                const selecoes =
-                    Array.isArray(
-                        aposta.selecoes
+                let data =
+                    String(
+                        selecao.data ||
+                        ""
                     )
-                        ? aposta.selecoes
-                        : Object.values(
-                            aposta.selecoes || {}
+                    .trim();
+
+
+                // Se não tiver data, tenta dataHora
+                if (
+                    !data &&
+                    selecao.dataHora
+                ) {
+
+                    data =
+                        String(
+                            selecao.dataHora
+                        )
+                        .substring(
+                            0,
+                            10
                         );
 
-
-                selecoes.forEach(
-                    selecao => {
-
-                        if (!selecao) {
-                            return;
-                        }
+                }
 
 
-                        let data =
-                            String(
-                                selecao.data ||
-                                ""
-                            ).trim();
+                if (
+                    /^\d{4}-\d{2}-\d{2}$/
+                    .test(data)
+                ) {
 
+                    datas.add(data);
 
-                        /*
-                           Se não tiver data,
-                           tenta recuperar de dataHora.
-                        */
-
-                        if (
-                            !/^\d{4}-\d{2}-\d{2}$/.test(
-                                data
-                            )
-                        ) {
-
-                            const dataHora =
-                                String(
-                                    selecao.dataHora ||
-                                    ""
-                                ).trim();
-
-
-                            if (
-                                dataHora.length >= 10
-                            ) {
-
-                                data =
-                                    dataHora.substring(
-                                        0,
-                                        10
-                                    );
-
-                            }
-
-                        }
-
-
-                        if (
-                            /^\d{4}-\d{2}-\d{2}$/.test(
-                                data
-                            )
-                        ) {
-
-                            datas.add(
-                                data
-                            );
-
-                        }
-
-                    }
-                );
+                }
 
             }
-        );
+
+        }
 
 
-        /*
-           Caso não encontre nenhuma data,
-           consulta hoje.
-        */
+        // =================================================
+        // SE NÃO ENCONTROU DATA
+        // =================================================
 
-        if (
-            datas.size === 0
-        ) {
+        if (datas.size === 0) {
 
             datas.add(
                 obterDataLocalAPI()
@@ -5305,14 +5289,14 @@ async function atualizarResultados() {
 
 
         console.log(
-            "📅 DATAS DOS RESULTADOS:",
+            "📅 DATAS DAS APOSTAS:",
             [...datas]
         );
 
 
-        /* =====================================================
-           BUSCAR RESULTADOS
-        ===================================================== */
+        // =================================================
+        // BUSCAR RESULTADOS DE CADA DATA
+        // =================================================
 
         const resultadosTodos = [];
 
@@ -5321,26 +5305,40 @@ async function atualizarResultados() {
             const data of datas
         ) {
 
-            console.log(
-                "📡 BUSCANDO RESULTADOS:",
-                data
-            );
+            try {
 
-
-            const resultados =
-                await buscarResultadosAPI(
+                console.log(
+                    "🔎 BUSCANDO RESULTADOS:",
                     data
                 );
 
 
-            if (
-                Array.isArray(
-                    resultados
-                )
-            ) {
+                const resultados =
+                    await buscarResultadosAPI(
+                        data
+                    );
 
-                resultadosTodos.push(
-                    ...resultados
+
+                if (
+                    Array.isArray(
+                        resultados
+                    )
+                ) {
+
+                    resultadosTodos.push(
+                        ...resultados
+                    );
+
+                }
+
+            }
+
+            catch (erro) {
+
+                console.error(
+                    "❌ ERRO BUSCANDO DATA:",
+                    data,
+                    erro
                 );
 
             }
@@ -5348,53 +5346,55 @@ async function atualizarResultados() {
         }
 
 
-        /* =====================================================
-           REMOVER DUPLICADOS
-        ===================================================== */
+        // =================================================
+        // REMOVER DUPLICADOS
+        // =================================================
 
         const mapa =
             new Map();
 
 
-        resultadosTodos.forEach(
-            jogo => {
+        for (
+            const jogo of
+            resultadosTodos
+        ) {
 
-                const id =
-                    String(
-                        jogo?.fixture?.id ||
-                        ""
-                    );
+            const id =
+                String(
+                    jogo?.fixture?.id ||
+                    jogo?.id ||
+                    ""
+                );
 
 
-                if (id) {
+            if (id) {
 
-                    mapa.set(
-                        id,
-                        jogo
-                    );
-
-                }
+                mapa.set(
+                    id,
+                    jogo
+                );
 
             }
-        );
+
+        }
 
 
-        const resultadosUnicos =
+        const resultadosFinais =
             [...mapa.values()];
 
 
         console.log(
-            "📊 TOTAL DE JOGOS RECEBIDOS:",
-            resultadosUnicos.length
+            "📊 TOTAL DE RESULTADOS:",
+            resultadosFinais.length
         );
 
 
         if (
-            resultadosUnicos.length === 0
+            resultadosFinais.length === 0
         ) {
 
             console.warn(
-                "⚠️ A API não retornou resultados."
+                "⚠️ Nenhum jogo retornado pela API."
             );
 
             return;
@@ -5402,18 +5402,18 @@ async function atualizarResultados() {
         }
 
 
-        /* =====================================================
-           COMPARAR COM AS APOSTAS
-        ===================================================== */
+        // =================================================
+        // ATUALIZAR APOSTAS
+        // =================================================
 
         await atualizarResultadosApostas(
-            resultadosUnicos
+            resultadosFinais
         );
 
 
-        /* =====================================================
-           RECARREGAR MENU
-        ===================================================== */
+        // =================================================
+        // RECARREGAR MENU JOGOS FEITOS
+        // =================================================
 
         if (
             typeof carregarJogosFeitosMenu ===
@@ -5426,15 +5426,16 @@ async function atualizarResultados() {
 
 
         console.log(
-            "✅ RESULTADOS ATUALIZADOS COM SUCESSO."
+            "✅ ATUALIZAÇÃO DOS RESULTADOS CONCLUÍDA."
         );
+
 
     }
 
     catch (erro) {
 
         console.error(
-            "❌ ERRO ATUALIZANDO RESULTADOS:",
+            "❌ ERRO NO CICLO DE RESULTADOS:",
             erro
         );
 
@@ -5442,125 +5443,57 @@ async function atualizarResultados() {
 
     finally {
 
-        atualizacaoEmAndamento =
+        atualizacaoResultadosEmAndamento =
             false;
 
     }
 
 }
+// =========================================================
+// ATUALIZAÇÃO AUTOMÁTICA DOS RESULTADOS
+// =========================================================
 
-/* =========================================================
-   INICIAR AUTOMÁTICO
-========================================================= */
+let intervaloResultados = null;
 
-/* =========================================================
-   INICIAR ATUALIZAÇÃO AUTOMÁTICA
-========================================================= */
 
-/* =========================================================
-   ATUALIZAÇÃO AUTOMÁTICA DOS RESULTADOS
-========================================================= */
-
-function iniciarAtualizacaoAPI(
+function iniciarAtualizacaoResultados(
     minutos = 30
 ) {
 
-    if (intervaloAtualizacao) {
+    if (intervaloResultados) {
 
         clearInterval(
-            intervaloAtualizacao
+            intervaloResultados
         );
-
-        intervaloAtualizacao =
-            null;
 
     }
 
 
-    /*
-       Atualiza imediatamente ao iniciar.
-    */
+    // Executa imediatamente
+    setTimeout(() => {
 
-    setTimeout(
-        async () => {
+        atualizarResultados();
 
-            console.log(
-                "🚀 PRIMEIRA ATUALIZAÇÃO DE RESULTADOS"
-            );
-
-            try {
-
-                await atualizarResultados();
-
-            }
-
-            catch (erro) {
-
-                console.error(
-                    "❌ ERRO NA PRIMEIRA ATUALIZAÇÃO:",
-                    erro
-                );
-
-            }
-
-        },
-        1000
-    );
+    }, 1000);
 
 
-    const intervaloMs =
-        Math.max(
-            5,
-            Number(minutos) || 30
-        ) *
-        60 *
-        1000;
-
-
-    intervaloAtualizacao =
+    // Depois continua automaticamente
+    intervaloResultados =
         setInterval(
-            async () => {
+            () => {
 
-                if (
-                    atualizacaoEmAndamento
-                ) {
-
-                    return;
-
-                }
-
-
-                console.log(
-                    "🔄 ATUALIZAÇÃO AUTOMÁTICA DOS RESULTADOS"
-                );
-
-
-                try {
-
-                    await atualizarResultados();
-
-                }
-
-                catch (erro) {
-
-                    console.error(
-                        "❌ ERRO NA ATUALIZAÇÃO AUTOMÁTICA:",
-                        erro
-                    );
-
-                }
+                atualizarResultados();
 
             },
-            intervaloMs
+            minutos * 60 * 1000
         );
 
 
     console.log(
-        `⏰ Atualização automática configurada para cada ${minutos} minutos.`
+        `🔄 RESULTADOS AUTOMÁTICOS: a cada ${minutos} minutos`
     );
 
 }
-
 /* =========================================================
    GERAR ID DO JOGADOR
 ========================================================= */
@@ -6984,588 +6917,652 @@ function corrigirDatasJogosSalvos() {
 
 async function carregarJogosFeitosMenu() {
 
-    const container =
-        document.getElementById(
-            "jogosFeitosMenu"
-        );
-
+    const container = document.getElementById("jogosFeitosMenu");
 
     if (!container) return;
 
-
-    container.innerHTML =
-        "<p style='color:white;text-align:center'>" +
-        "Carregando apostas..." +
-        "</p>";
-
+    container.innerHTML = `
+        <p style="color:white;text-align:center">
+            Carregando apostas...
+        </p>
+    `;
 
     try {
 
-        const snapshot =
-            await get(
-                ref(
-                    db,
-                    "apostas"
-                )
-            );
+        const snapshot = await get(
+            ref(db, "apostas")
+        );
 
+        if (!snapshot.exists()) {
 
-        if (
-            !snapshot.exists()
-        ) {
+            container.innerHTML = `
+                <p style="color:white;text-align:center">
+                    Nenhuma aposta encontrada.
+                </p>
+            `;
 
-            container.innerHTML =
-                "<p style='color:white;text-align:center'>" +
-                "Nenhuma aposta encontrada." +
-                "</p>";
+            const menu = obterElemento("menuEsportes");
 
-
-            obterElemento(
-                "menuEsportes"
-            )?.style &&
-            (
-                obterElemento(
-                    "menuEsportes"
-                ).style.display =
-                    "block"
-            );
-
+            if (menu) {
+                menu.style.display = "block";
+            }
 
             return;
-
         }
 
 
-        const dados =
-            snapshot.val();
+        const dados = snapshot.val();
 
 
-        const apostas =
-            Object.values(dados)
-                .filter(
-                    aposta =>
-                        aposta &&
-                        aposta.jogadorId ===
-                        jogadorId
-                )
-                .sort(
-                    (a, b) =>
-                        String(
-                            b.dataHora || ""
-                        ).localeCompare(
-                            String(
-                                a.dataHora || ""
-                            )
-                        )
+        /*
+        =====================================================
+        FILTRA SOMENTE AS APOSTAS DO JOGADOR
+        =====================================================
+        */
+
+        const apostas = Object.values(dados)
+            .filter(aposta => {
+
+                if (!aposta) return false;
+
+                return String(aposta.jogadorId || "") ===
+                       String(jogadorId || "");
+
+            })
+            .sort((a, b) => {
+
+                return String(
+                    b.dataHora || ""
+                ).localeCompare(
+                    String(a.dataHora || "")
                 );
 
-
-        if (
-            apostas.length === 0
-        ) {
-
-            container.innerHTML =
-                "<p style='color:white;text-align:center'>" +
-                "Você ainda não fez nenhuma aposta." +
-                "</p>";
+            });
 
 
-            const menu =
-                obterElemento(
-                    "menuEsportes"
-                );
+        if (apostas.length === 0) {
 
+            container.innerHTML = `
+                <p style="color:white;text-align:center">
+                    Você ainda não fez nenhuma aposta.
+                </p>
+            `;
+
+            const menu = obterElemento("menuEsportes");
 
             if (menu) {
+                menu.style.display = "block";
+            }
 
-                menu.style.display =
-                    "block";
+            return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        /*
+        =====================================================
+        CADA APOSTA
+        =====================================================
+        */
+
+        apostas.forEach(aposta => {
+
+            const card = document.createElement("div");
+
+            card.className = "menu-aposta";
+
+
+            /*
+            =================================================
+            STATUS DA APOSTA
+            =================================================
+            */
+
+            const status = String(
+                aposta.status || "aguardando"
+            )
+                .trim()
+                .toLowerCase();
+
+
+            let textoStatus = "Aguardando";
+            let classeStatus = "aguardando";
+
+
+            if (status === "ganhou") {
+
+                textoStatus = "Ganhou";
+                classeStatus = "ganhou";
+
+            }
+
+            else if (status === "perdeu") {
+
+                textoStatus = "Perdeu";
+                classeStatus = "perdeu";
+
+            }
+
+            else if (status === "liberada") {
+
+                textoStatus = "Liberada";
+                classeStatus = "liberada";
+
+            }
+
+            else if (status === "bloqueada") {
+
+                textoStatus = "Bloqueada";
+                classeStatus = "bloqueada";
+
+            }
+
+            else if (status === "finalizada") {
+
+                textoStatus = "Finalizada";
+                classeStatus = "finalizada";
 
             }
 
 
-            return;
+            /*
+            =================================================
+            NORMALIZA SELEÇÕES
+            =================================================
+            */
 
-        }
-
-
-        container.innerHTML =
-            "";
-
-
-        apostas.forEach(
-            aposta => {
-
-                const card =
-                    document.createElement(
-                        "div"
-                    );
+            const selecoes = Array.isArray(aposta.selecoes)
+                ? aposta.selecoes
+                : Object.values(aposta.selecoes || {});
 
 
-                card.className =
-                    "menu-aposta";
+            let htmlJogos = "";
 
 
-                const status =
-                    String(
-                        aposta.status ||
-                        "aguardando"
-                    ).toLowerCase();
+            /*
+            =================================================
+            CADA JOGO DA APOSTA
+            =================================================
+            */
+
+            selecoes.forEach(jogo => {
+
+                if (!jogo) return;
 
 
-                let textoStatus =
-                    "Aguardando";
+                /*
+                =============================================
+                RESULTADO
+                =============================================
+                */
+
+                const resultado = String(
+                    jogo.resultado ||
+                    jogo.status ||
+                    "aguardando"
+                )
+                    .trim()
+                    .toLowerCase();
 
 
-                let classeStatus =
-                    "aguardando";
+                let textoResultado = "Aguardando";
 
 
-                if (
-                    status === "ganhou"
-                ) {
+                if (resultado === "ganhou") {
 
-                    textoStatus =
-                        "Ganhou";
-
-                    classeStatus =
-                        "ganhou";
-
-                }
-
-                else if (
-                    status === "perdeu"
-                ) {
-
-                    textoStatus =
-                        "Perdeu";
-
-                    classeStatus =
-                        "perdeu";
+                    textoResultado = "Ganhou";
 
                 }
 
-                else if (
-                    status === "liberada"
-                ) {
+                else if (resultado === "perdeu") {
 
-                    textoStatus =
-                        "Liberada";
-
-                    classeStatus =
-                        "liberada";
-
-                }
-
-                else if (
-                    status === "bloqueada"
-                ) {
-
-                    textoStatus =
-                        "Bloqueada";
-
-                    classeStatus =
-                        "bloqueada";
-
-                }
-
-                else if (
-                    status === "finalizada"
-                ) {
-
-                    textoStatus =
-                        "Finalizada";
-
-                    classeStatus =
-                        "finalizada";
+                    textoResultado = "Perdeu";
 
                 }
 
 
-                const selecoes =
-                    Array.isArray(
-                        aposta.selecoes
-                    )
-                        ? aposta.selecoes
-                        : Object.values(
-                            aposta.selecoes || {}
+                /*
+                =============================================
+                PLACAR
+                =============================================
+                
+                Aceita:
+
+                placarCasa / placarFora
+
+                OU
+
+                placarA / placarB
+                =============================================
+                */
+
+                const placarCasa =
+                    jogo.placarCasa !== undefined &&
+                    jogo.placarCasa !== null
+                        ? jogo.placarCasa
+                        : (
+                            jogo.placarA !== undefined &&
+                            jogo.placarA !== null
+                                ? jogo.placarA
+                                : null
                         );
 
 
-                let htmlJogos =
-                    "";
+                const placarFora =
+                    jogo.placarFora !== undefined &&
+                    jogo.placarFora !== null
+                        ? jogo.placarFora
+                        : (
+                            jogo.placarB !== undefined &&
+                            jogo.placarB !== null
+                                ? jogo.placarB
+                                : null
+                        );
 
 
-                selecoes.forEach(
-                    jogo => {
-
-                        const resultado =
-    String(
-        jogo.resultado ||
-        jogo.status ||
-        "aguardando"
-    ).toLowerCase();
-
-                        let textoResultado =
-                            "Aguardando";
+                const temPlacar =
+                    placarCasa !== null &&
+                    placarCasa !== undefined &&
+                    placarFora !== null &&
+                    placarFora !== undefined;
 
 
-                        if (
-                            resultado ===
-                            "ganhou"
-                        ) {
-
-                            textoResultado =
-                                "Ganhou";
-
-                        }
-
-                        else if (
-                            resultado ===
-                            "perdeu"
-                        ) {
-
-                            textoResultado =
-                                "Perdeu";
-
-                        }
+                const textoPlacar = temPlacar
+                    ? `${placarCasa} × ${placarFora}`
+                    : "- × -";
 
 
-                        htmlJogos += `
+                /*
+                =============================================
+                DATA
+                =============================================
+                */
 
-                            <div class="menu-aposta-jogo">
-
-                                <div class="menu-aposta-times">
-
-                                    ${escapeHTML(
-                                        jogo.timeA ||
-                                        "Time A"
-                                    )}
-
-                                    ×
-
-                                    ${escapeHTML(
-                                        jogo.timeB ||
-                                        "Time B"
-                                    )}
-
-                                </div>
-
-
-                                <div class="menu-aposta-info">
-
-                                    🏆
-
-                                    <strong>
-
-                                        ${escapeHTML(
-                                            jogo.campeonato ||
-                                            "Campeonato"
-                                        )}
-
-                                    </strong>
-
-                                    <br>
-
-
-                                    📅
-
-                                    ${formatarData(
-                                        jogo.data || ""
-                                    )}
-
-                                    &nbsp;
-
-                                    ⏰
-
-                                    ${escapeHTML(
-                                        jogo.hora || ""
-                                    )}
-
-                                    <br>
-
-
-                                    🎯 Palpite:
-
-                                    <span
-                                        class="menu-aposta-palpite"
-                                    >
-
-                                        ${escapeHTML(
-                                            jogo.escolha || ""
-                                        )}
-
-                                        &nbsp;
-
-                                        ${Number(
-                                            jogo.valor || 0
-                                        ).toFixed(2)}
-
-                                    </span>
-
-                                    <br>
-
-
-                                    <div
-                                        class="menu-aposta-placar"
-                                    >
-
-                                        ⚽ Placar:
-
-                                        ${escapeHTML(
-                                            String(
-                                                jogo.placarCasa ??
-                                                jogo.placarA ??
-                                                "-"
-                                            )
-                                        )}
-
-                                        ×
-
-                                        ${escapeHTML(
-                                            String(
-                                                jogo.placarFora ??
-                                                jogo.placarB ??
-                                                "-"
-                                            )
-                                        )}
-
-                                    </div>
-
-
-                                    <div
-                                        class="
-                                            menu-aposta-resultado
-                                            ${resultado}
-                                        "
-                                    >
-
-                                        Status:
-                                        ${textoResultado}
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        `;
-
-                    }
+                const dataJogo = String(
+                    jogo.data || ""
                 );
 
 
-                let botaoSaque =
-                    "";
+                /*
+                =============================================
+                HORA
+                =============================================
+                */
+
+                const horaJogo = String(
+                    jogo.hora || ""
+                );
 
 
-                if (
-                    status === "ganhou" &&
-                    aposta.saqueSolicitado !== true
-                ) {
+                /*
+                =============================================
+                HTML DO JOGO
+                =============================================
+                */
 
-                    botaoSaque = `
+                htmlJogos += `
 
-                        <button
-                            type="button"
-                            class="btn-solicitar-saque"
+                    <div class="menu-aposta-jogo">
 
-                            onclick="abrirModalPix(
-                                '${escapeAttr(
-                                    aposta.codigo || ""
-                                )}',
-                                '${Number(
-                                    aposta.possivelRetorno || 0
-                                )}'
-                            )"
-                        >
+                        <div class="menu-aposta-times">
 
-                            💰 Solicitar Saque
+                            ${escapeHTML(
+                                String(
+                                    jogo.timeA ||
+                                    "Time A"
+                                )
+                            )}
 
-                        </button>
+                            ×
 
-                    `;
-
-                }
-
-
-                let statusSaque =
-                    "";
-
-
-                if (
-                    aposta.saqueSolicitado === true
-                ) {
-
-                    statusSaque = `
-
-                        <div
-                            style="
-                                width:100%;
-                                margin-top:8px;
-                                padding:10px;
-                                border-radius:7px;
-                                background:#555;
-                                color:#fff;
-                                text-align:center;
-                                font-size:12px;
-                                font-weight:bold;
-                            "
-                        >
-
-                            💰 Saque solicitado
-
-                            ${
-                                aposta.codigoSaque
-                                    ? `
-                                        <br>
-
-                                        <span
-                                            style="
-                                                font-size:10px;
-                                                opacity:.8;
-                                            "
-                                        >
-
-                                            Código:
-                                            ${escapeHTML(
-                                                aposta.codigoSaque
-                                            )}
-
-                                        </span>
-                                    `
-                                    : ""
-                            }
+                            ${escapeHTML(
+                                String(
+                                    jogo.timeB ||
+                                    "Time B"
+                                )
+                            )}
 
                         </div>
 
-                    `;
 
-                }
+                        <div class="menu-aposta-info">
+
+                            🏆
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    String(
+                                        jogo.campeonato ||
+                                        "Campeonato"
+                                    )
+                                )}
+
+                            </strong>
+
+                            <br>
 
 
-                card.innerHTML = `
-
-                    ${htmlJogos}
-
-                    ${botaoSaque}
-
-                    ${statusSaque}
-
-
-                    <div
-                        class="menu-aposta-resumo"
-                    >
-
-                        🎟️
-
-                        <strong>
+                            📅
 
                             ${escapeHTML(
-                                aposta.codigo || ""
+                                formatarData(dataJogo)
                             )}
 
-                        </strong>
-
-                        <br>
+                            &nbsp;
 
 
-                        👤
+                            ⏰
 
-                        ${escapeHTML(
-                            aposta.nome ||
-                            nomeJogador ||
-                            ""
-                        )}
-
-                        <br>
-
-
-                        💰 Aposta:
-
-                        <strong>
-
-                            ${dinheiro(
-                                aposta.valorUnico
+                            ${escapeHTML(
+                                horaJogo
                             )}
 
-                        </strong>
-
-                        <br>
+                            <br>
 
 
-                        🎯 Jogos:
+                            🎯 Palpite:
 
-                        <strong>
+                            <span class="menu-aposta-palpite">
 
-                            ${
-                                Number(
-                                    aposta.quantidadeJogos
-                                ) ||
-                                selecoes.length
-                            }
+                                ${escapeHTML(
+                                    String(
+                                        jogo.escolha || "-"
+                                    )
+                                )}
 
-                        </strong>
+                                &nbsp;
 
-                        <br>
+                                ${Number(
+                                    jogo.valor || 0
+                                ).toFixed(2)}
 
+                            </span>
 
-                        💵 Retorno:
-
-                        <strong>
-
-                            ${dinheiro(
-                                aposta.possivelRetorno
-                            )}
-
-                        </strong>
-
-                        <br>
+                            <br>
 
 
-                        <span
-                            class="
-                                menu-aposta-status
-                                ${classeStatus}
-                            "
-                        >
+                            <div class="menu-aposta-placar">
 
-                            ${textoStatus}
+                                ⚽ Placar:
 
-                        </span>
+                                <strong>
+
+                                    ${escapeHTML(
+                                        textoPlacar
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    menu-aposta-resultado
+                                    ${escapeHTML(resultado)}
+                                "
+                            >
+
+                                Status:
+
+                                ${escapeHTML(
+                                    textoResultado
+                                )}
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 `;
 
+            });
 
-                container.appendChild(
-                    card
-                );
+
+            /*
+            =================================================
+            BOTÃO DE SAQUE
+            =================================================
+            */
+
+            let botaoSaque = "";
+
+
+            if (
+                status === "ganhou" &&
+                aposta.saqueSolicitado !== true
+            ) {
+
+                botaoSaque = `
+
+                    <button
+                        type="button"
+                        class="btn-solicitar-saque"
+
+                        onclick="abrirModalPix(
+                            '${escapeAttr(
+                                aposta.codigo || ""
+                            )}',
+                            '${Number(
+                                aposta.possivelRetorno || 0
+                            )}'
+                        )"
+                    >
+
+                        💰 Solicitar Saque
+
+                    </button>
+
+                `;
 
             }
+
+
+            /*
+            =================================================
+            STATUS DO SAQUE
+            =================================================
+            */
+
+            let statusSaque = "";
+
+
+            if (
+                aposta.saqueSolicitado === true
+            ) {
+
+                statusSaque = `
+
+                    <div
+                        style="
+                            width:100%;
+                            margin-top:8px;
+                            padding:10px;
+                            border-radius:7px;
+                            background:#555;
+                            color:#fff;
+                            text-align:center;
+                            font-size:12px;
+                            font-weight:bold;
+                        "
+                    >
+
+                        💰 Saque solicitado
+
+                        ${
+                            aposta.codigoSaque
+                                ? `
+
+                                    <br>
+
+                                    <span
+                                        style="
+                                            font-size:10px;
+                                            opacity:.8;
+                                        "
+                                    >
+
+                                        Código:
+
+                                        ${escapeHTML(
+                                            String(
+                                                aposta.codigoSaque
+                                            )
+                                        )}
+
+                                    </span>
+
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                `;
+
+            }
+
+
+            /*
+            =================================================
+            RESUMO DA APOSTA
+            =================================================
+            */
+
+            const quantidadeJogos =
+                Number(
+                    aposta.quantidadeJogos
+                ) ||
+                selecoes.length;
+
+
+            card.innerHTML = `
+
+                ${htmlJogos}
+
+                ${botaoSaque}
+
+                ${statusSaque}
+
+
+                <div class="menu-aposta-resumo">
+
+                    🎟️
+
+                    <strong>
+
+                        ${escapeHTML(
+                            String(
+                                aposta.codigo || ""
+                            )
+                        )}
+
+                    </strong>
+
+                    <br>
+
+
+                    👤
+
+                    ${escapeHTML(
+                        String(
+                            aposta.nome ||
+                            nomeJogador ||
+                            ""
+                        )
+                    )}
+
+                    <br>
+
+
+                    💰 Aposta:
+
+                    <strong>
+
+                        ${dinheiro(
+                            aposta.valorUnico
+                        )}
+
+                    </strong>
+
+                    <br>
+
+
+                    🎯 Jogos:
+
+                    <strong>
+
+                        ${quantidadeJogos}
+
+                    </strong>
+
+                    <br>
+
+
+                    💵 Retorno:
+
+                    <strong>
+
+                        ${dinheiro(
+                            aposta.possivelRetorno
+                        )}
+
+                    </strong>
+
+                    <br>
+
+
+                    <span
+                        class="
+                            menu-aposta-status
+                            ${classeStatus}
+                        "
+                    >
+
+                        ${textoStatus}
+
+                    </span>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        });
+
+
+        /*
+        =====================================================
+        MOSTRA MENU
+        =====================================================
+        */
+
+        const menu = obterElemento(
+            "menuEsportes"
         );
 
-
-        const menu =
-            obterElemento(
-                "menuEsportes"
-            );
-
-
         if (menu) {
-
-            menu.style.display =
-                "block";
-
+            menu.style.display = "block";
         }
+
+
+        console.log(
+            "✅ JOGOS FEITOS CARREGADOS:",
+            apostas.length
+        );
 
     }
 
     catch (erro) {
 
         console.error(
-            "Erro ao carregar jogos feitos:",
+            "❌ ERRO AO CARREGAR JOGOS FEITOS:",
             erro
         );
 
@@ -7586,23 +7583,17 @@ async function carregarJogosFeitosMenu() {
         `;
 
 
-        const menu =
-            obterElemento(
-                "menuEsportes"
-            );
-
+        const menu = obterElemento(
+            "menuEsportes"
+        );
 
         if (menu) {
-
-            menu.style.display =
-                "block";
-
+            menu.style.display = "block";
         }
 
     }
 
 }
-
 
 /* =========================================================
    MOSTRAR DIA
@@ -14001,44 +13992,21 @@ document.addEventListener(
 
 async function iniciarSistema() {
 
-    try {
+    const carregou =
+        await carregarJogador();
 
-        const carregou =
-            await carregarJogador();
-
-
-        if (!carregou) {
-
-            return;
-
-        }
-
-
-        await inicializarJogos();
-
-
-        /* ================================================
-           ATUALIZA RESULTADOS A CADA 3 HORAS
-        ================================================ */
-
-        iniciarAtualizacaoAPI(
-    30
-);
-
+    if (!carregou) {
+        return;
     }
 
-    catch (erro) {
 
-        console.error(
-            "❌ Erro ao iniciar sistema:",
-            erro
-        );
+    await inicializarJogos();
 
-    }
+
+    // Atualiza resultados imediatamente
+    iniciarAtualizacaoResultados(30);
 
 }
-
-
 /* =========================================================
    APLICAR COR
 ========================================================= */
