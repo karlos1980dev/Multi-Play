@@ -3205,7 +3205,7 @@ const API_BASE =
    CACHE
 ========================================================= */
 
-/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const CACHE_TEMPO_RESULTADOS = 30 * 60 * 1000; // 30 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
+/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const const CACHE_TEMPO_RESULTADOS = 10 * 60 * 1000; // 10 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
 
 
 /* =========================================================
@@ -4121,146 +4121,122 @@ async function buscarResultadosAPI(
    ENCONTRAR JOGO NA RESPOSTA DA API
 ========================================================= */
 
-function encontrarJogoAPI(
-    selecao,
-    resultados
-) {
+// =========================================================
+// ENCONTRAR JOGO DA APOSTA NA RESPOSTA DA API
+// =========================================================
+
+function encontrarJogoAPI(selecao, resultadosAPI) {
 
     if (
         !selecao ||
-        !Array.isArray(resultados) ||
-        resultados.length === 0
+        !Array.isArray(resultadosAPI)
     ) {
         return null;
     }
 
-
-    /* =====================================================
-       1. TENTAR PELO FIXTURE ID
-    ===================================================== */
-
-    const idsPossiveis = [
-
-        selecao.fixtureId,
-
-        selecao.idAPI,
-
-        selecao.jogoId,
-
-        selecao?.fixture?.id
-
-    ]
-    .map(id =>
-        String(id || "").trim()
-    )
-    .filter(Boolean);
+    const fixtureIdProcurado = String(
+        selecao.fixtureId ||
+        selecao.idAPI ||
+        selecao.jogoId ||
+        selecao?.fixture?.id ||
+        ""
+    ).trim();
 
 
-    if (idsPossiveis.length > 0) {
+    const timeAProcurado = normalizarNome(
+        nomeTimeSeguro(
+            selecao.timeA
+        )
+    );
 
-        const encontrado =
-            resultados.find(jogo => {
+    const timeBProcurado = normalizarNome(
+        nomeTimeSeguro(
+            selecao.timeB
+        )
+    );
 
-                const idAPI = String(
+
+    // =====================================================
+    // 1. PRIMEIRO: PROCURAR PELO FIXTURE ID
+    // =====================================================
+
+    if (fixtureIdProcurado) {
+
+        const encontradoPorID =
+            resultadosAPI.find(jogo => {
+
+                const fixtureId = String(
                     jogo?.fixture?.id ||
                     jogo?.id ||
                     ""
                 ).trim();
 
-                return idsPossiveis.includes(
-                    idAPI
-                );
+                return fixtureId === fixtureIdProcurado;
 
             });
 
 
-        if (encontrado) {
+        if (encontradoPorID) {
 
-            return encontrado;
+            return encontradoPorID;
 
         }
 
     }
 
 
-    /* =====================================================
-       2. TENTAR PELO NOME DOS TIMES
-    ===================================================== */
+    // =====================================================
+    // 2. SEGUNDO: PROCURAR PELOS DOIS TIMES
+    // =====================================================
 
-    const timeA =
-        normalizarNome(
-            selecao.timeA ||
-            selecao.casa ||
-            ""
-        );
-
-    const timeB =
-        normalizarNome(
-            selecao.timeB ||
-            selecao.fora ||
-            ""
-        );
-
-
-    if (!timeA || !timeB) {
-
+    if (
+        !timeAProcurado ||
+        !timeBProcurado
+    ) {
         return null;
-
     }
 
 
     const encontradoPorTimes =
-        resultados.find(jogo => {
+        resultadosAPI.find(jogo => {
 
-            const casa =
+            const timeAAPI =
                 normalizarNome(
                     nomeTimeSeguro(
-                        jogo?.teams?.home
-                    )
-                );
-
-            const fora =
-                normalizarNome(
-                    nomeTimeSeguro(
-                        jogo?.teams?.away
+                        jogo?.teams?.home?.name ||
+                        jogo?.home?.name ||
+                        jogo?.timeA
                     )
                 );
 
 
-            if (
-                !casa ||
-                !fora
-            ) {
-                return false;
-            }
+            const timeBAPI =
+                normalizarNome(
+                    nomeTimeSeguro(
+                        jogo?.teams?.away?.name ||
+                        jogo?.away?.name ||
+                        jogo?.timeB
+                    )
+                );
 
 
             return (
-                (
-                    compararTimes(
-                        casa,
-                        timeA
-                    ) &&
-                    compararTimes(
-                        fora,
-                        timeB
-                    )
+                compararTimes(
+                    timeAProcurado,
+                    timeAAPI
+                ) &&
+                compararTimes(
+                    timeBProcurado,
+                    timeBAPI
                 )
             );
 
         });
 
 
-    if (encontradoPorTimes) {
+    return encontradoPorTimes || null;
 
-        return encontradoPorTimes;
-
-    }
-
-
-    return null;
 }
-
 /* =========================================================
    VERIFICAR SE JOGO TERMINOU
 ========================================================= */
@@ -4269,43 +4245,50 @@ function encontrarJogoAPI(
    VERIFICAR SE O JOGO TERMINOU
 ========================================================= */
 
+// =========================================================
+// VERIFICAR SE O JOGO TERMINOU
+// =========================================================
+
 function jogoFinalizado(jogo) {
 
     if (!jogo) {
         return false;
     }
 
+
     const status = String(
+
         jogo?.fixture?.status?.short ||
+
         jogo?.status?.short ||
+
         jogo?.fixture?.status?.long ||
+
         jogo?.status ||
+
         ""
+
     )
     .trim()
     .toUpperCase();
 
-    /*
-       Status considerados encerrados pela API-Football.
-    */
 
-    const finalizados = [
+    return [
         "FT",
         "AET",
         "PEN",
         "AWD",
         "WO"
-    ];
+    ].includes(status);
 
-    if (finalizados.includes(status)) {
-        return true;
-    }
-
-    return false;
 }
 /* =========================================================
    PEGAR PLACAR DA API
 ========================================================= */
+
+// =========================================================
+// PEGAR PLACAR DA API
+// =========================================================
 
 function pegarPlacar(jogo) {
 
@@ -4313,41 +4296,60 @@ function pegarPlacar(jogo) {
         return null;
     }
 
-    const home =
+
+    const casa =
+
         jogo?.goals?.home ??
         jogo?.score?.fulltime?.home ??
-        jogo?.score?.fullTime?.home;
+        jogo?.score?.extratime?.home ??
+        null;
 
-    const away =
+
+    const fora =
+
         jogo?.goals?.away ??
         jogo?.score?.fulltime?.away ??
-        jogo?.score?.fullTime?.away;
+        jogo?.score?.extratime?.away ??
+        null;
+
 
     if (
-        home === null ||
-        home === undefined ||
-        away === null ||
-        away === undefined
+        casa === null ||
+        casa === undefined ||
+        fora === null ||
+        fora === undefined
     ) {
+
         return null;
+
     }
 
-    const golsCasa = Number(home);
-    const golsFora = Number(away);
+
+    const golsCasa =
+        Number(casa);
+
+    const golsFora =
+        Number(fora);
+
 
     if (
         !Number.isFinite(golsCasa) ||
         !Number.isFinite(golsFora)
     ) {
+
         return null;
+
     }
 
+
     return {
+
         casa: golsCasa,
         fora: golsFora
-    };
-}
 
+    };
+
+}
 /* =========================================================
    RESULTADO DO PALPITE
 ========================================================= */
@@ -4356,180 +4358,204 @@ function pegarPlacar(jogo) {
    CALCULAR RESULTADO DO PALPITE
 ========================================================= */
 
+// =========================================================
+// CALCULAR RESULTADO DO PALPITE
+// =========================================================
+
 function calcularResultadoPalpite(
     escolha,
     golsCasa,
     golsFora
 ) {
 
-    const palpite = String(
-        escolha || ""
-    )
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
+    if (
+        golsCasa === null ||
+        golsCasa === undefined ||
+        golsFora === null ||
+        golsFora === undefined
+    ) {
 
-    const casa = Number(golsCasa);
-    const fora = Number(golsFora);
+        return "aguardando";
+
+    }
+
+
+    golsCasa =
+        Number(golsCasa);
+
+    golsFora =
+        Number(golsFora);
+
 
     if (
-        !Number.isFinite(casa) ||
-        !Number.isFinite(fora)
+        !Number.isFinite(golsCasa) ||
+        !Number.isFinite(golsFora)
     ) {
+
         return "aguardando";
+
     }
+
+
+    const texto =
+        normalizar(
+            String(
+                escolha || ""
+            )
+        );
+
 
     const total =
-        casa + fora;
+        golsCasa + golsFora;
 
 
-    /* =====================================================
-       CASA
-    ===================================================== */
+    // =====================================================
+    // CASA
+    // =====================================================
 
     if (
-        palpite === "casa" ||
-        palpite === "1"
+        texto === "casa" ||
+        texto === "1"
     ) {
 
-        return casa > fora
+        return golsCasa > golsFora
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       EMPATE
-    ===================================================== */
+    // =====================================================
+    // EMPATE
+    // =====================================================
 
     if (
-        palpite === "empate" ||
-        palpite === "x"
+        texto === "empate" ||
+        texto === "x"
     ) {
 
-        return casa === fora
+        return golsCasa === golsFora
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       FORA
-    ===================================================== */
+    // =====================================================
+    // FORA
+    // =====================================================
 
     if (
-        palpite === "fora" ||
-        palpite === "2"
+        texto === "fora" ||
+        texto === "2"
     ) {
 
-        return fora > casa
+        return golsFora > golsCasa
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       AMBAS MARCAM
-    ===================================================== */
+    // =====================================================
+    // AMBAS MARCAM
+    // =====================================================
 
     if (
-        palpite === "ambas" ||
-        palpite === "ambas marcam" ||
-        palpite === "ambas marcam sim" ||
-        palpite === "btts"
+        texto === "ambas" ||
+        texto === "ambas marcam" ||
+        texto === "btts"
     ) {
 
         return (
-            casa > 0 &&
-            fora > 0
+            golsCasa > 0 &&
+            golsFora > 0
         )
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       +2 GOLS
-       Considera Over 2.5:
-       3 ou mais gols = ganhou
-    ===================================================== */
+    // =====================================================
+    // +2 GOLS = 3 OU MAIS
+    // =====================================================
 
     if (
-        palpite === "+2" ||
-        palpite === "+2 gols" ||
-        palpite === "mais de 2 gols" ||
-        palpite === "over 2.5"
+        texto === "+2 gols" ||
+        texto === "mais de 2 gols" ||
+        texto === "over 2.5"
     ) {
 
         return total >= 3
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       -2 GOLS
-       Considera Under 2.5:
-       0, 1 ou 2 gols = ganhou
-    ===================================================== */
+    // =====================================================
+    // -2 GOLS = 0, 1 OU 2
+    // =====================================================
 
     if (
-        palpite === "-2" ||
-        palpite === "-2 gols" ||
-        palpite === "menos de 2 gols" ||
-        palpite === "under 2.5"
+        texto === "-2 gols" ||
+        texto === "menos de 2 gols" ||
+        texto === "under 2.5"
     ) {
 
         return total <= 2
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       CASA/FORA
-       Não pode haver empate
-    ===================================================== */
+    // =====================================================
+    // CASA/FORA = NÃO EMPATE
+    // =====================================================
 
     if (
-        palpite === "casa/fora" ||
-        palpite === "casa ou fora"
+        texto === "casa/fora" ||
+        texto === "casa fora"
     ) {
 
-        return casa !== fora
+        return golsCasa !== golsFora
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       CASA/EMPATE
-    ===================================================== */
+    // =====================================================
+    // CASA/EMPATE
+    // =====================================================
 
     if (
-        palpite === "casa/empate" ||
-        palpite === "casa ou empate"
+        texto === "casa/empate" ||
+        texto === "casa empate"
     ) {
 
-        return casa >= fora
+        return golsCasa >= golsFora
             ? "ganhou"
             : "perdeu";
+
     }
 
 
-    /* =====================================================
-       EMPATE/FORA
-    ===================================================== */
+    // =====================================================
+    // EMPATE/FORA
+    // =====================================================
 
     if (
-        palpite === "empate/fora" ||
-        palpite === "empate ou fora"
+        texto === "empate/fora" ||
+        texto === "empate fora"
     ) {
 
-        return fora >= casa
+        return golsFora >= golsCasa
             ? "ganhou"
             : "perdeu";
+
     }
 
 
@@ -4538,16 +4564,18 @@ function calcularResultadoPalpite(
         escolha
     );
 
+
     return "aguardando";
+
 }
 
 /* =========================================================
    ATUALIZAR UMA APOSTA
 ========================================================= */
 
-/* =========================================================
-   ATUALIZAR UMA APOSTA
-========================================================= */
+// =========================================================
+// ATUALIZAR UMA APOSTA
+// =========================================================
 
 async function atualizarUmaAposta(
     codigo,
@@ -4566,25 +4594,30 @@ async function atualizarUmaAposta(
     }
 
 
-    const selecoesOriginais =
-        aposta.selecoes;
+    if (
+        !Array.isArray(resultadosAPI) ||
+        resultadosAPI.length === 0
+    ) {
+
+        return false;
+
+    }
 
 
     const novasSelecoes =
-        selecoesOriginais.map(
+        aposta.selecoes.map(
             selecao => ({
                 ...selecao
             })
         );
 
 
-    let houveAlteracao =
-        false;
+    let houveAlteracao = false;
 
 
-    /* =====================================================
-       PROCESSAR CADA JOGO
-    ===================================================== */
+    // =====================================================
+    // PROCESSAR CADA SELEÇÃO
+    // =====================================================
 
     for (
         let i = 0;
@@ -4607,6 +4640,10 @@ async function atualizarUmaAposta(
                 resultadosAPI
             );
 
+
+        // =================================================
+        // JOGO NÃO ENCONTRADO
+        // =================================================
 
         if (!jogoAPI) {
 
@@ -4631,6 +4668,7 @@ async function atualizarUmaAposta(
         const fixtureId =
             String(
                 jogoAPI?.fixture?.id ||
+                selecao.fixtureId ||
                 ""
             );
 
@@ -4638,118 +4676,40 @@ async function atualizarUmaAposta(
         const statusAPI =
             String(
                 jogoAPI?.fixture?.status?.short ||
+                jogoAPI?.status?.short ||
                 ""
             )
+            .trim()
             .toUpperCase();
 
 
         console.log(
-            "🎯 VERIFICANDO JOGO:",
+            "🎯 VERIFICANDO:",
             {
                 codigo,
                 fixtureId,
-                timeA:
-                    selecao.timeA,
-                timeB:
-                    selecao.timeB,
-                escolha:
-                    selecao.escolha,
+                timeA: selecao.timeA,
+                timeB: selecao.timeB,
+                escolha: selecao.escolha,
                 statusAPI
             }
         );
 
 
-        /* =================================================
-           PEGAR PLACAR
-        ================================================= */
+        // =================================================
+        // VERIFICAR FINALIZAÇÃO
+        // =================================================
 
-        const placar =
-            pegarPlacar(
+        const finalizado =
+            jogoFinalizado(
                 jogoAPI
             );
 
 
-        /*
-           Se já terminou e a API trouxe o placar,
-           salvamos o placar mesmo que o resultado
-           já esteja preenchido.
-        */
-
-        if (
-            placar &&
-            jogoFinalizado(jogoAPI)
-        ) {
-
-            if (
-                Number(
-                    selecao.placarCasa
-                ) !== placar.casa
-            ) {
-
-                novasSelecoes[i].placarCasa =
-                    placar.casa;
-
-                houveAlteracao =
-                    true;
-
-            }
-
-
-            if (
-                Number(
-                    selecao.placarFora
-                ) !== placar.fora
-            ) {
-
-                novasSelecoes[i].placarFora =
-                    placar.fora;
-
-                houveAlteracao =
-                    true;
-
-            }
-
-
-            /*
-               Também salva nomes alternativos,
-               caso alguma parte antiga do sistema
-               utilize esses campos.
-            */
-
-            if (
-                selecao.placarA !==
-                placar.casa
-            ) {
-
-                novasSelecoes[i].placarA =
-                    placar.casa;
-
-            }
-
-
-            if (
-                selecao.placarB !==
-                placar.fora
-            ) {
-
-                novasSelecoes[i].placarB =
-                    placar.fora;
-
-            }
-
-        }
-
-
-        /* =================================================
-           JOGO AINDA NÃO TERMINOU
-        ================================================= */
-
-        if (
-            !jogoFinalizado(jogoAPI)
-        ) {
+        if (!finalizado) {
 
             console.log(
-                "⏳ JOGO AINDA NÃO FINALIZADO:",
+                "⏳ AINDA NÃO FINALIZADO:",
                 fixtureId,
                 statusAPI
             );
@@ -4759,14 +4719,20 @@ async function atualizarUmaAposta(
         }
 
 
-        /* =================================================
-           SEM PLACAR
-        ================================================= */
+        // =================================================
+        // PEGAR PLACAR
+        // =================================================
+
+        const placar =
+            pegarPlacar(
+                jogoAPI
+            );
+
 
         if (!placar) {
 
             console.warn(
-                "⚠️ JOGO FINALIZADO SEM PLACAR:",
+                "⚠️ FINALIZADO SEM PLACAR:",
                 fixtureId
             );
 
@@ -4775,9 +4741,80 @@ async function atualizarUmaAposta(
         }
 
 
-        /* =================================================
-           CALCULAR RESULTADO
-        ================================================= */
+        console.log(
+            "⚽ PLACAR ENCONTRADO:",
+            {
+                fixtureId,
+                placar:
+                    `${placar.casa} x ${placar.fora}`
+            }
+        );
+
+
+        // =================================================
+        // SALVAR PLACAR
+        // =================================================
+
+        if (
+            Number(
+                selecao.placarCasa
+            ) !== placar.casa
+        ) {
+
+            novasSelecoes[i].placarCasa =
+                placar.casa;
+
+            houveAlteracao = true;
+
+        }
+
+
+        if (
+            Number(
+                selecao.placarFora
+            ) !== placar.fora
+        ) {
+
+            novasSelecoes[i].placarFora =
+                placar.fora;
+
+            houveAlteracao = true;
+
+        }
+
+
+        // Campos antigos
+        if (
+            Number(
+                selecao.placarA
+            ) !== placar.casa
+        ) {
+
+            novasSelecoes[i].placarA =
+                placar.casa;
+
+            houveAlteracao = true;
+
+        }
+
+
+        if (
+            Number(
+                selecao.placarB
+            ) !== placar.fora
+        ) {
+
+            novasSelecoes[i].placarB =
+                placar.fora;
+
+            houveAlteracao = true;
+
+        }
+
+
+        // =================================================
+        // CALCULAR RESULTADO
+        // =================================================
 
         const resultado =
             calcularResultadoPalpite(
@@ -4788,7 +4825,7 @@ async function atualizarUmaAposta(
 
 
         console.log(
-            "📊 RESULTADO CALCULADO:",
+            "📊 RESULTADO:",
             {
                 fixtureId,
                 escolha:
@@ -4810,47 +4847,81 @@ async function atualizarUmaAposta(
         }
 
 
+        // =================================================
+        // ATUALIZAR RESULTADO
+        // =================================================
+
         if (
-            selecao.resultado !==
+            String(
+                selecao.resultado ||
+                "aguardando"
+            ).toLowerCase() !==
             resultado
         ) {
 
             novasSelecoes[i].resultado =
                 resultado;
 
-            houveAlteracao =
-                true;
+            houveAlteracao = true;
 
         }
 
 
+        // =================================================
+        // ATUALIZAR STATUS
+        // =================================================
+
         if (
-            selecao.status !==
+            String(
+                selecao.status ||
+                "aguardando"
+            ).toLowerCase() !==
             resultado
         ) {
 
             novasSelecoes[i].status =
                 resultado;
 
-            houveAlteracao =
-                true;
+            houveAlteracao = true;
+
+        }
+
+
+        // =================================================
+        // GARANTIR FIXTURE ID
+        // =================================================
+
+        if (
+            String(
+                selecao.fixtureId ||
+                ""
+            ) !== fixtureId &&
+            fixtureId
+        ) {
+
+            novasSelecoes[i].fixtureId =
+                fixtureId;
+
+            houveAlteracao = true;
 
         }
 
     }
 
 
-    /* =====================================================
-       CALCULAR STATUS DA APOSTA
-    ===================================================== */
+    // =====================================================
+    // CALCULAR STATUS DA APOSTA
+    // =====================================================
 
     const resultados =
         novasSelecoes.map(
             selecao =>
                 String(
-                    selecao.resultado ||
+                    selecao?.resultado ||
                     "aguardando"
-                ).toLowerCase()
+                )
+                .trim()
+                .toLowerCase()
         );
 
 
@@ -4884,36 +4955,40 @@ async function atualizarUmaAposta(
     }
 
 
-    console.log(
-        "🏁 STATUS DA APOSTA:",
-        {
-            codigo,
-            antigo:
-                aposta.status,
-            novo:
-                novoStatus,
-            resultados
-        }
-    );
-
+    // =====================================================
+    // VERIFICAR STATUS DA APOSTA
+    // =====================================================
 
     if (
         String(
             aposta.status ||
             "aguardando"
-        ).toLowerCase() !==
+        )
+        .trim()
+        .toLowerCase() !==
         novoStatus
     ) {
 
-        houveAlteracao =
-            true;
+        houveAlteracao = true;
 
     }
 
 
-    /* =====================================================
-       SALVAR NO FIREBASE
-    ===================================================== */
+    console.log(
+        "🏁 APOSTA:",
+        {
+            codigo,
+            statusAnterior:
+                aposta.status,
+            novoStatus,
+            resultados
+        }
+    );
+
+
+    // =====================================================
+    // NADA ALTERADO
+    // =====================================================
 
     if (!houveAlteracao) {
 
@@ -4922,53 +4997,43 @@ async function atualizarUmaAposta(
     }
 
 
-    const atualizacao = {
-
-        selecoes:
-            novasSelecoes,
-
-        status:
-            novoStatus,
-
-        ultimaAtualizacao:
-            new Date().toISOString()
-
-    };
-
+    // =====================================================
+    // SALVAR FIREBASE
+    // =====================================================
 
     await update(
-
         ref(
             db,
-            "apostas/" +
-            codigo
+            `apostas/${codigo}`
         ),
-
-        atualizacao
-
-    );
-
-
-    console.log(
-        "✅ APOSTA ATUALIZADA NO FIREBASE:",
         {
-            codigo,
+
+            selecoes:
+                novasSelecoes,
+
             status:
-                novoStatus
+                novoStatus,
+
+            ultimaAtualizacao:
+                new Date().toISOString()
+
         }
     );
 
 
+    console.log(
+        "✅ FIREBASE ATUALIZADO:",
+        codigo,
+        novoStatus
+    );
+
+
     return true;
+
 }
-
-/* =========================================================
-   ATUALIZAR TODAS AS APOSTAS
-========================================================= */
-
-/* =========================================================
-   ATUALIZAR TODAS AS APOSTAS
-========================================================= */
+// =========================================================
+// ATUALIZAR TODAS AS APOSTAS
+// =========================================================
 
 async function atualizarResultadosApostas(
     resultadosAPI
@@ -4980,10 +5045,10 @@ async function atualizarResultadosApostas(
     ) {
 
         console.warn(
-            "⚠️ Nenhum resultado disponível para comparar."
+            "⚠️ Nenhum resultado disponível."
         );
 
-        return;
+        return false;
 
     }
 
@@ -5003,13 +5068,16 @@ async function atualizarResultadosApostas(
             "ℹ️ Nenhuma aposta cadastrada."
         );
 
-        return;
+        return false;
 
     }
 
 
     const apostas =
         snapshot.val();
+
+
+    let quantidadeAtualizada = 0;
 
 
     for (
@@ -5027,18 +5095,26 @@ async function atualizarResultadosApostas(
 
         try {
 
-            await atualizarUmaAposta(
-                codigo,
-                aposta,
-                resultadosAPI
-            );
+            const alterou =
+                await atualizarUmaAposta(
+                    codigo,
+                    aposta,
+                    resultadosAPI
+                );
+
+
+            if (alterou) {
+
+                quantidadeAtualizada++;
+
+            }
 
         }
 
         catch (erro) {
 
             console.error(
-                "❌ Erro atualizando aposta:",
+                "❌ ERRO NA APOSTA:",
                 codigo,
                 erro
             );
@@ -5046,6 +5122,18 @@ async function atualizarResultadosApostas(
         }
 
     }
+
+
+    console.log(
+        "🏁 RESULTADOS FINALIZADOS:",
+        {
+            apostasAtualizadas:
+                quantidadeAtualizada
+        }
+    );
+
+
+    return true;
 
 }
 /* =========================================================
@@ -14021,7 +14109,7 @@ else {
 }
 const CONFIG = {
     vezesAbrir: 1,        // ← 1 vez apenas
-    duracaoSegundos: 20
+    duracaoSegundos: 15
 };
 
 let contadorExibicoes = 0;
