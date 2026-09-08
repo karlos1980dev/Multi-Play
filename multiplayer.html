@@ -521,19 +521,7 @@ body.cor5 {
     background: #333;
 
 }
-#diasContainer {
-    position: relative;
-    z-index: 100;
-    display: flex;
-    width: 100%;
-}
 
-#diasContainer .btn-dia {
-    position: relative;
-    z-index: 101;
-    pointer-events: auto;
-    cursor: pointer;
-}
 
 /* =========================================================
    CARROSSEL
@@ -656,12 +644,17 @@ body.cor5 {
 ========================================================= */
 
 .conteudo-dia {
-    display: block;
+
+    display: none;
+
     width: 100%;
+
     max-width: 600px;
-    color:Black;
+
     margin: auto;
+
     padding-bottom: 20px;
+
 }
 
 
@@ -2108,45 +2101,7 @@ body.cor5 {
         transform: rotate(-1.5deg);
     }
 }
-.card-competicao {
-    width: 100%;
-    margin-bottom: 15px;
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 3px 12px rgba(0,0,0,.10);
-}
 
-.cabecalho-competicao {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #ddd;
-}
-
-.cabecalho-competicao strong {
-    display: block;
-    font-size: 16px;
-    font-weight: 800;
-}
-
-.cabecalho-competicao span {
-    font-size: 12px;
-    opacity: .7;
-}
-
-.quantidade-jogos {
-    background: #e9e9e9;
-    padding: 5px 9px;
-    border-radius: 20px;
-    font-size: 11px !important;
-}
-
-.jogos-da-competicao {
-    width: 100%;
-}
 </style>
 
 </head>
@@ -2342,57 +2297,80 @@ body.cor5 {
      DIAS
 ===================================================== -->
 
-<!-- =====================================================
-     DIAS DINÂMICOS
-===================================================== -->
+<div
+    class="dias"
+    id="diasContainer"
+>
 
-<div class="dias" id="diasContainer">
-
-    <button
-        type="button"
-        class="btn-dia ativo"
-        data-offset="0"
-        onclick="selecionarDiaJogos(0)"
-    >
-        <strong id="tituloDia0">--</strong>
-        <span id="dataDia0">--/--</span>
+    <button data-dia="domingo">
+        Domingo
     </button>
 
-    <button
-        type="button"
-        class="btn-dia"
-        data-offset="1"
-        onclick="selecionarDiaJogos(1)"
-    >
-        <strong id="tituloDia1">--</strong>
-        <span id="dataDia1">--/--</span>
+    <button data-dia="segunda">
+        Segunda
     </button>
 
-    <button
-        type="button"
-        class="btn-dia"
-        data-offset="2"
-        onclick="selecionarDiaJogos(2)"
-    >
-        <strong id="tituloDia2">--</strong>
-        <span id="dataDia2">--/--</span>
+    <button data-dia="terca">
+        Terça
+    </button>
+
+    <button data-dia="quarta">
+        Quarta
+    </button>
+
+    <button data-dia="quinta">
+        Quinta
+    </button>
+
+    <button data-dia="sexta">
+        Sexta
+    </button>
+
+    <button data-dia="sabado">
+        Sábado
     </button>
 
 </div>
 
 
 <!-- =====================================================
-     CONTAINER ÚNICO DOS JOGOS
+     CONTEÚDOS
 ===================================================== -->
 
 <div
-    id="conteudoJogosDia"
+    id="conteudo-domingo"
     class="conteudo-dia"
 ></div>
 
-<!-- =====================================================
-     CONTEÚDOS
-===================================================== -->
+<div
+    id="conteudo-segunda"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-terca"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-quarta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-quinta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-sexta"
+    class="conteudo-dia"
+></div>
+
+<div
+    id="conteudo-sabado"
+    class="conteudo-dia"
+></div>
 
 
 <!-- =====================================================
@@ -2828,13 +2806,6 @@ const app = initializeApp(firebaseConfig);
 
 const db = getDatabase(app);
 
-let offsetDiaSelecionado = 0;
-let carregamentoJogosEmAndamento = false;
-let ultimaAtualizacaoPlacar = null;
-let intervaloAtualizacaoPlacar = null;
-const TEMPO_REFRESH_SEGUNDOS = 45; // Atualiza a cada 45s durante jogos
-
-
 // ↓ Corrige função faltante do Firebase
 const getDefaultsFromPostinstall = () => undefined;
 
@@ -2861,14 +2832,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 100;
+const LIMITE_API_DIA = 200;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 80 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 80;
+const LIMITE_SEGURANCA = 150;
 
 
 
@@ -2878,29 +2849,57 @@ const LIMITE_SEGURANCA = 80;
 
 function obterDiaDaSemanaDoJogo(jogo) {
 
-    const dataReal = obterDataJogoAPI(jogo);
+    const dataReal =
+        obterDataRealDoJogo(jogo);
 
     if (!dataReal) {
         return "";
     }
 
-    const partes = dataReal.split("-");
+    const partes =
+        dataReal.split("-");
 
     if (partes.length !== 3) {
         return "";
     }
 
-    const ano = Number(partes[0]);
-    const mes = Number(partes[1]) - 1;
-    const dia = Number(partes[2]);
+    const ano =
+        Number(partes[0]);
 
-    const data = new Date(ano, mes, dia);
+    const mes =
+        Number(partes[1]) - 1;
 
-    if (Number.isNaN(data.getTime())) {
+    const dia =
+        Number(partes[2]);
+
+
+    /*
+     * Criamos a data usando horário local.
+     * NÃO usamos new Date("YYYY-MM-DD"),
+     * porque isso pode provocar deslocamento
+     * por causa do UTC.
+     */
+
+    const data =
+        new Date(
+            ano,
+            mes,
+            dia
+        );
+
+
+    if (
+        Number.isNaN(
+            data.getTime()
+        )
+    ) {
         return "";
     }
 
-    return dias[data.getDay()] || "";
+
+    return dias[
+        data.getDay()
+    ];
 }
 /* =========================================================
    DATA UTC PARA CONTROLE DA API
@@ -2933,100 +2932,7 @@ function obterDataUTC(jogo) {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
 }
 
-/* =========================================================
-   AGRUPAR JOGOS POR COMPETIÇÃO
-========================================================= */
 
-function agruparJogosPorCompeticao(jogos) {
-
-    const grupos = new Map();
-
-    if (!Array.isArray(jogos)) {
-
-        return [];
-
-    }
-
-
-    jogos.forEach(jogo => {
-
-        if (!jogo) return;
-
-
-        const leagueId =
-            String(
-                jogo?.league?.id ||
-                jogo?.leagueId ||
-                ""
-            ).trim();
-
-
-        const nomeLiga =
-            String(
-                jogo?.league?.name ||
-                jogo?.competicao ||
-                jogo?.leagueName ||
-                "Outros"
-            ).trim();
-
-
-        const pais =
-            String(
-                jogo?.league?.country ||
-                jogo?.pais ||
-                ""
-            ).trim();
-
-
-        /*
-        =====================================================
-        USA ID DA COMPETIÇÃO QUANDO EXISTIR
-        =====================================================
-        */
-
-        const chave =
-            leagueId
-                ? `liga_${leagueId}`
-                : `${pais}|${nomeLiga}`;
-
-
-        if (!grupos.has(chave)) {
-
-            grupos.set(
-                chave,
-                {
-
-                    id:
-                        leagueId,
-
-                    nome:
-                        nomeLiga,
-
-                    pais:
-                        pais,
-
-                    jogos:
-                        []
-
-                }
-            );
-
-        }
-
-
-        grupos
-            .get(chave)
-            .jogos
-            .push(jogo);
-
-    });
-
-
-    return Array.from(
-        grupos.values()
-    );
-
-}
 /* =========================================================
    RESERVAR UMA CHAMADA DA API
 ========================================================= */
@@ -3299,8 +3205,7 @@ const API_BASE =
    CACHE
 ========================================================= */
 
-/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas
- const CACHE_TEMPO_RESULTADOS = 10 * 60 * 1000; // 10 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
+/* ===================================================== CONFIGURAÇÃO DO CACHE ===================================================== */ const CACHE_FIREBASE_PATH = "cacheMultiPlay"; const CACHE_TEMPO_JOGOS = 6 * 60 * 60 * 1000; // 6 horas const CACHE_TEMPO_COTACOES = 12 * 60 * 60 * 1000; // 12 horas const CACHE_TEMPO_RESULTADOS = 2 * 60 * 1000; // 10 minutos /* ===================================================== SALVAR CACHE ===================================================== */ async function salvarCacheFirebase(tipo, chave, dados) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return false; } if ( !tipo || chave === undefined || chave === null ) { console.warn( "⚠️ Dados inválidos para salvar cache:", { tipo, chave } ); return false; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); await ref.set({ timestamp: Date.now(), dados: dados }); console.log( `☁️ CACHE SALVO: ${tipo}/${chave}` ); return true; } catch (erro) { console.error( "❌ Erro salvando cache:", erro ); /* * IMPORTANTE: * erro no cache não deve parar * o carregamento dos jogos. */ return false; } } /* ===================================================== LER CACHE ===================================================== */ async function lerCacheFirebase(tipo, chave) { try { if ( typeof db === "undefined" || !db ) { console.warn( "⚠️ Firebase DB não disponível" ); return null; } if ( !tipo || chave === undefined || chave === null ) { return null; } const ref = db.ref( `${CACHE_FIREBASE_PATH}/${tipo}/${String(chave)}` ); const snapshot = await ref.once("value"); if ( !snapshot || !snapshot.exists() ) { console.log( `⚠️ CACHE NÃO EXISTE: ${tipo}/${chave}` ); return null; } const cache = snapshot.val(); if ( !cache || typeof cache !== "object" ) { console.warn( `⚠️ CACHE INVÁLIDO: ${tipo}/${chave}` ); return null; } return cache; } catch (erro) { console.error( "❌ Erro lendo cache Firebase:", erro ); /* * Se Firebase falhar, * retorna null para permitir * a consulta normal da API. */ return null; } } /* ===================================================== VERIFICAR CACHE ===================================================== */ function cacheValido(cache, tempoMaximo) { try { if (!cache) { return false; } if ( !cache.timestamp ) { return false; } const timestamp = Number(cache.timestamp); if ( !Number.isFinite(timestamp) ) { return false; } const idade = Date.now() - timestamp; if (idade < 0) { return false; } const valido = idade < tempoMaximo; console.log( valido ? `✅ CACHE VÁLIDO - ${Math.round(idade / 60000)} min` : `⏰ CACHE EXPIRADO - ${Math.round(idade / 60000)} min` ); return valido; } catch (erro) { console.error( "❌ Erro verificando cache:", erro ); return false; } } 
 
 
 /* =========================================================
@@ -5525,12 +5430,12 @@ async function atualizarResultados() {
         );
 
 
-       }
+    }
 
     catch (erro) {
 
         console.error(
-            "❌ ERRO AO CARREGAR JOGOS:",
+            "❌ ERRO NO CICLO DE RESULTADOS:",
             erro
         );
 
@@ -5538,7 +5443,7 @@ async function atualizarResultados() {
 
     finally {
 
-        carregamentoJogosEmAndamento =
+        atualizacaoResultadosEmAndamento =
             false;
 
     }
@@ -6036,7 +5941,7 @@ function montarMenu() {
             if (titulo) {
 
                 titulo.textContent =
-                    "JOGOS DISPONIVEL";
+                    "Jogos Feitos";
 
             }
 
@@ -7910,6 +7815,556 @@ function salvarCacheAPI(
 
 }
 
+
+
+
+/* =========================================================
+   CARREGAR JOGOS
+========================================================= */
+
+/* =========================================================
+   CARREGAR JOGOS
+   - CACHE PRIMEIRO
+   - API SOMENTE SE NECESSÁRIO
+   - DATA/HORA EM BRASÍLIA
+   - NÃO REMOVE JOGOS APÓS O HORÁRIO
+========================================================= */
+
+async function carregarJogos(
+    dia,
+    dataForcada = null
+) {
+
+    try {
+
+        console.log(
+            "========================================"
+        );
+
+        console.log(
+            "⚽ CARREGANDO JOGOS:",
+            dia
+        );
+
+        console.log(
+            "📅 DATA FORÇADA:",
+            dataForcada
+        );
+
+
+        /* =====================================================
+           CONTAINERS DOS DIAS
+        ===================================================== */
+
+        const containers = {
+
+            domingo:
+                document.getElementById(
+                    "conteudo-domingo"
+                ),
+
+            segunda:
+                document.getElementById(
+                    "conteudo-segunda"
+                ),
+
+            terca:
+                document.getElementById(
+                    "conteudo-terca"
+                ),
+
+            quarta:
+                document.getElementById(
+                    "conteudo-quarta"
+                ),
+
+            quinta:
+                document.getElementById(
+                    "conteudo-quinta"
+                ),
+
+            sexta:
+                document.getElementById(
+                    "conteudo-sexta"
+                ),
+
+            sabado:
+                document.getElementById(
+                    "conteudo-sabado"
+                )
+
+        };
+
+
+        const container =
+            containers[dia];
+
+
+        if (!container) {
+
+            console.error(
+                "❌ Container não encontrado para:",
+                dia
+            );
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           CALCULAR DATA DO DIA
+        ===================================================== */
+
+        let dataAPI =
+            dataForcada;
+
+
+        /*
+         * Se não foi informada uma data,
+         * calcula a próxima ocorrência do dia.
+         */
+
+        if (!dataAPI) {
+
+            const hoje =
+                new Date();
+
+
+            const indiceHoje =
+                hoje.getDay();
+
+
+            const indiceDestino =
+                dias.indexOf(
+                    dia
+                );
+
+
+            if (
+                indiceDestino === -1
+            ) {
+
+                console.error(
+                    "❌ Dia inválido:",
+                    dia
+                );
+
+                return;
+
+            }
+
+
+            let diferenca =
+                indiceDestino -
+                indiceHoje;
+
+
+            if (
+                diferenca < 0
+            ) {
+
+                diferenca += 7;
+
+            }
+
+
+            const dataCalculada =
+                new Date(
+                    hoje
+                );
+
+
+            dataCalculada.setDate(
+                hoje.getDate() +
+                diferenca
+            );
+
+
+            dataAPI =
+                obterDataLocalAPI(
+                    dataCalculada
+                );
+
+        }
+
+
+        /* =====================================================
+           VALIDAR DATA
+        ===================================================== */
+
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(
+                String(dataAPI)
+            )
+        ) {
+
+            console.error(
+                "❌ Data inválida:",
+                dataAPI
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "📅 DATA API:",
+            dataAPI
+        );
+
+
+        /* =====================================================
+           LOADING DO CONTAINER
+        ===================================================== */
+
+        container.innerHTML = `
+            <div
+                style="
+                    padding:25px;
+                    text-align:center;
+                    color:#fff;
+                    font-size:16px;
+                "
+            >
+                ⏳ Carregando jogos...
+            </div>
+        `;
+
+
+        /* =====================================================
+           BUSCAR JOGOS
+           
+           A função buscarJogosComCache()
+           já faz:
+           
+           1. Firebase
+           2. Jogos antigos salvos
+           3. API somente se necessário
+        ===================================================== */
+
+        let jogosAPI =
+            await buscarJogosComCache(
+                dataAPI
+            );
+
+
+        if (
+            !Array.isArray(
+                jogosAPI
+            )
+        ) {
+
+            jogosAPI = [];
+
+        }
+
+
+        console.log(
+            "📦 Jogos recebidos:",
+            jogosAPI.length
+        );
+
+
+        /* =====================================================
+           NORMALIZAR TODOS OS JOGOS
+        ===================================================== */
+
+        let jogosDoDia =
+            jogosAPI
+                .map(
+                    jogo =>
+                        normalizarJogoData(
+                            jogo
+                        )
+                )
+                .filter(
+                    jogo =>
+                        jogo !== null
+                );
+
+
+        /* =====================================================
+           GARANTIR QUE O JOGO PERTENCE AO DIA
+           
+           A comparação é feita usando
+           o horário de Brasília.
+        ===================================================== */
+
+        jogosDoDia =
+            jogosDoDia.filter(
+                jogo => {
+
+                    const dataReal =
+                        obterDataRealDoJogo(
+                            jogo
+                        );
+
+
+                    return (
+                        dataReal ===
+                        dataAPI
+                    );
+
+                }
+            );
+
+
+        /* =====================================================
+           REMOVER JOGOS CANCELADOS
+           
+           NÃO REMOVER:
+           NS
+           TBD
+           1H
+           HT
+           2H
+           ET
+           P
+           FT
+           AET
+           PEN
+           
+           Assim o jogo continua aparecendo
+           mesmo depois de começar ou terminar.
+        ===================================================== */
+
+        const statusBloqueados = [
+
+            "CANC",
+            "PST",
+            "ABD",
+            "AWD",
+            "WO"
+
+        ];
+
+
+        jogosDoDia =
+            jogosDoDia.filter(
+                jogo => {
+
+                    const status =
+                        String(
+                            jogo?.fixture?.status?.short ||
+                            jogo?.status ||
+                            ""
+                        )
+                        .trim()
+                        .toUpperCase();
+
+
+                    return !statusBloqueados.includes(
+                        status
+                    );
+
+                }
+            );
+
+
+        /* =====================================================
+           RECUPERAR JOGOS ANTIGOS DO LOCALSTORAGE
+           
+           Isso evita que uma falha da API apague
+           os jogos que já estavam disponíveis.
+        ===================================================== */
+
+        if (
+            jogosDoDia.length === 0 &&
+            Array.isArray(
+                jogosSalvos
+            )
+        ) {
+
+            const jogosLocais =
+                jogosSalvos
+                    .map(
+                        jogo =>
+                            normalizarJogoData(
+                                jogo
+                            )
+                    )
+                    .filter(
+                        jogo =>
+                            jogo &&
+                            obterDataRealDoJogo(
+                                jogo
+                            ) ===
+                            dataAPI
+                    );
+
+
+            if (
+                jogosLocais.length
+            ) {
+
+                console.log(
+                    "📦 Usando jogos antigos do localStorage:",
+                    jogosLocais.length
+                );
+
+
+                jogosDoDia =
+                    jogosLocais;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SE NÃO EXISTIR NENHUM JOGO
+        ===================================================== */
+
+        if (
+            jogosDoDia.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div
+                    style="
+                        padding:30px 15px;
+                        text-align:center;
+                        color:#fff;
+                    "
+                >
+
+                    <div
+                        style="
+                            font-size:40px;
+                            margin-bottom:10px;
+                        "
+                    >
+                        ⚽
+                    </div>
+
+                    <div
+                        style="
+                            font-size:17px;
+                            font-weight:bold;
+                        "
+                    >
+                        Nenhum jogo encontrado
+                    </div>
+
+                    <div
+                        style="
+                            margin-top:8px;
+                            opacity:.7;
+                            font-size:13px;
+                        "
+                    >
+                        ${formatarData(dataAPI)}
+                    </div>
+
+                </div>
+            `;
+
+
+            console.log(
+                "⚠️ Nenhum jogo para:",
+                dataAPI
+            );
+
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           ELIMINAR DUPLICADOS
+           
+           Usa fixtureId como identificador principal.
+        ===================================================== */
+
+        const mapaJogos =
+            new Map();
+
+
+        jogosDoDia.forEach(
+            jogo => {
+
+                const fixtureId =
+                    String(
+                        jogo?.fixtureId ||
+                        jogo?.idAPI ||
+                        jogo?.fixture?.id ||
+                        ""
+                    ).trim();
+
+
+                /*
+                 * Se possuir ID da API,
+                 * usa o ID como chave.
+                 */
+
+                if (fixtureId) {
+
+                    if (
+                        !mapaJogos.has(
+                            fixtureId
+                        )
+                    ) {
+
+                        mapaJogos.set(
+                            fixtureId,
+                            jogo
+                        );
+
+                    }
+
+                }
+
+                else {
+
+                    /*
+                     * Fallback caso o jogo não tenha ID.
+                     */
+
+                    const chave =
+                        [
+                            normalizarNome(
+                                jogo.timeA
+                            ),
+                            normalizarNome(
+                                jogo.timeB
+                            ),
+                            jogo.data,
+                            jogo.hora
+                        ].join(
+                            "|"
+                        );
+
+
+                    if (
+                        !mapaJogos.has(
+                            chave
+                        )
+                    ) {
+
+                        mapaJogos.set(
+                            chave,
+                            jogo
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        jogosDoDia =
+            Array.from(
+                mapaJogos.values()
+            );
+            /* =========================================================
+   DATA E HORA DO JOGO - BRASÍLIA
+========================================================= */
+
 function obterDataHoraBrasil(jogo) {
 
     if (!jogo) return null;
@@ -7925,21 +8380,27 @@ function obterDataHoraBrasil(jogo) {
 
     for (const fonte of fontes) {
 
-        const texto = String(fonte || "").trim();
+        const texto =
+            String(fonte || "").trim();
 
         if (texto) {
+
             valor = texto;
             break;
+
         }
+
     }
 
     if (!valor) return null;
 
-    const data = new Date(valor);
+    const data =
+        new Date(valor);
 
     if (Number.isNaN(data.getTime())) {
         return null;
     }
+
 
     const partesData =
         new Intl.DateTimeFormat(
@@ -7952,11 +8413,15 @@ function obterDataHoraBrasil(jogo) {
             }
         ).formatToParts(data);
 
+
     const mapaData = {};
 
-    partesData.forEach(parte => {
-        mapaData[parte.type] = parte.value;
-    });
+    partesData.forEach(
+        parte => {
+            mapaData[parte.type] =
+                parte.value;
+        }
+    );
 
 
     const partesHora =
@@ -7970,11 +8435,15 @@ function obterDataHoraBrasil(jogo) {
             }
         ).formatToParts(data);
 
+
     const mapaHora = {};
 
-    partesHora.forEach(parte => {
-        mapaHora[parte.type] = parte.value;
-    });
+    partesHora.forEach(
+        parte => {
+            mapaHora[parte.type] =
+                parte.value;
+        }
+    );
 
 
     return {
@@ -7989,18 +8458,27 @@ function obterDataHoraBrasil(jogo) {
             data.getTime()
 
     };
+
 }
 
 
-/* =====================================================
+/* =========================================================
    DATA REAL DO JOGO
-===================================================== */
+========================================================= */
+
+function obterDataRealDoJogo(jogo) {
+
+    const resultado =
+        obterDataHoraBrasil(jogo);
+
+    return resultado?.data || "";
+
+}
 
 
-
-/* =====================================================
-   HORA REAL DO JOGO
-===================================================== */
+/* =========================================================
+   HORA REAL DO JOGO - BRASÍLIA
+========================================================= */
 
 function obterHoraRealDoJogo(jogo) {
 
@@ -8008,590 +8486,408 @@ function obterHoraRealDoJogo(jogo) {
         obterDataHoraBrasil(jogo);
 
     return resultado?.hora || "";
-}    
-function obterDataBrasil(offset = 0) {
-    const data = new Date();
-    data.setHours(12, 0, 0, 0);
-    data.setDate(data.getDate() + Number(offset));
-    const ano = data.getFullYear();
-    const mes = String(data.getMonth() + 1).padStart(2, "0");
-    const dia = String(data.getDate()).padStart(2, "0");
-    return `${ano}-${mes}-${dia}`;
-}
-
-async function carregarJogosEmAndamentoAPI() {
-
-    try {
-
-        const resposta =
-            await fetch("/api/jogos/em-andamento");
-
-        if (!resposta.ok) {
-
-            throw new Error(
-                `HTTP ${resposta.status}`
-            );
-
-        }
-
-        return await resposta.json();
-
-    }
-
-    catch (erro) {
-
-        console.warn(
-            "⚠️ Erro buscando jogos em andamento:",
-            erro
-        );
-
-        return [];
-
-    }
 
 }
-/* =========================================================
-   RENDERIZAR JOGOS POR COMPETIÇÃO
-========================================================= */
 
-function renderizarJogosPorCompeticao(
-    container,
-    jogos
-) {
+        /* =====================================================
+           ORDENAR POR HORÁRIO
+        ===================================================== */
 
-    if (!container) {
+        jogosDoDia.sort(
+            (
+                a,
+                b
+            ) => {
 
-        console.error(
-            "❌ Container de jogos não encontrado."
-        );
-
-        return;
-
-    }
-
-
-    container.innerHTML = "";
-
-
-    if (!Array.isArray(jogos) || !jogos.length) {
-
-        container.innerHTML = `
-
-            <div class="sem-jogos">
-
-                Nenhum jogo encontrado
-                para este dia.
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    const grupos =
-        agruparJogosPorCompeticao(
-            jogos
-        );
-
-
-    grupos.forEach(
-        grupo => {
-
-            /* =============================================
-               CARD DA COMPETIÇÃO
-            ============================================= */
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.className =
-                "card-competicao";
-
-
-            /* =============================================
-               CABEÇALHO
-            ============================================= */
-
-            const cabecalho =
-                document.createElement(
-                    "div"
-                );
-
-
-            cabecalho.className =
-                "cabecalho-competicao";
-
-
-            const informacoes =
-                document.createElement(
-                    "div"
-                );
-
-
-            informacoes.innerHTML = `
-
-                <strong>
-
-                    ${escapeHTML(
-                        grupo.nome
-                    )}
-
-                </strong>
-
-                ${
-                    grupo.pais
-                        ? `
-                            <span>
-                                ${escapeHTML(
-                                    grupo.pais
-                                )}
-                            </span>
-                          `
-                        : ""
-                }
-
-            `;
-
-
-            const quantidade =
-                document.createElement(
-                    "span"
-                );
-
-
-            quantidade.className =
-                "quantidade-jogos";
-
-
-            quantidade.textContent =
-                `${grupo.jogos.length} jogo${
-                    grupo.jogos.length !== 1
-                        ? "s"
-                        : ""
-                }`;
-
-
-            cabecalho.appendChild(
-                informacoes
-            );
-
-
-            cabecalho.appendChild(
-                quantidade
-            );
-
-
-            /* =============================================
-               CONTAINER DOS JOGOS
-            ============================================= */
-
-            const jogosContainer =
-                document.createElement(
-                    "div"
-                );
-
-
-            jogosContainer.className =
-                "jogos-da-competicao";
-
-
-            /* =============================================
-               CRIAR CADA JOGO
-            ============================================= */
-
-            grupo.jogos.forEach(
-                (
-                    jogo,
-                    index
-                ) => {
-
-                    criarJogo(
-                        jogosContainer,
-                        jogo,
-                        index
+                const horaA =
+                    String(
+                        a?.hora ||
+                        obterHoraRealDoJogo(
+                            a
+                        ) ||
+                        "00:00"
                     );
 
+
+                const horaB =
+                    String(
+                        b?.hora ||
+                        obterHoraRealDoJogo(
+                            b
+                        ) ||
+                        "00:00"
+                    );
+
+
+                return horaA.localeCompare(
+                    horaB
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           GARANTIR DADOS CORRETOS
+           
+           Aqui gravamos:
+           
+           data = 2026-09-04
+           hora = 21:30
+           
+           dataHora = data original da API
+        ===================================================== */
+
+        jogosDoDia =
+            jogosDoDia.map(
+                jogo => {
+
+                    const dataHoraBrasil =
+                        obterDataHoraBrasil(
+                            jogo
+                        );
+
+
+                    const dataReal =
+                        dataHoraBrasil?.data ||
+                        jogo.data ||
+                        dataAPI;
+
+
+                    const horaReal =
+                        dataHoraBrasil?.hora ||
+                        jogo.hora ||
+                        "--:--";
+
+
+                    const fixtureId =
+                        String(
+                            jogo?.fixtureId ||
+                            jogo?.idAPI ||
+                            jogo?.fixture?.id ||
+                            ""
+                        ).trim();
+
+
+                    return {
+
+                        ...jogo,
+
+                        idAPI:
+                            fixtureId ||
+                            jogo.idAPI ||
+                            "",
+
+                        fixtureId:
+                            fixtureId ||
+                            jogo.fixtureId ||
+                            "",
+
+                        data:
+                            dataReal,
+
+                        hora:
+                            horaReal,
+
+                        dataHora:
+                            jogo?.fixture?.date ||
+                            jogo?.dataOriginalAPI ||
+                            jogo?.dataHoraAPI ||
+                            jogo?.dataHora ||
+                            "",
+
+                        dataOriginalAPI:
+                            jogo?.fixture?.date ||
+                            jogo?.dataOriginalAPI ||
+                            jogo?.dataHoraAPI ||
+                            jogo?.dataHora ||
+                            "",
+
+                        dataHoraAPI:
+                            jogo?.fixture?.date ||
+                            jogo?.dataOriginalAPI ||
+                            jogo?.dataHoraAPI ||
+                            jogo?.dataHora ||
+                            ""
+
+                    };
+
                 }
             );
+/* =========================================================
+   NÃO MOSTRAR JOGOS QUE JÁ COMEÇARAM
+   HORÁRIO DE BRASÍLIA
+========================================================= */
 
+const agora =
+    Date.now();
 
-            card.appendChild(
-                cabecalho
-            );
+jogosDoDia =
+    jogosDoDia.filter(
+        jogo => {
 
+            const dataHora =
+                obterDataHoraBrasil(
+                    jogo
+                );
 
-            card.appendChild(
-                jogosContainer
-            );
+            /*
+             * Se não conseguir descobrir a data/hora,
+             * mantém o jogo para não apagar por engano.
+             */
 
+            if (!dataHora) {
+                return true;
+            }
 
-            container.appendChild(
-                card
-            );
+            /*
+             * JOGO JÁ COMEÇOU OU JÁ PASSOU
+             */
+
+            if (
+                dataHora.timestamp <=
+                agora
+            ) {
+
+                console.log(
+                    "⏰ Jogo já começou, ocultando:",
+                    jogo.timeA,
+                    "x",
+                    jogo.timeB,
+                    dataHora.data,
+                    dataHora.hora
+                );
+
+                return false;
+
+            }
+
+            /*
+             * JOGO AINDA NÃO COMEÇOU
+             */
+
+            return true;
 
         }
     );
 
-}
-/* =========================================================
-   CARREGAR JOGOS
-========================================================= */
+        /* =====================================================
+           ATUALIZAR JOGOS SALVOS
+        ===================================================== */
 
-async function carregarJogos(dataSelecionada = null) {
+        jogosDoDia.forEach(
+            jogoNovo => {
 
-    try {
-
-        if (carregamentoJogosEmAndamento) {
-            return;
-        }
-
-        carregamentoJogosEmAndamento = true;
-
-
-        /* =========================================
-           CONTAINER
-        ========================================= */
-
-        const container =
-            document.getElementById(
-                "conteudoJogosDia"
-            );
+                const fixtureNovo =
+                    String(
+                        jogoNovo.fixtureId ||
+                        jogoNovo.idAPI ||
+                        ""
+                    );
 
 
-        if (!container) {
+                const indiceExistente =
+                    jogosSalvos.findIndex(
+                        jogoSalvo => {
 
-            console.error(
-                "❌ Container #conteudoJogosDia não encontrado."
-            );
-
-            return;
-        }
-
-
-        /* =========================================
-           DATA
-        ========================================= */
-
-        const dataAPI =
-            String(
-                dataSelecionada ||
-                obterDataDia(
-                    offsetDiaSelecionado
-                )
-            ).trim();
+                            const fixtureSalvo =
+                                String(
+                                    jogoSalvo?.fixtureId ||
+                                    jogoSalvo?.idAPI ||
+                                    jogoSalvo?.fixture?.id ||
+                                    ""
+                                );
 
 
-        console.log(
-            "⚽ BUSCANDO JOGOS:",
-            dataAPI
-        );
+                            if (
+                                fixtureNovo &&
+                                fixtureSalvo
+                            ) {
+
+                                return (
+                                    fixtureNovo ===
+                                    fixtureSalvo
+                                );
+
+                            }
 
 
-        /* =========================================
-           LIMPA TELA
-        ========================================= */
+                            return (
+                                normalizarNome(
+                                    jogoSalvo?.timeA
+                                ) ===
+                                normalizarNome(
+                                    jogoNovo?.timeA
+                                ) &&
 
-        container.style.display = "block";
+                                normalizarNome(
+                                    jogoSalvo?.timeB
+                                ) ===
+                                normalizarNome(
+                                    jogoNovo?.timeB
+                                ) &&
 
-        container.innerHTML = `
-            <div class="carregando-jogos">
-                ⚽ Carregando jogos...
-            </div>
-        `;
+                                jogoSalvo?.data ===
+                                jogoNovo?.data
+                            );
 
-
-        /* =========================================
-           BUSCA JOGOS DA DATA SOLICITADA
-        ========================================= */
-
-        let jogos =
-            await buscarJogosComCache(
-                dataAPI
-            );
-
-
-        if (!Array.isArray(jogos)) {
-            jogos = [];
-        }
+                        }
+                    );
 
 
-        console.log(
-            "📦 JOGOS RECEBIDOS:",
-            dataAPI,
-            jogos.length
-        );
+                if (
+                    indiceExistente >= 0
+                ) {
+
+                    const antigo =
+                        jogosSalvos[
+                            indiceExistente
+                        ];
 
 
-        /* =========================================
-           FILTRAR PELA DATA SOLICITADA
-        ========================================= */
+                    jogosSalvos[
+                        indiceExistente
+                    ] = {
 
-        jogos =
-            jogos.filter(jogo => {
+                        ...antigo,
 
-                if (!jogo) {
-                    return false;
+                        ...jogoNovo,
+
+                        /*
+                         * Nunca perder cotação antiga.
+                         */
+
+                        cotacoes:
+                            jogoNovo.cotacoes ||
+                            antigo.cotacoes ||
+                            {}
+
+                    };
+
                 }
 
+                else {
 
-                const dataJogo =
-                    String(
-                        jogo.data ||
-                        jogo.date ||
-                        jogo?.fixture?.date ||
-                        ""
-                    ).substring(0, 10);
+                    jogosSalvos.push(
+                        jogoNovo
+                    );
 
-
-                /*
-                 * Se o jogo não tiver data salva,
-                 * não elimina automaticamente.
-                 */
-
-                if (!dataJogo) {
-                    return true;
                 }
 
-
-                return dataJogo === dataAPI;
-            });
-
-
-        console.log(
-            "📅 JOGOS APÓS FILTRO:",
-            dataAPI,
-            jogos.length
-        );
-
-
-        /* =========================================
-           REMOVER JOGOS CANCELADOS
-        ========================================= */
-
-        jogos =
-            jogos.filter(jogo => {
-
-                const status =
-                    String(
-                        jogo?.fixture?.status?.short ||
-                        jogo?.status ||
-                        ""
-                    ).toUpperCase();
-
-
-                return ![
-                    "CANC",
-                    "PST",
-                    "ABD",
-                    "AWD",
-                    "WO"
-                ].includes(status);
-            });
-
-
-        /* =========================================
-           REMOVER DUPLICADOS
-        ========================================= */
-
-        const mapa =
-            new Map();
-
-
-        jogos.forEach(jogo => {
-
-            const fixtureId =
-                String(
-                    jogo.fixtureId ||
-                    jogo.idAPI ||
-                    jogo?.fixture?.id ||
-                    ""
-                ).trim();
-
-
-            if (fixtureId) {
-
-                mapa.set(
-                    fixtureId,
-                    jogo
-                );
-
-            } else {
-
-                const chave =
-                    [
-                        jogo?.teams?.home?.name ||
-                        jogo?.timeA ||
-                        "",
-
-                        jogo?.teams?.away?.name ||
-                        jogo?.timeB ||
-                        "",
-
-                        jogo.data ||
-                        dataAPI
-                    ]
-                    .join("|")
-                    .toLowerCase();
-
-
-                mapa.set(
-                    chave,
-                    jogo
-                );
             }
-        });
+        );
 
 
-        jogos =
-            Array.from(
-                mapa.values()
-            );
+        /* =====================================================
+           NORMALIZAR TODOS OS SALVOS
+        ===================================================== */
 
-
-        /* =========================================
-           ORDENAR POR HORÁRIO
-        ========================================= */
-
-        jogos.sort((a, b) => {
-
-            const horaA =
-                obterHoraRealDoJogo(a) ||
-                a.hora ||
-                "99:99";
-
-            const horaB =
-                obterHoraRealDoJogo(b) ||
-                b.hora ||
-                "99:99";
-
-
-            return horaA.localeCompare(
-                horaB
-            );
-        });
-
-
-        /* =========================================
-           NENHUM JOGO
-        ========================================= */
-
-        if (!jogos.length) {
-
-            container.innerHTML = `
-                <div class="sem-jogos">
-                    Nenhum jogo encontrado para este dia.
-                </div>
-            `;
-
-            console.warn(
-                "⚠️ NENHUM JOGO PARA:",
-                dataAPI
-            );
-
-            return;
-        }
-
-
-        /* =========================================
-           PREPARAR JOGOS
-        ========================================= */
-
-        const jogosParaSalvar =
-            jogos.map(jogo => {
-
-                const fixtureId =
-                    String(
-                        jogo.fixtureId ||
-                        jogo.idAPI ||
-                        jogo?.fixture?.id ||
-                        ""
-                    ).trim();
-
-
-                const info =
-                    obterDataHoraBrasil(
-                        jogo
-                    ) || {};
-
-
-                return {
-
-                    ...jogo,
-
-                    fixtureId,
-
-                    idAPI:
-                        fixtureId,
-
-                    data:
-                        jogo.data ||
-                        info.data ||
-                        dataAPI,
-
-                    hora:
-                        jogo.hora ||
-                        info.hora ||
-                        "--:--",
-
-                    dataHora:
-                        jogo.dataHora ||
-                        (
-                            (jogo.data ||
-                            info.data ||
-                            dataAPI)
-                            +
-                            " " +
-                            (
-                                jogo.hora ||
-                                info.hora ||
-                                "--:--"
-                            )
+        jogosSalvos =
+            jogosSalvos
+                .map(
+                    jogo =>
+                        normalizarJogoData(
+                            jogo
                         )
-                };
-            });
+                )
+                .filter(
+                    jogo => {
+
+                        if (!jogo) {
+                            return false;
+                        }
 
 
-        /* =========================================
-           SALVAR NO LOCALSTORAGE
-        ========================================= */
+                        const data =
+                            obterDataRealDoJogo(
+                                jogo
+                            );
+
+
+                        return /^\d{4}-\d{2}-\d{2}$/
+                            .test(
+                                data
+                            );
+
+                    }
+                );
+
+
+        /* =====================================================
+           SALVAR LOCALSTORAGE
+        ===================================================== */
 
         try {
 
             localStorage.setItem(
                 "ultimosJogos",
                 JSON.stringify(
-                    jogosParaSalvar
+                    jogosSalvos
                 )
             );
 
-        } catch (erro) {
+
+            console.log(
+                "💾 Jogos salvos:",
+                jogosSalvos.length
+            );
+
+        }
+
+        catch (erro) {
 
             console.warn(
-                "⚠️ Erro salvando jogos:",
+                "⚠️ Não foi possível salvar jogos:",
                 erro
             );
+
         }
 
 
-        /* =========================================
-           RENDERIZAR POR COMPETIÇÃO
-        ========================================= */
+        /* =====================================================
+           LIMPAR CONTAINER
+        ===================================================== */
 
-        renderizarJogosPorCompeticao(
-            container,
-            jogosParaSalvar
+        container.innerHTML = "";
+
+
+        /* =====================================================
+           CRIAR CARDS
+        ===================================================== */
+
+        jogosDoDia.forEach(
+            (
+                jogo,
+                index
+            ) => {
+
+                try {
+
+                    criarJogo(
+                        container,
+                        jogo,
+                        index
+                    );
+
+                }
+
+                catch (erro) {
+
+                    console.error(
+                        "❌ Erro criando jogo:",
+                        erro,
+                        jogo
+                    );
+
+                }
+
+            }
         );
 
 
-        /* =========================================
-           ATUALIZAR APOSTAS
-        ========================================= */
+        /* =====================================================
+           ATUALIZAR SELEÇÕES
+        ===================================================== */
 
         atualizarSelecoes();
 
@@ -8599,23 +8895,171 @@ async function carregarJogos(dataSelecionada = null) {
 
 
         console.log(
-            "✅ JOGOS RENDERIZADOS:",
-            dataAPI,
-            jogosParaSalvar.length
+            "✅ JOGOS EXIBIDOS:",
+            jogosDoDia.length
         );
 
 
-    } catch (erro) {
+        console.log(
+            "📅 DATA:",
+            dataAPI
+        );
+
+
+        jogosDoDia.forEach(
+            jogo => {
+
+                console.log(
+                    "⚽",
+                    jogo.timeA,
+                    "x",
+                    jogo.timeB,
+                    "|",
+                    jogo.data,
+                    "|",
+                    jogo.hora
+                );
+
+            }
+        );
+
+    }
+
+    catch (erro) {
 
         console.error(
             "❌ ERRO AO CARREGAR JOGOS:",
             erro
         );
 
-    } finally {
 
-        carregamentoJogosEmAndamento = false;
+        /*
+         * IMPORTANTE:
+         * Não apagar os jogos antigos se houver
+         * erro na API/cache.
+         */
+
+        if (
+            Array.isArray(
+                jogosSalvos
+            )
+        ) {
+
+            const jogosFallback =
+                jogosSalvos
+                    .map(
+                        jogo =>
+                            normalizarJogoData(
+                                jogo
+                            )
+                    )
+                    .filter(
+                        jogo =>
+                            jogo &&
+                            obterDataRealDoJogo(
+                                jogo
+                            ) ===
+                            dataAPI
+                    );
+
+
+            if (
+                jogosFallback.length
+            ) {
+
+                container.innerHTML = "";
+
+
+                jogosFallback.forEach(
+                    (
+                        jogo,
+                        index
+                    ) => {
+
+                        try {
+
+                            criarJogo(
+                                container,
+                                jogo,
+                                index
+                            );
+
+                        }
+
+                        catch (
+                            erroCard
+                        ) {
+
+                            console.error(
+                                "❌ Erro no fallback:",
+                                erroCard
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                atualizarSelecoes();
+
+                atualizarTotal();
+
+
+                console.log(
+                    "📦 Fallback exibido:",
+                    jogosFallback.length
+                );
+
+
+                return;
+
+            }
+
+        }
+
+
+        container.innerHTML = `
+            <div
+                style="
+                    padding:30px 15px;
+                    text-align:center;
+                    color:#fff;
+                "
+            >
+
+                <div
+                    style="
+                        font-size:35px;
+                    "
+                >
+                    ⚠️
+                </div>
+
+                <div
+                    style="
+                        margin-top:10px;
+                        font-weight:bold;
+                    "
+                >
+                    Não foi possível carregar os jogos.
+                </div>
+
+                <div
+                    style="
+                        margin-top:8px;
+                        font-size:13px;
+                        opacity:.7;
+                    "
+                >
+                    Os dados anteriores foram preservados.
+                </div>
+
+            </div>
+        `;
+
     }
+
 }
 /* =========================================================
    FAIXAS DAS COTAÇÕES PADRÃO
@@ -9512,234 +9956,88 @@ function aplicarCotacoesNaTela(
    ATUALIZAR COTAÇÕES DO JOGO
 ========================================================= */
 
-async function atualizarCotacoesJogo(divJogo, fixtureId) {
+async function atualizarCotacoesJogo(
+    div,
+    fixtureId
+) {
 
-    if (!divJogo || !fixtureId) {
+    if (!div) {
+        return;
+    }
+
+
+    const chave =
+        String(fixtureId || "").trim();
+
+
+    if (!chave) {
+
         console.warn(
-            "⚠️ Dados inválidos para atualizar cotação:",
-            {
-                divJogo,
-                fixtureId
-            }
+            "⚠️ JOGO SEM FIXTURE ID"
         );
 
         return;
-    }
 
-    try {
-
-        console.log(
-            "🎯 BUSCANDO COTAÇÃO API:",
-            fixtureId
-        );
-
-        const cotacao =
-            await buscarCotacao(fixtureId);
-
-        if (!cotacao) {
-
-            console.warn(
-                "⚠️ API não retornou cotação:",
-                fixtureId
-            );
-
-            return;
-        }
-
-        console.log(
-            "✅ COTAÇÃO RECEBIDA:",
-            fixtureId,
-            cotacao
-        );
-
-
-        /* =====================================================
-           LOCALIZAR BOTÕES
-        ===================================================== */
-
-        const btnCasa = document.createElement("button");
-btnCasa.dataset.escolha = "Casa";
-
-const btnEmpate = document.createElement("button");
-btnEmpate.dataset.escolha = "Empate";
-
-const btnFora = document.createElement("button");
-btnFora.dataset.escolha = "Fora";
-            
-
-function aplicarCotacaoNoBotao(botao, valor) {
-
-    if (!botao) return;
-
-    const odd = Number(valor);
-
-    if (
-        !Number.isFinite(odd) ||
-        odd <= 0
-    ) {
-        return;
-    }
-
-    const valorFormatado =
-        odd.toFixed(2);
-
-
-    /* =========================================
-       MUDA O VALOR REAL DA COTAÇÃO
-    ========================================= */
-
-    botao.dataset.odd =
-        valorFormatado;
-
-    botao.setAttribute(
-        "data-odd",
-        valorFormatado
-    );
-
-
-    /* =========================================
-       MUDA O TEXTO MOSTRADO
-    ========================================= */
-
-    const elementoOdd =
-        botao.querySelector(".odd");
-
-
-    if (elementoOdd) {
-
-        elementoOdd.textContent =
-            valorFormatado;
-
-    } else {
-
-        /*
-         * Caso sua cotação não tenha
-         * class="odd", procura o span
-         */
-
-        const spans =
-            botao.querySelectorAll("span");
-
-
-        if (spans.length) {
-
-            spans[
-                spans.length - 1
-            ].textContent =
-                valorFormatado;
-        }
     }
 
 
     console.log(
-        "✅ COTAÇÃO ATUALIZADA:",
-        valorFormatado
+        "🎯 ATUALIZANDO COTAÇÃO:",
+        chave
     );
-}
-        /* =====================================================
-           FUNÇÃO PARA SUBSTITUIR COTAÇÃO
-        ===================================================== */
 
-        function aplicarCotacao(botao, valor) {
 
-            if (!botao) return;
+    try {
 
-            const odd =
-                Number(valor);
-
-            if (
-                !Number.isFinite(odd) ||
-                odd <= 0
-            ) {
-                return;
-            }
-
-            // Salva a nova cotação
-            botao.dataset.odd =
-                odd.toFixed(2);
-
-            // Procura o elemento visual da cotação
-            const elementoOdd =
-                botao.querySelector(".odd");
-
-            if (elementoOdd) {
-
-                elementoOdd.textContent =
-                    odd.toFixed(2);
-
-            } else {
-
-                // Fallback caso sua estrutura use outro elemento
-                const spans =
-                    botao.querySelectorAll("span");
-
-                const ultimo =
-                    spans[spans.length - 1];
-
-                if (ultimo) {
-
-                    ultimo.textContent =
-                        odd.toFixed(2);
-
-                }
-
-            }
-
-            // Também guarda no objeto do botão
-            botao.setAttribute(
-                "data-odd",
-                odd.toFixed(2)
+        const dados =
+            await buscarCotacao(
+                chave
             );
+
+
+        if (
+            !Array.isArray(dados) ||
+            dados.length === 0
+        ) {
+
+            console.warn(
+                "⚠️ NENHUMA ODDS ENCONTRADA:",
+                chave
+            );
+
+            return;
+
         }
 
 
         /* =====================================================
-           API SUBSTITUI A COTAÇÃO PADRÃO
+           APLICA NA TELA
         ===================================================== */
 
-        aplicarCotacao(
-            btnCasa,
-            cotacao.casa
-        );
-
-        aplicarCotacao(
-            btnEmpate,
-            cotacao.empate
-        );
-
-        aplicarCotacao(
-            btnFora,
-            cotacao.fora
+        aplicarCotacoesNaTela(
+            div,
+            dados
         );
 
 
         console.log(
-            "🔄 COTAÇÕES SUBSTITUÍDAS:",
-            {
-                fixtureId,
-                casa: cotacao.casa,
-                empate: cotacao.empate,
-                fora: cotacao.fora
-            }
+            "✅ COTAÇÕES APLICADAS:",
+            chave
         );
 
 
-        /* =====================================================
-           ATUALIZA SELEÇÕES
-        ===================================================== */
+    }
 
-        atualizarSelecoes();
-        atualizarTotal();
-
-    } catch (erro) {
+    catch (erro) {
 
         console.error(
-            "❌ ERRO ATUALIZANDO COTAÇÃO:",
-            fixtureId,
+            "❌ ERRO ATUALIZANDO COTAÇÕES:",
+            chave,
             erro
         );
 
     }
+
 }
 /* =========================================================
    EXTRAIR COTAÇÕES DA API-FOOTBALL
@@ -12608,6 +12906,44 @@ async function inicializarJogos() {
 
 }
 
+/* =========================================================
+   CLIQUE NOS DIAS
+========================================================= */
+
+document
+    .querySelectorAll(
+        "#diasContainer button"
+    )
+    .forEach(
+        btn => {
+
+            btn.addEventListener(
+                "click",
+                async () => {
+
+                    const dia =
+                        btn.dataset.dia;
+
+
+                    diaAtual =
+                        dia;
+
+
+                    await carregarJogos(
+                        dia
+                    );
+
+
+                    mostrarDia(
+                        dia
+                    );
+
+                }
+            );
+
+        }
+    );
+
 
 /* =========================================================
    MODAL SOLICITAÇÃO DE SALDO
@@ -13294,293 +13630,245 @@ async function buscarCotacao(fixtureId) {
             "⚠️ Fixture ID inválido"
         );
 
-        return null;
+        return [];
+
     }
 
 
     /* =====================================================
-       EVITA CONSULTAS DUPLICADAS
+       EVITA DUAS CONSULTAS AO MESMO TEMPO
     ===================================================== */
 
-    if (cotacoesEmBusca.has(chave)) {
+    if (
+        cotacoesEmBusca.has(chave)
+    ) {
 
         console.log(
-            "⏳ Cotação já está sendo buscada:",
+            "⏳ COTAÇÃO JÁ ESTÁ SENDO BUSCADA:",
             chave
         );
 
         return cotacoesEmBusca.get(chave);
+
     }
 
 
-    /* =====================================================
-       CRIA PROMESSA DA CONSULTA
-    ===================================================== */
+    const promessa =
+        (async () => {
 
-    const promessa = (async () => {
-
-        try {
-
-            console.log(
-                "🎯 BUSCANDO COTAÇÃO API:",
-                chave
-            );
+            let cache = null;
 
 
             /* =================================================
-               PRIMEIRO: FIREBASE
+               1. FIREBASE
             ================================================= */
 
-            const cotacaoFirebase =
-                await lerCacheFirebase(
-                    `cotacoes/${chave}`
-                );
+            try {
 
-
-            if (
-                cotacaoFirebase &&
-                cotacaoFirebase.dados
-            ) {
-
-                const dados =
-                    cotacaoFirebase.dados;
-
-                const casa =
-                    Number(dados.casa);
-
-                const empate =
-                    Number(dados.empate);
-
-                const fora =
-                    Number(dados.fora);
+                cache =
+                    await lerCacheFirebase(
+                        "cotacoes",
+                        chave
+                    );
 
 
                 if (
-                    Number.isFinite(casa) &&
-                    Number.isFinite(empate) &&
-                    Number.isFinite(fora)
+                    cache &&
+                    Array.isArray(cache.dados) &&
+                    cache.dados.length > 0
                 ) {
 
-                    console.log(
-                        "☁️ COTAÇÃO ENCONTRADA NO FIREBASE:",
-                        chave,
-                        {
-                            casa,
-                            empate,
-                            fora
-                        }
-                    );
+                    const atualizadoEm =
+                        Number(
+                            cache.atualizadoEm || 0
+                        );
 
-                    return {
-                        casa,
-                        empate,
-                        fora
-                    };
+
+                    const idade =
+                        Date.now() -
+                        atualizadoEm;
+
+
+                    if (
+                        atualizadoEm > 0 &&
+                        idade <
+                            CACHE_TEMPO_COTACOES
+                    ) {
+
+                        console.log(
+                            "🔥 USANDO COTAÇÃO DO FIREBASE:",
+                            chave
+                        );
+
+
+                        return cache.dados;
+
+                    }
+
                 }
+
+            }
+
+            catch (erro) {
+
+                console.warn(
+                    "⚠️ ERRO LENDO CACHE DE COTAÇÃO:",
+                    erro
+                );
+
             }
 
 
             /* =================================================
-               API-FOOTBALL
+               2. API-FOOTBALL
             ================================================= */
 
-            const resposta =
-                await consultarAPI(
-                    `/odds?fixture=${encodeURIComponent(chave)}`
-                );
+            try {
 
-
-            const bookmakers =
-                resposta?.response?.[0]?.bookmakers ||
-                [];
-
-
-            if (!bookmakers.length) {
-
-                console.warn(
-                    "⚠️ API não retornou bookmakers:",
+                console.log(
+                    "📡 BUSCANDO ODDS NA API:",
                     chave
                 );
 
-                return null;
-            }
+
+                const dados =
+                    await consultarAPI(
+                        `/odds?fixture=${encodeURIComponent(chave)}`
+                    );
 
 
-            /* =================================================
-               PROCURA MERCADO 1X2
-            ================================================= */
+                if (!dados) {
 
-            let casa = null;
-            let empate = null;
-            let fora = null;
+                    throw new Error(
+                        "API retornou null"
+                    );
 
-
-            for (
-                const bookmaker
-                of bookmakers
-            ) {
-
-                const bets =
-                    bookmaker?.bets || [];
-
-
-                const mercado =
-                    bets.find(bet => {
-
-                        const nome =
-                            String(
-                                bet?.name || ""
-                            ).toLowerCase();
-
-                        return (
-                            nome.includes("match winner") ||
-                            nome.includes("vencedor") ||
-                            nome === "1x2"
-                        );
-                    });
-
-
-                if (!mercado) {
-                    continue;
-                }
-
-
-                const valores =
-                    mercado.values || [];
-
-
-                for (
-                    const item
-                    of valores
-                ) {
-
-                    const valor =
-                        Number(item?.odd);
-
-
-                    if (
-                        !Number.isFinite(valor) ||
-                        valor <= 0
-                    ) {
-                        continue;
-                    }
-
-
-                    const nome =
-                        String(
-                            item?.value || ""
-                        ).toLowerCase();
-
-
-                    if (
-                        nome === "home" ||
-                        nome === "1"
-                    ) {
-
-                        casa = valor;
-
-                    } else if (
-                        nome === "draw" ||
-                        nome === "x"
-                    ) {
-
-                        empate = valor;
-
-                    } else if (
-                        nome === "away" ||
-                        nome === "2"
-                    ) {
-
-                        fora = valor;
-                    }
                 }
 
 
                 if (
-                    casa !== null &&
-                    empate !== null &&
-                    fora !== null
+                    !Array.isArray(
+                        dados.response
+                    )
                 ) {
-                    break;
+
+                    throw new Error(
+                        "response da API não é um array"
+                    );
+
                 }
-            }
 
 
-            /* =================================================
-               VALIDA COTAÇÃO
-            ================================================= */
-
-            if (
-                casa === null ||
-                empate === null ||
-                fora === null
-            ) {
-
-                console.warn(
-                    "⚠️ Não foi possível encontrar 1X2:",
-                    chave,
-                    {
-                        casa,
-                        empate,
-                        fora
-                    }
+                console.log(
+                    "📊 RESPOSTA ODDS:",
+                    dados.response
                 );
 
-                return null;
+
+                /* =================================================
+                   API SEM ODDS
+                ================================================= */
+
+                if (
+                    dados.response.length === 0
+                ) {
+
+                    console.warn(
+                        "⚠️ API SEM ODDS:",
+                        chave
+                    );
+
+
+                    if (
+                        cache &&
+                        Array.isArray(cache.dados) &&
+                        cache.dados.length > 0
+                    ) {
+
+                        console.log(
+                            "♻️ USANDO CACHE ANTIGO"
+                        );
+
+
+                        return cache.dados;
+
+                    }
+
+
+                    return [];
+
+                }
+
+
+                /* =================================================
+                   3. SALVAR NO FIREBASE
+                ================================================= */
+
+                try {
+
+                    await salvarCacheFirebase(
+                        "cotacoes",
+                        chave,
+                        dados.response
+                    );
+
+
+                    console.log(
+                        "💾 ODDS SALVAS:",
+                        chave
+                    );
+
+                }
+
+                catch (erroCache) {
+
+                    console.warn(
+                        "⚠️ NÃO FOI POSSÍVEL SALVAR ODDS:",
+                        erroCache
+                    );
+
+                }
+
+
+                return dados.response;
+
             }
 
+            catch (erro) {
 
-            const resultado = {
-
-                casa: Number(casa),
-                empate: Number(empate),
-                fora: Number(fora),
-
-                fixtureId: chave,
-
-                atualizadoEm:
-                    Date.now()
-            };
+                console.error(
+                    "❌ ERRO BUSCANDO ODDS:",
+                    erro
+                );
 
 
-            /* =================================================
-               SALVA NO FIREBASE
-            ================================================= */
+                /* =================================================
+                   CACHE ANTIGO
+                ================================================= */
 
-            await salvarCacheFirebase(
-                `cotacoes/${chave}`,
-                resultado
-            );
+                if (
+                    cache &&
+                    Array.isArray(cache.dados) &&
+                    cache.dados.length > 0
+                ) {
 
-
-            console.log(
-                "💾 COTAÇÃO API SALVA:",
-                chave,
-                resultado
-            );
-
-
-            return resultado;
+                    console.log(
+                        "♻️ API FALHOU → CACHE ANTIGO:",
+                        chave
+                    );
 
 
-        } catch (erro) {
+                    return cache.dados;
 
-            console.error(
-                "❌ ERRO CONSULTANDO COTAÇÃO:",
-                chave,
-                erro
-            );
-
-            return null;
-
-        }
-
-    })();
+                }
 
 
-    /* =====================================================
-       GUARDA CONSULTA EM ANDAMENTO
-    ===================================================== */
+                return [];
+
+            }
+
+        })();
+
 
     cotacoesEmBusca.set(
         chave,
@@ -13592,14 +13880,18 @@ async function buscarCotacao(fixtureId) {
 
         return await promessa;
 
-    } finally {
+    }
+
+    finally {
 
         cotacoesEmBusca.delete(
             chave
         );
 
     }
+
 }
+
 /* =========================================================
    MENU HAMBURGER
 ========================================================= */
@@ -13700,29 +13992,20 @@ document.addEventListener(
 
 async function iniciarSistema() {
 
-    try {
-
-        atualizarBotoesDias();
-
+    const carregou =
         await carregarJogador();
 
-        // Carrega inicialmente HOJE
-        await selecionarDiaJogos(0);
-
-        iniciarAtualizacaoResultados(30);
-
-        iniciarAtualizacaoPlacar();
-
-        console.log("✅ SISTEMA INICIADO");
-
-    } catch (erro) {
-
-        console.error(
-            "❌ ERRO INICIANDO SISTEMA:",
-            erro
-        );
-
+    if (!carregou) {
+        return;
     }
+
+
+    await inicializarJogos();
+
+
+    // Atualiza resultados imediatamente
+    iniciarAtualizacaoResultados(30);
+
 }
 /* =========================================================
    APLICAR COR
@@ -13814,616 +14097,7 @@ function abryrModal() {
 window.addEventListener('load', () => {
     setTimeout(abryrModal, 300);
 });
-/* =====================================================
-   DATA DO DIA
-===================================================== */
-
-function obterDataDia(offset = 0) {
-
-    offset = Number(offset);
-
-    return obterDataBrasil(offset);
-}
-
-function atualizarBotoesDias() {
-
-    const nomesDias = [
-        "Domingo",
-        "Segunda",
-        "Terça",
-        "Quarta",
-        "Quinta",
-        "Sexta",
-        "Sábado"
-    ];
-
-    for (let offset = 0; offset < 3; offset++) {
-
-        const data = obterDataDia(offset);
-
-        if (!data) {
-            console.error(
-                "❌ Data inválida:",
-                offset
-            );
-            continue;
-        }
-
-        const [ano, mes, dia] =
-            data.split("-").map(Number);
-
-        const dataObj = new Date(
-            ano,
-            mes - 1,
-            dia,
-            12
-        );
-
-        const titulo =
-            document.getElementById(
-                `tituloDia${offset}`
-            );
-
-        const dataElemento =
-            document.getElementById(
-                `dataDia${offset}`
-            );
-
-        if (titulo) {
-
-            titulo.textContent =
-                nomesDias[
-                    dataObj.getDay()
-                ];
-        }
-
-        if (dataElemento) {
-
-            dataElemento.textContent =
-                `${String(dia).padStart(2, "0")}/${String(mes).padStart(2, "0")}`;
-        }
-
-        console.log(
-            `📅 DIA ${offset}:`,
-            data
-        );
-    }
-}
-
-/* =====================================================
-   CLIQUE NOS BOTÕES
-===================================================== */
-
-/* =========================================================
-   SELECIONAR DIA
-========================================================= */
-
-async function selecionarDiaJogos(offset) {
-
-    offset = Number(offset);
-
-    console.log(
-        "🖱️ BOTÃO CLICADO:",
-        offset
-    );
-
-    if (
-        !Number.isInteger(offset) ||
-        offset < 0 ||
-        offset > 2
-    ) {
-        console.error(
-            "❌ Offset inválido:",
-            offset
-        );
-        return;
-    }
-
-
-    /* =========================================
-       SALVA DIA
-    ========================================= */
-
-    offsetDiaSelecionado = offset;
-
-
-    /* =========================================
-       ATIVA BOTÃO
-    ========================================= */
-
-    const botoes =
-        document.querySelectorAll(
-            "#diasContainer .btn-dia"
-        );
-
-
-    botoes.forEach(botao => {
-
-        botao.classList.remove(
-            "ativo"
-        );
-    });
-
-
-    const botaoSelecionado =
-        document.querySelector(
-            `#diasContainer .btn-dia[data-offset="${offset}"]`
-        );
-
-
-    if (botaoSelecionado) {
-
-        botaoSelecionado.classList.add(
-            "ativo"
-        );
-
-    } else {
-
-        console.error(
-            "❌ Botão não encontrado:",
-            offset
-        );
-    }
-
-
-    /* =========================================
-       DATA DO BOTÃO
-    ========================================= */
-
-    const data =
-        obterDataDia(offset);
-
-
-    console.log(
-        "📅 CARREGANDO:",
-        {
-            offset,
-            data
-        }
-    );
-
-
-    /* =========================================
-       CARREGA OS JOGOS
-    ========================================= */
-
-    await carregarJogos(data);
-}
-
-/* =====================================================
-   INICIAR
-===================================================== */
-
-async function iniciarTresDias() {
-
-    console.log(
-        "🚀 INICIANDO 3 DIAS"
-    );
-
-    atualizarBotoesDias();
-
-    await selecionarDiaJogos(0);
-
-}
-
-
-/* =====================================================
-   DETECTAR VIRADA DO DIA
-===================================================== */
-
-let ultimoDia =
-    obterDataDia(0);
-
-
-function verificarMudancaDeDia() {
-
-    const diaAtual =
-        obterDataDia(0);
-
-
-    if (
-        diaAtual === ultimoDia
-    ) {
-        return;
-    }
-
-
-    console.log(
-        "🌅 NOVO DIA!"
-    );
-
-
-    console.log(
-        "📅 NOVO DIA:",
-        diaAtual
-    );
-
-
-    ultimoDia =
-        diaAtual;
-
-
-    /*
-    ================================================
-    ATUALIZA BOTÕES
-    ================================================
-    */
-
-    atualizarBotoesDias();
-
-
-    /*
-    ================================================
-    PRIMEIRO BOTÃO VOLTA A SER ATIVO
-    ================================================
-    */
-
-    document
-        .querySelectorAll(
-            "#diasContainer .btn-dia"
-        )
-        .forEach(botao => {
-
-            botao.classList.remove(
-                "ativo"
-            );
-
-        });
-
-
-    const primeiro =
-        document.querySelector(
-            '#diasContainer .btn-dia[data-offset="0"]'
-        );
-
-
-    if (primeiro) {
-
-        primeiro.classList.add(
-            "ativo"
-        );
-
-    }
-
-
-    /*
-    ================================================
-    CARREGA O NOVO "HOJE"
-    ================================================
-    */
-
-    selecionarDiaJogos(0);
-
-}
-// ⚽ ATUALIZA SOMENTE OS PLACARES — sem recarregar tudo!
-async function atualizarPlacarJogos() {
-
-    // Não roda se estiver carregando jogos
-    if (carregamentoJogosEmAndamento) {
-        return;
-    }
-
-    const offset =
-        Number(offsetDiaSelecionado || 0);
-
-    const dataAPI =
-        String(obterDataDia(offset)).trim();
-
-    console.log(
-        `🔄 Atualizando placares — Dia ${offset} — ${dataAPI} — ${new Date().toLocaleTimeString('pt-BR')}`
-    );
-
-    try {
-
-        const jogosNovos =
-            await buscarJogosSemCache(dataAPI);
-
-        if (
-            !Array.isArray(jogosNovos) ||
-            jogosNovos.length === 0
-        ) {
-
-            console.warn(
-                "⚠️ Sem dados novos para atualizar placar"
-            );
-
-            return;
-        }
-
-        // =====================================================
-        // MAPA DOS JOGOS POR FIXTURE ID
-        // =====================================================
-
-        const jogosMap = new Map();
-
-        jogosNovos.forEach(jogo => {
-
-            const id =
-                String(
-                    jogo?.fixture?.id ||
-                    jogo?.fixtureId ||
-                    jogo?.idAPI ||
-                    ""
-                ).trim();
-
-            if (id) {
-                jogosMap.set(id, jogo);
-            }
-        });
-
-        // =====================================================
-        // ATUALIZAR SOMENTE OS JOGOS DA TELA
-        // =====================================================
-
-        document
-            .querySelectorAll(
-                ".card-jogo, .jogo-item"
-            )
-            .forEach(card => {
-
-                const idJogo =
-                    String(
-                        card.dataset.id || ""
-                    ).trim();
-
-                if (
-                    !idJogo ||
-                    !jogosMap.has(idJogo)
-                ) {
-                    return;
-                }
-
-                const jogoAtualizado =
-                    jogosMap.get(idJogo);
-
-                // =================================================
-                // PLACAR
-                // =================================================
-
-                const golsCasa =
-                    jogoAtualizado?.goals?.home ??
-                    jogoAtualizado?.score?.fulltime?.home ??
-                    "-";
-
-                const golsFora =
-                    jogoAtualizado?.goals?.away ??
-                    jogoAtualizado?.score?.fulltime?.away ??
-                    "-";
-
-                // =================================================
-                // STATUS
-                // =================================================
-
-                const statusAPI =
-                    String(
-                        jogoAtualizado?.fixture?.status?.short ||
-                        ""
-                    ).trim();
-
-                const statusLongo =
-                    String(
-                        jogoAtualizado?.fixture?.status?.long ||
-                        ""
-                    ).trim();
-
-                // =================================================
-                // PLACAR NA TELA
-                // =================================================
-
-                const elemPlacar =
-                    card.querySelector(
-                        ".placar-jogo, .placar"
-                    );
-
-                if (elemPlacar) {
-
-                    elemPlacar.innerHTML = `
-                        <span class="gols-casa">
-                            ${golsCasa}
-                        </span>
-
-                        <span class="separador">
-                            x
-                        </span>
-
-                        <span class="gols-fora">
-                            ${golsFora}
-                        </span>
-                    `;
-                }
-
-                // =================================================
-                // STATUS NA TELA
-                // =================================================
-
-                const elemStatus =
-                    card.querySelector(
-                        ".status-jogo, .status"
-                    );
-
-                if (elemStatus) {
-
-                    elemStatus.textContent =
-                        statusLongo ||
-                        statusAPI;
-                }
-
-                // =================================================
-                // JOGO AO VIVO
-                // =================================================
-
-                const statusAoVivo = [
-                    "1H",
-                    "2H",
-                    "ET",
-                    "P",
-                    "LIVE",
-                    "HT"
-                ].includes(statusAPI);
-
-                if (statusAoVivo) {
-
-                    card.classList.add(
-                        "ao-vivo"
-                    );
-
-                } else {
-
-                    card.classList.remove(
-                        "ao-vivo"
-                    );
-                }
-
-            });
-
-        ultimaAtualizacaoPlacar =
-            new Date();
-
-        console.log(
-            `✅ Placares atualizados — ${jogosMap.size} jogos`
-        );
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro ao atualizar placares:",
-            erro
-        );
-    }
-}
-
-// 🔄 BUSCA DIRETO NA API — SEM CACHE — para placar atualizado
-// =====================================================
-// BUSCAR JOGOS PARA ATUALIZAR PLACAR
-// USA A API-FOOTBALL ATRAVÉS DO consultarAPI()
-// =====================================================
-
-async function buscarJogosSemCache(dataAPI) {
-
-    const data = String(dataAPI || "").trim();
-
-    if (!data) {
-        console.error("❌ Data inválida para buscar placar");
-        return [];
-    }
-
-    console.log("⚽ BUSCANDO PLACARES ATUALIZADOS:", data);
-
-    try {
-
-        const resposta = await consultarAPI(
-            `/fixtures?date=${encodeURIComponent(data)}`
-        );
-
-        if (!resposta) {
-            console.warn("⚠️ API não retornou resposta");
-            return [];
-        }
-
-        const jogos = Array.isArray(resposta.response)
-            ? resposta.response
-            : [];
-
-        console.log(
-            `⚽ API RETORNOU ${jogos.length} JOGOS PARA ${data}`
-        );
-
-        return jogos;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ ERRO AO BUSCAR PLACARES:",
-            erro
-        );
-
-        return [];
-    }
-}
-// ▶️ INICIAR ATUALIZAÇÃO DE PLACAR
-function iniciarAtualizacaoPlacar() {
-    // Para se já estiver rodando
-    if (intervaloAtualizacaoPlacar) {
-        clearInterval(intervaloAtualizacaoPlacar);
-    }
-
-    // Roda 1x imediatamente
-    atualizarPlacarJogos();
-    
-    // Depois a cada X segundos
-    intervaloAtualizacaoPlacar = setInterval(() => {
-        atualizarPlacarJogos();
-    }, TEMPO_REFRESH_SEGUNDOS * 1000);
-
-    console.log(`⏰ Atualização automática de placar ativada: ${TEMPO_REFRESH_SEGUNDOS}s`);
-}
-
-// ⏹️ PARAR ATUALIZAÇÃO
-function pararAtualizacaoPlacar() {
-    if (intervaloAtualizacaoPlacar) {
-        clearInterval(intervaloAtualizacaoPlacar);
-        intervaloAtualizacaoPlacar = null;
-        console.log("🛑 Atualização de placar parada");
-    }
-}
-
-window.selecionarDiaJogos = selecionarDiaJogos;
-/* =====================================================
-   VERIFICA A CADA 30 SEGUNDOS
-===================================================== */
-
-setInterval(
-    verificarMudancaDeDia,
-    30000
-);
-function testarBotoesDias() {
-
-    const container =
-        document.getElementById("diasContainer");
-
-    console.log(
-        "📦 diasContainer:",
-        container
-    );
-
-    if (!container) {
-        console.error(
-            "❌ #diasContainer NÃO EXISTE"
-        );
-        return;
-    }
-
-    const botoes =
-        container.querySelectorAll(".btn-dia");
-
-    console.log(
-        "🔘 TOTAL DE BOTÕES:",
-        botoes.length
-    );
-
-    botoes.forEach((botao, index) => {
-
-        console.log(
-            `🔘 BOTÃO ${index}:`,
-            {
-                offset:
-                    botao.dataset.offset,
-
-                texto:
-                    botao.innerText,
-
-                display:
-                    getComputedStyle(botao).display,
-
-                visibility:
-                    getComputedStyle(botao).visibility,
-
-                pointerEvents:
-                    getComputedStyle(botao).pointerEvents
-            }
-        );
-    });
-}
+iniciarAtualizacaoResultados(3);
 </script>
 </body>
 
