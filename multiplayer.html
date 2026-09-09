@@ -16,6 +16,30 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
 >
 
 <style>
+    .cabecalho-competicao {
+    background: #000000;
+    color: #ffffff;
+    padding: 10px 12px;
+    border-radius: 8px 8px 0 0;
+}
+
+.cabecalho-competicao strong {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.cabecalho-competicao span {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.cabecalho-competicao .quantidade-jogos {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+}
+    
  .carrossel-container {
     width: 100%;
     overflow: hidden;
@@ -976,7 +1000,7 @@ body.cor5 {
 
     padding: 10px;
 
-    border-radius: 7px;
+    border-radius: class="7px";
 
 }
 
@@ -2136,12 +2160,36 @@ body.cor5 {
     background: #e9e9e9;
     padding: 5px 9px;
     border-radius: 20px;
-    font-size: 11px !important;
+    font-size: 10px !important;
 }
-
+<!--  -->
 .jogos-da-competicao {
     width: 100%;
 }
+.card-competicao .cabecalho-competicao {
+    background-color: #000 !important;
+    color: #fff !important;
+    padding: 10px 12px !important;
+}
+
+.card-competicao .cabecalho-competicao strong {
+    color: #fff !important;
+}
+
+.card-competicao .cabecalho-competicao span {
+    color: #fff !important;
+}
+
+.card-competicao .cabecalho-competicao .quantidade-jogos {
+    color: #fff !important;
+}
+.card-competicao .cabecalho-competicao .quantidade-jogos {
+    color: black !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}
+
 </style>
 
 </head>
@@ -2856,14 +2904,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 450;
+const LIMITE_API_DIA = 150;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 80 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 300;
+const LIMITE_SEGURANCA = 200;
 
 
 
@@ -3310,7 +3358,21 @@ let processandoAposta = false;
 
 const cotacoesEmBusca = new Map();
 
+let apostaSaqueAtual = null;
 
+let valorSaqueAtual = 0;
+
+let selects = [];
+
+let diaAtual = "";
+
+let filtroPais = "";
+
+let jogadorId = "";
+
+let nomeJogador = "";
+
+let saldoJogador = 0;
 /* =========================================================
    CONFIGURAÇÕES
 ========================================================= */
@@ -3332,21 +3394,7 @@ const dias = [
 ];
 
 
-let apostaSaqueAtual = null;
 
-let valorSaqueAtual = 0;
-
-let selects = [];
-
-let diaAtual = "";
-
-let filtroPais = "";
-
-let jogadorId = "";
-
-let nomeJogador = "";
-
-let saldoJogador = 0;
 
 
 /* =========================================================
@@ -3403,11 +3451,6 @@ function obterElemento(id) {
     return document.getElementById(id);
 
 }
-
-
-/* =========================================================
-   CONSULTAR API COM PROTEÇÃO
-========================================================= */
 
 /* =========================================================
    CONSULTAR API COM LIMITE CENTRAL
@@ -6107,9 +6150,116 @@ function normalizarJogoData(jogo) {
     const dataReal =
         obterDataRealDoJogo(jogo);
 
+    /*
+    =====================================================
+    FIXTURE ID
+    =====================================================
+    */
+
+    const fixtureId = String(
+        jogo.fixtureId ||
+        jogo.idAPI ||
+        jogo?.fixture?.id ||
+        jogo.id ||
+        ""
+    ).trim();
+
+
+    /*
+    =====================================================
+    TIMES
+    =====================================================
+    */
+
+    const timeA =
+        jogo.timeA ||
+        jogo?.teams?.home?.name ||
+        jogo?.fixture?.teams?.home?.name ||
+        "";
+
+    const timeB =
+        jogo.timeB ||
+        jogo?.teams?.away?.name ||
+        jogo?.fixture?.teams?.away?.name ||
+        "";
+
+
+    /*
+    =====================================================
+    LOGO DO TIME DA CASA
+    =====================================================
+    */
+
+    let logoA =
+        jogo.logoA ||
+        jogo.logoCasa ||
+        jogo.homeLogo ||
+        jogo?.teams?.home?.logo ||
+        jogo?.fixture?.teams?.home?.logo ||
+        "";
+
+
+    /*
+    =====================================================
+    LOGO DO TIME VISITANTE
+    =====================================================
+    */
+
+    let logoB =
+        jogo.logoB ||
+        jogo.logoFora ||
+        jogo.awayLogo ||
+        jogo?.teams?.away?.logo ||
+        jogo?.fixture?.teams?.away?.logo ||
+        "";
+
+
+    /*
+    =====================================================
+    GARANTE QUE LOGO SEJA STRING
+    =====================================================
+    */
+
+    if (typeof logoA !== "string") {
+        logoA =
+            logoA?.url ||
+            logoA?.logo ||
+            logoA?.src ||
+            "";
+    }
+
+    if (typeof logoB !== "string") {
+        logoB =
+            logoB?.url ||
+            logoB?.logo ||
+            logoB?.src ||
+            "";
+    }
+
+
+    /*
+    =====================================================
+    RESULTADO NORMALIZADO
+    =====================================================
+    */
+
     return {
 
         ...jogo,
+
+        fixtureId,
+
+        timeA,
+        timeB,
+
+        /*
+        🔥 LOGOS DA API
+        🔥 FICAM SALVOS JUNTO COM O JOGO
+        */
+
+        logoA: String(logoA || "").trim(),
+
+        logoB: String(logoB || "").trim(),
 
         data:
             dataReal ||
@@ -6126,11 +6276,20 @@ function normalizarJogoData(jogo) {
             jogo?.fixture?.date ||
             jogo.dataOriginalAPI ||
             jogo.dataHora ||
+            "",
+
+        /*
+        =================================================
+        HORA REAL DO JOGO
+        =================================================
+        */
+
+        hora:
+            obterHoraRealDoJogo(jogo) ||
+            jogo.hora ||
             ""
     };
 }
-
-
 /* =========================================================
    VERIFICAR DATA
 ========================================================= */
@@ -8883,7 +9042,102 @@ function gerarCotacoesPadrao() {
             gerarCotacaoPadrao("empateFora")
     };
 }
+function obterLogoTime(jogo, lado) {
 
+    if (!jogo) return "";
+
+    let logo = "";
+
+    if (lado === "casa") {
+
+        logo =
+            jogo.logoA ||
+            jogo.logoCasa ||
+            jogo.homeLogo ||
+            jogo.teams?.home?.logo ||
+            jogo.fixture?.teams?.home?.logo ||
+            "";
+
+    } else {
+
+        logo =
+            jogo.logoB ||
+            jogo.logoFora ||
+            jogo.awayLogo ||
+            jogo.teams?.away?.logo ||
+            jogo.fixture?.teams?.away?.logo ||
+            "";
+
+    }
+
+    return String(logo || "").trim();
+}
+
+
+/* =========================================================
+   ESCAPAR HTML
+========================================================= */
+
+function escapeHTML(valor) {
+
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   ESCAPAR ATRIBUTO
+========================================================= */
+
+function escapeAttr(valor) {
+
+    return escapeHTML(valor);
+
+}
+
+
+/* =========================================================
+   LOGO PADRÃO
+========================================================= */
+
+const LOGO_TIME_PADRAO =
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="60"
+             height="60"
+             viewBox="0 0 60 60">
+
+            <circle
+                cx="30"
+                cy="30"
+                r="28"
+                fill="#eeeeee"/>
+
+            <circle
+                cx="30"
+                cy="30"
+                r="25"
+                fill="white"
+                stroke="#cccccc"
+                stroke-width="2"/>
+
+            <text
+                x="30"
+                y="37"
+                text-anchor="middle"
+                font-size="24">
+                ⚽
+            </text>
+
+        </svg>
+    `);
+    
+    
 /* =========================================================
    CRIAR JOGO
 ========================================================= */
@@ -8945,32 +9199,42 @@ function criarJogo(container, jogo, index) {
 
 
     let imagemA =
-        jogo.logoA ||
-        jogo.teams?.home?.logo ||
-        "";
+    jogo?.teams?.home?.logo ||
+    jogo?.logoA ||
+    jogo?.logoCasa ||
+    jogo?.homeLogo ||
+    "";
+
+let imagemB =
+    jogo?.teams?.away?.logo ||
+    jogo?.logoB ||
+    jogo?.logoFora ||
+    jogo?.awayLogo ||
+    "";
+
+console.log("🖼️ IMAGEM FINAL:", {
+    fixtureId,
+    imagemA,
+    imagemB
+});
+const fallbackLogo = escapeAttr(LOGO_TIME_PADRAO);
+    
 
 
-    let imagemB =
-        jogo.logoB ||
-        jogo.teams?.away?.logo ||
-        "";
+if (!imagemA) {
+
+    imagemA =
+        LOGO_TIME_PADRAO;
+
+}
 
 
-    if (!imagemA) {
+if (!imagemB) {
 
-        imagemA =
-            "https://via.placeholder.com/45?text=⚽";
+    imagemB =
+        LOGO_TIME_PADRAO;
 
-    }
-
-
-    if (!imagemB) {
-
-        imagemB =
-            "https://via.placeholder.com/45?text=⚽";
-
-    }
-
+}
 
     const campeonato =
         (
@@ -9032,13 +9296,13 @@ function criarJogo(container, jogo, index) {
             <div class="time-nome-img">
 
                 <img
-                    src="${escapeAttr(imagemA)}"
-                    alt="${escapeAttr(timeA)}"
-                    loading="lazy"
-                    onerror="
-                        this.src='https://via.placeholder.com/45?text=⚽'
-                    "
-                >
+    src="${escapeAttr(imagemA)}"
+    alt="${escapeAttr(timeA)}"
+    loading="lazy"
+    width="45"
+    height="45"
+    onerror="this.onerror=null; this.src='${fallbackLogo}'"
+>
 
                 <div class="nome-time">
                     ${escapeHTML(timeA)}
@@ -9083,13 +9347,13 @@ function criarJogo(container, jogo, index) {
             <div class="time-nome-img">
 
                 <img
-                    src="${escapeAttr(imagemB)}"
-                    alt="${escapeAttr(timeB)}"
-                    loading="lazy"
-                    onerror="
-                        this.src='https://via.placeholder.com/45?text=⚽'
-                    "
-                >
+    src="${escapeAttr(imagemB)}"
+    alt="${escapeAttr(timeB)}"
+    loading="lazy"
+    width="45"
+    height="45"
+    onerror="this.onerror=null; this.src='${fallbackLogo}'"
+>
 
                 <div class="nome-time">
                     ${escapeHTML(timeB)}
@@ -10513,57 +10777,6 @@ function formatarData(
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
 
 }
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(
-    text
-) {
-
-    return String(
-        text || ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* =========================================================
-   ESCAPE ATRIBUTO
-========================================================= */
-
-function escapeAttr(
-    text
-) {
-
-    return escapeHTML(
-        text
-    );
-
-}
-
 
 /* =========================================================
    ATUALIZAR SELEÇÕES
