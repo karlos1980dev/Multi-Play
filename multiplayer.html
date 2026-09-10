@@ -2196,13 +2196,14 @@ body.cor5 {
 
 
 <body>
+    <!-- BOTÃO FLUTUANTE WHATSAPP --> <a style="display:none;"href="https://wa.me/5571992290058" class="whatsapp-flutuante" target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp" > <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" > </a> <style> .whatsapp-flutuante { position: fixed; width: 60px; height: 60px; right: 18px; bottom: 20px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.30); text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; } .whatsapp-flutuante img { width: 38px; height: 38px; display: block; } .whatsapp-flutuante:hover { transform: scale(1.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); } .whatsapp-flutuante:active { transform: scale(0.94); } /* Animação suave */ @keyframes whatsappPulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55), 0 4px 12px rgba(0, 0, 0, 0.30); } 70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0), 0 4px 12px rgba(0, 0, 0, 0.30); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 4px 12px rgba(0, 0, 0, 0.30); } } .whatsapp-flutuante { animation: whatsappPulse 2s infinite; } /* Celular */ @media (max-width: 600px) { .whatsapp-flutuante { width: 56px; height: 56px; right: 15px; bottom: 18px; } .whatsapp-flutuante img { width: 35px; height: 35px; } } </style> 
 <!-- =====================================================
      TOPO
 ===================================================== -->
 
 <!-- MODAL -->
-<div id="meuModal" class="modal-overlay">
-    <div class="modal-content">
+<div style="display:none;"id="meuModal" class="modal-overlay">
+    <div style="display:none; class="modal-content">
 
         <div class="futebol-animacao">
             <div class="bola"></div>
@@ -2307,24 +2308,17 @@ body.cor5 {
     </div>
 
 </div>
-<!-- =====================================================
-     MENU
-===================================================== -->
 
-<div id="menuEsportes">
-
-    <div class="menu-titulo">
-        MENU
-    </div>
-
-    <ul id="listaEsportes"></ul>
-
-    <div id="jogosFeitosMenu">
-        
-    </div>
-
-</div>
-
+<!-- ===================================================== MENU ===================================================== --> <div id="menuEsportes"> <div class="menu-titulo"> MENU </div> <ul id="listaEsportes"></ul> <div id="jogosFeitosMenu"></div> <!-- BOTÃO CONTATO WHATSAPP --> <a
+    href="https://wa.me/5571992290058?text=Ol%C3%A1%2C%20quero%20jogar!%20Manda%20o%20Pix."
+    target="_blank"
+    rel="noopener noreferrer"
+    class="btn-contato-whatsapp"
+>
+    <span class="icone-whatsapp">☏</span>
+    <span>CONTATO</span>
+</a>
+</div> <style> .btn-contato-whatsapp { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 15px 12px; padding: 10px 12px; background: #25D366; color: #fff; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: 700; box-shadow: 0 3px 8px rgba(0,0,0,.25); transition: .2s ease; } .btn-contato-whatsapp:hover { transform: scale(1.02); } .btn-contato-whatsapp:active { transform: scale(.97); } .icone-whatsapp { font-size: 15px; line-height: 1; } </style> 
 
 <!-- =====================================================
      CARROSSEL
@@ -2876,7 +2870,7 @@ let carregamentoJogosEmAndamento = false;
 let ultimaAtualizacaoPlacar = null;
 let intervaloAtualizacaoPlacar = null;
 const TEMPO_REFRESH_SEGUNDOS = 45; // Atualiza a cada 45s durante jogos
-
+const selecoesPorJogo = {};
 
 // ↓ Corrige função faltante do Firebase
 const getDefaultsFromPostinstall = () => undefined;
@@ -3377,7 +3371,7 @@ let saldoJogador = 0;
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 500;
+const LIMITE = 400;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
@@ -8399,24 +8393,46 @@ function renderizarJogosPorCompeticao(
 
 async function carregarJogos(dataSelecionada = null) {
 
+    if (carregamentoJogosEmAndamento) {
+        console.log("⏳ Já existe um carregamento em andamento.");
+        return;
+    }
+
+    // =====================================================
+    // DATA SOLICITADA
+    // =====================================================
+
+    const dataAPI = String(
+        dataSelecionada ||
+        obterDataDia(offsetDiaSelecionado)
+    ).trim();
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataAPI)) {
+
+        console.error(
+            "❌ DATA INVÁLIDA:",
+            dataAPI
+        );
+
+        return;
+    }
+
+    // Guarda qual dia iniciou este carregamento
+    const dataDoCarregamento = dataAPI;
+
+    console.log(
+        "⚽ BUSCANDO JOGOS:",
+        dataDoCarregamento
+    );
+
+    carregamentoJogosEmAndamento = true;
+
     try {
-
-        if (carregamentoJogosEmAndamento) {
-            return;
-        }
-
-        carregamentoJogosEmAndamento = true;
-
-
-        /* =========================================
-           CONTAINER
-        ========================================= */
 
         const container =
             document.getElementById(
                 "conteudoJogosDia"
             );
-
 
         if (!container) {
 
@@ -8427,29 +8443,9 @@ async function carregarJogos(dataSelecionada = null) {
             return;
         }
 
-
-        /* =========================================
-           DATA
-        ========================================= */
-
-        const dataAPI =
-            String(
-                dataSelecionada ||
-                obterDataDia(
-                    offsetDiaSelecionado
-                )
-            ).trim();
-
-
-        console.log(
-            "⚽ BUSCANDO JOGOS:",
-            dataAPI
-        );
-
-
-        /* =========================================
-           LIMPA TELA
-        ========================================= */
+        // =====================================================
+        // LOADING
+        // =====================================================
 
         container.style.display = "block";
 
@@ -8459,180 +8455,126 @@ async function carregarJogos(dataSelecionada = null) {
             </div>
         `;
 
-
-        /* =========================================
-           BUSCA JOGOS DA DATA
-        ========================================= */
+        // =====================================================
+        // BUSCAR JOGOS
+        // =====================================================
 
         let jogos =
             await buscarJogosComCache(
-                dataAPI
+                dataDoCarregamento
             );
-
 
         if (!Array.isArray(jogos)) {
             jogos = [];
         }
 
-
         console.log(
             "📦 JOGOS RECEBIDOS:",
-            dataAPI,
+            dataDoCarregamento,
             jogos.length
         );
 
+        // =====================================================
+        // VERIFICA SE O USUÁRIO TROCOU DE DIA
+        // ENQUANTO A API/CACHE ESTAVA CARREGANDO
+        // =====================================================
 
-        /* =========================================
-           FILTRAR PELA DATA REAL
-           BRASÍLIA
-        ========================================= */
+        const diaAtualSelecionado =
+            obterDataDia(offsetDiaSelecionado);
 
-        jogos =
-            jogos.filter(jogo => {
+        if (
+            diaAtualSelecionado !==
+            dataDoCarregamento
+        ) {
 
-                if (!jogo) {
-                    return false;
+            console.warn(
+                "⚠️ RESPOSTA ANTIGA DESCARTADA:",
+                {
+                    carregado: dataDoCarregamento,
+                    selecionado: diaAtualSelecionado
                 }
+            );
 
+            return;
+        }
 
-                const info =
-                    obterDataHoraBrasil(
-                        jogo
-                    );
+        // =====================================================
+        // FILTRAR DATA REAL
+        // =====================================================
 
+        jogos = jogos.filter(jogo => {
 
-                if (!info) {
+            if (!jogo) {
+                return false;
+            }
 
-                    console.warn(
-                        "⚠️ JOGO SEM DATA/HORA:",
-                        jogo
-                    );
+            const info =
+                obterDataHoraBrasil(jogo);
 
-                    return false;
-                }
+            if (!info) {
+                return false;
+            }
 
+            return (
+                info.data ===
+                dataDoCarregamento
+            );
 
-                return (
-                    info.data ===
-                    dataAPI
-                );
+        });
 
-            });
+        // =====================================================
+        // REMOVER CANCELADOS
+        // =====================================================
 
+        jogos = jogos.filter(jogo => {
 
-        console.log(
-            "📅 JOGOS DA DATA:",
-            dataAPI,
-            jogos.length
-        );
+            const status =
+                String(
+                    jogo?.fixture?.status?.short ||
+                    jogo?.status?.short ||
+                    jogo?.status ||
+                    ""
+                )
+                .trim()
+                .toUpperCase();
 
+            return ![
+                "CANC",
+                "PST",
+                "ABD",
+                "AWD",
+                "WO"
+            ].includes(status);
 
-        /* =========================================
-           REMOVER JOGOS CANCELADOS
-        ========================================= */
+        });
 
-        jogos =
-            jogos.filter(jogo => {
+        // =====================================================
+        // OCULTAR JOGOS QUE JÁ PASSARAM
+        // =====================================================
 
-                const status =
-                    String(
-                        jogo?.fixture?.status?.short ||
-                        jogo?.status?.short ||
-                        jogo?.status ||
-                        ""
-                    )
-                    .trim()
-                    .toUpperCase();
+        const agora = Date.now();
 
+        jogos = jogos.filter(jogo => {
 
-                return ![
-                    "CANC",
-                    "PST",
-                    "ABD",
-                    "AWD",
-                    "WO"
-                ].includes(status);
+            const info =
+                obterDataHoraBrasil(jogo);
 
-            });
+            if (!info) {
+                return false;
+            }
 
+            return (
+                info.timestamp >
+                agora
+            );
 
-        /* =========================================
-           OCULTAR JOGOS QUE JÁ PASSARAM
-           
-           DATA + HORÁRIO
-           BRASÍLIA
-        ========================================= */
+        });
 
-        const agora =
-            Date.now();
+        // =====================================================
+        // REMOVER DUPLICADOS
+        // =====================================================
 
-
-        jogos =
-            jogos.filter(jogo => {
-
-                const info =
-                    obterDataHoraBrasil(
-                        jogo
-                    );
-
-
-                if (!info) {
-                    return false;
-                }
-
-
-                /*
-                 * Se o horário do jogo já passou,
-                 * ele não será mostrado.
-                 */
-
-                if (
-                    info.timestamp <=
-                    agora
-                ) {
-
-                    console.log(
-                        "⏰ JOGO OCULTO:",
-                        {
-                            timeA:
-                                jogo?.timeA ||
-                                jogo?.teams?.home?.name,
-
-                            timeB:
-                                jogo?.timeB ||
-                                jogo?.teams?.away?.name,
-
-                            data:
-                                info.data,
-
-                            hora:
-                                info.hora
-                        }
-                    );
-
-
-                    return false;
-                }
-
-
-                return true;
-
-            });
-
-
-        console.log(
-            "⏰ JOGOS FUTUROS:",
-            jogos.length
-        );
-
-
-        /* =========================================
-           REMOVER DUPLICADOS
-        ========================================= */
-
-        const mapa =
-            new Map();
-
+        const mapa = new Map();
 
         jogos.forEach(jogo => {
 
@@ -8644,94 +8586,47 @@ async function carregarJogos(dataSelecionada = null) {
                     ""
                 ).trim();
 
-
-            if (fixtureId) {
-
-                mapa.set(
-                    fixtureId,
-                    jogo
-                );
-
-            } else {
-
-                const info =
-                    obterDataHoraBrasil(
-                        jogo
-                    );
-
-
-                const chave =
-                    [
-                        jogo?.teams?.home?.name ||
-                        jogo?.timeA ||
-                        "",
-
-                        jogo?.teams?.away?.name ||
-                        jogo?.timeB ||
-                        "",
-
-                        info?.data ||
-                        dataAPI,
-
-                        info?.hora ||
-                        ""
-                    ]
-                    .join("|")
-                    .toLowerCase();
-
-
-                mapa.set(
-                    chave,
-                    jogo
-                );
-
+            if (!fixtureId) {
+                return;
             }
 
-        });
+            mapa.set(
+                fixtureId,
+                jogo
+            );
 
+        });
 
         jogos =
             Array.from(
                 mapa.values()
             );
 
+        // =====================================================
+        // ORDENAR
+        // =====================================================
 
-        /* =========================================
-           ORDENAR POR HORÁRIO
-        ========================================= */
+        jogos.sort((a, b) => {
 
-        jogos.sort(
-            (a, b) => {
+            const infoA =
+                obterDataHoraBrasil(a);
 
-                const infoA =
-                    obterDataHoraBrasil(a);
+            const infoB =
+                obterDataHoraBrasil(b);
 
-                const infoB =
-                    obterDataHoraBrasil(b);
+            if (!infoA) return 1;
+            if (!infoB) return -1;
 
+            return (
+                infoA.timestamp -
+                infoB.timestamp
+            );
 
-                if (!infoA) {
-                    return 1;
-                }
+        });
 
-
-                if (!infoB) {
-                    return -1;
-                }
-
-
-                return (
-                    infoA.timestamp -
-                    infoB.timestamp
-                );
-
-            }
-        );
-
-
-        /* =========================================
-           NENHUM JOGO
-        ========================================= */
+        // =====================================================
+        // NENHUM JOGO
+        // =====================================================
 
         if (!jogos.length) {
 
@@ -8741,25 +8636,17 @@ async function carregarJogos(dataSelecionada = null) {
                 </div>
             `;
 
-
-            console.warn(
-                "⚠️ NENHUM JOGO FUTURO PARA:",
-                dataAPI
+            console.log(
+                "⚠️ NENHUM JOGO:",
+                dataDoCarregamento
             );
-
 
             return;
         }
 
-
-        /* =========================================
-           PREPARAR JOGOS
-           
-           AQUI DEFINIMOS:
-           jogo.data
-           jogo.hora
-           jogo.dataHora
-        ========================================= */
+        // =====================================================
+        // NORMALIZAR
+        // =====================================================
 
         const jogosParaSalvar =
             jogos.map(jogo => {
@@ -8772,68 +8659,40 @@ async function carregarJogos(dataSelecionada = null) {
                         ""
                     ).trim();
 
-
                 const info =
-                    obterDataHoraBrasil(
-                        jogo
-                    );
-
+                    obterDataHoraBrasil(jogo);
 
                 const dataFinal =
                     info?.data ||
-                    dataAPI;
-
+                    dataDoCarregamento;
 
                 const horaFinal =
                     info?.hora ||
                     "--:--";
 
-
                 return {
-
                     ...jogo,
-
-                    /* =========================
-                       ID DO JOGO
-                    ========================= */
 
                     fixtureId,
 
                     idAPI:
                         fixtureId,
 
-
-                    /* =========================
-                       DATA BRASIL
-                    ========================= */
-
                     data:
                         dataFinal,
-
-
-                    /* =========================
-                       HORA BRASIL
-                    ========================= */
 
                     hora:
                         horaFinal,
 
-
-                    /* =========================
-                       DATA + HORA
-                    ========================= */
-
                     dataHora:
                         `${dataFinal} ${horaFinal}`
-
                 };
 
             });
 
-
-        /* =========================================
-           SALVAR LOCALSTORAGE
-        ========================================= */
+        // =====================================================
+        // SALVAR LOCAL
+        // =====================================================
 
         try {
 
@@ -8844,99 +8703,62 @@ async function carregarJogos(dataSelecionada = null) {
                 )
             );
 
-        }
-
-        catch (erro) {
+        } catch (erro) {
 
             console.warn(
-                "⚠️ Erro salvando jogos:",
+                "⚠️ Erro salvando localStorage:",
                 erro
             );
 
         }
 
-
-        /* =========================================
-           RENDERIZAR POR COMPETIÇÃO
-        ========================================= */
+        // =====================================================
+        // RENDERIZAR
+        // =====================================================
 
         renderizarJogosPorCompeticao(
             container,
             jogosParaSalvar
         );
 
-
-        /* =========================================
-           ATUALIZAR APOSTAS
-        ========================================= */
+        // =====================================================
+        // ATUALIZAR SELEÇÕES
+        // =====================================================
 
         if (
             typeof atualizarSelecoes ===
             "function"
         ) {
-
             atualizarSelecoes();
-
         }
-
 
         if (
             typeof atualizarTotal ===
             "function"
         ) {
-
             atualizarTotal();
-
         }
-
 
         console.log(
             "✅ JOGOS RENDERIZADOS:",
             {
-                data: dataAPI,
+                data: dataDoCarregamento,
                 quantidade:
                     jogosParaSalvar.length
             }
         );
 
-
-        /* =========================================
-           MOSTRAR HORÁRIOS NO CONSOLE
-        ========================================= */
-
-        jogosParaSalvar.forEach(
-            jogo => {
-
-                console.log(
-                    "🕐 JOGO:",
-                    jogo?.timeA ||
-                    jogo?.teams?.home?.name,
-                    "x",
-                    jogo?.timeB ||
-                    jogo?.teams?.away?.name,
-                    "|",
-                    jogo.hora
-                );
-
-            }
-        );
-
-
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.error(
             "❌ ERRO AO CARREGAR JOGOS:",
             erro
         );
 
-
         const container =
             document.getElementById(
                 "conteudoJogosDia"
             );
-
 
         if (container) {
 
@@ -8948,15 +8770,12 @@ async function carregarJogos(dataSelecionada = null) {
 
         }
 
-    }
-
-    finally {
+    } finally {
 
         carregamentoJogosEmAndamento =
             false;
 
     }
-
 }
 /* =========================================================
    FAIXAS DAS COTAÇÕES PADRÃO
@@ -10003,14 +9822,20 @@ async function atualizarCotacoesJogo(divJogo, fixtureId) {
            LOCALIZAR BOTÕES
         ===================================================== */
 
-        const btnCasa = document.createElement("button");
-btnCasa.dataset.escolha = "Casa";
+        const btnCasa =
+    divJogo.querySelector(
+        '.btn[data-escolha="Casa"]'
+    );
 
-const btnEmpate = document.createElement("button");
-btnEmpate.dataset.escolha = "Empate";
+const btnEmpate =
+    divJogo.querySelector(
+        '.btn[data-escolha="Empate"]'
+    );
 
-const btnFora = document.createElement("button");
-btnFora.dataset.escolha = "Fora";
+const btnFora =
+    divJogo.querySelector(
+        '.btn[data-escolha="Fora"]'
+    );
             
 
 function aplicarCotacaoNoBotao(botao, valor) {
