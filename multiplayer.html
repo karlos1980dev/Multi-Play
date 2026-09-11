@@ -2898,14 +2898,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 300;
+const LIMITE_API_DIA = 500;
 
 /*
    Limite que o sistema realmente vai utilizar.
-   Mesmo que a API permita 100, o MULTI PLAY.BET
-   nunca passará de 80 chamadas por dia.
+   Mesmo que a API permita 500, o MULTI PLAY.BET
+   nunca passará de 1000 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 500;
+const LIMITE_SEGURANCA = 1000;
 
 
 
@@ -3371,7 +3371,7 @@ let saldoJogador = 0;
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 1000;
+const LIMITE = 400;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
