@@ -2905,7 +2905,7 @@ const LIMITE_API_DIA = 500;
    Mesmo que a API permita 500, o MULTI PLAY.BET
    nunca passará de 1000 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 1000;
+const LIMITE_SEGURANCA = 2000;
 
 
 
@@ -3960,7 +3960,28 @@ async function obterDadosDoJogo(
     return jogo;
 
 }
+/* =========================================================
+   VERIFICAR SE O JOGO É DO BRASIL
+========================================================= */
 
+function jogoEhDoBrasil(jogo) {
+
+    const pais = String(
+        jogo?.league?.country ||
+        jogo?.pais ||
+        jogo?.country ||
+        ""
+    )
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+
+    return (
+        pais === "brazil" ||
+        pais === "brasil"
+    );
+}
 
 /* =========================================================
    NORMALIZAR TEXTO
@@ -8606,24 +8627,50 @@ async function carregarJogos(dataSelecionada = null) {
         // ORDENAR
         // =====================================================
 
-        jogos.sort((a, b) => {
+        /* =========================================================
+   ORDEM DOS JOGOS
+   1º BRASIL
+   2º OUTROS PAÍSES
+   Dentro de cada grupo: horário mais próximo primeiro
+========================================================= */
 
-            const infoA =
-                obterDataHoraBrasil(a);
+jogos.sort((a, b) => {
 
-            const infoB =
-                obterDataHoraBrasil(b);
+    const brasilA =
+        jogoEhDoBrasil(a);
 
-            if (!infoA) return 1;
-            if (!infoB) return -1;
+    const brasilB =
+        jogoEhDoBrasil(b);
 
-            return (
-                infoA.timestamp -
-                infoB.timestamp
-            );
+    /* =========================================
+       BRASIL SEMPRE PRIMEIRO
+    ========================================= */
 
-        });
+    if (brasilA && !brasilB) {
+        return -1;
+    }
 
+    if (!brasilA && brasilB) {
+        return 1;
+    }
+
+    /* =========================================
+       MESMO GRUPO:
+       ORDENAR POR DATA/HORA
+    ========================================= */
+
+    const dataA =
+        obterDataHoraBrasil(a);
+
+    const dataB =
+        obterDataHoraBrasil(b);
+
+    return (
+        dataA.timestamp -
+        dataB.timestamp
+    );
+
+});
         // =====================================================
         // NENHUM JOGO
         // =====================================================
