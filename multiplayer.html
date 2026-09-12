@@ -2893,14 +2893,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 500;
+const LIMITE_API_DIA = 5000;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 500, o MULTI PLAY.BET
    nunca passará de 1000 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 2000;
+const LIMITE_SEGURANCA = 5000;
 
 
 
@@ -3173,7 +3173,7 @@ async function reservarChamadaAPI() {
         ) {
 
             console.warn(
-                "🛑 LIMITE INTERNO DE 80 CHAMADAS ATINGIDO."
+                "🛑 LIMITE INTERNO DE 5000 CHAMADAS ATINGIDO."
             );
 
 
@@ -3366,7 +3366,7 @@ let saldoJogador = 0;
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 400;
+const LIMITE = 2000;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
