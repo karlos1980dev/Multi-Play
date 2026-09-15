@@ -1,0 +1,7983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Palpite Premiado</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+#modalPix,
+#modalConfirmacao {
+    display: none;
+}
+
+#modalPix.ativo,
+#modalConfirmacao.ativo {
+    display: flex;
+}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:8px;
+padding-top:8px;
+}
+.data-jogo{
+    text-align:center;
+    background:#0f172a;
+    color:#94a3b8;
+    padding:6px;
+    margin-top:4px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:bold;
+}
+.data-jogo{
+    text-align:center;
+    margin-top:6px;
+    padding:6px;
+    border-radius:7px;
+    background:#0f172a;
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.data-jogo strong{
+    color:#22c55e;
+}
+.container{
+max-width:500px;
+margin:auto;
+}
+
+/* =========================
+TOPO
+========================= */
+
+.topo{
+max-width:500px;
+margin:0 auto 8px;
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+min-height:42px;
+}
+
+.menu-btn{
+position:absolute;
+left:0;
+width:42px;
+height:42px;
+border:0;
+border-radius:10px;
+background:#1e293b;
+color:white;
+font-size:23px;
+cursor:pointer;
+}
+
+.titulo{
+text-align:center;
+font-size:20px;
+font-weight:bold;
+color:#22c55e;
+}
+
+/* =========================
+PAINEL FIXO
+========================= */
+
+.painel-fixo{
+
+position:sticky;
+
+top:0;
+
+z-index:900;
+
+max-width:500px;
+
+margin:0 auto 10px;
+
+background:#16a34a;
+
+padding:7px;
+
+border-radius:10px;
+
+box-shadow:
+0 4px 15px rgba(0,0,0,.45);
+
+}
+
+.topo-valores{
+
+display:flex;
+
+align-items:stretch;
+
+gap:5px;
+
+}
+
+.topo-item{
+
+flex:1;
+
+min-width:0;
+
+background:rgba(0,0,0,.18);
+
+border-radius:8px;
+
+padding:6px 3px;
+
+text-align:center;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+}
+
+.topo-item span{
+
+font-size:9px;
+
+font-weight:bold;
+
+white-space:nowrap;
+
+}
+
+.topo-item strong{
+
+font-size:12px;
+
+margin-top:3px;
+
+white-space:nowrap;
+
+}
+
+.enviar-fixo{
+
+flex:1.2;
+
+min-width:75px;
+
+border:0;
+
+border-radius:8px;
+
+background:white;
+
+color:#15803d;
+
+font-size:12px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+padding:5px 3px;
+
+}
+
+.enviar-fixo:hover{
+
+background:#dcfce7;
+
+}
+
+.enviar-fixo:disabled{
+
+background:#64748b;
+
+color:white;
+
+cursor:not-allowed;
+
+}
+
+/* =========================
+MENU
+========================= */
+
+.menu-lateral{
+
+position:fixed;
+
+top:0;
+
+left:-350px;
+
+width:350px;
+
+max-width:88%;
+
+height:100vh;
+
+background:#0f172a;
+
+z-index:1000;
+
+padding:20px;
+
+transition:.3s;
+
+overflow-y:auto;
+
+box-shadow:
+5px 0 20px rgba(0,0,0,.6);
+
+}
+
+.menu-lateral.ativo{
+
+left:0;
+
+}
+
+.menu-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:20px;
+
+}
+
+.menu-header h2{
+
+color:#22c55e;
+
+font-size:20px;
+
+}
+
+.fechar{
+
+width:40px;
+
+height:40px;
+
+border:0;
+
+border-radius:10px;
+
+background:#dc2626;
+
+color:white;
+
+font-size:18px;
+
+cursor:pointer;
+
+}
+
+.fundo-menu{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.65);
+
+z-index:999;
+
+}
+
+.fundo-menu.ativo{
+
+display:block;
+
+}
+
+/* =========================
+SITUAÇÃO
+========================= */
+
+.situacao{
+
+background:#1e293b;
+
+padding:12px;
+
+border-radius:12px;
+
+text-align:center;
+
+margin-bottom:10px;
+
+font-size:13px;
+
+line-height:1.7;
+
+}
+
+.situacao .liberado{
+
+color:#22c55e;
+
+font-weight:bold;
+
+font-size:16px;
+
+}
+
+.situacao .bloqueado{
+
+color:#ef4444;
+
+font-weight:bold;
+
+font-size:16px;
+
+}
+
+.status{
+
+text-align:center;
+
+font-size:12px;
+
+margin:6px 0 10px;
+
+color:#94a3b8;
+
+}
+
+/* =========================
+PRÓXIMO JOGO
+========================= */
+
+.proximo-jogo{
+
+background:#1e293b;
+
+padding:11px;
+
+border-radius:10px;
+
+text-align:center;
+
+margin-bottom:10px;
+
+font-size:13px;
+
+line-height:1.6;
+
+}
+
+.proximo-jogo strong{
+
+color:#22c55e;
+
+font-size:16px;
+
+}
+
+/* =========================
+DUELO
+========================= */
+
+.duelo{
+
+background:#1e293b;
+
+border-radius:12px;
+
+padding:8px;
+
+margin-bottom:10px;
+
+}
+
+.times{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+margin-bottom:6px;
+
+}
+
+.time{
+
+width:35%;
+
+text-align:center;
+
+}
+
+.time img{
+
+width:48px;
+
+height:48px;
+
+object-fit:contain;
+
+background:white;
+
+border-radius:50%;
+
+padding:3px;
+
+}
+
+.time p{
+
+margin-top:3px;
+
+font-weight:bold;
+
+font-size:12px;
+
+white-space:nowrap;
+
+}
+
+.placar-selecionado{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:4px;
+
+min-width:70px;
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#22c55e;
+
+}
+
+.placar-selecionado span{
+
+width:25px;
+
+height:30px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:#334155;
+
+border-radius:6px;
+
+}
+
+.placar-selecionado b{
+
+color:white;
+
+font-size:17px;
+
+}
+
+.jogo-info{
+
+text-align:center;
+
+font-size:11px;
+
+color:#94a3b8;
+
+margin:5px 0 7px;
+
+}
+
+/* =========================
+CONTADOR
+========================= */
+
+.contador{
+
+text-align:center;
+
+background:#0f172a;
+
+color:#22c55e;
+
+padding:7px;
+
+border-radius:8px;
+
+font-size:13px;
+
+font-weight:bold;
+
+margin-bottom:6px;
+
+}
+
+.contador.encerrado{
+
+background:#7f1d1d;
+
+color:#fecaca;
+
+}
+
+/* =========================
+SELECT
+========================= */
+
+select{
+
+width:100%;
+
+padding:9px;
+
+border:0;
+
+border-radius:8px;
+
+background:#334155;
+
+color:white;
+
+font-size:14px;
+
+outline:none;
+
+cursor:pointer;
+
+}
+
+select.bloqueado{
+
+background:#475569;
+
+color:#94a3b8;
+
+cursor:not-allowed;
+
+opacity:.7;
+
+}
+
+/* =========================
+NOME
+========================= */
+
+.nome-salvo{
+
+background:#1e293b;
+
+border-radius:12px;
+
+padding:12px;
+
+margin-bottom:15px;
+
+text-align:center;
+
+color:#cbd5e1;
+
+font-size:14px;
+
+}
+
+.nome-salvo strong{
+
+color:#22c55e;
+
+}
+
+/* =========================
+MEUS PALPITES
+========================= */
+
+.meu-card{
+
+background:#1e293b;
+
+padding:12px;
+
+border-radius:12px;
+
+margin-bottom:12px;
+
+}
+
+.meu-nome{
+
+color:#22c55e;
+
+font-size:17px;
+
+font-weight:bold;
+
+margin-bottom:8px;
+
+}
+
+.meu-placar{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:8px;
+
+background:#334155;
+
+padding:9px;
+
+border-radius:8px;
+
+margin-top:6px;
+
+font-size:12px;
+
+}
+
+.meu-placar strong{
+
+color:#22c55e;
+
+font-size:18px;
+
+}
+
+.data{
+
+color:#94a3b8;
+
+font-size:11px;
+
+margin-top:10px;
+
+line-height:1.5;
+
+}
+
+.sem-palpite{
+
+color:#94a3b8;
+
+text-align:center;
+
+padding:20px 0;
+
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:400px){
+
+.topo-valores{
+
+gap:3px;
+
+}
+
+.topo-item{
+
+padding:5px 2px;
+
+}
+
+.topo-item span{
+
+font-size:8px;
+
+}
+
+.topo-item strong{
+
+font-size:10px;
+
+}
+
+.enviar-fixo{
+
+min-width:65px;
+
+font-size:10px;
+
+}
+
+.time img{
+
+width:42px;
+
+height:42px;
+
+}
+
+.time p{
+
+font-size:11px;
+
+}
+
+.placar-selecionado{
+
+font-size:20px;
+
+}
+
+}
+
+/* =========================
+MODAL PIX
+========================= */
+
+.modal-pix{
+
+display:none;
+
+position:fixed;
+
+inset:0;
+
+background:rgba(0,0,0,.75);
+
+z-index:3000;
+
+align-items:center;
+
+justify-content:center;
+
+padding:15px;
+
+}
+
+.modal-pix.ativo{
+
+display:flex;
+
+}
+
+.modal-conteudo{
+
+width:100%;
+
+max-width:380px;
+
+background:#1e293b;
+
+border-radius:16px;
+
+padding:20px;
+
+position:relative;
+
+box-shadow:0 10px 40px rgba(0,0,0,.7);
+
+}
+
+.modal-conteudo h2{
+
+text-align:center;
+
+color:#22c55e;
+
+margin-bottom:12px;
+
+}
+
+.pix-info{
+
+text-align:center;
+
+color:#cbd5e1;
+
+font-size:13px;
+
+line-height:1.5;
+
+margin-bottom:15px;
+
+}
+
+.fechar-pix{
+
+position:absolute;
+
+right:12px;
+
+top:12px;
+
+width:35px;
+
+height:35px;
+
+border:0;
+
+border-radius:8px;
+
+background:#dc2626;
+
+color:white;
+
+font-size:17px;
+
+cursor:pointer;
+
+}
+
+.modal-conteudo label{
+
+display:block;
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:6px;
+
+}
+
+.modal-conteudo input{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#334155;
+
+color:white;
+
+font-size:16px;
+
+outline:none;
+
+margin-bottom:10px;
+
+}
+
+.btn-gerar-pix{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#22c55e;
+
+color:#052e16;
+
+font-weight:bold;
+
+font-size:14px;
+
+cursor:pointer;
+
+}
+
+.btn-gerar-pix:hover{
+
+background:#16a34a;
+
+}
+
+.area-pix{
+
+margin-top:18px;
+
+text-align:center;
+
+}
+
+.area-pix p{
+
+font-size:13px;
+
+color:#cbd5e1;
+
+margin-bottom:8px;
+
+}
+
+.chave-pix{
+
+background:#0f172a;
+
+padding:12px;
+
+border-radius:8px;
+
+word-break:break-all;
+
+color:#22c55e;
+
+font-weight:bold;
+
+font-size:13px;
+
+margin-bottom:10px;
+
+}
+
+.btn-copiar{
+
+width:100%;
+
+padding:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#3b82f6;
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+.btn-copiar:hover{
+
+background:#2563eb;
+
+}
+
+.pix-copiado{
+
+color:#22c55e !important;
+
+font-weight:bold;
+
+margin-top:8px;
+
+}
+
+.aviso-pix{
+
+font-size:11px !important;
+
+color:#fbbf24 !important;
+
+margin-top:12px;
+
+line-height:1.5;
+
+}
+select{
+    width:100%;
+    padding:11px;
+    border:2px solid #22ff66;
+    border-radius:10px;
+    background:linear-gradient(135deg,#064e3b,#16a34a);
+    color:#ffffff;
+    font-size:15px;
+    font-weight:bold;
+    outline:none;
+    cursor:pointer;
+    text-align:center;
+    text-align-last:center;
+    box-shadow:0 0 12px rgba(34,255,102,.45);
+}
+
+select:focus{
+    border-color:#86efac;
+    box-shadow:0 0 18px rgba(34,255,102,.8);
+}
+
+select option{
+    background:#064e3b;
+    color:white;
+    font-weight:bold;
+}
+/* =========================
+STATUS DO PALPITE
+SOMENTE EM MEUS PALPITES
+========================= */
+
+.status-palpite{
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.status-aguardando{
+    background:#713f12;
+    color:#facc15;
+    border:1px solid #eab308;
+}
+
+.status-ganhou{
+    background:#14532d;
+    color:#4ade80;
+    border:1px solid #22c55e;
+}
+
+.status-perdeu{
+    background:#7f1d1d;
+    color:#f87171;
+    border:1px solid #ef4444;
+}
+.status-palpite{
+    text-align:center;
+    padding:8px;
+    border-radius:8px;
+    margin:10px 0;
+    font-weight:bold;
+    font-size:13px;
+}
+
+.status-aguardando{
+    background:#92400e;
+    color:#fde68a;
+}
+
+.status-ganhou{
+    background:#166534;
+    color:#bbf7d0;
+}
+
+.status-perdeu{
+    background:#991b1b;
+    color:#fecaca;
+}
+
+.resultado-real{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-top:8px;
+}
+
+.resultado-real span{
+    color:#94a3b8;
+    font-size:12px;
+}
+/* Esconde o campo de seleção, mas mantém ele funcionando */
+select{
+    position:absolute;
+    opacity:0;
+    width:100%;
+    height:60px;
+    left:0;
+    top:0;
+    cursor:pointer;
+    z-index:10;
+}
+
+.duelo{
+    position:relative;
+}
+
+.placar-selecionado{
+    position:relative;
+    z-index:1;
+    pointer-events:none;
+}
+/* =========================
+MODAL CONFIRMAÇÃO DO PALPITE
+========================= */
+
+.modal-confirmacao{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.80);
+
+    z-index:4000;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:15px;
+}
+
+.modal-confirmacao.ativo{
+
+    display:flex;
+}
+
+.confirmacao-conteudo{
+
+    width:100%;
+
+    max-width:380px;
+
+    background:#1e293b;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    text-align:center;
+
+    box-shadow:0 10px 50px rgba(0,0,0,.8);
+
+    border:2px solid #22c55e;
+}
+
+.confirmacao-conteudo h2{
+
+    color:#22c55e;
+
+    font-size:21px;
+
+    margin-bottom:15px;
+}
+
+.confirmacao-info{
+
+    background:#0f172a;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+}
+
+.confirmacao-linha{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:8px 0;
+
+    border-bottom:1px solid #334155;
+
+    font-size:14px;
+}
+
+.confirmacao-linha:last-child{
+
+    border-bottom:0;
+}
+
+.confirmacao-linha span{
+
+    color:#cbd5e1;
+}
+
+.confirmacao-linha strong{
+
+    color:#fff;
+
+    font-size:16px;
+}
+
+.confirmacao-pagar{
+
+    color:#facc15 !important;
+
+}
+
+.confirmacao-receber{
+
+    color:#22c55e !important;
+
+    font-size:22px !important;
+}
+
+.botoes-confirmacao{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-top:12px;
+}
+
+.btn-confirmar,
+
+.btn-cancelar{
+
+    flex:1;
+
+    border:0;
+
+    border-radius:10px;
+
+    padding:13px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.btn-confirmar{
+
+    background:#22c55e;
+
+    color:#052e16;
+}
+
+.btn-cancelar{
+
+    background:#dc2626;
+
+    color:white;
+}
+
+.btn-confirmar:hover{
+
+    background:#16a34a;
+}
+
+.btn-cancelar:hover{
+
+    background:#b91c1c;
+}
+/* =========================
+MODAL PALPITE ENVIADO
+========================= */
+
+.modal-sucesso{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.80);
+
+    z-index:5000;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:15px;
+
+}
+
+.modal-sucesso.ativo{
+
+    display:flex;
+
+}
+
+.sucesso-conteudo{
+
+    width:100%;
+
+    max-width:380px;
+
+    background:#1e293b;
+
+    border:2px solid #22c55e;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    text-align:center;
+
+    box-shadow:
+        0 10px 50px rgba(0,0,0,.8);
+
+    animation:
+        aparecerSucesso .25s ease;
+
+}
+
+@keyframes aparecerSucesso{
+
+    from{
+
+        transform:scale(.85);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
+.sucesso-icone{
+
+    width:65px;
+
+    height:65px;
+
+    margin:0 auto 10px;
+
+    border-radius:50%;
+
+    background:#14532d;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:36px;
+
+}
+
+.sucesso-conteudo h2{
+
+    color:#22c55e;
+
+    font-size:21px;
+
+    margin-bottom:8px;
+
+}
+
+.sucesso-conteudo > p{
+
+    color:#cbd5e1;
+
+    font-size:13px;
+
+    margin-bottom:15px;
+
+}
+
+.sucesso-info{
+
+    background:#0f172a;
+
+    border-radius:12px;
+
+    padding:12px;
+
+    text-align:left;
+
+    margin-bottom:15px;
+
+}
+
+.sucesso-info div{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:8px 0;
+
+    border-bottom:1px solid #334155;
+
+    color:#cbd5e1;
+
+    font-size:13px;
+
+}
+
+.sucesso-info div:last-child{
+
+    border-bottom:0;
+
+}
+
+.sucesso-info strong{
+
+    color:#22c55e;
+
+    font-size:14px;
+
+}
+
+.btn-fechar-sucesso{
+
+    width:100%;
+
+    padding:13px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#22c55e;
+
+    color:#052e16;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.btn-fechar-sucesso:hover{
+
+    background:#16a34a;
+
+}
+</style>
+
+</head>
+
+<body>
+<!-- =========================
+MODAL CONFIRMAÇÃO DO PALPITE
+========================= -->
+
+<div id="modalConfirmacao" class="modal-confirmacao">
+
+    <div class="confirmacao-conteudo">
+
+        <h2>⚽ CONFIRMAR PALPITE</h2>
+
+        <div class="confirmacao-info">
+
+            <div class="confirmacao-linha">
+
+                <span>🎯 Placares escolhidos:</span>
+
+                <strong id="quantidadePlacares">0</strong>
+
+            </div>
+
+            <div class="confirmacao-linha">
+
+                <span>💰 Valor a pagar:</span>
+
+                <strong
+                    id="valorPagarConfirmacao"
+                    class="confirmacao-pagar">
+                    R$ 2,00
+                </strong>
+
+            </div>
+
+            <div class="confirmacao-linha">
+
+                <span>🏆 A receber:</span>
+
+                <strong
+                    id="valorReceberConfirmacao"
+                    class="confirmacao-receber">
+                    R$ 10,00
+                </strong>
+
+            </div>
+
+        </div>
+
+        <p style="
+            color:#94a3b8;
+            font-size:12px;
+            margin-bottom:5px;
+        ">
+            Confira os valores antes de confirmar.
+        </p>
+
+        <div class="botoes-confirmacao">
+
+            <button
+                id="btnCancelarConfirmacao"
+                class="btn-cancelar">
+                ❌ CANCELAR
+            </button>
+
+            <button
+                id="btnConfirmarPalpite"
+                class="btn-confirmar">
+                ✅ CONFIRMAR
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =========================
+MODAL PALPITE ENVIADO
+========================= -->
+
+<div id="modalSucesso" class="modal-sucesso">
+
+    <div class="sucesso-conteudo">
+
+        <div class="sucesso-icone">
+            ✅
+        </div>
+
+        <h2>PALPITE ENVIADO!</h2>
+
+        <p id="textoSucesso">
+            Seu palpite foi registrado com sucesso.
+        </p>
+
+        <div class="sucesso-info">
+
+            <div>
+                🎯 Placares:
+                <strong id="sucessoQuantidade">0</strong>
+            </div>
+
+            <div>
+                💰 Valor pago:
+                <strong id="sucessoValor">R$ 0,00</strong>
+            </div>
+
+            <div>
+                🏆 A receber:
+                <strong id="sucessoPremio">R$ 0,00</strong>
+            </div>
+
+            <div>
+                💵 Saldo restante:
+                <strong id="sucessoSaldo">R$ 0,00</strong>
+            </div>
+
+        </div>
+
+        <button
+            id="btnFecharSucesso"
+            class="btn-fechar-sucesso">
+
+            OK, ENTENDI
+
+        </button>
+
+    </div>
+
+</div>
+<!-- =========================
+TOPO
+========================= -->
+
+<div class="topo">
+
+<button
+id="btnMenu"
+class="menu-btn">
+
+☰
+
+</button>
+
+<div class="titulo">
+
+⚽ PALPITE PREMIADO
+
+</div>
+
+</div>
+
+
+<!-- =========================
+MENU
+========================= -->
+
+<div
+id="menuLateral"
+class="menu-lateral">
+
+<div class="menu-header">
+
+<h2>
+
+📋 Meus Palpites
+
+</h2>
+
+<button
+id="btnFechar"
+class="fechar">
+
+✕
+
+</button>
+
+</div>
+
+<div
+id="nomeMenu"
+class="nome-salvo">
+
+</div>
+
+<div id="meusPalpites">
+
+<p class="sem-palpite">
+
+Nenhum palpite realizado.
+
+</p>
+
+</div>
+
+</div>
+
+
+<div
+id="fundoMenu"
+class="fundo-menu">
+</div>
+
+
+<!-- =========================
+CONTEÚDO
+========================= -->
+
+<div class="container">
+
+
+<!-- =========================
+PAINEL FIXO
+========================= -->
+
+<div class="painel-fixo">
+
+<div class="topo-valores">
+
+
+<div class="topo-item">
+
+<span>
+💰 SALDO
+</span>
+
+<strong
+id="saldoTela">
+
+R$ 0,00
+
+</strong>
+
+</div>
+
+
+<div class="topo-item">
+
+<span>
+💵 VALOR
+</span>
+
+<strong
+id="valorTela">
+
+R$ 2,00
+
+</strong>
+
+</div>
+
+
+<div class="topo-item">
+
+<span>
+🏆 PRÊMIO 
+</span>
+
+<strong
+id="premioTela">
+
+R$ 5.000,00
+
+</strong>
+
+</div>
+
+
+<button
+id="btnEnviar"
+class="enviar-fixo">
+
+📤 ENVIAR
+
+</button>
+
+
+</div>
+
+</div>
+
+<!-- =========================
+MODAL DE RECARGA PIX
+========================= -->
+
+<div id="modalPix" class="modal-pix">
+
+  <div class="modal-conteudo">
+
+    <button
+      id="fecharPix"
+      class="fechar-pix">
+      ✕
+    </button>
+
+    <h2>💰 Adicionar saldo</h2>
+
+    <p class="pix-info">
+      Seu saldo é insuficiente para realizar o palpite.
+    </p>
+
+    <label>Digite o valor que deseja adicionar:</label>
+
+    <input
+      type="number"
+      id="valorRecarga"
+      min="1"
+      step="0.01"
+      placeholder="Ex: 10,00">
+
+    <button
+      id="gerarPix"
+      class="btn-gerar-pix">
+      💳 MOSTRAR PIX
+    </button>
+
+    <div
+      id="areaPix"
+      class="area-pix"
+      style="display:none;">
+
+      <p>Faça o pagamento via Pix:</p>
+
+      <div class="chave-pix">
+        <span id="chavePix">
+          71992290058
+        </span>
+      </div>
+
+      <button
+        id="copiarPix"
+        class="btn-copiar">
+        📋 COPIAR PIX
+      </button>
+
+      <p
+        id="pixCopiado"
+        class="pix-copiado">
+      </p>
+
+      <p class="aviso-pix">
+        ⚠️ Após realizar o pagamento, aguarde a confirmação
+        do saldo antes de enviar o palpite.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- =========================
+SITUAÇÃO
+========================= -->
+
+<div style="display: none;"
+id="situacao"
+class="situacao">
+
+⏳ Verificando saldo...
+
+</div>
+
+
+<!-- =========================
+STATUS
+========================= -->
+
+<div style="display: none;"
+id="status"
+class="status">
+
+🔄 Conectando...
+
+</div>
+
+
+<!-- =========================
+PRÓXIMO JOGO
+========================= -->
+
+<div style="display: none;"
+id="proximoJogo"
+class="proximo-jogo">
+
+⏳ Verificando próximo jogo...
+
+</div>
+
+
+<!-- =========================
+JOGO 1
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786830901/cr-vasco-da-gama.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar1Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar1Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831225/vitoria-esporte-clube.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 19/08/2026
+&nbsp; | &nbsp;
+⏰ 
+
+</div>
+
+
+<select id="jogo1">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+
+<!-- =========================
+JOGO 2
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar2Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar2Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831003/santos-fc-sp.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 19/08/2026
+
+&nbsp; | &nbsp;
+⏰ 
+
+</div>
+
+
+<select id="jogo2">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+
+<!-- =========================
+JOGO 3
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+<div class="placar-selecionado">
+
+<span id="placar3Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar3Fora">
+-
+</span>
+
+</div>
+
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701733/real-sociedad.png">
+
+<p>
+
+</p>
+
+</div>
+
+
+</div>
+
+
+<div class="jogo-info">
+
+📅 19/08/2026
+&nbsp; | &nbsp;
+⏰ 21:35
+
+</div>
+
+
+<select id="jogo3">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+<!-- =========================
+JOGO 4
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701824/eintracht-frankfurt.png">
+
+<p>
+
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar4Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar4Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701884/paris-saint-germain-f.png">
+
+<p>
+
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 19/08/2026
+&nbsp; | &nbsp;
+⏰ 
+
+</div>
+
+<select id="jogo4">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+<!-- =========================
+JOGO 5
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701969/club-atletico.png">
+
+<p>
+
+</p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar5Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar5Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702097/independiente-santa.png">
+
+<p>
+
+</p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 19/08/2026
+&nbsp; | &nbsp;
+⏰ 
+
+</div>
+
+<select id="jogo5">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+</div>
+<!-- =========================
+JOGO 6
+========================= -->
+
+<div class="duelo">
+
+<div class="times">
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702270/tottenham-hotspur.png">
+
+<p></p>
+
+</div>
+
+<div class="placar-selecionado">
+
+<span id="placar6Casa">
+-
+</span>
+
+<b>
+×
+</b>
+
+<span id="placar6Fora">
+-
+</span>
+
+</div>
+
+<div class="time">
+
+<img
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702339/charlton-athletic.png">
+
+<p></p>
+
+</div>
+
+</div>
+
+<div class="jogo-info">
+
+📅 19/08/2026
+&nbsp; | &nbsp;
+⏰ 22:00
+
+</div>
+
+<select id="jogo6">
+
+<option value="">
+Escolha o placar
+</option>
+
+</select>
+
+</div>
+
+<script>
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyAGOy5lPtqjSTtZpyFX7xtGGy3P2nYA77U",
+
+    authDomain:
+        "placarexato-97966.firebaseapp.com",
+
+    databaseURL:
+        "https://placarexato-97966-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+        "placarexato-97966",
+
+    storageBucket:
+        "placarexato-97966.firebasestorage.app",
+
+    messagingSenderId:
+        "942191850183",
+
+    appId:
+        "1:942191850183:web:9870fab0d09044b11004e2"
+
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.database();
+
+const palpitesRef =
+    db.ref("palpites");
+
+const jogadoresRef =
+    db.ref("jogadores");
+
+
+/* =========================================================
+   API-FOOTBALL
+========================================================= */
+
+const API_KEY =
+    "275f8195f07eaf0bde6b19c501b2926b";
+
+const API_BASE =
+    "https://v3.football.api-sports.io";
+
+const API_TIMEZONE =
+    "America/Sao_Paulo";
+
+const LIMITE_JOGOS_POR_DIA = 6;
+
+
+/* =========================================================
+   CACHE
+========================================================= */
+
+const CACHE_RESULTADO_MS =
+    30 * 60 * 1000;
+
+
+/* =========================================================
+   STATUS API
+========================================================= */
+
+const STATUS_FINAL = [
+    "FT",
+    "AET",
+    "PEN"
+];
+
+const STATUS_CANCELADO = [
+    "CANC",
+    "PST",
+    "ABD",
+    "AWD",
+    "WO"
+];
+
+
+/* =========================================================
+   PIX
+========================================================= */
+
+const CHAVE_PIX =
+    "71992290058";
+
+
+/* =========================================================
+   CONFIGURAÇÃO
+========================================================= */
+
+let configuracao = {
+
+    saldo: 0,
+
+    valorLiberacao: 2,
+
+    premio: 10000
+
+};
+
+
+/* =========================================================
+   PREMIAÇÃO
+========================================================= */
+
+const premiosPorQuantidade = {
+
+    2: 50,
+
+    3: 250,
+
+    4: 1500,
+
+    5: 5000,
+
+    6: 10000
+
+};
+
+
+/* =========================================================
+   FORMATAR MOEDA
+========================================================= */
+
+function formatarMoeda(valor) {
+
+    return "R$ " +
+        Number(valor || 0).toLocaleString(
+            "pt-BR",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+}
+
+
+/* =========================================================
+   DINHEIRO
+========================================================= */
+
+function dinheiro(valor) {
+
+    return Number(
+        valor || 0
+    )
+        .toFixed(2)
+        .replace(".", ",");
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(texto) {
+
+    return String(texto ?? "")
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   PLACARES
+========================================================= */
+
+const placares = [
+
+    "0:0",
+    "1:0",
+    "0:1",
+    "1:1",
+
+    "2:0",
+    "2:1",
+    "1:2",
+    "2:2",
+
+    "3:0",
+    "3:1",
+    "1:3",
+    "3:2",
+    "2:3",
+    "3:3",
+
+    "4:0",
+    "0:4",
+    "4:1",
+    "1:4",
+    "4:2",
+    "2:4",
+    "4:3",
+    "3:4",
+    "4:4",
+
+    "5:0",
+    "0:5",
+    "5:1",
+    "1:5",
+    "5:2",
+    "2:5"
+
+];
+
+
+/* =========================================================
+   JOGOS
+========================================================= */
+
+let jogos = {
+
+    jogo1: {
+        data: "",
+        hora: "",
+        select: "jogo1",
+        nome: "Jogo 1"
+    },
+
+    jogo2: {
+        data: "",
+        hora: "",
+        select: "jogo2",
+        nome: "Jogo 2"
+    },
+
+    jogo3: {
+        data: "",
+        hora: "",
+        select: "jogo3",
+        nome: "Jogo 3"
+    },
+
+    jogo4: {
+        data: "",
+        hora: "",
+        select: "jogo4",
+        nome: "Jogo 4"
+    },
+
+    jogo5: {
+        data: "",
+        hora: "",
+        select: "jogo5",
+        nome: "Jogo 5"
+    },
+
+    jogo6: {
+        data: "",
+        hora: "",
+        select: "jogo6",
+        nome: "Jogo 6"
+    }
+
+};
+
+
+/* =========================================================
+   CONTROLE API
+========================================================= */
+
+let jogosVieramDaAPI = false;
+
+let carregandoJogosAPI = false;
+
+let palpiteParaConfirmar = null;
+
+let atualizacaoResultadosEmAndamento = false;
+
+
+/* =========================================================
+   COMPETIÇÕES
+========================================================= */
+
+const PRIORIDADE_COMPETICOES = {
+
+    71: 1000,
+    72: 900,
+
+    13: 850,
+    11: 800,
+
+    2: 780,
+    39: 760,
+    140: 750,
+    135: 740,
+    78: 730,
+    61: 720,
+    3: 700,
+    848: 680,
+
+    94: 600,
+    88: 590,
+    128: 580
+
+};
+
+
+/* =========================================================
+   DATA ATUAL
+========================================================= */
+
+function obterDataHojeAPI() {
+
+    const agora =
+        new Date();
+
+    const formatter =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone:
+                    API_TIMEZONE,
+
+                year:
+                    "numeric",
+
+                month:
+                    "2-digit",
+
+                day:
+                    "2-digit"
+            }
+        );
+
+    return formatter.format(agora);
+
+}
+
+
+/* =========================================================
+   CONVERTER DATA API
+========================================================= */
+
+function converterDataAPI(dataISO) {
+
+    if (!dataISO) {
+        return null;
+    }
+
+    const data =
+        new Date(dataISO);
+
+    if (
+        Number.isNaN(
+            data.getTime()
+        )
+    ) {
+        return null;
+    }
+
+    const partes =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone:
+                    API_TIMEZONE,
+
+                year:
+                    "numeric",
+
+                month:
+                    "2-digit",
+
+                day:
+                    "2-digit",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                hour12:
+                    false
+            }
+        ).formatToParts(data);
+
+    const valores = {};
+
+    partes.forEach(
+        function(parte) {
+
+            if (
+                parte.type !==
+                "literal"
+            ) {
+
+                valores[
+                    parte.type
+                ] =
+                    parte.value;
+
+            }
+
+        }
+    );
+
+    return {
+
+        data:
+            `${valores.year}-${valores.month}-${valores.day}`,
+
+        hora:
+            `${valores.hour}:${valores.minute}`
+
+    };
+
+}
+
+
+/* =========================================================
+   BUSCAR JOGOS API
+========================================================= */
+
+async function buscarJogosAPI(data) {
+
+    try {
+
+        console.log(
+            "🌐 API-Football:",
+            data
+        );
+
+        const url =
+            `${API_BASE}/fixtures?date=${encodeURIComponent(data)}&timezone=${encodeURIComponent(API_TIMEZONE)}`;
+
+        const resposta =
+            await fetch(
+                url,
+                {
+                    method:
+                        "GET",
+
+                    headers: {
+                        "x-apisports-key":
+                            API_KEY
+                    }
+                }
+            );
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                `HTTP ${resposta.status}`
+            );
+
+        }
+
+        const resultado =
+            await resposta.json();
+
+        if (
+            !resultado ||
+            !Array.isArray(
+                resultado.response
+            )
+        ) {
+
+            return [];
+
+        }
+
+        console.log(
+            "⚽ Jogos encontrados:",
+            resultado.response.length
+        );
+
+        return resultado.response;
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro API-Football:",
+            erro
+        );
+
+        return [];
+
+    }
+
+}
+
+
+/* =========================================================
+   TRANSFORMAR JOGO API
+========================================================= */
+
+function transformarJogoAPI(item) {
+
+    if (
+        !item ||
+        !item.fixture
+    ) {
+
+        return null;
+
+    }
+
+    const fixture =
+        item.fixture;
+
+    const league =
+        item.league || {};
+
+    const teams =
+        item.teams || {};
+
+    const dataConvertida =
+        converterDataAPI(
+            fixture.date
+        );
+
+    if (!dataConvertida) {
+        return null;
+    }
+
+    const fixtureId =
+        String(
+            fixture.id || ""
+        ).trim();
+
+    if (!fixtureId) {
+        return null;
+    }
+
+    const timeA =
+        teams.home?.name ||
+        "Time A";
+
+    const timeB =
+        teams.away?.name ||
+        "Time B";
+
+    const status =
+        String(
+            fixture.status?.short ||
+            "NS"
+        ).toUpperCase();
+
+    return {
+
+        fixtureId:
+            fixtureId,
+
+        apiFixtureId:
+            fixtureId,
+
+        idAPI:
+            fixtureId,
+
+        timeA:
+            timeA,
+
+        timeB:
+            timeB,
+
+        casa:
+            timeA,
+
+        fora:
+            timeB,
+
+        imagemA:
+            teams.home?.logo ||
+            "",
+
+        imagemB:
+            teams.away?.logo ||
+            "",
+
+        casaImagem:
+            teams.home?.logo ||
+            "",
+
+        foraImagem:
+            teams.away?.logo ||
+            "",
+
+        campeonato:
+            league.name ||
+            "Futebol",
+
+        pais:
+            league.country ||
+            "",
+
+        ligaId:
+            Number(
+                league.id || 0
+            ),
+
+        temporada:
+            league.season ||
+            "",
+
+        data:
+            dataConvertida.data,
+
+        hora:
+            dataConvertida.hora,
+
+        dataAPI:
+            fixture.date,
+
+        status:
+            status,
+
+        statusLong:
+            fixture.status?.long ||
+            "",
+
+        finalizado:
+            STATUS_FINAL.includes(
+                status
+            ),
+
+        placarA:
+            item.goals?.home ??
+            null,
+
+        placarB:
+            item.goals?.away ??
+            null,
+
+        nome:
+            `${timeA} × ${timeB}`,
+
+        confronto:
+            `${timeA} × ${timeB}`,
+
+        cotacoes:
+            null
+
+    };
+
+}
+
+
+/* =========================================================
+   PRIORIDADE
+========================================================= */
+
+function obterPrioridadeCompeticao(jogo) {
+
+    const liga =
+        Number(
+            jogo?.ligaId || 0
+        );
+
+    if (
+        PRIORIDADE_COMPETICOES[
+            liga
+        ] !== undefined
+    ) {
+
+        return PRIORIDADE_COMPETICOES[
+            liga
+        ];
+
+    }
+
+    return 100;
+
+}
+
+
+/* =========================================================
+   SÉRIE A/B
+========================================================= */
+
+function ehSerieAB(jogo) {
+
+    const liga =
+        Number(
+            jogo?.ligaId || 0
+        );
+
+    return (
+        liga === 71 ||
+        liga === 72
+    );
+
+}
+
+
+/* =========================================================
+   ORDENAR
+========================================================= */
+
+function ordenarJogosAPI(lista) {
+
+    return lista.sort(
+        function(a, b) {
+
+            const prioridadeA =
+                obterPrioridadeCompeticao(
+                    a
+                );
+
+            const prioridadeB =
+                obterPrioridadeCompeticao(
+                    b
+                );
+
+            if (
+                prioridadeA !==
+                prioridadeB
+            ) {
+
+                return (
+                    prioridadeB -
+                    prioridadeA
+                );
+
+            }
+
+            return (
+                new Date(
+                    a.dataAPI
+                ) -
+                new Date(
+                    b.dataAPI
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SELECIONAR 6
+========================================================= */
+
+function selecionarSeisJogos(lista) {
+
+    if (
+        !Array.isArray(lista)
+    ) {
+
+        return [];
+
+    }
+
+    const mapa =
+        new Map();
+
+    lista.forEach(
+        function(jogo) {
+
+            if (
+                jogo &&
+                jogo.fixtureId
+            ) {
+
+                mapa.set(
+                    String(
+                        jogo.fixtureId
+                    ),
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+    const todos =
+        Array.from(
+            mapa.values()
+        );
+
+    const serieAB =
+        todos.filter(
+            ehSerieAB
+        );
+
+    const outros =
+        todos.filter(
+            function(jogo) {
+
+                return !ehSerieAB(
+                    jogo
+                );
+
+            }
+        );
+
+    ordenarJogosAPI(
+        serieAB
+    );
+
+    ordenarJogosAPI(
+        outros
+    );
+
+    const selecionados = [];
+
+    serieAB.forEach(
+        function(jogo) {
+
+            if (
+                selecionados.length <
+                LIMITE_JOGOS_POR_DIA
+            ) {
+
+                selecionados.push(
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+    outros.forEach(
+        function(jogo) {
+
+            if (
+                selecionados.length <
+                LIMITE_JOGOS_POR_DIA
+            ) {
+
+                selecionados.push(
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+    return selecionados;
+
+}
+
+
+/* =========================================================
+   JOGO FUTURO
+========================================================= */
+
+function jogoAindaNaoComecouAPI(jogo) {
+
+    if (!jogo) {
+        return false;
+    }
+
+    const dataHora =
+        obterDataJogo(
+            jogo
+        );
+
+    return (
+        dataHora.getTime() >
+        Date.now()
+    );
+
+}
+
+
+/* =========================================================
+   MONTAR JOGOS
+========================================================= */
+
+function montarJogosAPI(lista) {
+
+    jogos = {};
+
+    for (
+        let i = 1;
+        i <= LIMITE_JOGOS_POR_DIA;
+        i++
+    ) {
+
+        const jogo =
+            lista[i - 1];
+
+        if (jogo) {
+
+            jogos[
+                `jogo${i}`
+            ] = {
+
+                ...jogo,
+
+                select:
+                    `jogo${i}`,
+
+                numero:
+                    i,
+
+                nome:
+                    jogo.nome ||
+                    `${jogo.timeA} × ${jogo.timeB}`
+
+            };
+
+        } else {
+
+            jogos[
+                `jogo${i}`
+            ] = {
+
+                data: "",
+
+                hora: "",
+
+                select:
+                    `jogo${i}`,
+
+                numero:
+                    i,
+
+                nome:
+                    "Jogo indisponível",
+
+                fixtureId:
+                    "",
+
+                apiFixtureId:
+                    "",
+
+                idAPI:
+                    "",
+
+                timeA:
+                    "",
+
+                timeB:
+                    "",
+
+                casa:
+                    "",
+
+                fora:
+                    "",
+
+                imagemA:
+                    "",
+
+                imagemB:
+                    "",
+
+                campeonato:
+                    "",
+
+                pais:
+                    ""
+
+            };
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   VISUAL API
+========================================================= */
+
+function atualizarVisualDosJogosAPI() {
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+    duelos.forEach(
+        function(duelo, indice) {
+
+            const numero =
+                indice + 1;
+
+            const jogo =
+                jogos[
+                    `jogo${numero}`
+                ];
+
+            if (!jogo) {
+                return;
+            }
+
+            const imagens =
+                duelo.querySelectorAll(
+                    ".time img"
+                );
+
+            if (
+                imagens.length >= 2
+            ) {
+
+                if (
+                    jogo.imagemA
+                ) {
+
+                    imagens[0].src =
+                        jogo.imagemA;
+
+                    imagens[0].alt =
+                        jogo.timeA;
+
+                }
+
+                if (
+                    jogo.imagemB
+                ) {
+
+                    imagens[1].src =
+                        jogo.imagemB;
+
+                    imagens[1].alt =
+                        jogo.timeB;
+
+                }
+
+            }
+
+            const times =
+                duelo.querySelectorAll(
+                    ".time"
+                );
+
+            if (
+                times.length >= 2
+            ) {
+
+                const nomeCasa =
+                    times[0].querySelector(
+                        "p"
+                    );
+
+                const nomeFora =
+                    times[1].querySelector(
+                        "p"
+                    );
+
+                if (nomeCasa) {
+
+                    nomeCasa.textContent =
+                        jogo.timeA || "";
+
+                }
+
+                if (nomeFora) {
+
+                    nomeFora.textContent =
+                        jogo.timeB || "";
+
+                }
+
+            }
+
+            const campeonato =
+                duelo.querySelector(
+                    ".campeonato"
+                );
+
+            if (
+                campeonato &&
+                jogo.campeonato
+            ) {
+
+                campeonato.textContent =
+                    jogo.campeonato;
+
+            }
+
+            const info =
+                duelo.querySelector(
+                    ".jogo-info"
+                );
+
+            if (
+                info &&
+                jogo.data &&
+                jogo.hora
+            ) {
+
+                info.innerHTML = `
+
+                    📅 ${formatarData(
+                        jogo.data
+                    )}
+
+                    &nbsp; | &nbsp;
+
+                    ⏰ ${escapeHTML(
+                        jogo.hora
+                    )}
+
+                `;
+
+            }
+
+        }
+    );
+
+    atualizarDatasHorasDosJogos();
+
+    atualizarStatusJogos();
+
+    atualizarProximoJogo();
+
+}
+
+
+/* =========================================================
+   CARREGAR JOGOS
+========================================================= */
+
+async function carregarJogos() {
+
+    if (
+        carregandoJogosAPI
+    ) {
+
+        return;
+
+    }
+
+    carregandoJogosAPI =
+        true;
+
+    const modal =
+        document.getElementById(
+            "meuModal"
+        );
+
+    if (modal) {
+
+        modal.style.display =
+            "flex";
+
+    }
+
+    try {
+
+        const data =
+            obterDataHojeAPI();
+
+        console.log(
+            "📅 Procurando jogos de:",
+            data
+        );
+
+        const resposta =
+            await buscarJogosAPI(
+                data
+            );
+
+        let convertidos =
+            resposta
+                .map(
+                    transformarJogoAPI
+                )
+                .filter(Boolean);
+
+        convertidos =
+            convertidos.filter(
+                function(jogo) {
+
+                    return jogoAindaNaoComecouAPI(
+                        jogo
+                    );
+
+                }
+            );
+
+        const selecionados =
+            selecionarSeisJogos(
+                convertidos
+            );
+
+        console.log(
+            "🏆 Jogos escolhidos:",
+            selecionados
+        );
+
+        if (
+            selecionados.length > 0
+        ) {
+
+            montarJogosAPI(
+                selecionados
+            );
+
+            jogosVieramDaAPI =
+                true;
+
+            atualizarVisualDosJogosAPI();
+
+            for (
+                let i = 1;
+                i <= 6;
+                i++
+            ) {
+
+                preencherSelect(
+                    `jogo${i}`
+                );
+
+            }
+
+            console.log(
+                "✅ Jogos da API carregados."
+            );
+
+        } else {
+
+            console.warn(
+                "⚠️ Nenhum jogo futuro encontrado."
+            );
+
+            atualizarVisualDosJogosAPI();
+
+        }
+
+    } catch (erro) {
+
+        console.error(
+            "❌ ERRO AO CARREGAR JOGOS:",
+            erro
+        );
+
+    } finally {
+
+        carregandoJogosAPI =
+            false;
+
+        if (modal) {
+
+            modal.style.display =
+                "none";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CONFIGURAÇÃO FIREBASE DOS JOGOS
+========================================================= */
+
+const configuracaoJogosRef =
+    db.ref(
+        "configuracaoJogos"
+    );
+
+configuracaoJogosRef.on(
+    "value",
+    function(snapshot) {
+
+        const dados =
+            snapshot.val();
+
+        if (!dados) {
+            return;
+        }
+
+        for (
+            let i = 1;
+            i <= 6;
+            i++
+        ) {
+
+            const chave =
+                "jogo" + i;
+
+            const dadosJogo =
+                dados[chave];
+
+            if (!dadosJogo) {
+                continue;
+            }
+
+            if (
+                !jogos[chave]
+            ) {
+
+                jogos[chave] = {
+
+                    select:
+                        chave,
+
+                    nome:
+                        "Jogo " + i
+
+                };
+
+            }
+
+            if (
+                !jogosVieramDaAPI
+            ) {
+
+                if (
+                    dadosJogo.data
+                ) {
+
+                    jogos[chave].data =
+                        dadosJogo.data;
+
+                }
+
+                if (
+                    dadosJogo.hora
+                ) {
+
+                    jogos[chave].hora =
+                        dadosJogo.hora;
+
+                }
+
+                if (
+                    dadosJogo.casaImagem
+                ) {
+
+                    jogos[chave].casaImagem =
+                        dadosJogo.casaImagem;
+
+                    jogos[chave].imagemA =
+                        dadosJogo.casaImagem;
+
+                }
+
+                if (
+                    dadosJogo.foraImagem
+                ) {
+
+                    jogos[chave].foraImagem =
+                        dadosJogo.foraImagem;
+
+                    jogos[chave].imagemB =
+                        dadosJogo.foraImagem;
+
+                }
+
+            }
+
+        }
+
+        if (
+            !jogosVieramDaAPI
+        ) {
+
+            atualizarImagensDosJogos();
+
+            atualizarDatasHorasDosJogos();
+
+            atualizarStatusJogos();
+
+            atualizarNomesDosTimes();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   IMAGENS
+========================================================= */
+
+function atualizarImagensDosJogos() {
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+    duelos.forEach(
+        function(duelo, indice) {
+
+            const numero =
+                indice + 1;
+
+            const chave =
+                "jogo" + numero;
+
+            const jogo =
+                jogos[chave];
+
+            if (!jogo) {
+                return;
+            }
+
+            const imagens =
+                duelo.querySelectorAll(
+                    ".time img"
+                );
+
+            if (
+                imagens.length >= 2
+            ) {
+
+                if (
+                    jogo.casaImagem
+                ) {
+
+                    imagens[0].src =
+                        jogo.casaImagem;
+
+                }
+
+                if (
+                    jogo.foraImagem
+                ) {
+
+                    imagens[1].src =
+                        jogo.foraImagem;
+
+                }
+
+            }
+
+        }
+    );
+
+    atualizarNomesDosTimes();
+
+}
+
+
+/* =========================================================
+   ID JOGADOR
+========================================================= */
+
+function criarIdJogador(nome) {
+
+    return String(nome)
+
+        .toLowerCase()
+
+        .normalize("NFD")
+
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+
+        .replace(
+            /[^a-z0-9]+/g,
+            "_"
+        )
+
+        .replace(
+            /^_+|_+$/g,
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   OBTER NOME
+========================================================= */
+
+function obterNome() {
+
+    let nome =
+        localStorage.getItem(
+            "nomeJogador"
+        );
+
+    if (
+        nome &&
+        nome.trim() !== ""
+    ) {
+
+        return nome.trim();
+
+    }
+
+    while (true) {
+
+        nome =
+            prompt(
+                "👤 Digite seu nome:"
+            );
+
+        if (
+            nome === null
+        ) {
+
+            alert(
+                "⚠️ É necessário informar seu nome."
+            );
+
+            continue;
+
+        }
+
+        nome =
+            nome.trim();
+
+        if (
+            nome !== ""
+        ) {
+
+            localStorage.setItem(
+                "nomeJogador",
+                nome
+            );
+
+            return nome;
+
+        }
+
+        alert(
+            "⚠️ Digite um nome válido."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PIX
+========================================================= */
+
+function abrirModalPix() {
+
+    const modalPix =
+        document.getElementById(
+            "modalPix"
+        );
+
+    const valorRecarga =
+        document.getElementById(
+            "valorRecarga"
+        );
+
+    const areaPix =
+        document.getElementById(
+            "areaPix"
+        );
+
+    const chavePix =
+        document.getElementById(
+            "chavePix"
+        );
+
+    const pixCopiado =
+        document.getElementById(
+            "pixCopiado"
+        );
+
+    if (valorRecarga) {
+        valorRecarga.value = "";
+    }
+
+    if (areaPix) {
+        areaPix.style.display = "none";
+    }
+
+    if (pixCopiado) {
+        pixCopiado.textContent = "";
+    }
+
+    if (chavePix) {
+        chavePix.textContent = CHAVE_PIX;
+    }
+
+    if (modalPix) {
+        modalPix.classList.add("ativo");
+    }
+
+}
+
+
+function fecharModalPix() {
+
+    const modalPix =
+        document.getElementById(
+            "modalPix"
+        );
+
+    if (modalPix) {
+
+        modalPix.classList.remove(
+            "ativo"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GERAR PIX
+========================================================= */
+
+async function gerarSolicitacaoPix() {
+
+    const valorRecarga =
+        document.getElementById(
+            "valorRecarga"
+        );
+
+    const areaPix =
+        document.getElementById(
+            "areaPix"
+        );
+
+    const chavePix =
+        document.getElementById(
+            "chavePix"
+        );
+
+    const pixCopiado =
+        document.getElementById(
+            "pixCopiado"
+        );
+
+    const valor =
+        Number(
+            valorRecarga?.value
+        );
+
+    if (
+        !Number.isFinite(valor) ||
+        valor <= 0
+    ) {
+
+        alert(
+            "⚠️ Informe um valor válido."
+        );
+
+        return;
+
+    }
+
+    const nome =
+        obterNome();
+
+    if (!nome) {
+        return;
+    }
+
+    const jogadorId =
+        criarIdJogador(
+            nome
+        );
+
+    try {
+
+        const solicitacaoRef =
+            db
+                .ref(
+                    "solicitacoesRecarga"
+                )
+                .push();
+
+        await solicitacaoRef.set({
+
+            nome:
+                nome,
+
+            jogadorId:
+                jogadorId,
+
+            valor:
+                Number(
+                    valor.toFixed(2)
+                ),
+
+            chavePix:
+                CHAVE_PIX,
+
+            status:
+                "pendente",
+
+            data:
+                new Date()
+                    .toLocaleString(
+                        "pt-BR"
+                    ),
+
+            timestamp:
+                Date.now()
+
+        });
+
+        if (areaPix) {
+            areaPix.style.display = "block";
+        }
+
+        if (chavePix) {
+            chavePix.textContent = CHAVE_PIX;
+        }
+
+        if (pixCopiado) {
+            pixCopiado.textContent = "";
+        }
+
+        alert(
+            "✅ Solicitação registrada!\n\n" +
+            "Nome: " +
+            nome +
+            "\nValor: R$ " +
+            dinheiro(valor) +
+            "\n\nFaça o Pix e aguarde a confirmação."
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+            "❌ Não foi possível registrar a solicitação.\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   COPIAR PIX
+========================================================= */
+
+async function copiarPix() {
+
+    const pixCopiado =
+        document.getElementById(
+            "pixCopiado"
+        );
+
+    const botao =
+        document.getElementById(
+            "copiarPix"
+        );
+
+    try {
+
+        if (
+            navigator.clipboard &&
+            navigator.clipboard.writeText
+        ) {
+
+            await navigator.clipboard.writeText(
+                CHAVE_PIX
+            );
+
+        } else {
+
+            const campo =
+                document.createElement(
+                    "textarea"
+                );
+
+            campo.value =
+                CHAVE_PIX;
+
+            campo.style.position =
+                "fixed";
+
+            campo.style.opacity =
+                "0";
+
+            document.body.appendChild(
+                campo
+            );
+
+            campo.focus();
+
+            campo.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            campo.remove();
+
+        }
+
+        if (pixCopiado) {
+            pixCopiado.textContent =
+                "✅ Chave Pix copiada!";
+        }
+
+        if (botao) {
+            botao.textContent =
+                "✅ PIX COPIADO";
+        }
+
+        setTimeout(
+            function() {
+
+                if (pixCopiado) {
+                    pixCopiado.textContent = "";
+                }
+
+                if (botao) {
+                    botao.textContent =
+                        "📋 COPIAR PIX";
+                }
+
+            },
+            1000
+        );
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(
+            "❌ Não foi possível copiar automaticamente.\n\n" +
+            "Segure sobre a chave Pix para copiar."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CONFIGURAÇÃO JOGADOR
+========================================================= */
+
+function carregarConfiguracao() {
+
+    const nome =
+        obterNome();
+
+    const id =
+        criarIdJogador(
+            nome
+        );
+
+    jogadoresRef
+        .child(id)
+        .on(
+            "value",
+            function(snapshot) {
+
+                if (
+                    !snapshot.exists()
+                ) {
+
+                    configuracao = {
+
+                        saldo:
+                            0,
+
+                        valorLiberacao:
+                            2,
+
+                        premio:
+                            10000
+
+                    };
+
+                    atualizarTela();
+
+                    return;
+
+                }
+
+                const dados =
+                    snapshot.val();
+
+                configuracao.saldo =
+                    Number(
+                        dados.saldo
+                    ) || 0;
+
+                configuracao.valorLiberacao =
+                    Number(
+                        dados.valorLiberacao
+                    );
+
+                if (
+                    !Number.isFinite(
+                        configuracao.valorLiberacao
+                    )
+                ) {
+
+                    configuracao.valorLiberacao =
+                        2;
+
+                }
+
+                configuracao.premio =
+                    Number(
+                        dados.premio
+                    ) || 10000;
+
+                atualizarTela();
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ATUALIZAR TELA
+========================================================= */
+
+function atualizarTela() {
+
+    const saldoTela =
+        document.getElementById(
+            "saldoTela"
+        );
+
+    const valorTela =
+        document.getElementById(
+            "valorTela"
+        );
+
+    const premioTela =
+        document.getElementById(
+            "premioTela"
+        );
+
+    const situacao =
+        document.getElementById(
+            "situacao"
+        );
+
+    if (saldoTela) {
+
+        saldoTela.textContent =
+            formatarMoeda(
+                configuracao.saldo
+            );
+
+    }
+
+    if (valorTela) {
+
+        valorTela.textContent =
+            formatarMoeda(
+                configuracao.valorLiberacao
+            );
+
+    }
+
+    if (premioTela) {
+
+        premioTela.textContent =
+            formatarMoeda(
+                configuracao.premio
+            );
+
+    }
+
+    const podeMarcar =
+        configuracao.saldo >=
+        configuracao.valorLiberacao;
+
+    if (situacao) {
+
+        if (podeMarcar) {
+
+            situacao.innerHTML = `
+
+                <span class="liberado">
+                    🟢 PALPITE LIBERADO
+                </span>
+
+                <br>
+
+                Seu saldo é suficiente para jogar.
+
+            `;
+
+        } else {
+
+            situacao.innerHTML = `
+
+                <span class="bloqueado">
+                    🔴 PALPITE BLOQUEADO
+                </span>
+
+                <br>
+
+                Saldo insuficiente.
+
+                <br>
+
+                Necessário:
+
+                <strong>
+                    ${formatarMoeda(
+                        configuracao.valorLiberacao
+                    )}
+                </strong>
+
+            `;
+
+        }
+
+    }
+
+    atualizarStatusJogos();
+
+}
+
+
+/* =========================================================
+   PREMIO
+========================================================= */
+
+function atualizarPremio() {
+
+    const quantidade =
+        Object.values(
+            obterPalpitesSelecionados()
+        ).filter(
+            valor =>
+                valor &&
+                String(valor).trim() !== ""
+        ).length;
+
+    const premio =
+        premiosPorQuantidade[
+            quantidade
+        ] || 0;
+
+    const premioTela =
+        document.getElementById(
+            "premioTela"
+        );
+
+    if (premioTela) {
+
+        premioTela.textContent =
+            formatarMoeda(
+                premio
+            );
+
+    }
+
+    const valorReceber =
+        document.getElementById(
+            "valorReceberConfirmacao"
+        );
+
+    if (valorReceber) {
+
+        valorReceber.textContent =
+            formatarMoeda(
+                premio
+            );
+
+    }
+
+    return premio;
+
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+function preencherSelect(id) {
+
+    const select =
+        document.getElementById(
+            id
+        );
+
+    if (!select) {
+        return;
+    }
+
+    select.innerHTML = "";
+
+    const opcaoInicial =
+        document.createElement(
+            "option"
+        );
+
+    opcaoInicial.value = "";
+
+    opcaoInicial.textContent =
+        "Selecione o placar";
+
+    select.appendChild(
+        opcaoInicial
+    );
+
+    placares.forEach(
+        function(placar) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                placar;
+
+            option.textContent =
+                placar;
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ATUALIZAR PLACAR VISUAL
+========================================================= */
+
+function atualizarPlacar(
+    selectId,
+    casaId,
+    foraId
+) {
+
+    const select =
+        document.getElementById(
+            selectId
+        );
+
+    const casa =
+        document.getElementById(
+            casaId
+        );
+
+    const fora =
+        document.getElementById(
+            foraId
+        );
+
+    if (!select) {
+        return;
+    }
+
+    const valor =
+        select.value;
+
+    if (!valor) {
+
+        if (casa) {
+            casa.textContent = "-";
+        }
+
+        if (fora) {
+            fora.textContent = "-";
+        }
+
+        atualizarPremio();
+
+        return;
+    }
+
+    const partes =
+        valor.split(":");
+
+    if (casa) {
+        casa.textContent =
+            partes[0];
+    }
+
+    if (fora) {
+        fora.textContent =
+            partes[1];
+    }
+
+    atualizarPremio();
+
+}
+
+
+/* =========================================================
+   DATA DO JOGO
+========================================================= */
+
+function obterDataJogo(jogo) {
+
+    if (
+        !jogo ||
+        !jogo.data ||
+        !jogo.hora
+    ) {
+
+        return new Date(0);
+
+    }
+
+    return new Date(
+        jogo.data +
+        "T" +
+        jogo.hora +
+        ":00"
+    );
+
+}
+
+
+/* =========================================================
+   JOGO ABERTO
+========================================================= */
+
+function jogoEstaAberto(jogo) {
+
+    return (
+        new Date() <
+        obterDataJogo(
+            jogo
+        )
+    );
+
+}
+
+
+/* =========================================================
+   FORMATAR TEMPO
+========================================================= */
+
+function formatarTempo(ms) {
+
+    if (ms <= 0) {
+        return "00:00";
+    }
+
+    const totalSegundos =
+        Math.floor(
+            ms / 1000
+        );
+
+    const horas =
+        Math.floor(
+            totalSegundos /
+            3600
+        );
+
+    const minutos =
+        Math.floor(
+            (
+                totalSegundos %
+                3600
+            ) / 60
+        );
+
+    const segundos =
+        totalSegundos %
+        60;
+
+    if (horas > 0) {
+
+        return (
+            String(horas).padStart(2, "0") +
+            ":" +
+            String(minutos).padStart(2, "0") +
+            ":" +
+            String(segundos).padStart(2, "0")
+        );
+
+    }
+
+    return (
+        String(minutos).padStart(2, "0") +
+        ":" +
+        String(segundos).padStart(2, "0")
+    );
+
+}
+
+
+/* =========================================================
+   FORMATAR DATA
+========================================================= */
+
+function formatarData(data) {
+
+    if (!data) {
+        return "";
+    }
+
+    const partes =
+        String(data).split("-");
+
+    if (
+        partes.length !== 3
+    ) {
+
+        return data;
+
+    }
+
+    return (
+        partes[2] +
+        "/" +
+        partes[1] +
+        "/" +
+        partes[0]
+    );
+
+}
+
+
+/* =========================================================
+   STATUS DOS JOGOS
+========================================================= */
+
+function atualizarStatusJogos() {
+
+    const agora =
+        new Date();
+
+    Object.keys(jogos)
+        .forEach(
+            function(chave) {
+
+                const jogo =
+                    jogos[chave];
+
+                const select =
+                    document.getElementById(
+                        jogo.select
+                    );
+
+                if (!select) {
+                    return;
+                }
+
+                const horario =
+                    obterDataJogo(
+                        jogo
+                    );
+
+                const duelo =
+                    select.closest(
+                        ".duelo"
+                    );
+
+                if (!duelo) {
+                    return;
+                }
+
+                let contador =
+                    duelo.querySelector(
+                        ".contador"
+                    );
+
+                if (!contador) {
+
+                    contador =
+                        document.createElement(
+                            "div"
+                        );
+
+                    contador.className =
+                        "contador";
+
+                    duelo.insertBefore(
+                        contador,
+                        select
+                    );
+
+                }
+
+                if (
+                    !jogo.data ||
+                    !jogo.hora ||
+                    !jogo.fixtureId
+                ) {
+
+                    select.disabled =
+                        true;
+
+                    contador.className =
+                        "contador encerrado";
+
+                    contador.textContent =
+                        "⚠️ JOGO INDISPONÍVEL";
+
+                    return;
+
+                }
+
+                if (
+                    agora >= horario
+                ) {
+
+                    select.disabled =
+                        true;
+
+                    select.classList.add(
+                        "bloqueado"
+                    );
+
+                    contador.className =
+                        "contador encerrado";
+
+                    contador.textContent =
+                        "🔒 PALPITES ENCERRADOS";
+
+                    return;
+
+                }
+
+                select.disabled =
+                    false;
+
+                select.classList.remove(
+                    "bloqueado"
+                );
+
+                if (
+                    configuracao.saldo <
+                    configuracao.valorLiberacao
+                ) {
+
+                    contador.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+                contador.style.display =
+                    "block";
+
+                contador.className =
+                    "contador";
+
+                contador.textContent =
+                    "⏳ Encerra em: " +
+                    formatarTempo(
+                        horario -
+                        agora
+                    );
+
+            }
+        );
+
+    atualizarProximoJogo();
+
+}
+
+
+/* =========================================================
+   PRÓXIMO JOGO
+========================================================= */
+
+function atualizarProximoJogo() {
+
+    const agora =
+        new Date();
+
+    let proximo =
+        null;
+
+    Object.keys(jogos)
+        .forEach(
+            function(chave) {
+
+                const jogo =
+                    jogos[chave];
+
+                if (
+                    !jogo.data ||
+                    !jogo.hora ||
+                    !jogo.fixtureId
+                ) {
+                    return;
+                }
+
+                const horario =
+                    obterDataJogo(
+                        jogo
+                    );
+
+                if (
+                    horario > agora &&
+                    (
+                        !proximo ||
+                        horario <
+                        obterDataJogo(
+                            proximo
+                        )
+                    )
+                ) {
+
+                    proximo =
+                        jogo;
+
+                }
+
+            }
+        );
+
+    const area =
+        document.getElementById(
+            "proximoJogo"
+        );
+
+    if (!area) {
+        return;
+    }
+
+    if (!proximo) {
+
+        area.innerHTML =
+            "🏁 Todos os jogos foram encerrados.";
+
+        return;
+
+    }
+
+    const tempo =
+        obterDataJogo(
+            proximo
+        ) -
+        agora;
+
+    area.innerHTML = `
+
+        ⏭️ Próximo jogo:<br>
+
+        <strong>
+            ${escapeHTML(
+                proximo.nome ||
+                "Próximo jogo"
+            )}
+        </strong>
+
+        <br>
+
+        ⏳ Começa em:
+
+        <strong>
+            ${formatarTempo(
+                tempo
+            )}
+        </strong>
+
+        <br>
+
+        📅
+        ${formatarData(
+            proximo.data
+        )}
+
+        às
+
+        ${escapeHTML(
+            proximo.hora
+        )}
+
+    `;
+
+}
+
+
+/* =========================================================
+   PREMIAÇÃO
+========================================================= */
+
+function calcularPremiacao(
+    quantidade
+) {
+
+    return (
+        premiosPorQuantidade[
+            quantidade
+        ] || 0
+    );
+
+}
+
+
+/* =========================================================
+   MODAL CONFIRMAÇÃO
+========================================================= */
+
+function abrirModalConfirmacao(
+    quantidade,
+    valor,
+    premio
+) {
+
+    const quantidadeElemento =
+        document.getElementById(
+            "quantidadePlacares"
+        );
+
+    const valorElemento =
+        document.getElementById(
+            "valorPagarConfirmacao"
+        );
+
+    const premioElemento =
+        document.getElementById(
+            "valorReceberConfirmacao"
+        );
+
+    const modal =
+        document.getElementById(
+            "modalConfirmacao"
+        );
+
+    if (quantidadeElemento) {
+
+        quantidadeElemento.textContent =
+            quantidade;
+
+    }
+
+    if (valorElemento) {
+
+        valorElemento.textContent =
+            formatarMoeda(
+                valor
+            );
+
+    }
+
+    if (premioElemento) {
+
+        premioElemento.textContent =
+            formatarMoeda(
+                premio
+            );
+
+    }
+
+    if (modal) {
+
+        modal.classList.add(
+            "ativo"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   FECHAR CONFIRMAÇÃO
+========================================================= */
+
+function fecharModalConfirmacao() {
+
+    const modal =
+        document.getElementById(
+            "modalConfirmacao"
+        );
+
+    if (modal) {
+
+        modal.classList.remove(
+            "ativo"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PALPITES SELECIONADOS
+========================================================= */
+
+function obterPalpitesSelecionados() {
+
+    const palpites = {};
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const select =
+            document.getElementById(
+                "jogo" + i
+            );
+
+        palpites[
+            "jogo" + i
+        ] =
+            select
+                ? select.value
+                : "";
+
+    }
+
+    return palpites;
+
+}
+
+
+/* =========================================================
+   PALPITES VÁLIDOS
+========================================================= */
+
+function obterPalpitesValidos(
+    palpites
+) {
+
+    const validos = {};
+
+    Object.keys(jogos)
+        .forEach(
+            function(chave) {
+
+                const palpite =
+                    palpites[
+                        chave
+                    ];
+
+                if (!palpite) {
+                    return;
+                }
+
+                if (
+                    jogos[chave] &&
+                    jogoEstaAberto(
+                        jogos[chave]
+                    )
+                ) {
+
+                    validos[chave] =
+                        palpite;
+
+                }
+
+            }
+        );
+
+    return validos;
+
+}
+
+
+/* =========================================================
+   VERIFICAR SELECIONADOS
+========================================================= */
+
+function verificarJogosSelecionados(
+    palpites
+) {
+
+    const validos =
+        obterPalpitesValidos(
+            palpites
+        );
+
+    const quantidadeValidos =
+        Object.keys(
+            validos
+        ).length;
+
+    if (
+        quantidadeValidos < 2
+    ) {
+
+        alert(
+            "⚠️ É necessário ter pelo menos 2 placares válidos.\n\n" +
+            "Os jogos cujo horário já expirou não são considerados."
+        );
+
+        atualizarStatusJogos();
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+/* =========================================================
+   ENVIAR PALPITE
+========================================================= */
+
+async function enviarPalpite() {
+
+    const nome =
+        obterNome();
+
+    if (!nome) {
+        return;
+    }
+
+    const id =
+        criarIdJogador(
+            nome
+        );
+
+    const botao =
+        document.getElementById(
+            "btnEnviar"
+        );
+
+    try {
+
+        if (botao) {
+
+            botao.disabled =
+                true;
+
+            botao.textContent =
+                "⏳ VERIFICANDO...";
+
+        }
+
+        const jogadorSnap =
+            await jogadoresRef
+                .child(id)
+                .once("value");
+
+        if (
+            !jogadorSnap.exists()
+        ) {
+
+            await jogadoresRef
+                .child(id)
+                .set({
+
+                    nome:
+                        nome,
+
+                    saldo:
+                        0,
+
+                    valorLiberacao:
+                        2,
+
+                    premio:
+                        10000,
+
+                    criadoEm:
+                        Date.now()
+
+                });
+
+            abrirModalPix();
+
+            return;
+
+        }
+
+        const jogador =
+            jogadorSnap.val();
+
+        const saldoAtual =
+            Number(
+                jogador.saldo
+            ) || 0;
+
+        const valorLiberacao =
+            Number(
+                jogador.valorLiberacao
+            ) || 2;
+
+        const palpites =
+            obterPalpitesSelecionados();
+
+        const palpitesValidos =
+            obterPalpitesValidos(
+                palpites
+            );
+
+        const selecionados =
+            Object.values(
+                palpitesValidos
+            ).filter(
+                valor =>
+                    valor &&
+                    String(
+                        valor
+                    ).trim() !== ""
+            );
+
+        const quantidade =
+            selecionados.length;
+
+        if (
+            quantidade < 2
+        ) {
+
+            alert(
+                "⚠️ É necessário ter pelo menos 2 placares válidos.\n\n" +
+                "Os placares de jogos já encerrados não contam."
+            );
+
+            return;
+
+        }
+
+        if (
+            saldoAtual <
+            valorLiberacao
+        ) {
+
+            abrirModalPix();
+
+            return;
+
+        }
+
+        const premio =
+            calcularPremiacao(
+                quantidade
+            );
+
+        if (
+            premio <= 0
+        ) {
+
+            alert(
+                "❌ Não existe premiação configurada para " +
+                quantidade +
+                " jogos."
+            );
+
+            return;
+
+        }
+
+        palpiteParaConfirmar = {
+
+            quantidade:
+                quantidade,
+
+            valor:
+                valorLiberacao,
+
+            premio:
+                premio,
+
+            jogo1:
+                palpitesValidos.jogo1 ||
+                "",
+
+            jogo2:
+                palpitesValidos.jogo2 ||
+                "",
+
+            jogo3:
+                palpitesValidos.jogo3 ||
+                "",
+
+            jogo4:
+                palpitesValidos.jogo4 ||
+                "",
+
+            jogo5:
+                palpitesValidos.jogo5 ||
+                "",
+
+            jogo6:
+                palpitesValidos.jogo6 ||
+                ""
+
+        };
+
+        abrirModalConfirmacao(
+            quantidade,
+            valorLiberacao,
+            premio
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao preparar palpite:",
+            erro
+        );
+
+        alert(
+            "❌ Erro ao preparar o palpite:\n\n" +
+            erro.message
+        );
+
+    } finally {
+
+        if (botao) {
+
+            botao.disabled =
+                false;
+
+            botao.textContent =
+                "📤 ENVIAR";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CRIAR DADOS DO JOGO
+========================================================= */
+
+function criarDadosJogo(
+    jogoId,
+    placar
+) {
+
+    if (
+        !placar ||
+        String(placar).trim() === ""
+    ) {
+
+        return null;
+
+    }
+
+    const jogo =
+        jogos[jogoId];
+
+    if (!jogo) {
+
+        console.error(
+            "❌ Jogo não encontrado:",
+            jogoId
+        );
+
+        return null;
+
+    }
+
+    const fixtureId =
+        String(
+            jogo.fixtureId ||
+            jogo.apiFixtureId ||
+            jogo.idAPI ||
+            jogo.fixture?.id ||
+            ""
+        ).trim();
+
+    if (!fixtureId) {
+
+        console.error(
+            "❌ Jogo sem fixtureId:",
+            jogoId,
+            jogo
+        );
+
+    }
+
+    return {
+
+        jogo:
+            jogoId,
+
+        fixtureId:
+            fixtureId,
+
+        apiFixtureId:
+            fixtureId,
+
+        idAPI:
+            fixtureId,
+
+        casa:
+            jogo.casa ||
+            jogo.timeA ||
+            "",
+
+        fora:
+            jogo.fora ||
+            jogo.timeB ||
+            "",
+
+        timeA:
+            jogo.timeA ||
+            jogo.casa ||
+            "",
+
+        timeB:
+            jogo.timeB ||
+            jogo.fora ||
+            "",
+
+        confronto:
+            jogo.nome ||
+            jogo.confronto ||
+            `${jogo.casa || jogo.timeA || ""} × ${jogo.fora || jogo.timeB || ""}`,
+
+        campeonato:
+            jogo.campeonato ||
+            "",
+
+        pais:
+            jogo.pais ||
+            "",
+
+        data:
+            jogo.data ||
+            "",
+
+        hora:
+            jogo.hora ||
+            "",
+
+        placar:
+            String(
+                placar
+            ).trim(),
+
+        palpite:
+            String(
+                placar
+            ).trim(),
+
+        casaImagem:
+            jogo.casaImagem ||
+            jogo.imagemA ||
+            "",
+
+        foraImagem:
+            jogo.foraImagem ||
+            jogo.imagemB ||
+            "",
+
+        criadoEm:
+            Date.now()
+
+    };
+
+}
+
+
+/* =========================================================
+   CONFIRMAR PALPITE
+========================================================= */
+
+async function confirmarPalpite() {
+
+    const dados =
+        palpiteParaConfirmar;
+
+    if (!dados) {
+        return;
+    }
+
+    fecharModalConfirmacao();
+
+    const nome =
+        obterNome();
+
+    if (!nome) {
+        return;
+    }
+
+    const id =
+        criarIdJogador(
+            nome
+        );
+
+    const botao =
+        document.getElementById(
+            "btnEnviar"
+        );
+
+    try {
+
+        if (botao) {
+
+            botao.disabled =
+                true;
+
+            botao.textContent =
+                "⏳ ENVIANDO...";
+
+        }
+
+        const jogadorSnap =
+            await jogadoresRef
+                .child(id)
+                .once("value");
+
+        if (
+            !jogadorSnap.exists()
+        ) {
+
+            alert(
+                "❌ Jogador não encontrado."
+            );
+
+            return;
+
+        }
+
+        const jogador =
+            jogadorSnap.val();
+
+        const saldoAtual =
+            Number(
+                jogador.saldo
+            ) || 0;
+
+        const valor =
+            Number(
+                dados.valor
+            ) || 0;
+
+        if (
+            saldoAtual <
+            valor
+        ) {
+
+            abrirModalPix();
+
+            return;
+
+        }
+
+        const palpitesConfirmados =
+            obterPalpitesValidos(
+                dados
+            );
+
+        const quantidadeValidos =
+            Object.keys(
+                palpitesConfirmados
+            ).length;
+
+        if (
+            quantidadeValidos < 2
+        ) {
+
+            alert(
+                "⚠️ Não existem mais 2 placares válidos para enviar.\n\n" +
+                "Algum jogo pode ter expirado enquanto a confirmação estava aberta."
+            );
+
+            return;
+
+        }
+
+        const novoSaldo =
+            Number(
+                (
+                    saldoAtual -
+                    valor
+                ).toFixed(2)
+            );
+
+        const novoPalpite = {
+
+            status:
+                "aguardando",
+
+            resultados: {},
+
+            nome:
+                nome,
+
+            jogadorId:
+                id,
+
+            quantidadePlacares:
+                quantidadeValidos,
+
+            quantidade:
+                quantidadeValidos,
+
+            valor:
+                valor,
+
+            premio:
+                Number(
+                    dados.premio
+                ) || 0,
+
+            saldoAnterior:
+                saldoAtual,
+
+            saldoRestante:
+                novoSaldo,
+
+            jogo1:
+                criarDadosJogo(
+                    "jogo1",
+                    palpitesConfirmados.jogo1
+                ),
+
+            jogo2:
+                criarDadosJogo(
+                    "jogo2",
+                    palpitesConfirmados.jogo2
+                ),
+
+            jogo3:
+                criarDadosJogo(
+                    "jogo3",
+                    palpitesConfirmados.jogo3
+                ),
+
+            jogo4:
+                criarDadosJogo(
+                    "jogo4",
+                    palpitesConfirmados.jogo4
+                ),
+
+            jogo5:
+                criarDadosJogo(
+                    "jogo5",
+                    palpitesConfirmados.jogo5
+                ),
+
+            jogo6:
+                criarDadosJogo(
+                    "jogo6",
+                    palpitesConfirmados.jogo6
+                ),
+
+            data:
+                new Date()
+                    .toLocaleString(
+                        "pt-BR"
+                    ),
+
+            timestamp:
+                Date.now()
+
+        };
+
+
+        /*
+        Cria resultado inicial
+        somente para jogos realmente apostados.
+        */
+
+        for (
+            let i = 1;
+            i <= 6;
+            i++
+        ) {
+
+            if (
+                novoPalpite[
+                    "jogo" + i
+                ]
+            ) {
+
+                novoPalpite.resultados[
+                    "jogo" + i
+                ] =
+                    "- : -";
+
+            }
+
+        }
+
+
+        const novaReferencia =
+            palpitesRef.push();
+
+        await novaReferencia.set(
+            novoPalpite
+        );
+
+        await jogadoresRef
+            .child(id)
+            .update({
+
+                saldo:
+                    novoSaldo,
+
+                atualizadoEm:
+                    Date.now()
+
+            });
+
+        configuracao.saldo =
+            novoSaldo;
+
+        configuracao.valorLiberacao =
+            valor;
+
+        configuracao.premio =
+            Number(
+                dados.premio
+            ) || 0;
+
+        atualizarTela();
+
+        limparPalpites();
+
+        palpiteParaConfirmar =
+            null;
+
+        await carregarMeusPalpites();
+
+        abrirModalSucesso(
+            dados.quantidade,
+            valor,
+            dados.premio,
+            novoSaldo
+        );
+
+    } catch (erro) {
+
+        console.error(
+            erro
+        );
+
+        alert(
+            "❌ Não foi possível enviar o palpite.\n\n" +
+            erro.message
+        );
+
+    } finally {
+
+        if (botao) {
+
+            botao.disabled =
+                false;
+
+            botao.textContent =
+                "📤 ENVIAR";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   LIMPAR
+========================================================= */
+
+function limparPalpites() {
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const select =
+            document.getElementById(
+                "jogo" + i
+            );
+
+        const casa =
+            document.getElementById(
+                "placar" +
+                i +
+                "Casa"
+            );
+
+        const fora =
+            document.getElementById(
+                "placar" +
+                i +
+                "Fora"
+            );
+
+        if (select) {
+            select.value = "";
+        }
+
+        if (casa) {
+            casa.textContent = "-";
+        }
+
+        if (fora) {
+            fora.textContent = "-";
+        }
+
+    }
+
+    atualizarPremio();
+
+}
+
+
+/* =========================================================
+   NOME DO TIME PELA IMAGEM
+========================================================= */
+
+function nomeDoTimeDaImagem(src) {
+
+    try {
+
+        const url =
+            new URL(src);
+
+        const arquivo =
+            url.pathname
+                .split("/")
+                .pop();
+
+        let nome =
+            arquivo
+                .split("?")[0]
+                .replace(
+                    /\.(png|jpg|jpeg|webp)$/i,
+                    ""
+                );
+
+        nome =
+            nome.replace(
+                /[-_]+/g,
+                " "
+            );
+
+        return nome;
+
+    } catch (erro) {
+
+        return "";
+
+    }
+
+}
+
+
+/* =========================================================
+   NOMES
+========================================================= */
+
+function atualizarNomesDosTimes() {
+
+    if (
+        jogosVieramDaAPI
+    ) {
+
+        return;
+
+    }
+
+    document
+        .querySelectorAll(
+            ".time img"
+        )
+        .forEach(
+            function(img) {
+
+                const nome =
+                    nomeDoTimeDaImagem(
+                        img.src
+                    );
+
+                const time =
+                    img.closest(
+                        ".time"
+                    );
+
+                if (!time) {
+                    return;
+                }
+
+                const texto =
+                    time.querySelector(
+                        "p"
+                    );
+
+                if (
+                    texto &&
+                    nome
+                ) {
+
+                    texto.textContent =
+                        nome;
+
+                }
+
+            }
+        );
+
+    atualizarConfrontos();
+
+}
+
+
+/* =========================================================
+   CONFRONTO IMAGENS
+========================================================= */
+
+function obterConfrontoDasImagens(
+    duelo
+) {
+
+    if (!duelo) {
+        return "";
+    }
+
+    const imagens =
+        duelo.querySelectorAll(
+            ".time img"
+        );
+
+    if (
+        imagens.length < 2
+    ) {
+
+        return "";
+
+    }
+
+    const casa =
+        nomeDoTimeDaImagem(
+            imagens[0].src
+        );
+
+    const fora =
+        nomeDoTimeDaImagem(
+            imagens[1].src
+        );
+
+    if (
+        !casa ||
+        !fora
+    ) {
+
+        return "";
+
+    }
+
+    return (
+        casa +
+        " × " +
+        fora
+    );
+
+}
+
+
+/* =========================================================
+   CONFRONTOS
+========================================================= */
+
+function atualizarConfrontos() {
+
+    if (
+        jogosVieramDaAPI
+    ) {
+
+        return;
+
+    }
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+    duelos.forEach(
+        function(duelo, indice) {
+
+            const confronto =
+                obterConfrontoDasImagens(
+                    duelo
+                );
+
+            if (!confronto) {
+                return;
+            }
+
+            const chave =
+                "jogo" +
+                (indice + 1);
+
+            if (
+                jogos[chave]
+            ) {
+
+                jogos[chave].nome =
+                    confronto;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CONFRONTO AUTOMÁTICO
+========================================================= */
+
+function obterConfrontoAutomatico(
+    numeroJogo
+) {
+
+    const jogo =
+        jogos[
+            "jogo" +
+            numeroJogo
+        ];
+
+    if (jogo) {
+
+        return (
+            jogo.nome ||
+            jogo.confronto ||
+            `${jogo.casa || jogo.timeA || ""} × ${jogo.fora || jogo.timeB || ""}`
+        );
+
+    }
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+    const duelo =
+        duelos[
+            numeroJogo - 1
+        ];
+
+    if (!duelo) {
+        return "";
+    }
+
+    return obterConfrontoDasImagens(
+        duelo
+    );
+
+}
+
+
+/* =========================================================
+   DATAS
+========================================================= */
+
+function atualizarDatasHorasDosJogos() {
+
+    const duelos =
+        document.querySelectorAll(
+            ".duelo"
+        );
+
+    duelos.forEach(
+        function(duelo, indice) {
+
+            const chave =
+                "jogo" +
+                (indice + 1);
+
+            const jogo =
+                jogos[chave];
+
+            if (!jogo) {
+                return;
+            }
+
+            const info =
+                duelo.querySelector(
+                    ".jogo-info"
+                );
+
+            if (!info) {
+                return;
+            }
+
+            if (
+                !jogo.data ||
+                !jogo.hora
+            ) {
+
+                info.innerHTML =
+                    "";
+
+                return;
+
+            }
+
+            info.innerHTML = `
+
+                📅 ${formatarData(
+                    jogo.data
+                )}
+
+                &nbsp; | &nbsp;
+
+                ⏰ ${escapeHTML(
+                    jogo.hora
+                )}
+
+            `;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DATA/HORA PALPITE
+========================================================= */
+
+function dataHoraJogo(
+    item,
+    numero
+) {
+
+    const jogo =
+        item[
+            "jogo" +
+            numero
+        ];
+
+    if (!jogo) {
+
+        return "";
+
+    }
+
+    const data =
+        jogo.data || "";
+
+    const hora =
+        jogo.hora || "--:--";
+
+    return `
+
+        📅 ${escapeHTML(
+            formatarData(data)
+        )}
+
+        &nbsp; | &nbsp;
+
+        ⏰ ${escapeHTML(
+            hora
+        )}
+
+    `;
+
+}
+
+
+/* =========================================================
+   OBTER FIXTURE ID DO PALPITE
+========================================================= */
+
+function obterFixtureIdDoPalpite(
+    itemJogo,
+    numero
+) {
+
+    if (!itemJogo) {
+        return "";
+    }
+
+    let fixtureId =
+        itemJogo.fixtureId ||
+        itemJogo.apiFixtureId ||
+        itemJogo.idAPI ||
+        "";
+
+    fixtureId =
+        String(
+            fixtureId
+        ).trim();
+
+    if (fixtureId) {
+        return fixtureId;
+    }
+
+
+    /*
+    Recupera pelo jogo atual.
+    */
+
+    const chave =
+        "jogo" +
+        numero;
+
+    const jogoAtual =
+        jogos[chave];
+
+    if (jogoAtual) {
+
+        fixtureId =
+            jogoAtual.fixtureId ||
+            jogoAtual.apiFixtureId ||
+            jogoAtual.idAPI ||
+            "";
+
+        fixtureId =
+            String(
+                fixtureId
+            ).trim();
+
+        if (fixtureId) {
+            return fixtureId;
+        }
+
+    }
+
+
+    /*
+    Último recurso:
+    procura pelo nome dos times.
+    */
+
+    const casa =
+        String(
+            itemJogo.casa ||
+            itemJogo.timeA ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+    const fora =
+        String(
+            itemJogo.fora ||
+            itemJogo.timeB ||
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+    if (
+        casa &&
+        fora
+    ) {
+
+        const encontrados =
+            Object.values(
+                jogos
+            ).filter(
+                function(jogo) {
+
+                    const casaAtual =
+                        String(
+                            jogo.casa ||
+                            jogo.timeA ||
+                            ""
+                        )
+                        .trim()
+                        .toLowerCase();
+
+                    const foraAtual =
+                        String(
+                            jogo.fora ||
+                            jogo.timeB ||
+                            ""
+                        )
+                        .trim()
+                        .toLowerCase();
+
+                    return (
+                        casaAtual === casa &&
+                        foraAtual === fora &&
+                        jogo.fixtureId
+                    );
+
+                }
+            );
+
+        if (
+            encontrados.length === 1
+        ) {
+
+            return String(
+                encontrados[0].fixtureId
+            );
+
+        }
+
+    }
+
+    return "";
+
+}
+
+
+/* =========================================================
+   BUSCAR RESULTADO API
+========================================================= */
+
+async function buscarResultadoAPI(
+    fixtureId
+) {
+
+    if (!fixtureId) {
+
+        return null;
+
+    }
+
+    try {
+
+        console.log(
+            "⚽ Consultando resultado:",
+            fixtureId
+        );
+
+        const resposta =
+            await fetch(
+
+                `${API_BASE}/fixtures?id=${encodeURIComponent(fixtureId)}&timezone=${encodeURIComponent(API_TIMEZONE)}`,
+
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "x-apisports-key":
+                            API_KEY
+
+                    }
+
+                }
+
+            );
+
+        if (
+            !resposta.ok
+        ) {
+
+            throw new Error(
+                `HTTP ${resposta.status}`
+            );
+
+        }
+
+        const dados =
+            await resposta.json();
+
+        if (
+            !dados ||
+            !Array.isArray(
+                dados.response
+            ) ||
+            !dados.response.length
+        ) {
+
+            return null;
+
+        }
+
+        const jogo =
+            dados.response[0];
+
+        const fixture =
+            jogo.fixture ||
+            {};
+
+        const teams =
+            jogo.teams ||
+            {};
+
+        const goals =
+            jogo.goals ||
+            {};
+
+        const status =
+            fixture.status ||
+            {};
+
+        const statusCodigo =
+            String(
+                status.short ||
+                ""
+            ).toUpperCase();
+
+        const golsCasa =
+            Number.isFinite(
+                Number(
+                    goals.home
+                )
+            )
+                ? Number(
+                    goals.home
+                )
+                : null;
+
+        const golsFora =
+            Number.isFinite(
+                Number(
+                    goals.away
+                )
+            )
+                ? Number(
+                    goals.away
+                )
+                : null;
+
+        return {
+
+            fixtureId:
+                String(
+                    fixture.id ||
+                    fixtureId
+                ),
+
+            casa:
+                teams.home?.name ||
+                "Casa",
+
+            fora:
+                teams.away?.name ||
+                "Fora",
+
+            golsCasa:
+                golsCasa,
+
+            golsFora:
+                golsFora,
+
+            status:
+                statusCodigo,
+
+            descricaoStatus:
+                status.long ||
+                "",
+
+            finalizado:
+                STATUS_FINAL.includes(
+                    statusCodigo
+                ),
+
+            cancelado:
+                STATUS_CANCELADO.includes(
+                    statusCodigo
+                ),
+
+            atualizadoEm:
+                Date.now()
+
+        };
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao consultar resultado:",
+            fixtureId,
+            erro
+        );
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CACHE RESULTADO
+========================================================= */
+
+async function obterResultadoComCache(
+    fixtureId
+) {
+
+    if (!fixtureId) {
+        return null;
+    }
+
+    const chave =
+        String(
+            fixtureId
+        ).trim();
+
+    if (!chave) {
+        return null;
+    }
+
+    const ref =
+        db.ref(
+            `cacheMultiPlay/resultados/${chave}`
+        );
+
+    try {
+
+        const snapshot =
+            await ref.once(
+                "value"
+            );
+
+        const cache =
+            snapshot.val();
+
+        if (
+            cache &&
+            cache.atualizadoEm &&
+            (
+                Date.now() -
+                Number(
+                    cache.atualizadoEm
+                )
+            ) <
+            CACHE_RESULTADO_MS
+        ) {
+
+            console.log(
+                "📦 Resultado vindo do cache:",
+                chave
+            );
+
+            return cache;
+
+        }
+
+    } catch (erro) {
+
+        console.warn(
+            "⚠️ Erro lendo cache:",
+            erro
+        );
+
+    }
+
+    const resultado =
+        await buscarResultadoAPI(
+            chave
+        );
+
+    if (!resultado) {
+        return null;
+    }
+
+    try {
+
+        await ref.set(
+            resultado
+        );
+
+    } catch (erro) {
+
+        console.warn(
+            "⚠️ Erro salvando cache:",
+            erro
+        );
+
+    }
+
+    return resultado;
+
+}
+
+
+/* =========================================================
+   VERIFICAR ACERTO
+========================================================= */
+
+function verificarAcertoPalpite(
+    palpite,
+    resultado
+) {
+
+    if (
+        !palpite ||
+        !resultado
+    ) {
+
+        return false;
+
+    }
+
+    if (
+        !resultado.finalizado
+    ) {
+
+        return false;
+
+    }
+
+    if (
+        resultado.golsCasa === null ||
+        resultado.golsFora === null
+    ) {
+
+        return false;
+
+    }
+
+    const placarPalpite =
+        String(
+            palpite.placar ||
+            palpite.palpite ||
+            palpite.resultado ||
+            ""
+        ).trim();
+
+    const placarReal =
+        `${resultado.golsCasa}:${resultado.golsFora}`;
+
+    return (
+        placarPalpite ===
+        placarReal
+    );
+
+}
+
+
+/* =========================================================
+   RESULTADO DE UM JOGO DO PALPITE
+========================================================= */
+
+async function obterResultadoDoJogoPalpite(
+    itemJogo,
+    numero
+) {
+
+    if (!itemJogo) {
+
+        return {
+
+            status:
+                "vazio",
+
+            resultado:
+                null
+
+        };
+
+    }
+
+    const fixtureId =
+        obterFixtureIdDoPalpite(
+            itemJogo,
+            numero
+        );
+
+    if (!fixtureId) {
+
+        console.warn(
+            "⚠️ Jogo sem fixtureId:",
+            numero,
+            itemJogo
+        );
+
+        return {
+
+            status:
+                "aguardando",
+
+            resultado:
+                null
+
+        };
+
+    }
+
+    const resultado =
+        await obterResultadoComCache(
+            fixtureId
+        );
+
+    if (!resultado) {
+
+        return {
+
+            status:
+                "aguardando",
+
+            resultado:
+                null
+
+        };
+
+    }
+
+    if (
+        resultado.cancelado
+    ) {
+
+        return {
+
+            status:
+                "aguardando",
+
+            resultado:
+                resultado
+
+        };
+
+    }
+
+    if (
+        !resultado.finalizado
+    ) {
+
+        return {
+
+            status:
+                "aguardando",
+
+            resultado:
+                resultado
+
+        };
+
+    }
+
+    const acertou =
+        verificarAcertoPalpite(
+            itemJogo,
+            resultado
+        );
+
+    return {
+
+        status:
+            acertou
+                ? "ganhou"
+                : "perdeu",
+
+        resultado:
+            resultado
+
+    };
+
+}
+
+
+/* =========================================================
+   STATUS DO PALPITE COMPLETO
+========================================================= */
+
+async function obterStatusPalpiteAPI(
+    item
+) {
+
+    if (!item) {
+
+        return {
+
+            status:
+                "aguardando",
+
+            jogos:
+                []
+
+        };
+
+    }
+
+    const jogosDoPalpite = [];
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const itemJogo =
+            item[
+                "jogo" + i
+            ];
+
+        if (
+            !itemJogo
+        ) {
+
+            continue;
+
+        }
+
+        const retorno =
+            await obterResultadoDoJogoPalpite(
+                itemJogo,
+                i
+            );
+
+        jogosDoPalpite.push({
+
+            numero:
+                i,
+
+            palpite:
+                itemJogo,
+
+            status:
+                retorno.status,
+
+            resultado:
+                retorno.resultado
+
+        });
+
+    }
+
+
+    if (
+        jogosDoPalpite.length === 0
+    ) {
+
+        return {
+
+            status:
+                "aguardando",
+
+            jogos:
+                []
+
+        };
+
+    }
+
+
+    const algumPerdeu =
+        jogosDoPalpite.some(
+            function(itemJogo) {
+
+                return (
+                    itemJogo.status ===
+                    "perdeu"
+                );
+
+            }
+        );
+
+    if (algumPerdeu) {
+
+        return {
+
+            status:
+                "perdeu",
+
+            jogos:
+                jogosDoPalpite
+
+        };
+
+    }
+
+
+    const todosFinalizados =
+        jogosDoPalpite.every(
+            function(itemJogo) {
+
+                return (
+                    itemJogo.status ===
+                    "ganhou"
+                );
+
+            }
+        );
+
+    if (
+        todosFinalizados
+    ) {
+
+        return {
+
+            status:
+                "ganhou",
+
+            jogos:
+                jogosDoPalpite
+
+        };
+
+    }
+
+
+    return {
+
+        status:
+            "aguardando",
+
+        jogos:
+            jogosDoPalpite
+
+    };
+
+}
+
+
+/* =========================================================
+   HTML STATUS
+========================================================= */
+
+function criarStatusPalpiteHTML(
+    status
+) {
+
+    if (
+        status ===
+        "ganhou"
+    ) {
+
+        return `
+            <div class="status-palpite status-ganhou">
+                🟢 PALPITE GANHOU
+            </div>
+        `;
+
+    }
+
+    if (
+        status ===
+        "perdeu"
+    ) {
+
+        return `
+            <div class="status-palpite status-perdeu">
+                🔴 PALPITE PERDEU
+            </div>
+        `;
+
+    }
+
+    return `
+        <div class="status-palpite status-aguardando">
+            🟡 AGUARDANDO RESULTADO
+        </div>
+    `;
+
+}
+
+
+/* =========================================================
+   CARD DOS MEUS PALPITES
+========================================================= */
+
+function criarCardMeuPalpiteAPI(
+    container,
+    item,
+    retorno
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "meu-card";
+
+
+    const quantidade =
+        Number(
+            item.quantidadePlacares ||
+            item.quantidade ||
+            item.qtdPalpites ||
+            0
+        );
+
+
+    const valorPago =
+        Number(
+            item.valor ||
+            item.valorPago ||
+            item.valorAposta ||
+            0
+        );
+
+
+    const premio =
+        Number(
+            item.premio ||
+            item.valorPremio ||
+            premiosPorQuantidade[
+                quantidade
+            ] ||
+            0
+        );
+
+
+    let jogosHTML =
+        "";
+
+
+    const resultadosAPI =
+        retorno.jogos ||
+        [];
+
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const jogo =
+            item[
+                "jogo" + i
+            ];
+
+        if (!jogo) {
+            continue;
+        }
+
+
+        const resultadoItem =
+            resultadosAPI.find(
+                function(x) {
+
+                    return (
+                        x.numero ===
+                        i
+                    );
+
+                }
+            );
+
+
+        const resultado =
+            resultadoItem?.resultado ||
+            null;
+
+
+        const confronto =
+            jogo.confronto ||
+            `${jogo.casa || jogo.timeA || ""} × ${jogo.fora || jogo.timeB || ""}`;
+
+
+        const placarPalpite =
+            jogo.placar ||
+            jogo.palpite ||
+            "--";
+
+
+        let placarReal =
+            "- : -";
+
+
+        if (
+            resultado &&
+            resultado.golsCasa !== null &&
+            resultado.golsFora !== null
+        ) {
+
+            placarReal =
+                `${resultado.golsCasa} : ${resultado.golsFora}`;
+
+        }
+
+
+        jogosHTML += `
+
+            <div class="meu-placar">
+
+                <span>
+
+                    ⚽
+                    ${escapeHTML(
+                        confronto
+                    )}
+
+                </span>
+
+                <strong>
+
+                    ${escapeHTML(
+                        placarPalpite
+                    )}
+
+                </strong>
+
+            </div>
+
+            <div class="data-jogo">
+
+                ${dataHoraJogo(
+                    item,
+                    i
+                )}
+
+            </div>
+
+            <div class="resultado-real">
+
+                <span>
+                    Resultado:
+                </span>
+
+                <strong>
+                    ${escapeHTML(
+                        placarReal
+                    )}
+                </strong>
+
+            </div>
+
+        `;
+
+    }
+
+
+    card.innerHTML = `
+
+        ${criarStatusPalpiteHTML(
+            retorno.status
+        )}
+
+        <div class="meu-nome">
+
+            👤
+            ${escapeHTML(
+                item.nome ||
+                item.nomeJogador ||
+                ""
+            )}
+
+        </div>
+
+        ${jogosHTML}
+
+        <div class="data">
+
+            💰 Valor:
+
+            ${formatarMoeda(
+                valorPago
+            )}
+
+            <br>
+
+            🏆 Prêmio:
+
+            ${formatarMoeda(
+                premio
+            )}
+
+            <br>
+
+            💵 Saldo restante:
+
+            ${formatarMoeda(
+                Number(
+                    item.saldoRestante
+                ) || 0
+            )}
+
+            <br>
+
+            📅 Enviado:
+
+            ${escapeHTML(
+                item.data ||
+                ""
+            )}
+
+        </div>
+
+    `;
+
+
+    container.appendChild(
+        card
+    );
+
+}
+
+
+/* =========================================================
+   CARREGAR MEUS PALPITES
+========================================================= */
+
+async function carregarMeusPalpites() {
+
+    const container =
+        document.getElementById(
+            "meusPalpites"
+        );
+
+    const nomeMenu =
+        document.getElementById(
+            "nomeMenu"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const nomeJogador =
+        localStorage.getItem(
+            "nomeJogador"
+        );
+
+    if (nomeMenu) {
+
+        nomeMenu.innerHTML =
+            nomeJogador
+                ? `👤 <strong>${escapeHTML(nomeJogador)}</strong>`
+                : "👤 Jogador";
+
+    }
+
+    if (!nomeJogador) {
+
+        container.innerHTML = `
+            <p class="sem-palpite">
+                Nenhum palpite realizado.
+            </p>
+        `;
+
+        return;
+
+    }
+
+    try {
+
+        const snapshot =
+            await palpitesRef.once(
+                "value"
+            );
+
+        const dados =
+            snapshot.val() ||
+            {};
+
+        const palpites =
+            Object.entries(
+                dados
+            )
+            .map(
+                function([id, palpite]) {
+
+                    return {
+
+                        id:
+                            id,
+
+                        ...palpite
+
+                    };
+
+                }
+            )
+            .filter(
+                function(palpite) {
+
+                    const nome =
+                        String(
+                            palpite.nomeJogador ||
+                            palpite.nome ||
+                            ""
+                        )
+                        .trim()
+                        .toLowerCase();
+
+                    return (
+                        nome ===
+                        String(
+                            nomeJogador
+                        )
+                        .trim()
+                        .toLowerCase()
+                    );
+
+                }
+            );
+
+
+        if (
+            !palpites.length
+        ) {
+
+            container.innerHTML = `
+                <p class="sem-palpite">
+                    Nenhum palpite realizado.
+                </p>
+            `;
+
+            return;
+
+        }
+
+
+        palpites.sort(
+            function(a, b) {
+
+                const dataA =
+                    Number(
+                        a.timestamp ||
+                        a.criadoEm ||
+                        0
+                    );
+
+                const dataB =
+                    Number(
+                        b.timestamp ||
+                        b.criadoEm ||
+                        0
+                    );
+
+                return (
+                    dataB -
+                    dataA
+                );
+
+            }
+        );
+
+
+        container.innerHTML = `
+            <p class="sem-palpite">
+                🔄 Atualizando resultados...
+            </p>
+        `;
+
+
+        const resultados =
+            [];
+
+        /*
+        Processa um palpite por vez.
+        Isso evita disparar muitas consultas
+        simultâneas na API.
+        */
+
+        for (
+            const palpite of palpites
+        ) {
+
+            const retorno =
+                await obterStatusPalpiteAPI(
+                    palpite
+                );
+
+            resultados.push({
+
+                palpite:
+                    palpite,
+
+                retorno:
+                    retorno
+
+            });
+
+        }
+
+
+        container.innerHTML =
+            "";
+
+
+        resultados.forEach(
+            function(item) {
+
+                criarCardMeuPalpiteAPI(
+
+                    container,
+
+                    item.palpite,
+
+                    item.retorno
+
+                );
+
+            }
+        );
+
+
+        /*
+        Atualiza o status geral no Firebase
+        somente quando todos os jogos
+        estiverem definidos.
+        */
+
+        for (
+            const item of resultados
+        ) {
+
+            const palpite =
+                item.palpite;
+
+            const retorno =
+                item.retorno;
+
+            if (
+                palpite.id &&
+                (
+                    retorno.status ===
+                    "ganhou" ||
+                    retorno.status ===
+                    "perdeu"
+                )
+            ) {
+
+                /*
+                Não altera o status se
+                já estiver definido manualmente.
+                */
+
+                if (
+                    palpite.status !==
+                    "ganhou" &&
+                    palpite.status !==
+                    "perdeu"
+                ) {
+
+                    try {
+
+                        await palpitesRef
+                            .child(
+                                palpite.id
+                            )
+                            .update({
+
+                                status:
+                                    retorno.status,
+
+                                atualizadoEm:
+                                    Date.now()
+
+                            });
+
+                    } catch (erro) {
+
+                        console.warn(
+                            "⚠️ Não foi possível salvar status:",
+                            erro
+                        );
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao carregar meus palpites:",
+            erro
+        );
+
+        container.innerHTML = `
+
+            <p class="sem-palpite">
+
+                ❌ Não foi possível carregar
+                seus palpites.
+
+            </p>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function abrirMenu() {
+
+    const menu =
+        document.getElementById(
+            "menuLateral"
+        );
+
+    const fundo =
+        document.getElementById(
+            "fundoMenu"
+        );
+
+    if (menu) {
+        menu.classList.add("ativo");
+    }
+
+    if (fundo) {
+        fundo.classList.add("ativo");
+    }
+
+    mostrarNome();
+
+}
+
+
+function fecharMenu() {
+
+    const menu =
+        document.getElementById(
+            "menuLateral"
+        );
+
+    const fundo =
+        document.getElementById(
+            "fundoMenu"
+        );
+
+    if (menu) {
+        menu.classList.remove("ativo");
+    }
+
+    if (fundo) {
+        fundo.classList.remove("ativo");
+    }
+
+}
+
+
+function mostrarNome() {
+
+    const nome =
+        localStorage.getItem(
+            "nomeJogador"
+        );
+
+    const area =
+        document.getElementById(
+            "nomeMenu"
+        );
+
+    if (!area) {
+        return;
+    }
+
+    if (nome) {
+
+        area.innerHTML =
+            "👤 Jogador: <strong>" +
+            escapeHTML(nome) +
+            "</strong>";
+
+    } else {
+
+        area.innerHTML =
+            "👤 Nenhum nome cadastrado";
+
+    }
+
+}
+
+
+/* =========================================================
+   MODAL SUCESSO
+========================================================= */
+
+function abrirModalSucesso(
+    quantidade,
+    valor,
+    premio,
+    saldo
+) {
+
+    const modal =
+        document.getElementById(
+            "modalSucesso"
+        );
+
+    const quantidadeEl =
+        document.getElementById(
+            "sucessoQuantidade"
+        );
+
+    const valorEl =
+        document.getElementById(
+            "sucessoValor"
+        );
+
+    const premioEl =
+        document.getElementById(
+            "sucessoPremio"
+        );
+
+    const saldoEl =
+        document.getElementById(
+            "sucessoSaldo"
+        );
+
+    if (quantidadeEl) {
+        quantidadeEl.textContent =
+            quantidade;
+    }
+
+    if (valorEl) {
+        valorEl.textContent =
+            formatarMoeda(
+                valor
+            );
+    }
+
+    if (premioEl) {
+        premioEl.textContent =
+            formatarMoeda(
+                premio
+            );
+    }
+
+    if (saldoEl) {
+        saldoEl.textContent =
+            formatarMoeda(
+                saldo
+            );
+    }
+
+    if (modal) {
+        modal.classList.add("ativo");
+    }
+
+}
+
+
+function fecharModalSucesso() {
+
+    const modal =
+        document.getElementById(
+            "modalSucesso"
+        );
+
+    if (modal) {
+
+        modal.classList.remove(
+            "ativo"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EVENTOS
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const btnFecharSucesso =
+            document.getElementById(
+                "btnFecharSucesso"
+            );
+
+        if (btnFecharSucesso) {
+
+            btnFecharSucesso.addEventListener(
+                "click",
+                fecharModalSucesso
+            );
+
+        }
+
+
+        /* PIX */
+
+        const fecharPix =
+            document.getElementById(
+                "fecharPix"
+            );
+
+        if (fecharPix) {
+
+            fecharPix.addEventListener(
+                "click",
+                fecharModalPix
+            );
+
+        }
+
+        const gerarPix =
+            document.getElementById(
+                "gerarPix"
+            );
+
+        if (gerarPix) {
+
+            gerarPix.addEventListener(
+                "click",
+                gerarSolicitacaoPix
+            );
+
+        }
+
+        const copiarPixBotao =
+            document.getElementById(
+                "copiarPix"
+            );
+
+        if (copiarPixBotao) {
+
+            copiarPixBotao.addEventListener(
+                "click",
+                copiarPix
+            );
+
+        }
+
+
+        /* CONFIRMAÇÃO */
+
+        const cancelarConfirmacao =
+            document.getElementById(
+                "btnCancelarConfirmacao"
+            );
+
+        if (cancelarConfirmacao) {
+
+            cancelarConfirmacao.addEventListener(
+                "click",
+                fecharModalConfirmacao
+            );
+
+        }
+
+        const confirmarBotao =
+            document.getElementById(
+                "btnConfirmarPalpite"
+            );
+
+        if (confirmarBotao) {
+
+            confirmarBotao.addEventListener(
+                "click",
+                confirmarPalpite
+            );
+
+        }
+
+
+        /* SELECTS */
+
+        for (
+            let i = 1;
+            i <= 6;
+            i++
+        ) {
+
+            preencherSelect(
+                "jogo" + i
+            );
+
+        }
+
+
+        /* EVENTOS SELECT */
+
+        for (
+            let i = 1;
+            i <= 6;
+            i++
+        ) {
+
+            const numero =
+                i;
+
+            const select =
+                document.getElementById(
+                    "jogo" +
+                    numero
+                );
+
+            if (!select) {
+                continue;
+            }
+
+            select.addEventListener(
+                "change",
+                function() {
+
+                    atualizarPlacar(
+
+                        "jogo" +
+                        numero,
+
+                        "placar" +
+                        numero +
+                        "Casa",
+
+                        "placar" +
+                        numero +
+                        "Fora"
+
+                    );
+
+                    atualizarPremio();
+
+                }
+            );
+
+        }
+
+
+        /* MENU */
+
+        const btnMenu =
+            document.getElementById(
+                "btnMenu"
+            );
+
+        if (btnMenu) {
+
+            btnMenu.addEventListener(
+                "click",
+                abrirMenu
+            );
+
+        }
+
+        const btnFechar =
+            document.getElementById(
+                "btnFechar"
+            );
+
+        if (btnFechar) {
+
+            btnFechar.addEventListener(
+                "click",
+                fecharMenu
+            );
+
+        }
+
+        const fundoMenu =
+            document.getElementById(
+                "fundoMenu"
+            );
+
+        if (fundoMenu) {
+
+            fundoMenu.addEventListener(
+                "click",
+                fecharMenu
+            );
+
+        }
+
+
+        /* ENVIAR */
+
+        const btnEnviar =
+            document.getElementById(
+                "btnEnviar"
+            );
+
+        if (btnEnviar) {
+
+            btnEnviar.addEventListener(
+                "click",
+                enviarPalpite
+            );
+
+        }
+
+
+        /* CONFIGURAÇÃO */
+
+        carregarConfiguracao();
+
+
+        /* MEUS PALPITES */
+
+        carregarMeusPalpites();
+
+
+        /* FIREBASE */
+
+        db.ref(
+            ".info/connected"
+        ).on(
+            "value",
+            function(snap) {
+
+                const status =
+                    document.getElementById(
+                        "status"
+                    );
+
+                if (!status) {
+                    return;
+                }
+
+                if (
+                    snap.val() === true
+                ) {
+
+                    status.textContent =
+                        "🟢 Conectado ao servidor";
+
+                    status.style.color =
+                        "#22c55e";
+
+                } else {
+
+                    status.textContent =
+                        "🔴 Sem conexão";
+
+                    status.style.color =
+                        "#ef4444";
+
+                }
+
+            }
+        );
+
+
+        /* STATUS */
+
+        atualizarStatusJogos();
+
+
+        /* JOGOS API */
+
+        carregarJogos();
+
+
+        /* CONTADOR */
+
+        setInterval(
+            atualizarStatusJogos,
+            1000
+        );
+
+
+        /*
+        RESULTADOS:
+
+        Não executa a cada segundo.
+        Apenas a cada 30 minutos.
+        */
+
+        setInterval(
+            function() {
+
+                atualizarResultadosMeusPalpites();
+
+            },
+            CACHE_RESULTADO_MS
+        );
+
+
+        atualizarPremio();
+
+    }
+);
+
+
+/* =========================================================
+   ATUALIZAÇÃO RESULTADOS
+========================================================= */
+
+async function atualizarResultadosMeusPalpites() {
+
+    if (
+        atualizacaoResultadosEmAndamento
+    ) {
+
+        return;
+
+    }
+
+    atualizacaoResultadosEmAndamento =
+        true;
+
+    try {
+
+        await carregarMeusPalpites();
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro atualizando resultados:",
+            erro
+        );
+
+    } finally {
+
+        atualizacaoResultadosEmAndamento =
+            false;
+
+    }
+
+}
+</script></body></html>
