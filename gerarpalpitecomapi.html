@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
+
+<title>Palpite Certo</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #061109;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    margin: auto;
+    padding: 15px;
+}
+
+/* =========================
+   TOPO
+========================= */
+
+.topo {
+    text-align: center;
+    padding: 10px 5px 20px;
+}
+
+.topo h1 {
+    margin: 0;
+    color: #25e66c;
+    font-size: 31px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.topo p {
+    margin: 7px 0 0;
+    color: #a9bdb0;
+    font-size: 13px;
+}
+
+
+/* =========================
+   CONFIGURAÇÃO
+========================= */
+
+.config {
+    background: #102319;
+    border: 1px solid #28553a;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.config label {
+    display: block;
+    margin-bottom: 7px;
+    color: #b8c9bd;
+    font-size: 13px;
+}
+
+.config input {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+
+    border-radius: 9px;
+    border: 1px solid #315b40;
+
+    background: #07140d;
+    color: #fff;
+
+    outline: none;
+    margin-bottom: 13px;
+}
+
+.config input:focus {
+    border-color: #25e66c;
+}
+
+
+/* =========================
+   BOTÕES
+========================= */
+
+button {
+    width: 100%;
+    min-height: 47px;
+
+    border: none;
+    border-radius: 11px;
+
+    padding: 10px;
+
+    color: #fff;
+    font-size: 15px;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+.btn-gerar {
+    background:
+        linear-gradient(
+            135deg,
+            #08a949,
+            #21df69
+        );
+}
+
+.btn-imagem {
+    background:
+        linear-gradient(
+            135deg,
+            #145dff,
+            #4a83ff
+        );
+}
+
+.btn-download {
+    background:
+        linear-gradient(
+            135deg,
+            #8140d8,
+            #b865ff
+        );
+}
+
+.btn-whatsapp {
+    background:
+        linear-gradient(
+            135deg,
+            #079c48,
+            #20dc70
+        );
+}
+
+.botoes {
+    display: grid;
+    gap: 9px;
+    margin-top: 12px;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 25px;
+}
+
+.loading.ativo {
+    display: block;
+}
+
+.spinner {
+    width: 36px;
+    height: 36px;
+
+    border: 4px solid #254530;
+    border-top-color: #25e66c;
+
+    border-radius: 50%;
+
+    margin: auto;
+
+    animation:
+        girar .8s linear infinite;
+}
+
+@keyframes girar {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* =========================
+   MENSAGEM
+========================= */
+
+.mensagem {
+    display: none;
+
+    background: #391818;
+    border: 1px solid #743333;
+
+    color: #ffb4b4;
+
+    padding: 12px;
+
+    border-radius: 9px;
+
+    margin-top: 12px;
+
+    font-size: 13px;
+}
+
+.mensagem.visivel {
+    display: block;
+}
+
+
+/* =========================
+   PALPITES
+========================= */
+
+#palpites {
+    margin-top: 15px;
+}
+
+.jogo {
+    background: #102319;
+
+    border: 1px solid #28553a;
+
+    border-radius: 14px;
+
+    padding: 13px;
+
+    margin-bottom: 10px;
+}
+
+.jogo-numero {
+    color: #25e66c;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    margin-bottom: 10px;
+}
+
+.times {
+    display: grid;
+
+    grid-template-columns:
+        1fr 65px 1fr;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+.time {
+    text-align: center;
+}
+
+.time img {
+    width: 50px;
+    height: 50px;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin:
+        auto auto 6px;
+}
+
+.time-nome {
+    font-size: 12px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+.vs {
+    text-align: center;
+
+    color: #718879;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+.placar {
+    text-align: center;
+
+    color: #25e66c;
+
+    font-size: 28px;
+
+    font-weight: 1000;
+
+    margin-top: 10px;
+}
+
+.info-jogo {
+    text-align: center;
+
+    color: #7e9585;
+
+    font-size: 10px;
+
+    margin-top: 6px;
+}
+
+
+/* =========================
+   ARTE
+========================= */
+
+.area-arte {
+    display: none;
+
+    margin-top: 20px;
+}
+
+.area-arte.visivel {
+    display: block;
+}
+
+#arte {
+
+    width: 100%;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #164d2d 0%,
+            #0b2515 35%,
+            #061109 100%
+        );
+
+    border-radius: 18px;
+
+    border: 1px solid #2d6942;
+
+    padding: 18px;
+
+    overflow: hidden;
+}
+
+.arte-topo {
+    text-align: center;
+
+    padding-bottom: 14px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.12);
+}
+
+.arte-titulo {
+    color: #27e66d;
+
+    font-size: 27px;
+
+    font-weight: 1000;
+
+    letter-spacing: 1px;
+}
+
+.arte-subtitulo {
+    margin-top: 5px;
+
+    color: #c0d5c6;
+
+    font-size: 11px;
+}
+
+.arte-jogo {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 65px 1fr;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 11px 0;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+}
+
+.arte-time {
+    text-align: center;
+}
+
+.arte-time img {
+
+    width: 40px;
+    height: 40px;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin:
+        auto auto 4px;
+}
+
+.arte-time span {
+
+    display: block;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    line-height: 1.15;
+}
+
+.arte-placar {
+
+    text-align: center;
+
+    color: #25e66c;
+
+    font-size: 23px;
+
+    font-weight: 1000;
+}
+
+.arte-rodape {
+
+    text-align: center;
+
+    color: #91a898;
+
+    font-size: 10px;
+
+    padding-top: 13px;
+}
+
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 700px) {
+
+    .container {
+        padding-top: 25px;
+    }
+
+    #arte {
+        padding: 25px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================
+         TOPO
+    ========================== -->
+
+    <div class="topo">
+
+        <h1>
+            ⚽ PALPITE CERTO
+        </h1>
+
+        <p>
+            Gere 6 palpites com placares prováveis
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+         CONFIGURAÇÃO
+    ========================== -->
+
+    <div class="config">
+
+        <label>
+            📅 Data dos jogos
+        </label>
+
+        <input
+            type="date"
+            id="dataJogo"
+        >
+
+
+        <button
+            class="btn-gerar"
+            id="btnGerar"
+            onclick="buscarJogos()"
+        >
+            ⚽ GERAR 6 PALPITES
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         LOADING
+    ========================== -->
+
+    <div
+        id="loading"
+        class="loading"
+    >
+
+        <div class="spinner"></div>
+
+        <div
+            style="
+                margin-top:10px;
+                color:#b8c9bd;
+            "
+        >
+            Buscando jogos...
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MENSAGEM
+    ========================== -->
+
+    <div
+        id="mensagem"
+        class="mensagem"
+    ></div>
+
+
+    <!-- =========================
+         PALPITES
+    ========================== -->
+
+    <div
+        id="palpites"
+    ></div>
+
+
+    <!-- =========================
+         ARTE
+    ========================== -->
+
+    <div
+        id="areaArte"
+        class="area-arte"
+    >
+
+        <div id="arte">
+
+
+            <div class="arte-topo">
+
+                <div class="arte-titulo">
+
+                    ⚽ PALPITE CERTO
+
+                </div>
+
+
+                <div
+                    id="arteData"
+                    class="arte-subtitulo"
+                >
+                    6 PALPITES
+                </div>
+
+            </div>
+
+
+            <div
+                id="arteJogos"
+            ></div>
+
+
+            <div class="arte-rodape">
+
+                Placar provável
+                •
+                Palpite Certo
+
+            </div>
+
+        </div>
+
+
+        <div class="botoes">
+
+
+            <button
+                class="btn-imagem"
+                onclick="gerarImagem()"
+            >
+                🎨 GERAR IMAGEM
+            </button>
+
+
+            <button
+                class="btn-download"
+                onclick="baixarImagem()"
+            >
+                ⬇️ BAIXAR IMAGEM
+            </button>
+
+
+            <button
+                class="btn-whatsapp"
+                onclick="compartilharWhatsApp()"
+            >
+                📲 COMPARTILHAR NO WHATSAPP
+            </button>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     HTML2CANVAS
+===================================================== -->
+
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+</script>
+
+
+
+<script>
+
+/* =====================================================
+   API-FOOTBALL
+===================================================== */
+
+const API_BASE =
+    "https://v3.football.api-sports.io";
+
+
+/*
+ * SUA CHAVE DA API
+ */
+
+const API_KEY =
+    "275f8195f07eaf0bde6b19c501b2926b";
+
+
+const TIMEZONE =
+    "America/Sao_Paulo";
+
+
+/* =====================================================
+   VARIÁVEIS
+===================================================== */
+
+let jogosSelecionados = [];
+
+let imagemGerada = null;
+
+let placaresUsados = [];
+
+
+/* =====================================================
+   LISTA DE PLACARES
+===================================================== */
+
+const PLACARES_PROVAVEIS = [
+
+    "0:0",
+
+    "1:0",
+    "0:1",
+    "1:1",
+
+    "2:0",
+    "0:2",
+    "2:1",
+    "1:2",
+    "2:2",
+
+    "3:0",
+    "0:3",
+    "3:1",
+    "1:3",
+    "3:2",
+    "2:3",
+    "3:3",
+
+    "4:0",
+    "0:4",
+    "4:1",
+    "1:4",
+    "4:2",
+    "2:4",
+
+    "4:3",
+    "3:4",
+    "4:4",
+
+    "5:0",
+    "0:5",
+    "5:1",
+    "1:5"
+
+];
+
+
+/* =====================================================
+   DATA ATUAL
+===================================================== */
+
+function definirDataAtual() {
+
+    const agora =
+        new Date();
+
+
+    const ano =
+        agora.getFullYear();
+
+
+    const mes =
+        String(
+            agora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const dia =
+        String(
+            agora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    document
+        .getElementById(
+            "dataJogo"
+        )
+        .value =
+        `${ano}-${mes}-${dia}`;
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    definirDataAtual
+);
+
+
+/* =====================================================
+   MENSAGENS
+===================================================== */
+
+function mostrarMensagem(
+    texto
+) {
+
+    const elemento =
+        document.getElementById(
+            "mensagem"
+        );
+
+
+    elemento.textContent =
+        texto;
+
+
+    elemento.classList.add(
+        "visivel"
+    );
+
+}
+
+
+function esconderMensagem() {
+
+    document
+        .getElementById(
+            "mensagem"
+        )
+        .classList.remove(
+            "visivel"
+        );
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+function mostrarLoading(
+    ativo
+) {
+
+    const elemento =
+        document.getElementById(
+            "loading"
+        );
+
+
+    if (ativo) {
+
+        elemento.classList.add(
+            "ativo"
+        );
+
+    } else {
+
+        elemento.classList.remove(
+            "ativo"
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   BUSCAR JOGOS
+===================================================== */
+
+async function buscarJogos() {
+
+    esconderMensagem();
+
+
+    const data =
+        document
+            .getElementById(
+                "dataJogo"
+            )
+            .value
+            .trim();
+
+
+    if (!data) {
+
+        mostrarMensagem(
+            "Escolha a data dos jogos."
+        );
+
+        return;
+
+    }
+
+
+    mostrarLoading(true);
+
+
+    document
+        .getElementById(
+            "palpites"
+        )
+        .innerHTML = "";
+
+
+    document
+        .getElementById(
+            "areaArte"
+        )
+        .classList.remove(
+            "visivel"
+        );
+
+
+    imagemGerada = null;
+
+    placaresUsados = [];
+
+
+    try {
+
+
+        /*
+         * UMA ÚNICA CONSULTA
+         * PARA TODOS OS JOGOS DA DATA.
+         */
+
+        const url =
+            `${API_BASE}/fixtures` +
+            `?date=${encodeURIComponent(data)}` +
+            `&timezone=${encodeURIComponent(TIMEZONE)}`;
+
+
+        console.log(
+            "📡 Consultando API:",
+            url
+        );
+
+
+        const resposta =
+            await fetch(
+                url,
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "x-apisports-key":
+                            API_KEY
+
+                    }
+
+                }
+            );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro HTTP " +
+                resposta.status
+            );
+
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        console.log(
+            "📊 API:",
+            dados
+        );
+
+
+        if (
+            !dados ||
+            !Array.isArray(
+                dados.response
+            )
+        ) {
+
+            throw new Error(
+                "A API não retornou jogos."
+            );
+
+        }
+
+
+        let jogos =
+            dados.response.filter(
+                jogoValido
+            );
+
+
+        /*
+         * REMOVER JOGOS FINALIZADOS.
+         */
+
+        jogos =
+            jogos.filter(
+                jogo => {
+
+                    const status =
+                        String(
+                            jogo?.fixture?.status?.short ||
+                            ""
+                        ).toUpperCase();
+
+
+                    return ![
+                        "FT",
+                        "AET",
+                        "PEN",
+                        "CANC",
+                        "PST",
+                        "ABD",
+                        "AWD",
+                        "WO"
+                    ].includes(
+                        status
+                    );
+
+                }
+            );
+
+
+        /*
+         * ORDENAR POR HORÁRIO.
+         */
+
+        jogos.sort(
+            (a, b) => {
+
+                return (
+                    new Date(
+                        a.fixture.date
+                    ).getTime()
+                    -
+                    new Date(
+                        b.fixture.date
+                    ).getTime()
+                );
+
+            }
+        );
+
+
+        if (
+            jogos.length === 0
+        ) {
+
+            throw new Error(
+                "Não encontrei jogos disponíveis para essa data."
+            );
+
+        }
+
+
+        /*
+         * SELECIONAR 6.
+         */
+
+        jogosSelecionados =
+            selecionarSeisJogos(
+                jogos
+            );
+
+
+        /*
+         * GERAR OS PLACARES.
+         */
+
+        jogosSelecionados =
+            jogosSelecionados.map(
+                gerarPalpite
+            );
+
+
+        /*
+         * MOSTRAR.
+         */
+
+        mostrarPalpites();
+
+
+        montarArte();
+
+
+        document
+            .getElementById(
+                "areaArte"
+            )
+            .classList.add(
+                "visivel"
+            );
+
+
+        console.log(
+            "✅ 6 palpites gerados:",
+            jogosSelecionados
+        );
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro:",
+            erro
+        );
+
+
+        mostrarMensagem(
+            erro.message ||
+            "Não foi possível carregar os jogos."
+        );
+
+
+    } finally {
+
+        mostrarLoading(false);
+
+    }
+
+}
+
+
+/* =====================================================
+   VALIDAR JOGO
+===================================================== */
+
+function jogoValido(
+    jogo
+) {
+
+    const id =
+        jogo?.fixture?.id;
+
+
+    const casa =
+        jogo?.teams?.home?.name;
+
+
+    const fora =
+        jogo?.teams?.away?.name;
+
+
+    return Boolean(
+        id &&
+        casa &&
+        fora
+    );
+
+}
+
+
+/* =====================================================
+   SELECIONAR 6 JOGOS
+===================================================== */
+
+function selecionarSeisJogos(
+    jogos
+) {
+
+    if (
+        jogos.length <= 6
+    ) {
+
+        return jogos.slice();
+
+    }
+
+
+    const resultado = [];
+
+
+    /*
+     * Divide a lista em 6 partes.
+     */
+
+    const passo =
+        jogos.length / 6;
+
+
+    for (
+        let i = 0;
+        i < 6;
+        i++
+    ) {
+
+        const inicio =
+            Math.floor(
+                i * passo
+            );
+
+
+        const fim =
+            Math.floor(
+                (i + 1) * passo
+            );
+
+
+        const tamanho =
+            Math.max(
+                1,
+                fim - inicio
+            );
+
+
+        const posicao =
+            inicio +
+            Math.floor(
+                Math.random() *
+                tamanho
+            );
+
+
+        if (
+            jogos[posicao] &&
+            !resultado.includes(
+                jogos[posicao]
+            )
+        ) {
+
+            resultado.push(
+                jogos[posicao]
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Completar caso necessário.
+     */
+
+    for (
+        const jogo of jogos
+    ) {
+
+        if (
+            resultado.length >= 6
+        ) {
+            break;
+        }
+
+
+        if (
+            !resultado.includes(
+                jogo
+            )
+        ) {
+
+            resultado.push(
+                jogo
+            );
+
+        }
+
+    }
+
+
+    return resultado.slice(
+        0,
+        6
+    );
+
+}
+
+
+/* =====================================================
+   GERAR PALPITE
+===================================================== */
+
+function gerarPalpite(
+    jogo
+) {
+
+    const casa =
+        jogo?.teams?.home;
+
+
+    const fora =
+        jogo?.teams?.away;
+
+
+    const forcaCasa =
+        obterForca(
+            casa
+        );
+
+
+    const forcaFora =
+        obterForca(
+            fora
+        );
+
+
+    const diferenca =
+        forcaCasa -
+        forcaFora;
+
+
+    let candidatos;
+
+
+    /*
+     * TIME DA CASA
+     * COM MAIOR FORÇA
+     */
+
+    if (
+        diferenca > 0.12
+    ) {
+
+        candidatos = [
+
+            "1:0",
+            "2:0",
+            "2:1",
+            "3:0",
+            "3:1",
+            "3:2",
+            "4:1",
+            "4:2",
+            "1:1",
+            "2:2"
+
+        ];
+
+    }
+
+
+    /*
+     * TIME VISITANTE
+     * COM MAIOR FORÇA
+     */
+
+    else if (
+        diferenca < -0.12
+    ) {
+
+        candidatos = [
+
+            "0:1",
+            "0:2",
+            "1:2",
+            "0:3",
+            "1:3",
+            "2:3",
+            "1:4",
+            "2:4",
+            "1:1",
+            "2:2"
+
+        ];
+
+    }
+
+
+    /*
+     * JOGO EQUILIBRADO
+     */
+
+    else {
+
+        candidatos = [
+
+            "0:0",
+            "1:0",
+            "0:1",
+            "1:1",
+            "2:0",
+            "0:2",
+            "2:1",
+            "1:2",
+            "2:2",
+            "3:1",
+            "1:3",
+            "3:2",
+            "2:3",
+            "3:3"
+
+        ];
+
+    }
+
+
+    /*
+     * NÃO REPETIR PLACAR.
+     */
+
+    let disponiveis =
+        candidatos.filter(
+            placar =>
+                !placaresUsados.includes(
+                    placar
+                )
+        );
+
+
+    /*
+     * Se acabou a lista,
+     * usa qualquer placar ainda não usado.
+     */
+
+    if (
+        disponiveis.length === 0
+    ) {
+
+        disponiveis =
+            PLACARES_PROVAVEIS.filter(
+                placar =>
+                    !placaresUsados.includes(
+                        placar
+                    )
+            );
+
+    }
+
+
+    /*
+     * Fallback.
+     */
+
+    if (
+        disponiveis.length === 0
+    ) {
+
+        disponiveis =
+            candidatos;
+
+    }
+
+
+    /*
+     * ESCOLHER ALEATORIAMENTE.
+     */
+
+    const indice =
+        Math.floor(
+            Math.random() *
+            disponiveis.length
+        );
+
+
+    const placar =
+        disponiveis[
+            indice
+        ];
+
+
+    /*
+     * MARCAR COMO USADO.
+     */
+
+    placaresUsados.push(
+        placar
+    );
+
+
+    const partes =
+        placar.split(":");
+
+
+    jogo.palpite = {
+
+        golsCasa:
+            Number(
+                partes[0]
+            ),
+
+        golsFora:
+            Number(
+                partes[1]
+            )
+
+    };
+
+
+    return jogo;
+
+}
+
+
+/* =====================================================
+   FORÇA
+===================================================== */
+
+function obterForca(
+    time
+) {
+
+    if (!time) {
+
+        return 1;
+
+    }
+
+
+    let forca = 1;
+
+
+    if (
+        time.winner === true
+    ) {
+
+        forca += 0.20;
+
+    }
+
+
+    if (
+        time.winner === false
+    ) {
+
+        forca -= 0.10;
+
+    }
+
+
+    /*
+     * Pequena variação para
+     * não gerar sempre os mesmos
+     * placares.
+     */
+
+    forca +=
+        Math.random() *
+        0.30 -
+        0.15;
+
+
+    return forca;
+
+}
+
+
+/* =====================================================
+   MOSTRAR PALPITES
+===================================================== */
+
+function mostrarPalpites() {
+
+    const container =
+        document.getElementById(
+            "palpites"
+        );
+
+
+    container.innerHTML = "";
+
+
+    jogosSelecionados.forEach(
+        (jogo, index) => {
+
+
+            const casa =
+                jogo.teams.home;
+
+
+            const fora =
+                jogo.teams.away;
+
+
+            const golsCasa =
+                jogo.palpite.golsCasa;
+
+
+            const golsFora =
+                jogo.palpite.golsFora;
+
+
+            const horario =
+                formatarHora(
+                    jogo.fixture.date
+                );
+
+
+            const elemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            elemento.className =
+                "jogo";
+
+
+            elemento.innerHTML = `
+
+                <div class="jogo-numero">
+
+                    PALPITE ${index + 1}
+
+                </div>
+
+
+                <div class="times">
+
+
+                    <div class="time">
+
+                        <img
+                            src="${escaparAtributo(casa.logo)}"
+                            alt=""
+                            crossorigin="anonymous"
+                            onerror="
+                                this.style.display='none'
+                            "
+                        >
+
+                        <div class="time-nome">
+
+                            ${escaparHTML(
+                                casa.name
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="vs">
+
+                        VS
+
+                    </div>
+
+
+                    <div class="time">
+
+                        <img
+                            src="${escaparAtributo(fora.logo)}"
+                            alt=""
+                            crossorigin="anonymous"
+                            onerror="
+                                this.style.display='none'
+                            "
+                        >
+
+                        <div class="time-nome">
+
+                            ${escaparHTML(
+                                fora.name
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="placar">
+
+                    ${golsCasa}
+                    :
+                    ${golsFora}
+
+                </div>
+
+
+                <div class="info-jogo">
+
+                    ${escaparHTML(
+                        jogo.league?.name ||
+                        ""
+                    )}
+
+                    •
+
+                    ${horario}
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                elemento
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   MONTAR ARTE
+===================================================== */
+
+function montarArte() {
+
+    const container =
+        document.getElementById(
+            "arteJogos"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const data =
+        document
+            .getElementById(
+                "dataJogo"
+            )
+            .value;
+
+
+    document
+        .getElementById(
+            "arteData"
+        )
+        .textContent =
+        `6 PALPITES • ${formatarData(data)}`;
+
+
+    jogosSelecionados.forEach(
+        (jogo) => {
+
+
+            const casa =
+                jogo.teams.home;
+
+
+            const fora =
+                jogo.teams.away;
+
+
+            const golsCasa =
+                jogo.palpite.golsCasa;
+
+
+            const golsFora =
+                jogo.palpite.golsFora;
+
+
+            const linha =
+                document.createElement(
+                    "div"
+                );
+
+
+            linha.className =
+                "arte-jogo";
+
+
+            linha.innerHTML = `
+
+                <div class="arte-time">
+
+                    <img
+                        src="${escaparAtributo(casa.logo)}"
+                        crossorigin="anonymous"
+                        alt=""
+                        onerror="
+                            this.style.display='none'
+                        "
+                    >
+
+                    <span>
+
+                        ${escaparHTML(
+                            abreviarTime(
+                                casa.name
+                            )
+                        )}
+
+                    </span>
+
+                </div>
+
+
+                <div class="arte-placar">
+
+                    ${golsCasa}:${golsFora}
+
+                </div>
+
+
+                <div class="arte-time">
+
+                    <img
+                        src="${escaparAtributo(fora.logo)}"
+                        crossorigin="anonymous"
+                        alt=""
+                        onerror="
+                            this.style.display='none'
+                        "
+                    >
+
+                    <span>
+
+                        ${escaparHTML(
+                            abreviarTime(
+                                fora.name
+                            )
+                        )}
+
+                    </span>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                linha
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   GERAR IMAGEM
+===================================================== */
+
+async function gerarImagem() {
+
+    if (
+        jogosSelecionados.length === 0
+    ) {
+
+        mostrarMensagem(
+            "Gere os 6 palpites primeiro."
+        );
+
+        return;
+
+    }
+
+
+    const arte =
+        document.getElementById(
+            "arte"
+        );
+
+
+    await esperarImagens(
+        arte
+    );
+
+
+    try {
+
+
+        const canvas =
+            await html2canvas(
+                arte,
+                {
+
+                    backgroundColor:
+                        "#061109",
+
+                    scale:
+                        2,
+
+                    useCORS:
+                        true,
+
+                    allowTaint:
+                        false,
+
+                    logging:
+                        false
+
+                }
+            );
+
+
+        imagemGerada =
+            canvas;
+
+
+        mostrarMensagemTemporaria(
+            "✅ Imagem gerada com sucesso!"
+        );
+
+
+    } catch (erro) {
+
+        console.error(
+            erro
+        );
+
+
+        mostrarMensagem(
+            "Não foi possível gerar a imagem."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ESPERAR IMAGENS
+===================================================== */
+
+function esperarImagens(
+    container
+) {
+
+    const imagens =
+        Array.from(
+            container.querySelectorAll(
+                "img"
+            )
+        );
+
+
+    return Promise.all(
+
+        imagens.map(
+            img => {
+
+                if (
+                    img.complete
+                ) {
+
+                    return Promise.resolve();
+
+                }
+
+
+                return new Promise(
+                    resolve => {
+
+                        img.onload =
+                            resolve;
+
+                        img.onerror =
+                            resolve;
+
+                    }
+                );
+
+            }
+        )
+
+    );
+
+}
+
+
+/* =====================================================
+   BAIXAR
+===================================================== */
+
+async function baixarImagem() {
+
+    if (!imagemGerada) {
+
+        await gerarImagem();
+
+    }
+
+
+    if (!imagemGerada) {
+
+        return;
+
+    }
+
+
+    const data =
+        document
+            .getElementById(
+                "dataJogo"
+            )
+            .value
+            .replaceAll(
+                "-",
+                ""
+            );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.download =
+        `palpite-certo-${data}.png`;
+
+
+    link.href =
+        imagemGerada.toDataURL(
+            "image/png"
+        );
+
+
+    document
+        .body
+        .appendChild(
+            link
+        );
+
+
+    link.click();
+
+
+    link.remove();
+
+}
+
+
+/* =====================================================
+   COMPARTILHAR
+===================================================== */
+
+async function compartilharWhatsApp() {
+
+    if (!imagemGerada) {
+
+        await gerarImagem();
+
+    }
+
+
+    if (!imagemGerada) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const blob =
+            await new Promise(
+                resolve => {
+
+                    imagemGerada.toBlob(
+                        resolve,
+                        "image/png"
+                    );
+
+                }
+            );
+
+
+        const arquivo =
+            new File(
+                [
+                    blob
+                ],
+                "palpite-certo.png",
+                {
+                    type:
+                        "image/png"
+                }
+            );
+
+
+        /*
+         * COMPARTILHAMENTO NATIVO
+         * DO ANDROID.
+         */
+
+        if (
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({
+                files: [
+                    arquivo
+                ]
+            })
+        ) {
+
+
+            await navigator.share({
+
+                title:
+                    "Palpite Certo",
+
+                text:
+                    gerarTextoWhatsApp(),
+
+                files: [
+                    arquivo
+                ]
+
+            });
+
+
+            return;
+
+        }
+
+
+        /*
+         * FALLBACK.
+         */
+
+        await baixarImagem();
+
+
+        const texto =
+            encodeURIComponent(
+                gerarTextoWhatsApp()
+            );
+
+
+        window.open(
+            "https://wa.me/?text=" +
+            texto,
+            "_blank"
+        );
+
+
+    } catch (erro) {
+
+        console.log(
+            "Compartilhamento cancelado."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   TEXTO WHATSAPP
+===================================================== */
+
+function gerarTextoWhatsApp() {
+
+    let texto =
+        "⚽ *PALPITE CERTO*\n\n";
+
+
+    jogosSelecionados.forEach(
+        (jogo, index) => {
+
+
+            const casa =
+                jogo.teams.home.name;
+
+
+            const fora =
+                jogo.teams.away.name;
+
+
+            const golsCasa =
+                jogo.palpite.golsCasa;
+
+
+            const golsFora =
+                jogo.palpite.golsFora;
+
+
+            texto +=
+                `${index + 1}. ` +
+                `${casa} x ${fora}\n` +
+                `🎯 Placar provável: ` +
+                `${golsCasa}:${golsFora}\n\n`;
+
+        }
+    );
+
+
+    return texto;
+
+}
+
+
+/* =====================================================
+   FORMATAR DATA
+===================================================== */
+
+function formatarData(
+    data
+) {
+
+    if (!data) {
+
+        return "";
+
+    }
+
+
+    const partes =
+        data.split("-");
+
+
+    if (
+        partes.length !== 3
+    ) {
+
+        return data;
+
+    }
+
+
+    return (
+        partes[2] +
+        "/" +
+        partes[1] +
+        "/" +
+        partes[0]
+    );
+
+}
+
+
+/* =====================================================
+   FORMATAR HORA
+===================================================== */
+
+function formatarHora(
+    dataISO
+) {
+
+    if (!dataISO) {
+
+        return "--:--";
+
+    }
+
+
+    try {
+
+
+        const data =
+            new Date(
+                dataISO
+            );
+
+
+        return data.toLocaleTimeString(
+            "pt-BR",
+            {
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                timeZone:
+                    TIMEZONE
+
+            }
+        );
+
+
+    } catch {
+
+        return "--:--";
+
+    }
+
+}
+
+
+/* =====================================================
+   ABREVIAR TIME
+===================================================== */
+
+function abreviarTime(
+    nome
+) {
+
+    if (!nome) {
+
+        return "";
+
+    }
+
+
+    if (
+        nome.length <= 15
+    ) {
+
+        return nome;
+
+    }
+
+
+    const palavras =
+        nome
+            .trim()
+            .split(/\s+/);
+
+
+    if (
+        palavras.length >= 2
+    ) {
+
+        return palavras
+            .slice(
+                0,
+                2
+            )
+            .map(
+                palavra =>
+                    palavra.substring(
+                        0,
+                        10
+                    )
+            )
+            .join(" ");
+
+    }
+
+
+    return nome.substring(
+        0,
+        15
+    );
+
+}
+
+
+/* =====================================================
+   SEGURANÇA HTML
+===================================================== */
+
+function escaparHTML(
+    valor
+) {
+
+    return String(
+        valor ?? ""
+    )
+
+    .replaceAll(
+        "&",
+        "&amp;"
+    )
+
+    .replaceAll(
+        "<",
+        "&lt;"
+    )
+
+    .replaceAll(
+        ">",
+        "&gt;"
+    )
+
+    .replaceAll(
+        '"',
+        "&quot;"
+    )
+
+    .replaceAll(
+        "'",
+        "&#039;"
+    );
+
+}
+
+
+function escaparAtributo(
+    valor
+) {
+
+    return escaparHTML(
+        valor
+    );
+
+}
+
+
+/* =====================================================
+   MENSAGEM TEMPORÁRIA
+===================================================== */
+
+function mostrarMensagemTemporaria(
+    texto
+) {
+
+    const elemento =
+        document.getElementById(
+            "mensagem"
+        );
+
+
+    elemento.textContent =
+        texto;
+
+
+    elemento.classList.add(
+        "visivel"
+    );
+
+
+    setTimeout(
+        function() {
+
+            elemento.classList.remove(
+                "visivel"
+            );
+
+        },
+        2500
+    );
+
+}
+
+</script>
+
+</body>
+</html>
