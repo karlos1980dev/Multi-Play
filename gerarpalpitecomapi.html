@@ -661,20 +661,20 @@ src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
 <script>
 
 /* =====================================================
+   PALPITE CERTO
+   JAVASCRIPT COMPLETO
+===================================================== */
+
+
+/* =====================================================
    API-FOOTBALL
 ===================================================== */
 
 const API_BASE =
     "https://v3.football.api-sports.io";
 
-
-/*
- * SUA CHAVE DA API
- */
-
 const API_KEY =
     "275f8195f07eaf0bde6b19c501b2926b";
-
 
 const TIMEZONE =
     "America/Sao_Paulo";
@@ -692,7 +692,7 @@ let placaresUsados = [];
 
 
 /* =====================================================
-   LISTA DE PLACARES
+   PLACARES POSSÍVEIS
 ===================================================== */
 
 const PLACARES_PROVAVEIS = [
@@ -731,13 +731,21 @@ const PLACARES_PROVAVEIS = [
     "5:0",
     "0:5",
     "5:1",
-    "1:5"
+    "1:5",
+
+    "5:2",
+    "2:5",
+    "5:3",
+    "3:5",
+
+    "5:4",
+    "4:5"
 
 ];
 
 
 /* =====================================================
-   DATA ATUAL
+   INICIAR DATA
 ===================================================== */
 
 function definirDataAtual() {
@@ -768,12 +776,18 @@ function definirDataAtual() {
         );
 
 
-    document
-        .getElementById(
+    const campo =
+        document.getElementById(
             "dataJogo"
-        )
-        .value =
-        `${ano}-${mes}-${dia}`;
+        );
+
+
+    if (campo) {
+
+        campo.value =
+            `${ano}-${mes}-${dia}`;
+
+    }
 
 }
 
@@ -785,7 +799,7 @@ document.addEventListener(
 
 
 /* =====================================================
-   MENSAGENS
+   MENSAGEM
 ===================================================== */
 
 function mostrarMensagem(
@@ -796,6 +810,11 @@ function mostrarMensagem(
         document.getElementById(
             "mensagem"
         );
+
+
+    if (!elemento) {
+        return;
+    }
 
 
     elemento.textContent =
@@ -811,13 +830,58 @@ function mostrarMensagem(
 
 function esconderMensagem() {
 
-    document
-        .getElementById(
+    const elemento =
+        document.getElementById(
             "mensagem"
-        )
-        .classList.remove(
-            "visivel"
         );
+
+
+    if (!elemento) {
+        return;
+    }
+
+
+    elemento.classList.remove(
+        "visivel"
+    );
+
+}
+
+
+function mostrarMensagemTemporaria(
+    texto
+) {
+
+    const elemento =
+        document.getElementById(
+            "mensagem"
+        );
+
+
+    if (!elemento) {
+        return;
+    }
+
+
+    elemento.textContent =
+        texto;
+
+
+    elemento.classList.add(
+        "visivel"
+    );
+
+
+    setTimeout(
+        () => {
+
+            elemento.classList.remove(
+                "visivel"
+            );
+
+        },
+        2500
+    );
 
 }
 
@@ -834,6 +898,11 @@ function mostrarLoading(
         document.getElementById(
             "loading"
         );
+
+
+    if (!elemento) {
+        return;
+    }
 
 
     if (ativo) {
@@ -862,13 +931,14 @@ async function buscarJogos() {
     esconderMensagem();
 
 
+    const campoData =
+        document.getElementById(
+            "dataJogo"
+        );
+
+
     const data =
-        document
-            .getElementById(
-                "dataJogo"
-            )
-            .value
-            .trim();
+        campoData?.value?.trim();
 
 
     if (!data) {
@@ -885,21 +955,36 @@ async function buscarJogos() {
     mostrarLoading(true);
 
 
-    document
-        .getElementById(
+    const palpites =
+        document.getElementById(
             "palpites"
-        )
-        .innerHTML = "";
+        );
 
 
-    document
-        .getElementById(
+    if (palpites) {
+
+        palpites.innerHTML =
+            "";
+
+    }
+
+
+    const areaArte =
+        document.getElementById(
             "areaArte"
-        )
-        .classList.remove(
+        );
+
+
+    if (areaArte) {
+
+        areaArte.classList.remove(
             "visivel"
         );
 
+    }
+
+
+    jogosSelecionados = [];
 
     imagemGerada = null;
 
@@ -908,11 +993,9 @@ async function buscarJogos() {
 
     try {
 
-
-        /*
-         * UMA ÚNICA CONSULTA
-         * PARA TODOS OS JOGOS DA DATA.
-         */
+        /* =============================================
+           UMA CONSULTA PARA A DATA
+        ============================================= */
 
         const url =
             `${API_BASE}/fixtures` +
@@ -921,7 +1004,7 @@ async function buscarJogos() {
 
 
         console.log(
-            "📡 Consultando API:",
+            "📡 Buscando jogos:",
             url
         );
 
@@ -930,9 +1013,7 @@ async function buscarJogos() {
             await fetch(
                 url,
                 {
-
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
 
@@ -948,7 +1029,7 @@ async function buscarJogos() {
         if (!resposta.ok) {
 
             throw new Error(
-                "Erro HTTP " +
+                "Erro na API. HTTP " +
                 resposta.status
             );
 
@@ -960,7 +1041,7 @@ async function buscarJogos() {
 
 
         console.log(
-            "📊 API:",
+            "📊 Resposta API:",
             dados
         );
 
@@ -973,11 +1054,15 @@ async function buscarJogos() {
         ) {
 
             throw new Error(
-                "A API não retornou jogos."
+                "A API não retornou uma lista de jogos."
             );
 
         }
 
+
+        /* =============================================
+           FILTRAR JOGOS
+        ============================================= */
 
         let jogos =
             dados.response.filter(
@@ -985,9 +1070,9 @@ async function buscarJogos() {
             );
 
 
-        /*
-         * REMOVER JOGOS FINALIZADOS.
-         */
+        /* =============================================
+           REMOVER FINALIZADOS/CANCELADOS
+        ============================================= */
 
         jogos =
             jogos.filter(
@@ -1000,7 +1085,8 @@ async function buscarJogos() {
                         ).toUpperCase();
 
 
-                    return ![
+                    const statusExcluido = [
+
                         "FT",
                         "AET",
                         "PEN",
@@ -1009,7 +1095,11 @@ async function buscarJogos() {
                         "ABD",
                         "AWD",
                         "WO"
-                    ].includes(
+
+                    ];
+
+
+                    return !statusExcluido.includes(
                         status
                     );
 
@@ -1017,51 +1107,204 @@ async function buscarJogos() {
             );
 
 
-        /*
-         * ORDENAR POR HORÁRIO.
-         */
+        /* =============================================
+           REMOVER CATEGORIAS INDESEJADAS
+        ============================================= */
 
-        jogos.sort(
-            (a, b) => {
+        jogos =
+            jogos.filter(
+                jogo =>
+                    !ehCategoriaIndesejada(
+                        jogo
+                    )
+            );
 
-                return (
-                    new Date(
-                        a.fixture.date
-                    ).getTime()
-                    -
-                    new Date(
-                        b.fixture.date
-                    ).getTime()
-                );
 
-            }
+        console.log(
+            "⚽ Jogos válidos:",
+            jogos.length
         );
 
 
+        /* =============================================
+           SEPARAR BRASIL
+        ============================================= */
+
+        const jogosBrasil =
+            jogos.filter(
+                ehJogoDoBrasil
+            );
+
+
+        /* =============================================
+           SÉRIE A
+        ============================================= */
+
+        const serieA =
+            jogosBrasil.filter(
+                ehSerieA
+            );
+
+
+        /* =============================================
+           SÉRIE B
+        ============================================= */
+
+        const serieB =
+            jogosBrasil.filter(
+                ehSerieB
+            );
+
+
+        /* =============================================
+           OUTROS BRASIL
+        ============================================= */
+
+        const outrosBrasil =
+            jogosBrasil.filter(
+                jogo => {
+
+                    return (
+                        !serieA.includes(
+                            jogo
+                        ) &&
+                        !serieB.includes(
+                            jogo
+                        )
+                    );
+
+                }
+            );
+
+
+        /* =============================================
+           ORDENAR
+        ============================================= */
+
+        ordenarPorHorario(
+            serieA
+        );
+
+        ordenarPorHorario(
+            serieB
+        );
+
+        ordenarPorHorario(
+            outrosBrasil
+        );
+
+        ordenarPorHorario(
+            jogos
+        );
+
+
+        /* =============================================
+           CRIAR LISTA PRIORIZADA
+        ============================================= */
+
+        const jogosPrioritarios = [];
+
+
+        /*
+         * 1º SÉRIE A
+         */
+
+        adicionarJogosUnicos(
+            jogosPrioritarios,
+            serieA
+        );
+
+
+        /*
+         * 2º SÉRIE B
+         */
+
+        adicionarJogosUnicos(
+            jogosPrioritarios,
+            serieB
+        );
+
+
+        /*
+         * 3º OUTROS BRASIL
+         */
+
+        adicionarJogosUnicos(
+            jogosPrioritarios,
+            outrosBrasil
+        );
+
+
+        /*
+         * 4º OUTROS PAÍSES
+         *
+         * SOMENTE PARA COMPLETAR.
+         */
+
         if (
-            jogos.length === 0
+            jogosPrioritarios.length < 6
         ) {
 
-            throw new Error(
-                "Não encontrei jogos disponíveis para essa data."
+            adicionarJogosUnicos(
+                jogosPrioritarios,
+                jogos
             );
 
         }
 
 
-        /*
-         * SELECIONAR 6.
-         */
+        console.log(
+            "🇧🇷 Série A:",
+            serieA.length
+        );
+
+        console.log(
+            "🇧🇷 Série B:",
+            serieB.length
+        );
+
+        console.log(
+            "🇧🇷 Outros Brasil:",
+            outrosBrasil.length
+        );
+
+        console.log(
+            "📋 Lista priorizada:",
+            jogosPrioritarios.length
+        );
+
+
+        /* =============================================
+           VERIFICAR SE EXISTEM JOGOS
+        ============================================= */
+
+        if (
+            jogosPrioritarios.length === 0
+        ) {
+
+            throw new Error(
+                "Não encontrei jogos profissionais disponíveis para essa data."
+            );
+
+        }
+
+
+        /* =============================================
+           SELECIONAR 6
+        ============================================= */
 
         jogosSelecionados =
             selecionarSeisJogos(
-                jogos
+                jogosPrioritarios
             );
 
 
-        /*
-         * GERAR OS PLACARES.
-         */
+        /* =============================================
+           GERAR PALPITES
+        ============================================= */
+
+        placaresUsados = [];
+
 
         jogosSelecionados =
             jogosSelecionados.map(
@@ -1069,9 +1312,9 @@ async function buscarJogos() {
             );
 
 
-        /*
-         * MOSTRAR.
-         */
+        /* =============================================
+           MOSTRAR
+        ============================================= */
 
         mostrarPalpites();
 
@@ -1079,17 +1322,17 @@ async function buscarJogos() {
         montarArte();
 
 
-        document
-            .getElementById(
-                "areaArte"
-            )
-            .classList.add(
+        if (areaArte) {
+
+            areaArte.classList.add(
                 "visivel"
             );
 
+        }
+
 
         console.log(
-            "✅ 6 palpites gerados:",
+            "✅ Palpites:",
             jogosSelecionados
         );
 
@@ -1103,7 +1346,7 @@ async function buscarJogos() {
 
 
         mostrarMensagem(
-            erro.message ||
+            erro?.message ||
             "Não foi possível carregar os jogos."
         );
 
@@ -1147,6 +1390,350 @@ function jogoValido(
 
 
 /* =====================================================
+   VERIFICAR CATEGORIAS INDESEJADAS
+===================================================== */
+
+function ehCategoriaIndesejada(
+    jogo
+) {
+
+    const liga =
+        normalizarTexto(
+            jogo?.league?.name
+        );
+
+
+    const tipo =
+        normalizarTexto(
+            jogo?.league?.type
+        );
+
+
+    const pais =
+        normalizarTexto(
+            jogo?.league?.country
+        );
+
+
+    const casa =
+        normalizarTexto(
+            jogo?.teams?.home?.name
+        );
+
+
+    const fora =
+        normalizarTexto(
+            jogo?.teams?.away?.name
+        );
+
+
+    const texto =
+        `
+        ${liga}
+        ${tipo}
+        ${pais}
+        ${casa}
+        ${fora}
+        `;
+
+
+    /*
+     * SUB-15 ATÉ SUB-23
+     */
+
+    const base =
+        /sub[\s-]*(15|16|17|18|19|20|21|22|23)/i;
+
+
+    /*
+     * U15 ATÉ U23
+     */
+
+    const categoriaU =
+        /\bu[\s-]*(15|16|17|18|19|20|21|22|23)\b/i;
+
+
+    /*
+     * UNDER 15 ATÉ UNDER 23
+     */
+
+    const under =
+        /under[\s-]*(15|16|17|18|19|20|21|22|23)/i;
+
+
+    /*
+     * OUTRAS CATEGORIAS DE BASE
+     */
+
+    const palavrasBase =
+        /youth|juvenil|junior|júnior|academy|academia|reserva|reserve|u18|u19|u20|u21|u22|u23/i;
+
+
+    if (
+        base.test(texto) ||
+        categoriaU.test(texto) ||
+        under.test(texto) ||
+        palavrasBase.test(texto)
+    ) {
+
+        console.log(
+            "🚫 Categoria de base removida:",
+            jogo?.league?.name,
+            casa,
+            "x",
+            fora
+        );
+
+
+        return true;
+
+    }
+
+
+    /*
+     * FEMININO
+     */
+
+    const feminino =
+        /women|woman|feminino|feminina|women's|womens/i;
+
+
+    if (
+        feminino.test(texto)
+    ) {
+
+        console.log(
+            "🚫 Feminino removido:",
+            jogo?.league?.name
+        );
+
+
+        return true;
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =====================================================
+   NORMALIZAR TEXTO
+===================================================== */
+
+function normalizarTexto(
+    texto
+) {
+
+    return String(
+        texto || ""
+    )
+    .normalize(
+        "NFD"
+    )
+    .replace(
+        /[\u0300-\u036f]/g,
+        ""
+    )
+    .toLowerCase()
+    .trim();
+
+}
+
+
+/* =====================================================
+   VERIFICAR BRASIL
+===================================================== */
+
+function ehJogoDoBrasil(
+    jogo
+) {
+
+    const pais =
+        normalizarTexto(
+            jogo?.league?.country
+        );
+
+
+    return (
+        pais === "brazil" ||
+        pais === "brasil"
+    );
+
+}
+
+
+/* =====================================================
+   VERIFICAR SÉRIE A
+===================================================== */
+
+function ehSerieA(
+    jogo
+) {
+
+    if (
+        !ehJogoDoBrasil(
+            jogo
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    const liga =
+        normalizarTexto(
+            jogo?.league?.name
+        );
+
+
+    /*
+     * Nomes normalmente utilizados
+     * pela API-Football.
+     */
+
+    return (
+
+        liga.includes(
+            "serie a"
+        ) ||
+
+        liga.includes(
+            "brasileirao serie a"
+        ) ||
+
+        liga.includes(
+            "brasileirao"
+        )
+
+    );
+
+}
+
+
+/* =====================================================
+   VERIFICAR SÉRIE B
+===================================================== */
+
+function ehSerieB(
+    jogo
+) {
+
+    if (
+        !ehJogoDoBrasil(
+            jogo
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    const liga =
+        normalizarTexto(
+            jogo?.league?.name
+        );
+
+
+    return (
+
+        liga.includes(
+            "serie b"
+        ) ||
+
+        liga.includes(
+            "brasileirao serie b"
+        )
+
+    );
+
+}
+
+
+/* =====================================================
+   ORDENAR POR HORÁRIO
+===================================================== */
+
+function ordenarPorHorario(
+    lista
+) {
+
+    lista.sort(
+        (a, b) => {
+
+            const dataA =
+                new Date(
+                    a?.fixture?.date
+                ).getTime();
+
+
+            const dataB =
+                new Date(
+                    b?.fixture?.date
+                ).getTime();
+
+
+            return (
+                dataA -
+                dataB
+            );
+
+        }
+    );
+
+
+    return lista;
+
+}
+
+
+/* =====================================================
+   ADICIONAR JOGOS ÚNICOS
+===================================================== */
+
+function adicionarJogosUnicos(
+    destino,
+    origem
+) {
+
+    origem.forEach(
+        jogo => {
+
+            const id =
+                jogo?.fixture?.id;
+
+
+            const jaExiste =
+                destino.some(
+                    item =>
+                        String(
+                            item?.fixture?.id
+                        ) ===
+                        String(id)
+                );
+
+
+            if (
+                !jaExiste &&
+                destino.length < 6
+            ) {
+
+                destino.push(
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
    SELECIONAR 6 JOGOS
 ===================================================== */
 
@@ -1154,68 +1741,76 @@ function selecionarSeisJogos(
     jogos
 ) {
 
+    const lista =
+        Array.isArray(jogos)
+            ? jogos.slice()
+            : [];
+
+
     if (
-        jogos.length <= 6
+        lista.length <= 6
     ) {
 
-        return jogos.slice();
+        return lista;
 
     }
 
+
+    /*
+     * Como a lista já está
+     * priorizada, os primeiros
+     * jogos possuem preferência.
+     *
+     * Há uma pequena aleatoriedade
+     * para não gerar exatamente
+     * os mesmos 6 toda vez.
+     */
 
     const resultado = [];
 
 
     /*
-     * Divide a lista em 6 partes.
+     * Misturar somente uma parte
+     * inicial da lista.
      */
 
-    const passo =
-        jogos.length / 6;
+    const limiteMistura =
+        Math.min(
+            lista.length,
+            12
+        );
 
 
-    for (
-        let i = 0;
-        i < 6;
-        i++
+    const candidatos =
+        lista.slice(
+            0,
+            limiteMistura
+        );
+
+
+    while (
+        resultado.length < 6 &&
+        candidatos.length > 0
     ) {
 
-        const inicio =
-            Math.floor(
-                i * passo
-            );
-
-
-        const fim =
-            Math.floor(
-                (i + 1) * passo
-            );
-
-
-        const tamanho =
-            Math.max(
-                1,
-                fim - inicio
-            );
-
-
-        const posicao =
-            inicio +
+        const indice =
             Math.floor(
                 Math.random() *
-                tamanho
+                candidatos.length
             );
 
 
-        if (
-            jogos[posicao] &&
-            !resultado.includes(
-                jogos[posicao]
-            )
-        ) {
+        const jogo =
+            candidatos.splice(
+                indice,
+                1
+            )[0];
+
+
+        if (jogo) {
 
             resultado.push(
-                jogos[posicao]
+                jogo
             );
 
         }
@@ -1228,21 +1823,33 @@ function selecionarSeisJogos(
      */
 
     for (
-        const jogo of jogos
+        const jogo of lista
     ) {
 
         if (
             resultado.length >= 6
         ) {
+
             break;
+
         }
 
 
-        if (
-            !resultado.includes(
-                jogo
-            )
-        ) {
+        const id =
+            jogo?.fixture?.id;
+
+
+        const existe =
+            resultado.some(
+                item =>
+                    String(
+                        item?.fixture?.id
+                    ) ===
+                    String(id)
+            );
+
+
+        if (!existe) {
 
             resultado.push(
                 jogo
@@ -1294,12 +1901,11 @@ function gerarPalpite(
         forcaFora;
 
 
-    let candidatos;
+    let candidatos = [];
 
 
     /*
-     * TIME DA CASA
-     * COM MAIOR FORÇA
+     * CASA MAIS FORTE
      */
 
     if (
@@ -1325,8 +1931,7 @@ function gerarPalpite(
 
 
     /*
-     * TIME VISITANTE
-     * COM MAIOR FORÇA
+     * FORA MAIS FORTE
      */
 
     else if (
@@ -1352,7 +1957,7 @@ function gerarPalpite(
 
 
     /*
-     * JOGO EQUILIBRADO
+     * EQUILIBRADO
      */
 
     else {
@@ -1380,7 +1985,7 @@ function gerarPalpite(
 
 
     /*
-     * NÃO REPETIR PLACAR.
+     * REMOVER REPETIDOS
      */
 
     let disponiveis =
@@ -1393,8 +1998,8 @@ function gerarPalpite(
 
 
     /*
-     * Se acabou a lista,
-     * usa qualquer placar ainda não usado.
+     * SE NÃO HOUVER,
+     * USAR LISTA GERAL.
      */
 
     if (
@@ -1413,7 +2018,7 @@ function gerarPalpite(
 
 
     /*
-     * Fallback.
+     * ÚLTIMO FALLBACK
      */
 
     if (
@@ -1421,13 +2026,13 @@ function gerarPalpite(
     ) {
 
         disponiveis =
-            candidatos;
+            PLACARES_PROVAVEIS.slice();
 
     }
 
 
     /*
-     * ESCOLHER ALEATORIAMENTE.
+     * ESCOLHER
      */
 
     const indice =
@@ -1443,17 +2048,15 @@ function gerarPalpite(
         ];
 
 
-    /*
-     * MARCAR COMO USADO.
-     */
-
     placaresUsados.push(
         placar
     );
 
 
     const partes =
-        placar.split(":");
+        placar.split(
+            ":"
+        );
 
 
     jogo.palpite = {
@@ -1477,7 +2080,7 @@ function gerarPalpite(
 
 
 /* =====================================================
-   FORÇA
+   FORÇA DO TIME
 ===================================================== */
 
 function obterForca(
@@ -1491,14 +2094,16 @@ function obterForca(
     }
 
 
-    let forca = 1;
+    let forca =
+        1;
 
 
     if (
         time.winner === true
     ) {
 
-        forca += 0.20;
+        forca +=
+            0.20;
 
     }
 
@@ -1507,15 +2112,15 @@ function obterForca(
         time.winner === false
     ) {
 
-        forca -= 0.10;
+        forca -=
+            0.10;
 
     }
 
 
     /*
-     * Pequena variação para
-     * não gerar sempre os mesmos
-     * placares.
+     * Variação para evitar
+     * resultados idênticos.
      */
 
     forca +=
@@ -1541,33 +2146,45 @@ function mostrarPalpites() {
         );
 
 
-    container.innerHTML = "";
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML =
+        "";
 
 
     jogosSelecionados.forEach(
         (jogo, index) => {
 
-
             const casa =
-                jogo.teams.home;
+                jogo?.teams?.home || {};
 
 
             const fora =
-                jogo.teams.away;
+                jogo?.teams?.away || {};
 
 
             const golsCasa =
-                jogo.palpite.golsCasa;
+                jogo?.palpite?.golsCasa ??
+                0;
 
 
             const golsFora =
-                jogo.palpite.golsFora;
+                jogo?.palpite?.golsFora ??
+                0;
 
 
             const horario =
                 formatarHora(
-                    jogo.fixture.date
+                    jogo?.fixture?.date
                 );
+
+
+            const liga =
+                jogo?.league?.name ||
+                "";
 
 
             const elemento =
@@ -1591,7 +2208,6 @@ function mostrarPalpites() {
 
                 <div class="times">
 
-
                     <div class="time">
 
                         <img
@@ -1599,7 +2215,7 @@ function mostrarPalpites() {
                             alt=""
                             crossorigin="anonymous"
                             onerror="
-                                this.style.display='none'
+                                this.style.display='none';
                             "
                         >
 
@@ -1628,7 +2244,7 @@ function mostrarPalpites() {
                             alt=""
                             crossorigin="anonymous"
                             onerror="
-                                this.style.display='none'
+                                this.style.display='none';
                             "
                         >
 
@@ -1642,15 +2258,12 @@ function mostrarPalpites() {
 
                     </div>
 
-
                 </div>
 
 
                 <div class="placar">
 
-                    ${golsCasa}
-                    :
-                    ${golsFora}
+                    ${golsCasa}:${golsFora}
 
                 </div>
 
@@ -1658,8 +2271,7 @@ function mostrarPalpites() {
                 <div class="info-jogo">
 
                     ${escaparHTML(
-                        jogo.league?.name ||
-                        ""
+                        liga
                     )}
 
                     •
@@ -1693,43 +2305,59 @@ function montarArte() {
         );
 
 
-    container.innerHTML = "";
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML =
+        "";
+
+
+    const campoData =
+        document.getElementById(
+            "dataJogo"
+        );
 
 
     const data =
-        document
-            .getElementById(
-                "dataJogo"
-            )
-            .value;
+        campoData?.value ||
+        "";
 
 
-    document
-        .getElementById(
+    const arteData =
+        document.getElementById(
             "arteData"
-        )
-        .textContent =
-        `6 PALPITES • ${formatarData(data)}`;
+        );
+
+
+    if (arteData) {
+
+        arteData.textContent =
+            `6 PALPITES • ${formatarData(data)}`;
+
+    }
 
 
     jogosSelecionados.forEach(
-        (jogo) => {
-
+        jogo => {
 
             const casa =
-                jogo.teams.home;
+                jogo?.teams?.home || {};
 
 
             const fora =
-                jogo.teams.away;
+                jogo?.teams?.away || {};
 
 
             const golsCasa =
-                jogo.palpite.golsCasa;
+                jogo?.palpite?.golsCasa ??
+                0;
 
 
             const golsFora =
-                jogo.palpite.golsFora;
+                jogo?.palpite?.golsFora ??
+                0;
 
 
             const linha =
@@ -1751,7 +2379,7 @@ function montarArte() {
                         crossorigin="anonymous"
                         alt=""
                         onerror="
-                            this.style.display='none'
+                            this.style.display='none';
                         "
                     >
 
@@ -1782,7 +2410,7 @@ function montarArte() {
                         crossorigin="anonymous"
                         alt=""
                         onerror="
-                            this.style.display='none'
+                            this.style.display='none';
                         "
                     >
 
@@ -1836,12 +2464,34 @@ async function gerarImagem() {
         );
 
 
-    await esperarImagens(
-        arte
-    );
+    if (!arte) {
+
+        mostrarMensagem(
+            "Área da imagem não encontrada."
+        );
+
+        return;
+
+    }
 
 
     try {
+
+        await esperarImagens(
+            arte
+        );
+
+
+        if (
+            typeof html2canvas !==
+            "function"
+        ) {
+
+            throw new Error(
+                "HTML2Canvas não foi carregado."
+            );
+
+        }
 
 
         const canvas =
@@ -1880,6 +2530,7 @@ async function gerarImagem() {
     } catch (erro) {
 
         console.error(
+            "Erro ao gerar imagem:",
             erro
         );
 
@@ -1944,7 +2595,7 @@ function esperarImagens(
 
 
 /* =====================================================
-   BAIXAR
+   BAIXAR IMAGEM
 ===================================================== */
 
 async function baixarImagem() {
@@ -1963,16 +2614,19 @@ async function baixarImagem() {
     }
 
 
+    const campoData =
+        document.getElementById(
+            "dataJogo"
+        );
+
+
     const data =
-        document
-            .getElementById(
-                "dataJogo"
-            )
-            .value
-            .replaceAll(
+        campoData?.value
+            ?.replaceAll(
                 "-",
                 ""
-            );
+            ) ||
+        "jogos";
 
 
     const link =
@@ -1991,11 +2645,9 @@ async function baixarImagem() {
         );
 
 
-    document
-        .body
-        .appendChild(
-            link
-        );
+    document.body.appendChild(
+        link
+    );
 
 
     link.click();
@@ -2007,7 +2659,7 @@ async function baixarImagem() {
 
 
 /* =====================================================
-   COMPARTILHAR
+   COMPARTILHAR WHATSAPP
 ===================================================== */
 
 async function compartilharWhatsApp() {
@@ -2028,7 +2680,6 @@ async function compartilharWhatsApp() {
 
     try {
 
-
         const blob =
             await new Promise(
                 resolve => {
@@ -2040,6 +2691,15 @@ async function compartilharWhatsApp() {
 
                 }
             );
+
+
+        if (!blob) {
+
+            throw new Error(
+                "Não foi possível criar a imagem."
+            );
+
+        }
 
 
         const arquivo =
@@ -2057,7 +2717,6 @@ async function compartilharWhatsApp() {
 
         /*
          * COMPARTILHAMENTO NATIVO
-         * DO ANDROID.
          */
 
         if (
@@ -2069,7 +2728,6 @@ async function compartilharWhatsApp() {
                 ]
             })
         ) {
-
 
             await navigator.share({
 
@@ -2092,7 +2750,7 @@ async function compartilharWhatsApp() {
 
 
         /*
-         * FALLBACK.
+         * FALLBACK
          */
 
         await baixarImagem();
@@ -2114,7 +2772,8 @@ async function compartilharWhatsApp() {
     } catch (erro) {
 
         console.log(
-            "Compartilhamento cancelado."
+            "Compartilhamento cancelado:",
+            erro
         );
 
     }
@@ -2135,21 +2794,24 @@ function gerarTextoWhatsApp() {
     jogosSelecionados.forEach(
         (jogo, index) => {
 
-
             const casa =
-                jogo.teams.home.name;
+                jogo?.teams?.home?.name ||
+                "Casa";
 
 
             const fora =
-                jogo.teams.away.name;
+                jogo?.teams?.away?.name ||
+                "Fora";
 
 
             const golsCasa =
-                jogo.palpite.golsCasa;
+                jogo?.palpite?.golsCasa ??
+                0;
 
 
             const golsFora =
-                jogo.palpite.golsFora;
+                jogo?.palpite?.golsFora ??
+                0;
 
 
             texto +=
@@ -2223,7 +2885,6 @@ function formatarHora(
 
     try {
 
-
         const data =
             new Date(
                 dataISO
@@ -2271,6 +2932,12 @@ function abreviarTime(
     }
 
 
+    nome =
+        String(
+            nome
+        ).trim();
+
+
     if (
         nome.length <= 15
     ) {
@@ -2281,9 +2948,9 @@ function abreviarTime(
 
 
     const palavras =
-        nome
-            .trim()
-            .split(/\s+/);
+        nome.split(
+            /\s+/
+        );
 
 
     if (
@@ -2316,7 +2983,7 @@ function abreviarTime(
 
 
 /* =====================================================
-   SEGURANÇA HTML
+   ESCAPAR HTML
 ===================================================== */
 
 function escaparHTML(
@@ -2355,49 +3022,16 @@ function escaparHTML(
 }
 
 
+/* =====================================================
+   ESCAPAR ATRIBUTO
+===================================================== */
+
 function escaparAtributo(
     valor
 ) {
 
     return escaparHTML(
         valor
-    );
-
-}
-
-
-/* =====================================================
-   MENSAGEM TEMPORÁRIA
-===================================================== */
-
-function mostrarMensagemTemporaria(
-    texto
-) {
-
-    const elemento =
-        document.getElementById(
-            "mensagem"
-        );
-
-
-    elemento.textContent =
-        texto;
-
-
-    elemento.classList.add(
-        "visivel"
-    );
-
-
-    setTimeout(
-        function() {
-
-            elemento.classList.remove(
-                "visivel"
-            );
-
-        },
-        2500
     );
 
 }
