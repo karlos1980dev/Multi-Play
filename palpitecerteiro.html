@@ -2332,15 +2332,15 @@ const API_TIMEZONE = "America/Sao_Paulo";
 const LIMITE_JOGOS_POR_DIA = 6;
 // Plano da API: 100/dia
 // Limite interno: 80/dia
-const LIMITE_API_DIA = 8100;
-const LIMITE_SEGURANCA = 880;
+const LIMITE_API_DIA = 200;
+const LIMITE_SEGURANCA = 80;
 
 // Resultados não finalizados podem ser atualizados
 // somente a cada 30 minutos.
-const CACHE_RESULTADO_MS = 2 * 60 * 60 * 1000;
+const CACHE_RESULTADO_MS = 20 * 60 * 1000;
 
 // Jogos ficam no cache até serem substituídos
-const CACHE_JOGOS_MS = Infinity;
+const CACHE_JOGOS_MS = 30 * 60 * 1000;
 
 const STATUS_FINAL = [
     "FT",
@@ -4733,95 +4733,116 @@ async function buscarJogosComCache(data) {
 
 async function carregarJogos() {
 
-    if (
-        carregandoJogosAPI
-    ) {
+    if (carregandoJogosAPI) return;
 
-        return;
-
-    }
-
-
-    carregandoJogosAPI =
-        true;
-
+    carregandoJogosAPI = true;
 
     const modal =
-        document.getElementById(
-            "meuModal"
-        );
-
+        document.getElementById("meuModal");
 
     if (modal) {
-
-        modal.style.display =
-            "flex";
-
+        modal.style.display = "flex";
     }
-
 
     try {
 
-        const data =
+        // SOMENTE A DATA DE HOJE
+        const dataHoje =
             obterDataHojeAPI();
 
-
         console.log(
-            "📅 Data dos jogos:",
-            data
+            "🔎 Buscando jogos de hoje:",
+            dataHoje
         );
+
+        const resposta =
+            await buscarJogosComCache(
+                dataHoje
+            );
+
+        if (
+            !Array.isArray(resposta)
+        ) {
+
+            console.warn(
+                "⚠️ API não retornou jogos."
+            );
+
+            return;
+        }
 
 
         /*
-           IMPORTANTE:
-
-           Primeiro Firebase.
-           API somente se necessário.
-        */
-        const resposta =
-            await buscarJogosComCache(
-                data
-            );
-
-
-        let convertidos =
+         * Converte os jogos recebidos
+         */
+        let jogosHoje =
             resposta
-                .map(
-                    transformarJogoAPI
-                )
+                .map(transformarJogoAPI)
                 .filter(Boolean);
 
 
         /*
-           Somente jogos que ainda não começaram.
-        */
-        convertidos =
-            convertidos.filter(
-                function(jogo) {
+         * Mantém somente jogos que ainda
+         * não começaram.
+         */
+        jogosHoje =
+            jogosHoje.filter(
+                jogo =>
+                    jogoAindaNaoComecouAPI(jogo)
+            );
 
-                    return jogoAindaNaoComecouAPI(
+
+        /*
+         * Remove duplicados pelo fixtureId
+         */
+        const mapa =
+            new Map();
+
+        jogosHoje.forEach(
+            jogo => {
+
+                const id =
+                    jogo.fixtureId ||
+                    jogo.apiFixtureId ||
+                    jogo.idAPI;
+
+                if (id) {
+
+                    mapa.set(
+                        String(id),
                         jogo
                     );
 
                 }
+
+            }
+        );
+
+
+        jogosHoje =
+            Array.from(
+                mapa.values()
             );
 
 
+        /*
+         * Seleciona no máximo 6 jogos
+         */
         const selecionados =
             selecionarSeisJogos(
-                convertidos
+                jogosHoje
             );
-
-
-        console.log(
-            "🏆 Jogos selecionados:",
-            selecionados
-        );
 
 
         if (
             selecionados.length > 0
         ) {
+
+            console.log(
+                "✅ Jogos futuros de hoje:",
+                selecionados
+            );
+
 
             montarJogosAPI(
                 selecionados
@@ -4848,40 +4869,42 @@ async function carregarJogos() {
             }
 
 
-            console.log(
-                "✅ Jogos carregados sem nova chamada se o cache estiver válido."
-            );
+            atualizarStatusJogos();
+
+            atualizarProximoJogo();
+
 
         } else {
 
             console.warn(
-                "⚠️ Nenhum jogo futuro encontrado."
+                "⚠️ Nenhum jogo futuro disponível hoje."
             );
+
+
+            jogos = {};
 
 
             atualizarVisualDosJogosAPI();
 
-        }
+            atualizarStatusJogos();
 
+            atualizarProximoJogo();
+
+        }
 
     } catch (erro) {
 
         console.error(
-            "❌ ERRO AO CARREGAR JOGOS:",
+            "❌ Erro ao carregar jogos de hoje:",
             erro
         );
 
     } finally {
 
-        carregandoJogosAPI =
-            false;
-
+        carregandoJogosAPI = false;
 
         if (modal) {
-
-            modal.style.display =
-                "none";
-
+            modal.style.display = "none";
         }
 
     }
@@ -5958,60 +5981,133 @@ function atualizarPlacar(
    DATA DO JOGO
 ========================================================= */
 
-function obterDataJogo(
-    jogo
-) {
+function obterDataJogo(jogo) {
 
-    if (
-        !jogo ||
-        !jogo.data ||
-        !jogo.hora
-    ) {
-
+    if (!jogo) {
         return new Date(0);
-
     }
 
+    const data =
+        String(jogo.data || "").trim();
+
+    const hora =
+        String(jogo.hora || "").trim();
+
+    if (!data || !hora) {
+        return new Date(0);
+    }
+
+    /*
+     * O jogo já está convertido para o horário
+     * de São Paulo pela API.
+     *
+     * Criamos a data como horário local,
+     * sem conversão UTC adicional.
+     */
+    const partesData =
+        data.split("-").map(Number);
+
+    const partesHora =
+        hora.split(":").map(Number);
+
+    if (
+        partesData.length !== 3 ||
+        partesHora.length < 2
+    ) {
+        return new Date(0);
+    }
+
+    const ano = partesData[0];
+    const mes = partesData[1];
+    const dia = partesData[2];
+
+    const horaJogo = partesHora[0];
+    const minutoJogo = partesHora[1];
 
     return new Date(
-
-        jogo.data +
-        "T" +
-        jogo.hora +
-        ":00"
-
+        ano,
+        mes - 1,
+        dia,
+        horaJogo,
+        minutoJogo,
+        0,
+        0
     );
-
 }
 
 
-/* =========================================================
-   JOGO ABERTO
-========================================================= */
+function jogoAindaNaoComecouAPI(jogo) {
 
-function jogoEstaAberto(
-    jogo
-) {
-
-    if (
-        !jogo ||
-        !jogo.data ||
-        !jogo.hora ||
-        !jogo.fixtureId
-    ) {
-
+    if (!jogo) {
         return false;
-
     }
 
+    /*
+     * Jogos cancelados/adiados não entram.
+     */
+    const status =
+        String(
+            jogo.status ||
+            ""
+        ).toUpperCase();
 
+    if (
+        STATUS_CANCELADO.includes(status)
+    ) {
+        return false;
+    }
+
+    /*
+     * Se a API já informou que começou,
+     * não mostrar como jogo futuro.
+     */
+    const statusAoVivo = [
+        "1H",
+        "HT",
+        "2H",
+        "ET",
+        "BT",
+        "P",
+        "LIVE",
+        "INT"
+    ];
+
+    if (
+        statusAoVivo.includes(status)
+    ) {
+        return false;
+    }
+
+    /*
+     * Jogos finalizados também não entram.
+     */
+    if (
+        STATUS_FINAL.includes(status)
+    ) {
+        return false;
+    }
+
+    const horarioJogo =
+        obterDataJogo(jogo);
+
+    if (
+        horarioJogo.getTime() <= 0
+    ) {
+        return false;
+    }
+
+    const agora =
+        new Date();
+
+    /*
+     * Pequena margem de 30 segundos.
+     * Evita que um jogo exatamente no horário
+     * seja considerado futuro.
+     */
     return (
-        new Date() <
-        obterDataJogo(
-            jogo
-        )
+        horarioJogo.getTime() >
+        agora.getTime() + 30000
     );
-
 }
 
 
