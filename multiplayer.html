@@ -8373,7 +8373,31 @@ function renderizarJogosPorCompeticao(
             /* =============================================
                CRIAR CADA JOGO
             ============================================= */
+jogos.sort(function(a, b) {
 
+    var prioridadeA = prioridadeCampeonato(a);
+    var prioridadeB = prioridadeCampeonato(b);
+
+    // Primeiro: Série A, B e C
+    if (prioridadeA !== prioridadeB) {
+        return prioridadeA - prioridadeB;
+    }
+
+    // Dentro da mesma prioridade:
+    // mantém os jogos em ordem de horário
+    var dataA = "";
+    var dataB = "";
+
+    if (a && a.fixture && a.fixture.date) {
+        dataA = String(a.fixture.date);
+    }
+
+    if (b && b.fixture && b.fixture.date) {
+        dataB = String(b.fixture.date);
+    }
+
+    return dataA.localeCompare(dataB);
+});
             grupo.jogos.forEach(
                 (
                     jogo,
@@ -13157,7 +13181,14 @@ function(
 
 };
 
+window.confirmarCashOutDoModal = function() {
 
+    window.abrirModalPix(
+        codigoCashOutModal,
+        valorCashOutModal
+    );
+
+};
 /* =========================================================
    FECHAR MODAL PIX
 ========================================================= */
@@ -15108,13 +15139,9 @@ function criarModalCashOut() {
                     </button>
 
                     <button
-                        type="button"
-                        id="btnConfirmarCashOut"
-                        class="cashout-confirmar">
-
-                        💰 SACAR AGORA
-
-                    </button>
+    onclick="window.abrirModalPix(codigoCashOutModal, valorCashOutModal)">
+    💰 SAQUE ANTECIPADO
+</button>
 
                 </div>
 
@@ -15954,6 +15981,208 @@ if (
     inicializarCashOut();
 
 }
+async function verificarCashOutDisponivel() {
+
+    if (!jogadorId) {
+        return;
+    }
+
+    try {
+
+        const snapshot = await get(
+            ref(db, "apostas")
+        );
+
+        if (!snapshot.exists()) {
+            return;
+        }
+
+        const dados = snapshot.val();
+
+        Object.entries(dados).forEach(
+            ([codigo, aposta]) => {
+
+                if (!aposta) {
+                    return;
+                }
+
+                if (
+                    String(aposta.jogadorId || "") !==
+                    String(jogadorId)
+                ) {
+                    return;
+                }
+
+                const apostaCompleta = {
+                    ...aposta,
+                    codigo: codigo
+                };
+
+                const analise =
+                    analisarCashOut(
+                        apostaCompleta
+                    );
+
+                if (!analise.permitido) {
+                    return;
+                }
+
+                mostrarAlertaCashOut(
+                    apostaCompleta,
+                    analise
+                );
+
+            }
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao verificar Cash Out:",
+            erro
+        );
+
+    }
+}
+function mostrarAlertaCashOut(
+    aposta,
+    analise
+) {
+
+    const idAlerta =
+        "alertaCashOut_" +
+        aposta.codigo;
+
+    if (
+        document.getElementById(idAlerta)
+    ) {
+        return;
+    }
+
+    const alerta =
+        document.createElement("div");
+
+    alerta.id = idAlerta;
+
+    alerta.style.cssText = `
+        position: fixed;
+        left: 15px;
+        right: 15px;
+        bottom: 20px;
+        z-index: 999999;
+        background: #16a34a;
+        color: white;
+        padding: 18px;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.4);
+        text-align: center;
+        font-weight: 700;
+    `;
+
+    alerta.innerHTML = `
+
+        <div style="font-size:20px;">
+            💰 CASH OUT DISPONÍVEL!
+        </div>
+
+        <div style="margin:8px 0;">
+            Você já acertou
+            ${analise.jogosGanhados}
+            jogo(s).
+        </div>
+
+        <div style="font-size:22px;">
+            ${formatarRealCashOut(
+                analise.valorCashOut
+            )}
+        </div>
+
+        <button
+            id="btnAlertaCashOut"
+            style="
+                margin-top:12px;
+                width:100%;
+                padding:13px;
+                border:0;
+                border-radius:10px;
+                background:white;
+                color:#16a34a;
+                font-weight:900;
+                font-size:16px;
+            "
+        >
+            💰 SACAR AGORA
+        </button>
+
+    `;
+
+    document.body.appendChild(alerta);
+
+    document
+        .getElementById("btnAlertaCashOut")
+        .onclick = function() {
+
+            alerta.remove();
+
+            abrirModalCashOut(
+                aposta
+            );
+
+        };
+
+}
+function normalizarTexto(valor) {
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
+
+function prioridadeCampeonato(jogo) {
+
+    if (!jogo || !jogo.league) {
+        return 4;
+    }
+
+    var nome = normalizarTexto(jogo.league.name);
+    var pais = normalizarTexto(jogo.league.country);
+
+    if (pais !== "brazil" && pais !== "brasil") {
+        return 4;
+    }
+
+    if (
+        nome === "serie a" ||
+        nome === "brasileirao serie a" ||
+        nome === "campeonato brasileiro serie a"
+    ) {
+        return 1;
+    }
+
+    if (
+        nome === "serie b" ||
+        nome === "brasileirao serie b" ||
+        nome === "campeonato brasileiro serie b"
+    ) {
+        return 2;
+    }
+
+    if (
+        nome === "serie c" ||
+        nome === "brasileirao serie c" ||
+        nome === "campeonato brasileiro serie c"
+    ) {
+        return 3;
+    }
+
+    return 4;
+}
+
+
+await carregarJogosFeitosMenu();
+
+verificarCashOutDisponivel();
 </script>
 </body>
 

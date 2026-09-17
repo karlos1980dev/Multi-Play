@@ -2332,12 +2332,12 @@ const API_TIMEZONE = "America/Sao_Paulo";
 const LIMITE_JOGOS_POR_DIA = 6;
 // Plano da API: 100/dia
 // Limite interno: 80/dia
-const LIMITE_API_DIA = 100;
-const LIMITE_SEGURANCA = 80;
+const LIMITE_API_DIA = 8100;
+const LIMITE_SEGURANCA = 880;
 
 // Resultados não finalizados podem ser atualizados
 // somente a cada 30 minutos.
-const CACHE_RESULTADO_MS = 30 * 60 * 1000;
+const CACHE_RESULTADO_MS = 2 * 60 * 60 * 1000;
 
 // Jogos ficam no cache até serem substituídos
 const CACHE_JOGOS_MS = Infinity;
@@ -2369,6 +2369,332 @@ const cacheMemoria = {
     cotacoes: new Map(),
     resultados: new Map()
 };
+const INTERVALO_RESULTADOS = 3 * 60 * 60 * 1000; // 30 minutos
+
+
+let ultimaAtualizacaoResultados = {};
+let atualizandoResultados = {};
+async function atualizarResultadosDoDia(data) {
+
+    const chaveData = String(data || "").trim();
+
+    if (!chaveData) {
+        console.warn("⚠️ Data inválida para atualizar resultados.");
+        return [];
+    }
+
+    // Evita duas chamadas simultâneas para a mesma data
+    if (atualizandoResultados[chaveData]) {
+        console.log(
+            "⏳ Atualização já em andamento:",
+            chaveData
+        );
+
+        return [];
+    }
+
+    // Verifica intervalo de 30 minutos
+    const ultima =
+        Number(ultimaAtualizacaoResultados[chaveData] || 0);
+
+    const agora = Date.now();
+
+    if (agora - ultima < INTERVALO_RESULTADOS) {
+
+        console.log(
+            "⏱️ Resultado ainda dentro do intervalo de 30 minutos:",
+            chaveData
+        );
+
+        return [];
+    }
+
+    atualizandoResultados[chaveData] = true;
+
+    try {
+
+        console.log(
+            "📡 Buscando TODOS os resultados:",
+            chaveData
+        );
+
+        const endpoint =
+            `/fixtures?date=${encodeURIComponent(chaveData)}` +
+            `&timezone=${encodeURIComponent(API_TIMEZONE)}`;
+
+        const resposta = await consultarAPI(endpoint);
+
+        if (
+            !resposta ||
+            !Array.isArray(resposta.response)
+        ) {
+
+            console.warn(
+                "⚠️ API não retornou resultados:",
+                chaveData
+            );
+
+            return [];
+        }
+
+        const jogosAPI = resposta.response;
+
+        console.log(
+            `📊 ${jogosAPI.length} jogos recebidos em UMA chamada`
+        );
+
+        let atualizados = 0;
+        let finalizados = 0;
+
+        for (const jogoAPI of jogosAPI) {
+
+            const fixtureId =
+                String(
+                    jogoAPI?.fixture?.id || ""
+                ).trim();
+
+            if (!fixtureId) continue;
+
+            const status =
+                String(
+                    jogoAPI?.fixture?.status?.short || ""
+                ).toUpperCase();
+
+            /*
+             * IMPORTANTE:
+             * null = resultado ainda não disponível
+             * 0 = zero gols, que é um resultado válido
+             */
+            const golsCasa =
+                jogoAPI?.goals?.home ?? null;
+
+            const golsFora =
+                jogoAPI?.goals?.away ?? null;
+
+            const resultado = {
+
+                fixtureId: fixtureId,
+
+                status: status,
+
+                statusLong:
+                    jogoAPI?.fixture?.status?.long || "",
+
+                // Mantém seus nomes atuais
+                placarA: golsCasa,
+
+                placarB: golsFora,
+
+                // Também salva com os nomes usados
+                // no palpite
+                golsCasa: golsCasa,
+
+                golsFora: golsFora,
+
+                minuto:
+                    jogoAPI?.fixture?.status?.elapsed ?? null,
+
+                atualizadoEm: Date.now(),
+
+                finalizado:
+                    STATUS_FINAL.includes(status),
+
+                cancelado:
+                    STATUS_CANCELADO.includes(status)
+            };
+
+            // Salva pelo fixtureId
+            await salvarResultadoCache(
+                fixtureId,
+                resultado
+            );
+
+            atualizados++;
+
+            if (
+                STATUS_FINAL.includes(status) ||
+                STATUS_CANCELADO.includes(status)
+            ) {
+
+                finalizados++;
+
+                console.log(
+                    `🏁 Jogo finalizado: ${fixtureId} ` +
+                    `${golsCasa ?? "-"}:${golsFora ?? "-"}`
+                );
+            }
+        }
+
+        // Só marca a data como atualizada depois
+        // que toda a resposta foi processada
+        ultimaAtualizacaoResultados[chaveData] =
+            Date.now();
+
+        console.log(
+            `✅ Resultados atualizados: ${atualizados}`
+        );
+
+        console.log(
+            `🏁 Finalizados/cancelados: ${finalizados}`
+        );
+
+        return jogosAPI;
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro atualizando resultados:",
+            erro
+        );
+
+        return [];
+
+    } finally {
+
+        atualizandoResultados[chaveData] = false;
+    }
+}
+
+
+async function verificarResultadosDosJogos(listaJogos) {
+
+    if (!Array.isArray(listaJogos)) {
+        return [];
+    }
+
+    const datas = new Set();
+
+    for (const jogo of listaJogos) {
+
+        if (!jogo) continue;
+
+        const fixtureId =
+            String(
+                jogo.fixtureId ||
+                jogo.idAPI ||
+                jogo?.fixture?.id ||
+                ""
+            ).trim();
+
+        if (!fixtureId) continue;
+
+        const data =
+            String(
+                jogo.data ||
+                jogo.date ||
+                ""
+            ).substring(0, 10);
+
+        if (!data) continue;
+
+        datas.add(data);
+    }
+
+    const resultados = [];
+
+    // UMA chamada por DATA
+    for (const data of datas) {
+
+        const dados =
+            await atualizarResultadosDoDia(data);
+
+        if (Array.isArray(dados)) {
+            resultados.push(...dados);
+        }
+    }
+
+    return resultados;
+}
+
+
+async function obterResultadoComCache(fixtureId) {
+
+    const chave =
+        String(fixtureId || "").trim();
+
+    if (!chave) return null;
+
+    // ==========================================
+    // 1. MEMÓRIA
+    // ==========================================
+
+    if (cacheMemoria.resultados.has(chave)) {
+
+        const memoria =
+            cacheMemoria.resultados.get(chave);
+
+        // Finalizado = nunca mais precisa consultar
+        if (
+            memoria.finalizado ||
+            memoria.cancelado
+        ) {
+            return memoria;
+        }
+
+        const idade =
+            Date.now() -
+            Number(memoria.atualizadoEm || 0);
+
+        if (idade < INTERVALO_RESULTADOS) {
+            return memoria;
+        }
+    }
+
+    // ==========================================
+    // 2. FIREBASE
+    // ==========================================
+
+    try {
+
+        const snapshot =
+            await db
+                .ref(`cacheMultiPlay/resultados/${chave}`)
+                .once("value");
+
+        if (snapshot.exists()) {
+
+            const cache =
+                snapshot.val();
+
+            // Finalizado = permanente
+            if (
+                cache.finalizado ||
+                cache.cancelado
+            ) {
+
+                cacheMemoria.resultados.set(
+                    chave,
+                    cache
+                );
+
+                return cache;
+            }
+
+            const idade =
+                Date.now() -
+                Number(cache.atualizadoEm || 0);
+
+            if (idade < INTERVALO_RESULTADOS) {
+
+                cacheMemoria.resultados.set(
+                    chave,
+                    cache
+                );
+
+                return cache;
+            }
+        }
+
+    } catch (erro) {
+
+        console.warn(
+            "⚠️ Erro lendo resultado:",
+            erro
+        );
+    }
+
+    return null;
+}
 
 /* =========================================================
    PIX
@@ -2485,44 +2811,7 @@ function escapeHTML(texto) {
    PLACARES
 ========================================================= */
 
-const placares = [
-
-    "0:0",
-
-    "1:0",
-    "0:1",
-    "1:1",
-
-    "2:0",
-    "2:1",
-    "1:2",
-    "2:2",
-
-    "3:0",
-    "3:1",
-    "1:3",
-    "3:2",
-    "2:3",
-    "3:3",
-
-    "4:0",
-    "0:4",
-    "4:1",
-    "1:4",
-    "4:2",
-    "2:4",
-    "4:3",
-    "3:4",
-    "4:4",
-
-    "5:0",
-    "0:5",
-    "5:1",
-    "1:5",
-    "5:2",
-    "2:5"
-
-];
+const placares = ["0:0","1:0","0:1","1:1","2:0","2:1","1:2","2:2","3:0","3:1","1:3","3:2","2:3","3:3","4:0","0:4","4:1","1:4","4:2","2:4","4:3","3:4","4:4","5:0","0:5","5:1","1:5","5:2","2:5"];
 
 function criarBotoesPlacares() {
 
@@ -4206,10 +4495,7 @@ async function obterResultadoComCache(fixtureId) {
     return await buscarResultadoAPI(chave);
 }
 
-async function salvarResultadoCache(
-    fixtureId,
-    resultado
-) {
+async function salvarResultadoCache(fixtureId, resultado) {
 
     const chave =
         String(fixtureId || "").trim();
@@ -4219,9 +4505,37 @@ async function salvarResultadoCache(
     }
 
     const dados = {
-        ...resultado,
         fixtureId: chave,
-        atualizadoEm: Date.now()
+
+        status:
+            resultado.status ?? "",
+
+        statusLong:
+            resultado.statusLong ?? "",
+
+        placarA:
+            resultado.placarA ?? null,
+
+        placarB:
+            resultado.placarB ?? null,
+
+        golsCasa:
+            resultado.golsCasa ?? null,
+
+        golsFora:
+            resultado.golsFora ?? null,
+
+        minuto:
+            resultado.minuto ?? null,
+
+        finalizado:
+            resultado.finalizado === true,
+
+        cancelado:
+            resultado.cancelado === true,
+
+        atualizadoEm:
+            Date.now()
     };
 
     try {
@@ -4251,7 +4565,6 @@ async function salvarResultadoCache(
         return false;
     }
 }
-
 /* =========================================================
    SALVAR JOGOS NO CACHE
 ========================================================= */
