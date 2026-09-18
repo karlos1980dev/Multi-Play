@@ -2185,6 +2185,90 @@ body.cor5 {
     opacity: 1 !important;
 }
 .btn-contato-whatsapp { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 15px 12px; padding: 10px 12px; background: #25D366; color: #fff; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: 700; box-shadow: 0 3px 8px rgba(0,0,0,.25); transition: .2s ease; } .btn-contato-whatsapp:hover { transform: scale(1.02); } .btn-contato-whatsapp:active { transform: scale(.97); } .icone-whatsapp { font-size: 15px; line-height: 1; }
+
+
+
+.termo-container {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.termo-titulo {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.termo-texto {
+    background: #f3f3f3;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 190px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.termo-texto p {
+    margin: 0 0 9px 0;
+}
+
+.termo-texto p:last-child {
+    margin-bottom: 0;
+}
+
+.check-termo {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.check-termo input {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+
+.ano-nascimento-container {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.ano-nascimento-container label {
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.ano-nascimento-container input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.ano-nascimento-container input:focus {
+    outline: none;
+    border-color: #28a745;
+}
+
+
+
 </style>
 
 </head>
@@ -2196,7 +2280,101 @@ body.cor5 {
      TOPO
 ===================================================== -->
 
-<div id="meuModal" class="modal-overlay"> <div class="modal-content"> <div class="futebol-animacao"> <div class="bola"></div> <div class="gol"></div> <div class="grama"></div> </div> <h2>🔞 Você tem mais de 18 anos?</h2> <p> Este site é destinado exclusivamente a maiores de 18 anos. </p> <div class="botoes-idade"> <button id="btnSim18" type="button" onclick="confirmarMaioridade(true)" > SIM </button> <button id="btnNao18" type="button" onclick="confirmarMaioridade(false)" > NÃO </button> </div> </div> </div> <style> #meuModal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 999999; } #meuModal .modal-content { width: calc(100% - 40px); max-width: 380px; background: #fff; border-radius: 15px; padding: 25px 20px; text-align: center; box-sizing: border-box; box-shadow: 0 10px 40px rgba(0,0,0,.5); } #meuModal h2 { margin: 15px 0 10px; font-size: 22px; color: #111; } #meuModal p { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: #555; } .botoes-idade { display: flex; gap: 12px; justify-content: center; } .botoes-idade button { flex: 1; border: none; border-radius: 8px; padding: 13px 10px; font-size: 16px; font-weight: bold; cursor: pointer; } #btnSim18 { background: #198754; color: #fff; } #btnNao18 { background: #dc3545; color: #fff; } #btnSim18:active, #btnNao18:active { transform: scale(.97); } /* ===================================================== ANIMAÇÃO DA BOLA ===================================================== */ .futebol-animacao { position: relative; width: 100%; height: 70px; overflow: hidden; } .bola { position: absolute; width: 35px; height: 35px; background: #111; border-radius: 50%; left: 20%; bottom: 15px; animation: bolaPulando 1s infinite alternate; } .gol { position: absolute; right: 15%; bottom: 15px; width: 45px; height: 35px; border: 3px solid #999; border-bottom: none; } .grama { position: absolute; bottom: 5px; left: 5%; width: 90%; height: 4px; background: #198754; border-radius: 10px; } @keyframes bolaPulando { from { transform: translateY(0) rotate(0deg); } to { transform: translateY(-25px) rotate(180deg); } } </style> <script> /* ========================================================= CONFIRMAÇÃO DE MAIORIDADE ========================================================= */ function confirmarMaioridade(maiorDe18) { if (maiorDe18 === true) { /* * Usuário confirmou que é maior de 18. */ localStorage.setItem( "maiorDe18", "sim" ); const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "none"; } console.log( "✅ Maioridade confirmada." ); return; } /* * Usuário informou que NÃO é maior * de 18 anos. */ localStorage.removeItem( "maiorDe18" ); /* * Substitui a página por uma mensagem * de acesso encerrado. */ document.documentElement.innerHTML = ` <html> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0" > <title>Acesso encerrado</title> <style> * { box-sizing: border-box; } body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #111; font-family: Arial, sans-serif; text-align: center; padding: 20px; } .bloqueado { max-width: 400px; color: white; } .bloqueado .icone { font-size: 60px; margin-bottom: 15px; } .bloqueado h1 { font-size: 24px; margin: 0 0 12px; } .bloqueado p { color: #bbb; line-height: 1.5; } </style> </head> <body> <div class="bloqueado"> <div class="icone"> 🔞 </div> <h1> Acesso encerrado </h1> <p> Este site é destinado exclusivamente a maiores de 18 anos. </p> </div> </body> </html> `; } /* ========================================================= VERIFICAR MAIORIDADE AO ABRIR O SITE ========================================================= */ document.addEventListener( "DOMContentLoaded", function() { const maiorDe18 = localStorage.getItem( "maiorDe18" ); if ( maiorDe18 === "sim" ) { /* * Já confirmou anteriormente. * Não mostra o modal. */ const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "none"; } } else { /* * Primeira visita. * Mostra confirmação. */ const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "flex"; } } } ); </script> 
+<div id="meuModal" class="modal-overlay"> <div class="modal-content"> <div class="futebol-animacao"> <div class="bola"></div> <div class="gol"></div> <div class="grama"></div> </div>
+
+<div class="ano-nascimento-container">
+
+    <label for="anoNascimento18">
+        📅 Informe seu ano de nascimento:
+    </label>
+
+    <input
+        type="number"
+        id="anoNascimento18"
+        placeholder="Ex.: 1990"
+        min="1900"
+        max="2008"
+        inputmode="numeric"
+    >
+
+</div>
+
+<!-- TERMO DE MAIORIDADE -->
+<div class="termo-container">
+
+    <div class="termo-titulo">
+        📄 TERMO DE CONFIRMAÇÃO DE MAIORIDADE
+    </div>
+
+    <div class="termo-texto">
+
+        <p>
+            Ao acessar este site, declaro que tenho
+            <strong>18 anos ou mais</strong>.
+        </p>
+
+        <p>
+            Confirmo que estou acessando este site por minha
+            própria vontade e que as informações fornecidas
+            por mim são verdadeiras.
+        </p>
+
+        <p>
+            Declaro estar ciente de que este site e seus serviços
+            são destinados exclusivamente a pessoas maiores de 18 anos.
+        </p>
+
+        <p>
+            Comprometo-me a não permitir que menores de 18 anos
+            utilizem minha conta, dispositivo ou acesso aos serviços
+            disponibilizados neste site.
+        </p>
+
+        <p>
+            Estou ciente de que atividades envolvendo apostas ou
+            jogos podem resultar em perdas financeiras.
+        </p>
+
+        <p>
+            Comprometo-me a utilizar os serviços de forma responsável
+            e de acordo com a legislação aplicável.
+        </p>
+
+        <p>
+            Ao continuar, confirmo que li, compreendi e concordo
+            com este termo de confirmação de maioridade.
+        </p>
+
+    </div>
+
+    <label class="check-termo">
+
+        <input
+            type="checkbox"
+            id="aceitoTermo18"
+            onchange="verificarTermo18()"
+        >
+
+        <span>
+            Declaro que tenho 18 anos ou mais, li e concordo
+            com o termo acima.
+        </span>
+
+    </label>
+
+</div>
+ <h2>🔞 Você tem mais de 18 anos?</h2> <p> Este site é destinado exclusivamente a maiores de 18 anos. </p> 
+<div class="botoes-idade">
+    
+     <button <button
+    id="btnSim18"
+    type="button"
+    onclick="confirmarMaioridade(true)"
+    disabled>
+    SIM, TENHO 18+
+</button>
+
+ <button id="btnNao18" type="button" onclick="confirmarMaioridade(false)" > NÃO </button> </div> </div> </div> <style> #meuModal { position: fixed; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 999999; } #meuModal .modal-content { width: calc(100% - 40px); max-width: 380px; background: #fff; border-radius: 15px; padding: 25px 20px; text-align: center; box-sizing: border-box; box-shadow: 0 10px 40px rgba(0,0,0,.5); } #meuModal h2 { margin: 15px 0 10px; font-size: 22px; color: #111; } #meuModal p { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: #555; } .botoes-idade { display: flex; gap: 12px; justify-content: center; } .botoes-idade button { flex: 1; border: none; border-radius: 8px; padding: 13px 10px; font-size: 16px; font-weight: bold; cursor: pointer; } #btnSim18 { background: #198754; color: #fff; } #btnNao18 { background: #dc3545; color: #fff; } #btnSim18:active, #btnNao18:active { transform: scale(.97); } /* ===================================================== ANIMAÇÃO DA BOLA ===================================================== */ .futebol-animacao { position: relative; width: 100%; height: 70px; overflow: hidden; } .bola { position: absolute; width: 35px; height: 35px; background: #111; border-radius: 50%; left: 20%; bottom: 15px; animation: bolaPulando 1s infinite alternate; } .gol { position: absolute; right: 15%; bottom: 15px; width: 45px; height: 35px; border: 3px solid #999; border-bottom: none; } .grama { position: absolute; bottom: 5px; left: 5%; width: 90%; height: 4px; background: #198754; border-radius: 10px; } @keyframes bolaPulando { from { transform: translateY(0) rotate(0deg); } to { transform: translateY(-25px) rotate(180deg); } } </style> <script> /* ========================================================= CONFIRMAÇÃO DE MAIORIDADE ========================================================= */ function confirmarMaioridade(maiorDe18) { if (maiorDe18 === true) { /* * Usuário confirmou que é maior de 18. */ localStorage.setItem( "maiorDe18", "sim" ); const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "none"; } console.log( "✅ Maioridade confirmada." ); return; } /* * Usuário informou que NÃO é maior * de 18 anos. */ localStorage.removeItem( "maiorDe18" ); /* * Substitui a página por uma mensagem * de acesso encerrado. */ document.documentElement.innerHTML = ` <html> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0" > <title>Acesso encerrado</title> <style> * { box-sizing: border-box; } body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #111; font-family: Arial, sans-serif; text-align: center; padding: 20px; } .bloqueado { max-width: 400px; color: white; } .bloqueado .icone { font-size: 60px; margin-bottom: 15px; } .bloqueado h1 { font-size: 24px; margin: 0 0 12px; } .bloqueado p { color: #bbb; line-height: 1.5; } </style> </head> <body> <div class="bloqueado"> <div class="icone"> 🔞 </div> <h1> Acesso encerrado </h1> <p> Este site é destinado exclusivamente a maiores de 18 anos. </p> </div> </body> </html> `; } /* ========================================================= VERIFICAR MAIORIDADE AO ABRIR O SITE ========================================================= */ document.addEventListener( "DOMContentLoaded", function() { const maiorDe18 = localStorage.getItem( "maiorDe18" ); if ( maiorDe18 === "sim" ) { /* * Já confirmou anteriormente. * Não mostra o modal. */ const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "none"; } } else { /* * Primeira visita. * Mostra confirmação. */ const modal = document.getElementById( "meuModal" ); if (modal) { modal.style.display = "flex"; } } } ); </script> 
 
 <div class="topo-fixo">    
     <div
@@ -8865,7 +9043,7 @@ const FAIXAS_COTACAO_PADRAO = {
 
     casaFora:   [1.00, 2.70],
     casaEmpate: [1.00, 2.30],
-    empateFora: [1.00, 3.69]
+    empateFora: [1.00, 3.69] 
 };
 
 
@@ -12054,7 +12232,7 @@ async function abrirJogosFeitos() {
     if (jogosFeitosModal) {
 
         jogosFeitosModal.style.display =
-            "flex";
+            "flex    ";
 
     }
 
@@ -16180,6 +16358,129 @@ function prioridadeCampeonato(jogo) {
 }
 
 
+
+
+function confirmarMaioridade(maiorDe18) {
+
+    if (maiorDe18 === true) {
+
+        const anoInput =
+            document.getElementById("anoNascimento18");
+
+        const checkbox =
+            document.getElementById("aceitoTermo18");
+
+        if (!anoInput || !anoInput.value) {
+
+            alert("⚠️ Informe seu ano de nascimento.");
+
+            return;
+        }
+
+        const anoNascimento =
+            parseInt(anoInput.value, 10);
+
+        const anoAtual =
+            new Date().getFullYear();
+
+        if (
+            isNaN(anoNascimento) ||
+            anoNascimento < 1900 ||
+            anoNascimento > anoAtual
+        ) {
+
+            alert("⚠️ Informe um ano de nascimento válido.");
+
+            return;
+        }
+
+        /*
+         * Verifica a idade considerando
+         * também mês e dia.
+         */
+
+        const hoje = new Date();
+
+        const dataNascimento =
+            new Date(
+                anoNascimento,
+                0,
+                1
+            );
+
+        let idade =
+            hoje.getFullYear() -
+            dataNascimento.getFullYear();
+
+        /*
+         * Como temos apenas o ano,
+         * consideramos que a pessoa já
+         * completou aniversário naquele ano.
+         */
+
+        if (idade < 18) {
+
+            alert(
+                "🔞 Você precisa ter 18 anos ou mais para continuar."
+            );
+
+            return;
+        }
+
+        if (!checkbox || !checkbox.checked) {
+
+            alert(
+                "⚠️ Você precisa marcar e aceitar o termo antes de continuar."
+            );
+
+            return;
+        }
+
+        localStorage.setItem(
+            "maiorDe18",
+            "sim"
+        );
+
+        localStorage.setItem(
+            "termoMaioridadeAceito",
+            "sim"
+        );
+
+        localStorage.setItem(
+            "anoNascimento18",
+            String(anoNascimento)
+        );
+
+        localStorage.setItem(
+            "dataConfirmacaoMaioridade",
+            new Date().toISOString()
+        );
+
+        const modal =
+            document.getElementById("meuModal");
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+
+        return;
+    }
+
+    if (maiorDe18 === false) {
+
+        localStorage.removeItem("maiorDe18");
+        localStorage.removeItem("termoMaioridadeAceito");
+        localStorage.removeItem("anoNascimento18");
+        localStorage.removeItem("dataConfirmacaoMaioridade");
+
+        const modal =
+            document.getElementById("meuModal");
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+    }
+}
 await carregarJogosFeitosMenu();
 
 verificarCashOutDisponivel();
