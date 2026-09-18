@@ -2335,8 +2335,11 @@ const LIMITE_JOGOS_POR_DIA = 6;
    CACHE
 ========================================================= */
 
-const CACHE_RESULTADO_MS =
-    30 * 60 * 1000;
+
+// Depois → 2 horas para jogos encerrados
+const CACHE_RESULTADO_MS = 2 * 60 * 60 * 1000;
+const CACHE_JOGO_ENCERRADO = 7 * 24 * 60 * 60 * 1000; // 7 dias!
+
 
 
 /* =========================================================
@@ -2365,7 +2368,68 @@ const STATUS_CANCELADO = [
 const CHAVE_PIX =
     "71992290058";
 
+function iniciarSincronizacaoResultados() {
+  console.log("🔄 Sincronizando resultados em tempo real...");
 
+  // Escuta MUDANÇAS nos palpites do usuário → atualiza automaticamente
+  palpitesRef.on("value", async function(snapshot) {
+    console.log("📬 Atualização recebida do Firebase");
+    await carregarMeusPalpites();
+  });
+
+  // Escuta alterações nos resultados dos jogos → atualiza na hora
+  db.ref("cacheResultados").on("value", function() {
+    console.log("⚽ Resultados atualizados!");
+    carregarMeusPalpites();
+  });
+}
+
+
+async function salvarResultadoNoFirebase(fixtureId, resultado) {
+  if (!fixtureId || !resultado) return;
+  
+  const chave = String(fixtureId).trim();
+  await db.ref(`cacheResultados/${chave}`).set({
+    ...resultado,
+    atualizadoEm: Date.now()
+  });
+  console.log("✅ Resultado salvo no Firebase:", chave);
+}
+
+async function obterResultadoComCache(fixtureId) {
+  if (!fixtureId) return null;
+  const chave = String(fixtureId).trim();
+
+  // 🔹 PRIMEIRO: Tenta pegar do Firebase (rápido e gratuito)
+  try {
+    const snap = await db.ref(`cacheResultados/${chave}`).once("value");
+    const cache = snap.val();
+    
+    if (cache?.atualizadoEm) {
+      const tempoValido = cache.finalizado 
+        ? 7 * 24 * 60 * 60 * 1000   // 7 dias se já terminou
+        : 2 * 60 * 60 * 1000;       // 2 horas se ainda rolando
+      
+      if (Date.now() - cache.atualizadoEm < tempoValido) {
+        console.log("📦 Do Firebase:", chave);
+        return cache;
+      }
+    }
+  } catch (e) {
+    console.warn("⚠️ Erro lendo Firebase:", e);
+  }
+
+  // 🔹 SÓ SE NÃO TIVER: busca na API
+  console.log("🌐 Buscando na API:", chave);
+  const resultado = await buscarResultadoAPI(chave);
+  
+  if (resultado) {
+    // Salva no Firebase → TODOS os usuários usam depois ✅
+    await salvarResultadoNoFirebase(chave, resultado);
+  }
+  
+  return resultado;
+}
 /* =========================================================
    CONFIGURAÇÃO
 ========================================================= */
@@ -3421,135 +3485,58 @@ function atualizarVisualDosJogosAPI() {
 ========================================================= */
 
 async function carregarJogos() {
-
-    if (
-        carregandoJogosAPI
-    ) {
-
-        return;
-
-    }
-
-    carregandoJogosAPI =
-        true;
-
-    const modal =
-        document.getElementById(
-            "meuModal"
-        );
-
-    if (modal) {
-
-        modal.style.display =
-            "flex";
-
-    }
-
+  if (carregandoJogosAPI) return;
+  
+  // ⬇️ NOVO: Verifica cache do dia
+  const hoje = obterDataHojeAPI();
+  const cacheDia = localStorage.getItem(`jogos_${hoje}`);
+  
+  if (cacheDia) {
     try {
-
-        const data =
-            obterDataHojeAPI();
-
-        console.log(
-            "📅 Procurando jogos de:",
-            data
-        );
-
-        const resposta =
-            await buscarJogosAPI(
-                data
-            );
-
-        let convertidos =
-            resposta
-                .map(
-                    transformarJogoAPI
-                )
-                .filter(Boolean);
-
-        convertidos =
-            convertidos.filter(
-                function(jogo) {
-
-                    return jogoAindaNaoComecouAPI(
-                        jogo
-                    );
-
-                }
-            );
-
-        const selecionados =
-            selecionarSeisJogos(
-                convertidos
-            );
-
-        console.log(
-            "🏆 Jogos escolhidos:",
-            selecionados
-        );
-
-        if (
-            selecionados.length > 0
-        ) {
-
-            montarJogosAPI(
-                selecionados
-            );
-
-            jogosVieramDaAPI =
-                true;
-
-            atualizarVisualDosJogosAPI();
-
-            for (
-                let i = 1;
-                i <= 6;
-                i++
-            ) {
-
-                preencherSelect(
-                    `jogo${i}`
-                );
-
-            }
-
-            console.log(
-                "✅ Jogos da API carregados."
-            );
-
-        } else {
-
-            console.warn(
-                "⚠️ Nenhum jogo futuro encontrado."
-            );
-
-            atualizarVisualDosJogosAPI();
-
-        }
-
-    } catch (erro) {
-
-        console.error(
-            "❌ ERRO AO CARREGAR JOGOS:",
-            erro
-        );
-
-    } finally {
-
-        carregandoJogosAPI =
-            false;
-
-        if (modal) {
+      const dados = JSON.parse(cacheDia);
+      if (dados.horaCarregada && 
+          Date.now() - dados.horaCarregada < 4 * 60 * 60 * 1000) { // 4h
+        montarJogosAPI(dados.lista);
+        jogosVieramDaAPI = true;
+        atualizarVisualDosJogosAPI();
+        for (let i=1; i<=6; i++) preencherSelect(`jogo${i}`);
+        console.log("📦 Jogos carregados do cache do dia");
+        return;
+      }
+    } catch {}
+  }
+  
+  // Se não tem cache ou venceu → consulta API
+  carregandoJogosAPI = true;
+  try {
+    const data = obterDataHojeAPI();
+    const resposta = await buscarJogosAPI(data);
+    let convertidos = resposta.map(transformarJogoAPI).filter(Boolean);
+    convertidos = convertidos.filter(jogoAindaNaoComecouAPI);
+    const selecionados = selecionarSeisJogos(convertidos);
+    
+    if (selecionados.length > 0) {
+      montarJogosAPI(selecionados);
+      jogosVieramDaAPI = true;
+      atualizarVisualDosJogosAPI();
+      for (let i=1; i<=6; i++) preencherSelect(`jogo${i}`);
+      
+      // ⬇️ Salva no cache
+      localStorage.setItem(`jogos_${hoje}`, JSON.stringify({
+        lista: selecionados,
+        horaCarregada: Date.now()
+      }));
+    }
+  } finally {
+    carregandoJogosAPI = false;
+    if (modal) {
 
             modal.style.display =
                 "none";
 
         }
-
-    }
-
+  }
 }
-
 
 /* =========================================================
    CONFIGURAÇÃO FIREBASE DOS JOGOS
@@ -6466,94 +6453,37 @@ async function buscarResultadoAPI(
    CACHE RESULTADO
 ========================================================= */
 
-async function obterResultadoComCache(
-    fixtureId
-) {
+// No Firebase, crie o caminho público: cacheResultados/[fixtureId]
+// Altere a função:
 
-    if (!fixtureId) {
-        return null;
+async function obterResultadoComCache(fixtureId) {
+  if (!fixtureId) return null;
+  const chave = String(fixtureId).trim();
+  
+  // ⬇️ Mude para caminho COMPARTILHADO
+  const ref = db.ref(`cacheResultados/${chave}`);
+  
+  try {
+    const snap = await ref.once("value");
+    const cache = snap.val();
+    
+    // Se existe e está atualizado → usa
+    if (cache?.atualizadoEm && 
+        Date.now() - cache.atualizadoEm < CACHE_RESULTADO_MS) {
+      console.log("📦 Cache compartilhado:", chave);
+      return cache;
     }
-
-    const chave =
-        String(
-            fixtureId
-        ).trim();
-
-    if (!chave) {
-        return null;
-    }
-
-    const ref =
-        db.ref(
-            `cacheMultiPlay/resultados/${chave}`
-        );
-
-    try {
-
-        const snapshot =
-            await ref.once(
-                "value"
-            );
-
-        const cache =
-            snapshot.val();
-
-        if (
-            cache &&
-            cache.atualizadoEm &&
-            (
-                Date.now() -
-                Number(
-                    cache.atualizadoEm
-                )
-            ) <
-            CACHE_RESULTADO_MS
-        ) {
-
-            console.log(
-                "📦 Resultado vindo do cache:",
-                chave
-            );
-
-            return cache;
-
-        }
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro lendo cache:",
-            erro
-        );
-
-    }
-
-    const resultado =
-        await buscarResultadoAPI(
-            chave
-        );
-
-    if (!resultado) {
-        return null;
-    }
-
-    try {
-
-        await ref.set(
-            resultado
-        );
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro salvando cache:",
-            erro
-        );
-
-    }
-
-    return resultado;
-
+  } catch (e) {
+    console.warn("Cache indisponível:", e);
+  }
+  
+  // Se não tem ou venceu → consulta API
+  const resultado = await buscarResultadoAPI(chave);
+  if (!resultado) return null;
+  
+  // Salva para TODOS usarem
+  await ref.set(resultado);
+  return resultado;
 }
 
 
@@ -6615,30 +6545,17 @@ function verificarAcertoPalpite(
    RESULTADO DE UM JOGO DO PALPITE
 ========================================================= */
 
-async function obterResultadoDoJogoPalpite(
-    itemJogo,
-    numero
-) {
-
-    if (!itemJogo) {
-
-        return {
-
-            status:
-                "vazio",
-
-            resultado:
-                null
-
-        };
-
-    }
-
-    const fixtureId =
-        obterFixtureIdDoPalpite(
-            itemJogo,
-            numero
-        );
+async function obterResultadoDoJogoPalpite(itemJogo, numero) {
+  if (!itemJogo) return { status: "vazio", resultado: null };
+  
+  // ⬇️ NOVO: Pula se o jogo ainda não começou
+  const jogo = jogos[`jogo${numero}`];
+  if (jogo && obterDataJogo(jogo) > new Date()) {
+    return { status: "aguardando", resultado: null };
+  }
+  
+  const fixtureId = obterFixtureIdDoPalpite(itemJogo, numero);
+  // ... resto continua
 
     if (!fixtureId) {
 
@@ -7929,16 +7846,13 @@ document.addEventListener(
         */
 
         setInterval(
-            function() {
+    function() {
+        atualizarResultadosMeusPalpites();
+    },
+    60 * 60 * 1000  // ✅ 1 hora em vez de CACHE_RESULTADO_MS
+);
 
-                atualizarResultadosMeusPalpites();
-
-            },
-            CACHE_RESULTADO_MS
-        );
-
-
-        atualizarPremio();
+atualizarPremio();
 
     }
 );
