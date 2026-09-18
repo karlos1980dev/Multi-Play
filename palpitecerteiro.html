@@ -1872,7 +1872,7 @@ JOGO 1
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786830901/cr-vasco-da-gama.png">
 
 <p>
 
@@ -1901,7 +1901,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831225/vitoria-esporte-clube.png">
 
 <p>
 
@@ -1945,7 +1945,7 @@ JOGO 2
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1784513469/palmeiras.png">
 
 <p>
 
@@ -1974,7 +1974,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1786831003/santos-fc-sp.png">
 
 <p>
 
@@ -2019,7 +2019,7 @@ JOGO 3
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701694/real-madrid.png">
 
 <p>
 
@@ -2048,7 +2048,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701733/real-sociedad.png">
 
 <p>
 
@@ -2089,7 +2089,7 @@ JOGO 4
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701824/eintracht-frankfurt.png">
 
 <p>
 
@@ -2116,7 +2116,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701884/paris-saint-germain-f.png">
 
 <p>
 
@@ -2154,7 +2154,7 @@ JOGO 5
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787701969/club-atletico.png">
 
 <p>
 
@@ -2181,7 +2181,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702097/independiente-santa.png">
 
 <p>
 
@@ -2220,7 +2220,7 @@ JOGO 6
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702270/tottenham-hotspur.png">
 
 <p></p>
 
@@ -2245,7 +2245,7 @@ src="">
 <div class="time">
 
 <img
-src="">
+src="https://res.cloudinary.com/dtw3turzb/image/upload/v1787702339/charlton-athletic.png">
 
 <p></p>
 
@@ -2314,33 +2314,34 @@ const palpitesRef =
 const jogadoresRef =
     db.ref("jogadores");
 
-const configuracaoJogosRef =
-    db.ref("configuracaoJogos");
-
 
 /* =========================================================
    API-FOOTBALL
 ========================================================= */
 
-// =====================================================
-// API FOOTBALL + CACHE MULTI PLAY
-// =====================================================
+const API_KEY =
+    "275f8195f07eaf0bde6b19c501b2926b";
 
-const API_KEY = "275f8195f07eaf0bde6b19c501b2926b";
-const API_BASE = "https://v3.football.api-sports.io";
-const API_TIMEZONE = "America/Sao_Paulo";
+const API_BASE =
+    "https://v3.football.api-sports.io";
+
+const API_TIMEZONE =
+    "America/Sao_Paulo";
+
 const LIMITE_JOGOS_POR_DIA = 6;
-// Plano da API: 100/dia
-// Limite interno: 80/dia
-const LIMITE_API_DIA = 200;
-const LIMITE_SEGURANCA = 80;
 
-// Resultados não finalizados podem ser atualizados
-// somente a cada 30 minutos.
-const CACHE_RESULTADO_MS = 20 * 60 * 1000;
 
-// Jogos ficam no cache até serem substituídos
-const CACHE_JOGOS_MS = 30 * 60 * 1000;
+/* =========================================================
+   CACHE
+========================================================= */
+
+const CACHE_RESULTADO_MS =
+    30 * 60 * 1000;
+
+
+/* =========================================================
+   STATUS API
+========================================================= */
 
 const STATUS_FINAL = [
     "FT",
@@ -2356,345 +2357,6 @@ const STATUS_CANCELADO = [
     "WO"
 ];
 
-// Controle local da sessão
-let controleAPICarregado = false;
-let chamadasAPILocal = 0;
-
-// Impede duas chamadas iguais simultâneas
-const chamadasEmAndamento = new Map();
-
-// Cache em memória
-const cacheMemoria = {
-    jogos: new Map(),
-    cotacoes: new Map(),
-    resultados: new Map()
-};
-const INTERVALO_RESULTADOS = 3 * 60 * 60 * 1000; // 30 minutos
-
-
-let ultimaAtualizacaoResultados = {};
-let atualizandoResultados = {};
-async function atualizarResultadosDoDia(data) {
-
-    const chaveData = String(data || "").trim();
-
-    if (!chaveData) {
-        console.warn("⚠️ Data inválida para atualizar resultados.");
-        return [];
-    }
-
-    // Evita duas chamadas simultâneas para a mesma data
-    if (atualizandoResultados[chaveData]) {
-        console.log(
-            "⏳ Atualização já em andamento:",
-            chaveData
-        );
-
-        return [];
-    }
-
-    // Verifica intervalo de 30 minutos
-    const ultima =
-        Number(ultimaAtualizacaoResultados[chaveData] || 0);
-
-    const agora = Date.now();
-
-    if (agora - ultima < INTERVALO_RESULTADOS) {
-
-        console.log(
-            "⏱️ Resultado ainda dentro do intervalo de 30 minutos:",
-            chaveData
-        );
-
-        return [];
-    }
-
-    atualizandoResultados[chaveData] = true;
-
-    try {
-
-        console.log(
-            "📡 Buscando TODOS os resultados:",
-            chaveData
-        );
-
-        const endpoint =
-            `/fixtures?date=${encodeURIComponent(chaveData)}` +
-            `&timezone=${encodeURIComponent(API_TIMEZONE)}`;
-
-        const resposta = await consultarAPI(endpoint);
-
-        if (
-            !resposta ||
-            !Array.isArray(resposta.response)
-        ) {
-
-            console.warn(
-                "⚠️ API não retornou resultados:",
-                chaveData
-            );
-
-            return [];
-        }
-
-        const jogosAPI = resposta.response;
-
-        console.log(
-            `📊 ${jogosAPI.length} jogos recebidos em UMA chamada`
-        );
-
-        let atualizados = 0;
-        let finalizados = 0;
-
-        for (const jogoAPI of jogosAPI) {
-
-            const fixtureId =
-                String(
-                    jogoAPI?.fixture?.id || ""
-                ).trim();
-
-            if (!fixtureId) continue;
-
-            const status =
-                String(
-                    jogoAPI?.fixture?.status?.short || ""
-                ).toUpperCase();
-
-            /*
-             * IMPORTANTE:
-             * null = resultado ainda não disponível
-             * 0 = zero gols, que é um resultado válido
-             */
-            const golsCasa =
-                jogoAPI?.goals?.home ?? null;
-
-            const golsFora =
-                jogoAPI?.goals?.away ?? null;
-
-            const resultado = {
-
-                fixtureId: fixtureId,
-
-                status: status,
-
-                statusLong:
-                    jogoAPI?.fixture?.status?.long || "",
-
-                // Mantém seus nomes atuais
-                placarA: golsCasa,
-
-                placarB: golsFora,
-
-                // Também salva com os nomes usados
-                // no palpite
-                golsCasa: golsCasa,
-
-                golsFora: golsFora,
-
-                minuto:
-                    jogoAPI?.fixture?.status?.elapsed ?? null,
-
-                atualizadoEm: Date.now(),
-
-                finalizado:
-                    STATUS_FINAL.includes(status),
-
-                cancelado:
-                    STATUS_CANCELADO.includes(status)
-            };
-
-            // Salva pelo fixtureId
-            await salvarResultadoCache(
-                fixtureId,
-                resultado
-            );
-
-            atualizados++;
-
-            if (
-                STATUS_FINAL.includes(status) ||
-                STATUS_CANCELADO.includes(status)
-            ) {
-
-                finalizados++;
-
-                console.log(
-                    `🏁 Jogo finalizado: ${fixtureId} ` +
-                    `${golsCasa ?? "-"}:${golsFora ?? "-"}`
-                );
-            }
-        }
-
-        // Só marca a data como atualizada depois
-        // que toda a resposta foi processada
-        ultimaAtualizacaoResultados[chaveData] =
-            Date.now();
-
-        console.log(
-            `✅ Resultados atualizados: ${atualizados}`
-        );
-
-        console.log(
-            `🏁 Finalizados/cancelados: ${finalizados}`
-        );
-
-        return jogosAPI;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro atualizando resultados:",
-            erro
-        );
-
-        return [];
-
-    } finally {
-
-        atualizandoResultados[chaveData] = false;
-    }
-}
-
-
-async function verificarResultadosDosJogos(listaJogos) {
-
-    if (!Array.isArray(listaJogos)) {
-        return [];
-    }
-
-    const datas = new Set();
-
-    for (const jogo of listaJogos) {
-
-        if (!jogo) continue;
-
-        const fixtureId =
-            String(
-                jogo.fixtureId ||
-                jogo.idAPI ||
-                jogo?.fixture?.id ||
-                ""
-            ).trim();
-
-        if (!fixtureId) continue;
-
-        const data =
-            String(
-                jogo.data ||
-                jogo.date ||
-                ""
-            ).substring(0, 10);
-
-        if (!data) continue;
-
-        datas.add(data);
-    }
-
-    const resultados = [];
-
-    // UMA chamada por DATA
-    for (const data of datas) {
-
-        const dados =
-            await atualizarResultadosDoDia(data);
-
-        if (Array.isArray(dados)) {
-            resultados.push(...dados);
-        }
-    }
-
-    return resultados;
-}
-
-
-async function obterResultadoComCache(fixtureId) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave) return null;
-
-    // ==========================================
-    // 1. MEMÓRIA
-    // ==========================================
-
-    if (cacheMemoria.resultados.has(chave)) {
-
-        const memoria =
-            cacheMemoria.resultados.get(chave);
-
-        // Finalizado = nunca mais precisa consultar
-        if (
-            memoria.finalizado ||
-            memoria.cancelado
-        ) {
-            return memoria;
-        }
-
-        const idade =
-            Date.now() -
-            Number(memoria.atualizadoEm || 0);
-
-        if (idade < INTERVALO_RESULTADOS) {
-            return memoria;
-        }
-    }
-
-    // ==========================================
-    // 2. FIREBASE
-    // ==========================================
-
-    try {
-
-        const snapshot =
-            await db
-                .ref(`cacheMultiPlay/resultados/${chave}`)
-                .once("value");
-
-        if (snapshot.exists()) {
-
-            const cache =
-                snapshot.val();
-
-            // Finalizado = permanente
-            if (
-                cache.finalizado ||
-                cache.cancelado
-            ) {
-
-                cacheMemoria.resultados.set(
-                    chave,
-                    cache
-                );
-
-                return cache;
-            }
-
-            const idade =
-                Date.now() -
-                Number(cache.atualizadoEm || 0);
-
-            if (idade < INTERVALO_RESULTADOS) {
-
-                cacheMemoria.resultados.set(
-                    chave,
-                    cache
-                );
-
-                return cache;
-            }
-        }
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro lendo resultado:",
-            erro
-        );
-    }
-
-    return null;
-}
 
 /* =========================================================
    PIX
@@ -2811,111 +2473,44 @@ function escapeHTML(texto) {
    PLACARES
 ========================================================= */
 
-const placares = ["0:0","1:0","0:1","1:1","2:0","2:1","1:2","2:2","3:0","3:1","1:3","3:2","2:3","3:3","4:0","0:4","4:1","1:4","4:2","2:4","4:3","3:4","4:4","5:0","0:5","5:1","1:5","5:2","2:5"];
+const placares = [
 
-function criarBotoesPlacares() {
+    "0:0",
+    "1:0",
+    "0:1",
+    "1:1",
 
-    for (let i = 1; i <= 6; i++) {
+    "2:0",
+    "2:1",
+    "1:2",
+    "2:2",
 
-        const select = document.getElementById(`jogo${i}`);
+    "3:0",
+    "3:1",
+    "1:3",
+    "3:2",
+    "2:3",
+    "3:3",
 
-        if (!select) continue;
+    "4:0",
+    "0:4",
+    "4:1",
+    "1:4",
+    "4:2",
+    "2:4",
+    "4:3",
+    "3:4",
+    "4:4",
 
-        // Esconde o select original
-        select.classList.add("select-placar-original");
+    "5:0",
+    "0:5",
+    "5:1",
+    "1:5",
+    "5:2",
+    "2:5"
 
-        // Evita criar duas vezes
-        const duelo = select.closest(".duelo");
+];
 
-        if (!duelo) continue;
-
-        let container =
-            duelo.querySelector(".seletor-placares");
-
-        if (container) continue;
-
-        container =
-            document.createElement("div");
-
-        container.className =
-            "seletor-placares";
-
-        placares.forEach(placar => {
-
-            const botao =
-                document.createElement("button");
-
-            botao.type = "button";
-
-            botao.className =
-                "botao-placar";
-
-            botao.textContent =
-                placar;
-
-            botao.dataset.valor =
-                placar;
-
-            botao.addEventListener(
-                "click",
-                function () {
-
-                    /*
-                     * Seleciona o valor no select original.
-                     */
-                    select.value = placar;
-
-                    /*
-                     * Dispara o evento change.
-                     * Isso mantém seu JavaScript atual funcionando.
-                     */
-                    select.dispatchEvent(
-                        new Event(
-                            "change",
-                            {
-                                bubbles: true
-                            }
-                        )
-                    );
-
-                    /*
-                     * Remove seleção dos outros.
-                     */
-                    container
-                        .querySelectorAll(
-                            ".botao-placar"
-                        )
-                        .forEach(btn => {
-
-                            btn.classList.remove(
-                                "selecionado"
-                            );
-
-                        });
-
-                    /*
-                     * Marca o botão escolhido.
-                     */
-                    botao.classList.add(
-                        "selecionado"
-                    );
-
-                }
-            );
-
-            container.appendChild(botao);
-
-        });
-
-        /*
-         * Coloca a grade depois do select.
-         */
-        select.insertAdjacentElement(
-            "afterend",
-            container
-        );
-    }
-}
 
 /* =========================================================
    JOGOS
@@ -2969,7 +2564,7 @@ let jogos = {
 
 
 /* =========================================================
-   CONTROLES
+   CONTROLE API
 ========================================================= */
 
 let jogosVieramDaAPI = false;
@@ -2979,21 +2574,6 @@ let carregandoJogosAPI = false;
 let palpiteParaConfirmar = null;
 
 let atualizacaoResultadosEmAndamento = false;
-
-
-/*
-   Evita consultar o mesmo fixture várias vezes
-   durante uma mesma atualização.
-*/
-const resultadosEmMemoria =
-    new Map();
-
-
-/*
-   Evita chamadas simultâneas do mesmo fixture.
-*/
-const consultasResultadoEmAndamento =
-    new Map();
 
 
 /* =========================================================
@@ -3025,397 +2605,62 @@ const PRIORIDADE_COMPETICOES = {
 
 
 /* =========================================================
-   CONTROLE DE CHAMADAS API
-========================================================= */
-
-/*
-   Esta é a ÚNICA função que reserva chamada da API.
-
-   Todas as consultas API passam por ela.
-*/
-async function reservarChamadaAPI() {
-
-    const hoje =
-        new Date()
-            .toISOString()
-            .slice(0, 10);
-
-    const ref =
-        db.ref(
-            "cacheMultiPlay/controle"
-        );
-
-    let chamadaLiberada = false;
-
-    try {
-
-        const resultado =
-            await ref.transaction(
-                function(controle) {
-
-                    /*
-                       Primeiro acesso ou novo dia.
-                    */
-                    if (
-                        !controle ||
-                        controle.data !== hoje
-                    ) {
-
-                        chamadaLiberada =
-                            true;
-
-                        return {
-
-                            data:
-                                hoje,
-
-                            chamadasHoje:
-                                1
-
-                        };
-
-                    }
-
-                    const chamadas =
-                        Number(
-                            controle.chamadasHoje || 0
-                        );
-
-                    /*
-                       Limite de segurança.
-                    */
-                    if (
-                        chamadas >=
-                        LIMITE_SEGURANCA
-                    ) {
-
-                        chamadaLiberada =
-                            false;
-
-                        return;
-
-                    }
-
-                    /*
-                       Limite absoluto.
-                    */
-                    if (
-                        chamadas >=
-                        LIMITE_API_DIA
-                    ) {
-
-                        chamadaLiberada =
-                            false;
-
-                        return;
-
-                    }
-
-                    chamadaLiberada =
-                        true;
-
-                    return {
-
-                        ...controle,
-
-                        chamadasHoje:
-                            chamadas + 1
-
-                    };
-
-                }
-            );
-
-
-        if (
-            !resultado.committed ||
-            !chamadaLiberada
-        ) {
-
-            console.warn(
-                "🚫 API BLOQUEADA. Limite de 20 chamadas atingido."
-            );
-
-            return false;
-
-        }
-
-
-        const dados =
-            resultado.snapshot.val();
-
-
-        console.log(
-            `📡 Chamada API autorizada: ${dados.chamadasHoje}/${LIMITE_SEGURANCA}`
-        );
-
-
-        return true;
-
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro no controle da API:",
-            erro
-        );
-
-        return false;
-
-    }
-
-}
-
-
-/* =========================================================
-   CONSULTAR API
-========================================================= */
-
-/* =========================================================
-   CONSULTAR API
-   TODAS AS CHAMADAS DEVEM PASSAR AQUI
-========================================================= */
-
-async function consultarAPI(endpoint) {
-
-    /*
-     * Evita chamadas duplicadas exatamente iguais.
-     */
-    if (chamadasEmAndamento.has(endpoint)) {
-
-        console.log(
-            "⏳ Reutilizando chamada em andamento:",
-            endpoint
-        );
-
-        return chamadasEmAndamento.get(endpoint);
-    }
-
-    const permitido = await reservarChamadaAPI();
-
-    if (!permitido) {
-
-        console.warn(
-            "🚫 Chamada API bloqueada:",
-            endpoint
-        );
-
-        return null;
-    }
-
-    const promessa = (async () => {
-
-        try {
-
-            console.log(
-                "🌐 CONSULTANDO API:",
-                endpoint
-            );
-
-            const resposta = await fetch(
-                API_BASE + endpoint,
-                {
-                    method: "GET",
-                    headers: {
-                        "x-apisports-key": API_KEY
-                    }
-                }
-            );
-
-            if (!resposta.ok) {
-
-                throw new Error(
-                    `HTTP ${resposta.status}`
-                );
-            }
-
-            const dados = await resposta.json();
-
-            return dados;
-
-        } catch (erro) {
-
-            console.error(
-                "❌ Erro API:",
-                erro
-            );
-
-            return null;
-
-        } finally {
-
-            chamadasEmAndamento.delete(endpoint);
-
-        }
-
-    })();
-
-    chamadasEmAndamento.set(
-        endpoint,
-        promessa
-    );
-
-    return promessa;
-}
-
-/* =========================================================
-   DATA ATUAL DA API
-========================================================= */
-
-/* =========================================================
-   DATA DE CONTROLE DA API - SÃO PAULO
+   DATA ATUAL
 ========================================================= */
 
 function obterDataHojeAPI() {
 
-    return new Intl.DateTimeFormat(
-        "en-CA",
-        {
-            timeZone: API_TIMEZONE,
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        }
-    ).format(new Date());
+    const agora =
+        new Date();
 
-}
+    const formatter =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone:
+                    API_TIMEZONE,
 
-        
+                year:
+                    "numeric",
 
-/* =========================================================
-   RESERVAR CHAMADA API
-========================================================= */
+                month:
+                    "2-digit",
 
-async function reservarChamadaAPI() {
-
-    // Se já atingiu o limite nesta sessão
-    if (chamadasAPILocal >= LIMITE_SEGURANCA) {
-
-        console.warn(
-            `🚫 Limite interno atingido: ${chamadasAPILocal}/${LIMITE_SEGURANCA}`
-        );
-
-        return false;
-    }
-
-    /*
-     * Só consulta o contador Firebase uma vez
-     * por abertura do site.
-     */
-    if (!controleAPICarregado) {
-
-        try {
-
-            const hoje = obterDataHojeAPI();
-
-            const snapshot = await db
-                .ref("cacheMultiPlay/controle")
-                .once("value");
-
-            const controle = snapshot.val() || {};
-
-            if (controle.data === hoje) {
-
-                chamadasAPILocal =
-                    Number(controle.chamadasHoje) || 0;
-
-            } else {
-
-                chamadasAPILocal = 0;
-
+                day:
+                    "2-digit"
             }
-
-            controleAPICarregado = true;
-
-        } catch (erro) {
-
-            console.warn(
-                "⚠️ Firebase desconectado ao consultar controle da API."
-            );
-
-            /*
-             * NÃO chama a API sem conseguir verificar
-             * o limite.
-             */
-            return false;
-        }
-    }
-
-    if (chamadasAPILocal >= LIMITE_SEGURANCA) {
-
-        console.warn(
-            `🚫 API bloqueada: ${chamadasAPILocal}/${LIMITE_SEGURANCA}`
         );
 
-        return false;
-    }
+    return formatter.format(agora);
 
-    chamadasAPILocal++;
-
-    /*
-     * Atualização do contador não bloqueia a API.
-     */
-    const hoje = obterDataHojeAPI();
-
-    db.ref("cacheMultiPlay/controle")
-        .set({
-            data: hoje,
-            chamadasHoje: chamadasAPILocal,
-            ultimaChamadaEm: Date.now()
-        })
-        .catch(erro => {
-
-            console.warn(
-                "⚠️ Não foi possível atualizar contador:",
-                erro.message || erro
-            );
-
-        });
-
-    console.log(
-        `📡 API: chamada ${chamadasAPILocal}/${LIMITE_SEGURANCA}`
-    );
-
-    return true;
 }
+
 
 /* =========================================================
    CONVERTER DATA API
 ========================================================= */
 
-function converterDataAPI(
-    dataISO
-) {
+function converterDataAPI(dataISO) {
 
     if (!dataISO) {
         return null;
     }
 
-
     const data =
-        new Date(
-            dataISO
-        );
-
+        new Date(dataISO);
 
     if (
         Number.isNaN(
             data.getTime()
         )
     ) {
-
         return null;
-
     }
-
 
     const partes =
         new Intl.DateTimeFormat(
-
             "en-CA",
-
             {
-
                 timeZone:
                     API_TIMEZONE,
 
@@ -3436,16 +2681,10 @@ function converterDataAPI(
 
                 hour12:
                     false
-
             }
-
-        ).formatToParts(
-            data
-        );
-
+        ).formatToParts(data);
 
     const valores = {};
-
 
     partes.forEach(
         function(parte) {
@@ -3464,7 +2703,6 @@ function converterDataAPI(
 
         }
     );
-
 
     return {
 
@@ -3485,44 +2723,78 @@ function converterDataAPI(
 
 async function buscarJogosAPI(data) {
 
-    const chave =
-        String(data || "").trim();
+    try {
 
-    if (!chave) {
-        return [];
-    }
+        console.log(
+            "🌐 API-Football:",
+            data
+        );
 
-    const endpoint =
-        `/fixtures?date=${encodeURIComponent(chave)}` +
-        `&timezone=${encodeURIComponent(API_TIMEZONE)}`;
+        const url =
+            `${API_BASE}/fixtures?date=${encodeURIComponent(data)}&timezone=${encodeURIComponent(API_TIMEZONE)}`;
 
-    const resposta =
-        await consultarAPI(endpoint);
+        const resposta =
+            await fetch(
+                url,
+                {
+                    method:
+                        "GET",
 
-    if (
-        !resposta ||
-        !Array.isArray(resposta.response)
-    ) {
+                    headers: {
+                        "x-apisports-key":
+                            API_KEY
+                    }
+                }
+            );
 
-        console.warn(
-            "⚠️ API não retornou jogos."
+        if (!resposta.ok) {
+
+            throw new Error(
+                `HTTP ${resposta.status}`
+            );
+
+        }
+
+        const resultado =
+            await resposta.json();
+
+        if (
+            !resultado ||
+            !Array.isArray(
+                resultado.response
+            )
+        ) {
+
+            return [];
+
+        }
+
+        console.log(
+            "⚽ Jogos encontrados:",
+            resultado.response.length
+        );
+
+        return resultado.response;
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro API-Football:",
+            erro
         );
 
         return [];
+
     }
 
-    return resposta.response.map(
-        transformarJogoAPI
-    );
 }
+
 
 /* =========================================================
    TRANSFORMAR JOGO API
 ========================================================= */
 
-function transformarJogoAPI(
-    item
-) {
+function transformarJogoAPI(item) {
 
     if (
         !item ||
@@ -3533,7 +2805,6 @@ function transformarJogoAPI(
 
     }
 
-
     const fixture =
         item.fixture;
 
@@ -3543,28 +2814,23 @@ function transformarJogoAPI(
     const teams =
         item.teams || {};
 
-
     const dataConvertida =
         converterDataAPI(
             fixture.date
         );
 
-
     if (!dataConvertida) {
         return null;
     }
-
 
     const fixtureId =
         String(
             fixture.id || ""
         ).trim();
 
-
     if (!fixtureId) {
         return null;
     }
-
 
     const timeA =
         teams.home?.name ||
@@ -3574,13 +2840,11 @@ function transformarJogoAPI(
         teams.away?.name ||
         "Time B";
 
-
     const status =
         String(
             fixture.status?.short ||
             "NS"
         ).toUpperCase();
-
 
     return {
 
@@ -3685,15 +2949,12 @@ function transformarJogoAPI(
    PRIORIDADE
 ========================================================= */
 
-function obterPrioridadeCompeticao(
-    jogo
-) {
+function obterPrioridadeCompeticao(jogo) {
 
     const liga =
         Number(
             jogo?.ligaId || 0
         );
-
 
     if (
         PRIORIDADE_COMPETICOES[
@@ -3707,7 +2968,6 @@ function obterPrioridadeCompeticao(
 
     }
 
-
     return 100;
 
 }
@@ -3717,15 +2977,12 @@ function obterPrioridadeCompeticao(
    SÉRIE A/B
 ========================================================= */
 
-function ehSerieAB(
-    jogo
-) {
+function ehSerieAB(jogo) {
 
     const liga =
         Number(
             jogo?.ligaId || 0
         );
-
 
     return (
         liga === 71 ||
@@ -3739,9 +2996,7 @@ function ehSerieAB(
    ORDENAR
 ========================================================= */
 
-function ordenarJogosAPI(
-    lista
-) {
+function ordenarJogosAPI(lista) {
 
     return lista.sort(
         function(a, b) {
@@ -3756,7 +3011,6 @@ function ordenarJogosAPI(
                     b
                 );
 
-
             if (
                 prioridadeA !==
                 prioridadeB
@@ -3768,7 +3022,6 @@ function ordenarJogosAPI(
                 );
 
             }
-
 
             return (
                 new Date(
@@ -3789,9 +3042,7 @@ function ordenarJogosAPI(
    SELECIONAR 6
 ========================================================= */
 
-function selecionarSeisJogos(
-    lista
-) {
+function selecionarSeisJogos(lista) {
 
     if (
         !Array.isArray(lista)
@@ -3801,10 +3052,8 @@ function selecionarSeisJogos(
 
     }
 
-
     const mapa =
         new Map();
-
 
     lista.forEach(
         function(jogo) {
@@ -3826,18 +3075,15 @@ function selecionarSeisJogos(
         }
     );
 
-
     const todos =
         Array.from(
             mapa.values()
         );
 
-
     const serieAB =
         todos.filter(
             ehSerieAB
         );
-
 
     const outros =
         todos.filter(
@@ -3850,7 +3096,6 @@ function selecionarSeisJogos(
             }
         );
 
-
     ordenarJogosAPI(
         serieAB
     );
@@ -3859,14 +3104,8 @@ function selecionarSeisJogos(
         outros
     );
 
+    const selecionados = [];
 
-    const selecionados =
-        [];
-
-
-    /*
-       Primeiro Série A/B.
-    */
     serieAB.forEach(
         function(jogo) {
 
@@ -3884,10 +3123,6 @@ function selecionarSeisJogos(
         }
     );
 
-
-    /*
-       Depois as demais competições.
-    */
     outros.forEach(
         function(jogo) {
 
@@ -3905,7 +3140,6 @@ function selecionarSeisJogos(
         }
     );
 
-
     return selecionados;
 
 }
@@ -3915,20 +3149,16 @@ function selecionarSeisJogos(
    JOGO FUTURO
 ========================================================= */
 
-function jogoAindaNaoComecouAPI(
-    jogo
-) {
+function jogoAindaNaoComecouAPI(jogo) {
 
     if (!jogo) {
         return false;
     }
 
-
     const dataHora =
         obterDataJogo(
             jogo
         );
-
 
     return (
         dataHora.getTime() >
@@ -3942,12 +3172,9 @@ function jogoAindaNaoComecouAPI(
    MONTAR JOGOS
 ========================================================= */
 
-function montarJogosAPI(
-    lista
-) {
+function montarJogosAPI(lista) {
 
     jogos = {};
-
 
     for (
         let i = 1;
@@ -3957,7 +3184,6 @@ function montarJogosAPI(
 
         const jogo =
             lista[i - 1];
-
 
         if (jogo) {
 
@@ -4051,30 +3277,25 @@ function atualizarVisualDosJogosAPI() {
             ".duelo"
         );
 
-
     duelos.forEach(
         function(duelo, indice) {
 
             const numero =
                 indice + 1;
 
-
             const jogo =
                 jogos[
                     `jogo${numero}`
                 ];
 
-
             if (!jogo) {
                 return;
             }
-
 
             const imagens =
                 duelo.querySelectorAll(
                     ".time img"
                 );
-
 
             if (
                 imagens.length >= 2
@@ -4092,7 +3313,6 @@ function atualizarVisualDosJogosAPI() {
 
                 }
 
-
                 if (
                     jogo.imagemB
                 ) {
@@ -4107,12 +3327,10 @@ function atualizarVisualDosJogosAPI() {
 
             }
 
-
             const times =
                 duelo.querySelectorAll(
                     ".time"
                 );
-
 
             if (
                 times.length >= 2
@@ -4128,14 +3346,12 @@ function atualizarVisualDosJogosAPI() {
                         "p"
                     );
 
-
                 if (nomeCasa) {
 
                     nomeCasa.textContent =
                         jogo.timeA || "";
 
                 }
-
 
                 if (nomeFora) {
 
@@ -4146,12 +3362,10 @@ function atualizarVisualDosJogosAPI() {
 
             }
 
-
             const campeonato =
                 duelo.querySelector(
                     ".campeonato"
                 );
-
 
             if (
                 campeonato &&
@@ -4163,12 +3377,10 @@ function atualizarVisualDosJogosAPI() {
 
             }
 
-
             const info =
                 duelo.querySelector(
                     ".jogo-info"
                 );
-
 
             if (
                 info &&
@@ -4195,7 +3407,6 @@ function atualizarVisualDosJogosAPI() {
         }
     );
 
-
     atualizarDatasHorasDosJogos();
 
     atualizarStatusJogos();
@@ -4204,528 +3415,6 @@ function atualizarVisualDosJogosAPI() {
 
 }
 
-/* =========================================================
-   CACHE DOS JOGOS DO DIA
-========================================================= */
-
-
-
-/* =========================================================
-   LER JOGOS DO CACHE
-========================================================= */
-
-/* =========================================================
-   OBTER JOGOS DO CACHE
-========================================================= */
-
-async function obterJogosDoCache(data) {
-
-    const chave = String(data || "").trim();
-
-    if (!chave) {
-        return null;
-    }
-
-    // Primeiro memória
-    if (cacheMemoria.jogos.has(chave)) {
-
-        console.log(
-            "💾 Jogos encontrados na memória:",
-            chave
-        );
-
-        return cacheMemoria.jogos.get(chave);
-    }
-
-    try {
-
-        const snapshot = await db
-            .ref(`cacheMultiPlay/jogos/${chave}`)
-            .once("value");
-
-        if (!snapshot.exists()) {
-
-            console.log(
-                "📭 Nenhum cache de jogos:",
-                chave
-            );
-
-            return null;
-        }
-
-        const cache = snapshot.val();
-
-        if (!Array.isArray(cache.jogos)) {
-
-            return null;
-        }
-
-        cacheMemoria.jogos.set(
-            chave,
-            cache.jogos
-        );
-
-        console.log(
-            `💾 ${cache.jogos.length} jogos carregados do Firebase`
-        );
-
-        return cache.jogos;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro lendo cache dos jogos:",
-            erro
-        );
-
-        return null;
-    }
-}
-async function salvarCotacaoNoCache(
-    fixtureId,
-    cotacao
-) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave || !cotacao) {
-        return false;
-    }
-
-    try {
-
-        await db
-            .ref(`cacheMultiPlay/cotacoes/${chave}`)
-            .set({
-                fixtureId: chave,
-                atualizadoEm: Date.now(),
-                cotacao: cotacao
-            });
-
-        cacheMemoria.cotacoes.set(
-            chave,
-            {
-                fixtureId: chave,
-                atualizadoEm: Date.now(),
-                cotacao: cotacao
-            }
-        );
-
-        return true;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro salvando cotação:",
-            erro
-        );
-
-        return false;
-    }
-}
-async function buscarCotacaoComCache(fixtureId) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave) {
-        return null;
-    }
-
-    /*
-     * CACHE PRIMEIRO
-     */
-    const cache =
-        await obterCotacaoDoCache(chave);
-
-    if (cache) {
-
-        console.log(
-            `💾 Cotação ${chave} veio do cache.`
-        );
-
-        return cache.cotacao || cache;
-    }
-
-    /*
-     * Não existe cache.
-     * Faz UMA chamada.
-     */
-    console.log(
-        `🌐 Buscando cotação API: ${chave}`
-    );
-
-    const endpoint =
-        `/odds?fixture=${encodeURIComponent(chave)}`;
-
-    const resposta =
-        await consultarAPI(endpoint);
-
-    if (
-        !resposta ||
-        !Array.isArray(resposta.response) ||
-        resposta.response.length === 0
-    ) {
-
-        /*
-         * Salva ausência para não ficar
-         * chamando repetidamente.
-         */
-        await salvarCotacaoNoCache(
-            chave,
-            {
-                disponivel: false
-            }
-        );
-
-        return null;
-    }
-
-    const cotacao =
-        resposta.response[0];
-
-    await salvarCotacaoNoCache(
-        chave,
-        cotacao
-    );
-
-    return cotacao;
-}
-async function obterResultadoComCache(fixtureId) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave) {
-        return null;
-    }
-
-    /*
-     * Memória
-     */
-    if (
-        cacheMemoria.resultados.has(chave)
-    ) {
-
-        const memoria =
-            cacheMemoria.resultados.get(chave);
-
-        if (
-            memoria.finalizado ||
-            memoria.cancelado
-        ) {
-
-            return memoria;
-        }
-
-        const idade =
-            Date.now() -
-            Number(memoria.atualizadoEm || 0);
-
-        if (idade < CACHE_RESULTADO_MS) {
-
-            return memoria;
-        }
-    }
-
-    /*
-     * Firebase
-     */
-    try {
-
-        const snapshot =
-            await db
-                .ref(`cacheMultiPlay/resultados/${chave}`)
-                .once("value");
-
-        if (snapshot.exists()) {
-
-            const cache =
-                snapshot.val();
-
-            /*
-             * FINALIZADO = NUNCA MAIS API
-             */
-            if (
-                cache.finalizado ||
-                cache.cancelado
-            ) {
-
-                cacheMemoria.resultados.set(
-                    chave,
-                    cache
-                );
-
-                return cache;
-            }
-
-            /*
-             * Resultado recente
-             */
-            const idade =
-                Date.now() -
-                Number(cache.atualizadoEm || 0);
-
-            if (
-                idade <
-                CACHE_RESULTADO_MS
-            ) {
-
-                cacheMemoria.resultados.set(
-                    chave,
-                    cache
-                );
-
-                return cache;
-            }
-        }
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro lendo resultado do cache:",
-            erro
-        );
-    }
-
-    /*
-     * Só agora consulta API.
-     */
-    return await buscarResultadoAPI(chave);
-}
-
-async function salvarResultadoCache(fixtureId, resultado) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave || !resultado) {
-        return false;
-    }
-
-    const dados = {
-        fixtureId: chave,
-
-        status:
-            resultado.status ?? "",
-
-        statusLong:
-            resultado.statusLong ?? "",
-
-        placarA:
-            resultado.placarA ?? null,
-
-        placarB:
-            resultado.placarB ?? null,
-
-        golsCasa:
-            resultado.golsCasa ?? null,
-
-        golsFora:
-            resultado.golsFora ?? null,
-
-        minuto:
-            resultado.minuto ?? null,
-
-        finalizado:
-            resultado.finalizado === true,
-
-        cancelado:
-            resultado.cancelado === true,
-
-        atualizadoEm:
-            Date.now()
-    };
-
-    try {
-
-        await db
-            .ref(`cacheMultiPlay/resultados/${chave}`)
-            .set(dados);
-
-        cacheMemoria.resultados.set(
-            chave,
-            dados
-        );
-
-        console.log(
-            `💾 Resultado salvo: ${chave}`
-        );
-
-        return true;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro salvando resultado:",
-            erro
-        );
-
-        return false;
-    }
-}
-/* =========================================================
-   SALVAR JOGOS NO CACHE
-========================================================= */
-
-async function salvarJogosNoCache(data, lista) {
-
-    const chave = String(data || "").trim();
-
-    if (!chave || !Array.isArray(lista)) {
-        return false;
-    }
-
-    const agora = Date.now();
-
-    const dados = {
-        data: chave,
-        atualizadoEm: agora,
-        consultadoEm: agora,
-        quantidade: lista.length,
-        consultadoAPI: true,
-        jogos: lista
-    };
-
-    try {
-
-        await db
-            .ref(`cacheMultiPlay/jogos/${chave}`)
-            .set(dados);
-
-        cacheMemoria.jogos.set(
-            chave,
-            lista
-        );
-
-        console.log(
-            `✅ ${lista.length} jogos salvos no cache: ${chave}`
-        );
-
-        return true;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro salvando jogos no cache:",
-            erro
-        );
-
-        return false;
-    }
-}
-async function obterCotacaoDoCache(fixtureId) {
-
-    const chave =
-        String(fixtureId || "").trim();
-
-    if (!chave) {
-        return null;
-    }
-
-    if (cacheMemoria.cotacoes.has(chave)) {
-
-        return cacheMemoria.cotacoes.get(chave);
-    }
-
-    try {
-
-        const snapshot =
-            await db
-                .ref(`cacheMultiPlay/cotacoes/${chave}`)
-                .once("value");
-
-        if (!snapshot.exists()) {
-            return null;
-        }
-
-        const dados =
-            snapshot.val();
-
-        cacheMemoria.cotacoes.set(
-            chave,
-            dados
-        );
-
-        return dados;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro lendo cotação:",
-            erro
-        );
-
-        return null;
-    }
-}
-/* =========================================================
-   BUSCAR JOGOS COM CACHE
-========================================================= */
-
-async function buscarJogosComCache(data) {
-
-    const chave = String(data || "").trim();
-
-    if (!chave) {
-        return [];
-    }
-
-    /*
-     * PRIMEIRO CACHE
-     */
-    const cache = await obterJogosDoCache(chave);
-
-    if (Array.isArray(cache)) {
-
-        console.log(
-            "🟢 JOGOS VIERAM DO CACHE."
-        );
-
-        jogosVieramDaAPI = false;
-
-        return cache;
-    }
-
-    /*
-     * Só chega aqui se realmente não existir cache.
-     */
-    console.log(
-        "🔴 CACHE DE JOGOS NÃO EXISTE."
-    );
-
-    console.log(
-        "🌐 Será feita UMA consulta à API."
-    );
-
-    const jogosAPI =
-        await buscarJogosAPI(chave);
-
-    const lista =
-        Array.isArray(jogosAPI)
-            ? jogosAPI
-            : [];
-
-    /*
-     * Salva inclusive lista vazia.
-     * Isso impede ficar chamando API toda vez
-     * quando a API não encontrou jogos.
-     */
-    await salvarJogosNoCache(
-        chave,
-        lista
-    );
-
-    jogosVieramDaAPI =
-        lista.length > 0;
-
-    return lista;
-}
-
-/* =========================================================
-   CARREGAR JOGOS
-========================================================= */
 
 /* =========================================================
    CARREGAR JOGOS
@@ -4733,128 +3422,84 @@ async function buscarJogosComCache(data) {
 
 async function carregarJogos() {
 
-    if (carregandoJogosAPI) return;
+    if (
+        carregandoJogosAPI
+    ) {
 
-    carregandoJogosAPI = true;
+        return;
+
+    }
+
+    carregandoJogosAPI =
+        true;
 
     const modal =
-        document.getElementById("meuModal");
+        document.getElementById(
+            "meuModal"
+        );
 
     if (modal) {
-        modal.style.display = "flex";
+
+        modal.style.display =
+            "flex";
+
     }
 
     try {
 
-        // SOMENTE A DATA DE HOJE
-        const dataHoje =
+        const data =
             obterDataHojeAPI();
 
         console.log(
-            "🔎 Buscando jogos de hoje:",
-            dataHoje
+            "📅 Procurando jogos de:",
+            data
         );
 
         const resposta =
-            await buscarJogosComCache(
-                dataHoje
+            await buscarJogosAPI(
+                data
             );
 
-        if (
-            !Array.isArray(resposta)
-        ) {
-
-            console.warn(
-                "⚠️ API não retornou jogos."
-            );
-
-            return;
-        }
-
-
-        /*
-         * Converte os jogos recebidos
-         */
-        let jogosHoje =
+        let convertidos =
             resposta
-                .map(transformarJogoAPI)
+                .map(
+                    transformarJogoAPI
+                )
                 .filter(Boolean);
 
+        convertidos =
+            convertidos.filter(
+                function(jogo) {
 
-        /*
-         * Mantém somente jogos que ainda
-         * não começaram.
-         */
-        jogosHoje =
-            jogosHoje.filter(
-                jogo =>
-                    jogoAindaNaoComecouAPI(jogo)
-            );
-
-
-        /*
-         * Remove duplicados pelo fixtureId
-         */
-        const mapa =
-            new Map();
-
-        jogosHoje.forEach(
-            jogo => {
-
-                const id =
-                    jogo.fixtureId ||
-                    jogo.apiFixtureId ||
-                    jogo.idAPI;
-
-                if (id) {
-
-                    mapa.set(
-                        String(id),
+                    return jogoAindaNaoComecouAPI(
                         jogo
                     );
 
                 }
-
-            }
-        );
-
-
-        jogosHoje =
-            Array.from(
-                mapa.values()
             );
 
-
-        /*
-         * Seleciona no máximo 6 jogos
-         */
         const selecionados =
             selecionarSeisJogos(
-                jogosHoje
+                convertidos
             );
 
+        console.log(
+            "🏆 Jogos escolhidos:",
+            selecionados
+        );
 
         if (
             selecionados.length > 0
         ) {
 
-            console.log(
-                "✅ Jogos futuros de hoje:",
-                selecionados
-            );
-
-
             montarJogosAPI(
                 selecionados
             );
 
-
             jogosVieramDaAPI =
                 true;
 
-
             atualizarVisualDosJogosAPI();
-
 
             for (
                 let i = 1;
@@ -4868,51 +3513,52 @@ async function carregarJogos() {
 
             }
 
-
-            atualizarStatusJogos();
-
-            atualizarProximoJogo();
-
+            console.log(
+                "✅ Jogos da API carregados."
+            );
 
         } else {
 
             console.warn(
-                "⚠️ Nenhum jogo futuro disponível hoje."
+                "⚠️ Nenhum jogo futuro encontrado."
             );
 
-
-            jogos = {};
-
-
             atualizarVisualDosJogosAPI();
-
-            atualizarStatusJogos();
-
-            atualizarProximoJogo();
 
         }
 
     } catch (erro) {
 
         console.error(
-            "❌ Erro ao carregar jogos de hoje:",
+            "❌ ERRO AO CARREGAR JOGOS:",
             erro
         );
 
     } finally {
 
-        carregandoJogosAPI = false;
+        carregandoJogosAPI =
+            false;
 
         if (modal) {
-            modal.style.display = "none";
+
+            modal.style.display =
+                "none";
+
         }
 
     }
 
 }
+
+
 /* =========================================================
-   FIREBASE CONFIGURAÇÃO DOS JOGOS
+   CONFIGURAÇÃO FIREBASE DOS JOGOS
 ========================================================= */
+
+const configuracaoJogosRef =
+    db.ref(
+        "configuracaoJogos"
+    );
 
 configuracaoJogosRef.on(
     "value",
@@ -4921,11 +3567,9 @@ configuracaoJogosRef.on(
         const dados =
             snapshot.val();
 
-
         if (!dados) {
             return;
         }
-
 
         for (
             let i = 1;
@@ -4936,15 +3580,12 @@ configuracaoJogosRef.on(
             const chave =
                 "jogo" + i;
 
-
             const dadosJogo =
                 dados[chave];
-
 
             if (!dadosJogo) {
                 continue;
             }
-
 
             if (
                 !jogos[chave]
@@ -4962,7 +3603,6 @@ configuracaoJogosRef.on(
 
             }
 
-
             if (
                 !jogosVieramDaAPI
             ) {
@@ -4976,7 +3616,6 @@ configuracaoJogosRef.on(
 
                 }
 
-
                 if (
                     dadosJogo.hora
                 ) {
@@ -4985,7 +3624,6 @@ configuracaoJogosRef.on(
                         dadosJogo.hora;
 
                 }
-
 
                 if (
                     dadosJogo.casaImagem
@@ -4998,7 +3636,6 @@ configuracaoJogosRef.on(
                         dadosJogo.casaImagem;
 
                 }
-
 
                 if (
                     dadosJogo.foraImagem
@@ -5015,7 +3652,6 @@ configuracaoJogosRef.on(
             }
 
         }
-
 
         if (
             !jogosVieramDaAPI
@@ -5046,32 +3682,26 @@ function atualizarImagensDosJogos() {
             ".duelo"
         );
 
-
     duelos.forEach(
         function(duelo, indice) {
 
             const numero =
                 indice + 1;
 
-
             const chave =
                 "jogo" + numero;
 
-
             const jogo =
                 jogos[chave];
-
 
             if (!jogo) {
                 return;
             }
 
-
             const imagens =
                 duelo.querySelectorAll(
                     ".time img"
                 );
-
 
             if (
                 imagens.length >= 2
@@ -5085,7 +3715,6 @@ function atualizarImagensDosJogos() {
                         jogo.casaImagem;
 
                 }
-
 
                 if (
                     jogo.foraImagem
@@ -5101,7 +3730,6 @@ function atualizarImagensDosJogos() {
         }
     );
 
-
     atualizarNomesDosTimes();
 
 }
@@ -5111,9 +3739,7 @@ function atualizarImagensDosJogos() {
    ID JOGADOR
 ========================================================= */
 
-function criarIdJogador(
-    nome
-) {
+function criarIdJogador(nome) {
 
     return String(nome)
 
@@ -5150,7 +3776,6 @@ function obterNome() {
             "nomeJogador"
         );
 
-
     if (
         nome &&
         nome.trim() !== ""
@@ -5160,14 +3785,12 @@ function obterNome() {
 
     }
 
-
     while (true) {
 
         nome =
             prompt(
                 "👤 Digite seu nome:"
             );
-
 
         if (
             nome === null
@@ -5181,10 +3804,8 @@ function obterNome() {
 
         }
 
-
         nome =
             nome.trim();
-
 
         if (
             nome !== ""
@@ -5198,7 +3819,6 @@ function obterNome() {
             return nome;
 
         }
-
 
         alert(
             "⚠️ Digite um nome válido."
@@ -5220,51 +3840,41 @@ function abrirModalPix() {
             "modalPix"
         );
 
-
     const valorRecarga =
         document.getElementById(
             "valorRecarga"
         );
-
 
     const areaPix =
         document.getElementById(
             "areaPix"
         );
 
-
     const chavePix =
         document.getElementById(
             "chavePix"
         );
-
 
     const pixCopiado =
         document.getElementById(
             "pixCopiado"
         );
 
-
     if (valorRecarga) {
         valorRecarga.value = "";
     }
-
 
     if (areaPix) {
         areaPix.style.display = "none";
     }
 
-
     if (pixCopiado) {
         pixCopiado.textContent = "";
     }
 
-
     if (chavePix) {
-        chavePix.textContent =
-            CHAVE_PIX;
+        chavePix.textContent = CHAVE_PIX;
     }
-
 
     if (modalPix) {
         modalPix.classList.add("ativo");
@@ -5279,7 +3889,6 @@ function fecharModalPix() {
         document.getElementById(
             "modalPix"
         );
-
 
     if (modalPix) {
 
@@ -5303,30 +3912,25 @@ async function gerarSolicitacaoPix() {
             "valorRecarga"
         );
 
-
     const areaPix =
         document.getElementById(
             "areaPix"
         );
-
 
     const chavePix =
         document.getElementById(
             "chavePix"
         );
 
-
     const pixCopiado =
         document.getElementById(
             "pixCopiado"
         );
 
-
     const valor =
         Number(
             valorRecarga?.value
         );
-
 
     if (
         !Number.isFinite(valor) ||
@@ -5341,21 +3945,17 @@ async function gerarSolicitacaoPix() {
 
     }
 
-
     const nome =
         obterNome();
-
 
     if (!nome) {
         return;
     }
 
-
     const jogadorId =
         criarIdJogador(
             nome
         );
-
 
     try {
 
@@ -5365,7 +3965,6 @@ async function gerarSolicitacaoPix() {
                     "solicitacoesRecarga"
                 )
                 .push();
-
 
         await solicitacaoRef.set({
 
@@ -5397,24 +3996,17 @@ async function gerarSolicitacaoPix() {
 
         });
 
-
         if (areaPix) {
-            areaPix.style.display =
-                "block";
+            areaPix.style.display = "block";
         }
-
 
         if (chavePix) {
-            chavePix.textContent =
-                CHAVE_PIX;
+            chavePix.textContent = CHAVE_PIX;
         }
-
 
         if (pixCopiado) {
-            pixCopiado.textContent =
-                "";
+            pixCopiado.textContent = "";
         }
-
 
         alert(
             "✅ Solicitação registrada!\n\n" +
@@ -5425,13 +4017,9 @@ async function gerarSolicitacaoPix() {
             "\n\nFaça o Pix e aguarde a confirmação."
         );
 
-
     } catch (erro) {
 
-        console.error(
-            erro
-        );
-
+        console.error(erro);
 
         alert(
             "❌ Não foi possível registrar a solicitação.\n\n" +
@@ -5454,12 +4042,10 @@ async function copiarPix() {
             "pixCopiado"
         );
 
-
     const botao =
         document.getElementById(
             "copiarPix"
         );
-
 
     try {
 
@@ -5479,84 +4065,60 @@ async function copiarPix() {
                     "textarea"
                 );
 
-
             campo.value =
                 CHAVE_PIX;
-
 
             campo.style.position =
                 "fixed";
 
-
             campo.style.opacity =
                 "0";
-
 
             document.body.appendChild(
                 campo
             );
 
-
             campo.focus();
 
             campo.select();
-
 
             document.execCommand(
                 "copy"
             );
 
-
             campo.remove();
 
         }
 
-
         if (pixCopiado) {
-
             pixCopiado.textContent =
                 "✅ Chave Pix copiada!";
-
         }
-
 
         if (botao) {
-
             botao.textContent =
                 "✅ PIX COPIADO";
-
         }
-
 
         setTimeout(
             function() {
 
                 if (pixCopiado) {
-
-                    pixCopiado.textContent =
-                        "";
-
+                    pixCopiado.textContent = "";
                 }
 
-
                 if (botao) {
-
                     botao.textContent =
                         "📋 COPIAR PIX";
-
                 }
 
             },
             1000
         );
 
-
     } catch (erro) {
 
-        console.error(
-            erro
-        );
-
+        console.error(erro);
 
         alert(
             "❌ Não foi possível copiar automaticamente.\n\n" +
@@ -5577,12 +4139,10 @@ function carregarConfiguracao() {
     const nome =
         obterNome();
 
-
     const id =
         criarIdJogador(
             nome
         );
-
 
     jogadoresRef
         .child(id)
@@ -5607,29 +4167,24 @@ function carregarConfiguracao() {
 
                     };
 
-
                     atualizarTela();
 
                     return;
 
                 }
 
-
                 const dados =
                     snapshot.val();
-
 
                 configuracao.saldo =
                     Number(
                         dados.saldo
                     ) || 0;
 
-
                 configuracao.valorLiberacao =
                     Number(
                         dados.valorLiberacao
                     );
-
 
                 if (
                     !Number.isFinite(
@@ -5642,12 +4197,10 @@ function carregarConfiguracao() {
 
                 }
 
-
                 configuracao.premio =
                     Number(
                         dados.premio
                     ) || 10000;
-
 
                 atualizarTela();
 
@@ -5668,24 +4221,20 @@ function atualizarTela() {
             "saldoTela"
         );
 
-
     const valorTela =
         document.getElementById(
             "valorTela"
         );
-
 
     const premioTela =
         document.getElementById(
             "premioTela"
         );
 
-
     const situacao =
         document.getElementById(
             "situacao"
         );
-
 
     if (saldoTela) {
 
@@ -5696,7 +4245,6 @@ function atualizarTela() {
 
     }
 
-
     if (valorTela) {
 
         valorTela.textContent =
@@ -5705,7 +4253,6 @@ function atualizarTela() {
             );
 
     }
-
 
     if (premioTela) {
 
@@ -5716,11 +4263,9 @@ function atualizarTela() {
 
     }
 
-
     const podeMarcar =
         configuracao.saldo >=
         configuracao.valorLiberacao;
-
 
     if (situacao) {
 
@@ -5766,7 +4311,6 @@ function atualizarTela() {
 
     }
 
-
     atualizarStatusJogos();
 
 }
@@ -5787,18 +4331,15 @@ function atualizarPremio() {
                 String(valor).trim() !== ""
         ).length;
 
-
     const premio =
         premiosPorQuantidade[
             quantidade
         ] || 0;
 
-
     const premioTela =
         document.getElementById(
             "premioTela"
         );
-
 
     if (premioTela) {
 
@@ -5809,12 +4350,10 @@ function atualizarPremio() {
 
     }
 
-
     const valorReceber =
         document.getElementById(
             "valorReceberConfirmacao"
         );
-
 
     if (valorReceber) {
 
@@ -5825,7 +4364,6 @@ function atualizarPremio() {
 
     }
 
-
     return premio;
 
 }
@@ -5835,43 +4373,32 @@ function atualizarPremio() {
    SELECT
 ========================================================= */
 
-function preencherSelect(
-    id
-) {
+function preencherSelect(id) {
 
     const select =
         document.getElementById(
             id
         );
 
-
     if (!select) {
         return;
     }
 
-
-    select.innerHTML =
-        "";
-
+    select.innerHTML = "";
 
     const opcaoInicial =
         document.createElement(
             "option"
         );
 
-
-    opcaoInicial.value =
-        "";
-
+    opcaoInicial.value = "";
 
     opcaoInicial.textContent =
         "Selecione o placar";
 
-
     select.appendChild(
         opcaoInicial
     );
-
 
     placares.forEach(
         function(placar) {
@@ -5881,14 +4408,11 @@ function preencherSelect(
                     "option"
                 );
 
-
             option.value =
                 placar;
 
-
             option.textContent =
                 placar;
-
 
             select.appendChild(
                 option
@@ -5915,27 +4439,22 @@ function atualizarPlacar(
             selectId
         );
 
-
     const casa =
         document.getElementById(
             casaId
         );
-
 
     const fora =
         document.getElementById(
             foraId
         );
 
-
     if (!select) {
         return;
     }
 
-
     const valor =
         select.value;
-
 
     if (!valor) {
 
@@ -5943,34 +4462,27 @@ function atualizarPlacar(
             casa.textContent = "-";
         }
 
-
         if (fora) {
             fora.textContent = "-";
         }
 
-
         atualizarPremio();
 
         return;
-
     }
-
 
     const partes =
         valor.split(":");
-
 
     if (casa) {
         casa.textContent =
             partes[0];
     }
 
-
     if (fora) {
         fora.textContent =
             partes[1];
     }
-
 
     atualizarPremio();
 
@@ -5983,131 +4495,39 @@ function atualizarPlacar(
 
 function obterDataJogo(jogo) {
 
-    if (!jogo) {
-        return new Date(0);
-    }
-
-    const data =
-        String(jogo.data || "").trim();
-
-    const hora =
-        String(jogo.hora || "").trim();
-
-    if (!data || !hora) {
-        return new Date(0);
-    }
-
-    /*
-     * O jogo já está convertido para o horário
-     * de São Paulo pela API.
-     *
-     * Criamos a data como horário local,
-     * sem conversão UTC adicional.
-     */
-    const partesData =
-        data.split("-").map(Number);
-
-    const partesHora =
-        hora.split(":").map(Number);
-
     if (
-        partesData.length !== 3 ||
-        partesHora.length < 2
+        !jogo ||
+        !jogo.data ||
+        !jogo.hora
     ) {
+
         return new Date(0);
+
     }
-
-    const ano = partesData[0];
-    const mes = partesData[1];
-    const dia = partesData[2];
-
-    const horaJogo = partesHora[0];
-    const minutoJogo = partesHora[1];
 
     return new Date(
-        ano,
-        mes - 1,
-        dia,
-        horaJogo,
-        minutoJogo,
-        0,
-        0
+        jogo.data +
+        "T" +
+        jogo.hora +
+        ":00"
     );
+
 }
 
 
-function jogoAindaNaoComecouAPI(jogo) {
+/* =========================================================
+   JOGO ABERTO
+========================================================= */
 
-    if (!jogo) {
-        return false;
-    }
+function jogoEstaAberto(jogo) {
 
-    /*
-     * Jogos cancelados/adiados não entram.
-     */
-    const status =
-        String(
-            jogo.status ||
-            ""
-        ).toUpperCase();
-
-    if (
-        STATUS_CANCELADO.includes(status)
-    ) {
-        return false;
-    }
-
-    /*
-     * Se a API já informou que começou,
-     * não mostrar como jogo futuro.
-     */
-    const statusAoVivo = [
-        "1H",
-        "HT",
-        "2H",
-        "ET",
-        "BT",
-        "P",
-        "LIVE",
-        "INT"
-    ];
-
-    if (
-        statusAoVivo.includes(status)
-    ) {
-        return false;
-    }
-
-    /*
-     * Jogos finalizados também não entram.
-     */
-    if (
-        STATUS_FINAL.includes(status)
-    ) {
-        return false;
-    }
-
-    const horarioJogo =
-        obterDataJogo(jogo);
-
-    if (
-        horarioJogo.getTime() <= 0
-    ) {
-        return false;
-    }
-
-    const agora =
-        new Date();
-
-    /*
-     * Pequena margem de 30 segundos.
-     * Evita que um jogo exatamente no horário
-     * seja considerado futuro.
-     */
     return (
-        horarioJogo.getTime() >
-        agora.getTime() + 30000
+        new Date() <
+        obterDataJogo(
+            jogo
+        )
     );
+
 }
 
 
@@ -6115,27 +4535,22 @@ function jogoAindaNaoComecouAPI(jogo) {
    FORMATAR TEMPO
 ========================================================= */
 
-function formatarTempo(
-    ms
-) {
+function formatarTempo(ms) {
 
     if (ms <= 0) {
         return "00:00";
     }
-
 
     const totalSegundos =
         Math.floor(
             ms / 1000
         );
 
-
     const horas =
         Math.floor(
             totalSegundos /
             3600
         );
-
 
     const minutos =
         Math.floor(
@@ -6145,44 +4560,26 @@ function formatarTempo(
             ) / 60
         );
 
-
     const segundos =
         totalSegundos %
         60;
 
-
     if (horas > 0) {
 
         return (
-
-            String(horas)
-                .padStart(2, "0") +
-
+            String(horas).padStart(2, "0") +
             ":" +
-
-            String(minutos)
-                .padStart(2, "0") +
-
+            String(minutos).padStart(2, "0") +
             ":" +
-
-            String(segundos)
-                .padStart(2, "0")
-
+            String(segundos).padStart(2, "0")
         );
 
     }
 
-
     return (
-
-        String(minutos)
-            .padStart(2, "0") +
-
+        String(minutos).padStart(2, "0") +
         ":" +
-
-        String(segundos)
-            .padStart(2, "0")
-
+        String(segundos).padStart(2, "0")
     );
 
 }
@@ -6192,18 +4589,14 @@ function formatarTempo(
    FORMATAR DATA
 ========================================================= */
 
-function formatarData(
-    data
-) {
+function formatarData(data) {
 
     if (!data) {
         return "";
     }
 
-
     const partes =
         String(data).split("-");
-
 
     if (
         partes.length !== 3
@@ -6213,15 +4606,12 @@ function formatarData(
 
     }
 
-
     return (
-
         partes[2] +
         "/" +
         partes[1] +
         "/" +
         partes[0]
-
     );
 
 }
@@ -6236,7 +4626,6 @@ function atualizarStatusJogos() {
     const agora =
         new Date();
 
-
     Object.keys(jogos)
         .forEach(
             function(chave) {
@@ -6244,40 +4633,33 @@ function atualizarStatusJogos() {
                 const jogo =
                     jogos[chave];
 
-
                 const select =
                     document.getElementById(
                         jogo.select
                     );
 
-
                 if (!select) {
                     return;
                 }
-
 
                 const horario =
                     obterDataJogo(
                         jogo
                     );
 
-
                 const duelo =
                     select.closest(
                         ".duelo"
                     );
 
-
                 if (!duelo) {
                     return;
                 }
-
 
                 let contador =
                     duelo.querySelector(
                         ".contador"
                     );
-
 
                 if (!contador) {
 
@@ -6286,10 +4668,8 @@ function atualizarStatusJogos() {
                             "div"
                         );
 
-
                     contador.className =
                         "contador";
-
 
                     duelo.insertBefore(
                         contador,
@@ -6297,7 +4677,6 @@ function atualizarStatusJogos() {
                     );
 
                 }
-
 
                 if (
                     !jogo.data ||
@@ -6308,28 +4687,16 @@ function atualizarStatusJogos() {
                     select.disabled =
                         true;
 
-
                     contador.className =
                         "contador encerrado";
 
-
-                    contador.style.display =
-                        "block";
-
-
                     contador.textContent =
                         "⚠️ JOGO INDISPONÍVEL";
-
 
                     return;
 
                 }
 
-
-                /*
-                   Jogo já começou:
-                   bloqueia aposta.
-                */
                 if (
                     agora >= horario
                 ) {
@@ -6337,40 +4704,26 @@ function atualizarStatusJogos() {
                     select.disabled =
                         true;
 
-
                     select.classList.add(
                         "bloqueado"
                     );
 
-
                     contador.className =
                         "contador encerrado";
 
-
-                    contador.style.display =
-                        "block";
-
-
                     contador.textContent =
                         "🔒 PALPITES ENCERRADOS";
-
 
                     return;
 
                 }
 
-
-                /*
-                   Jogo futuro.
-                */
                 select.disabled =
                     false;
-
 
                 select.classList.remove(
                     "bloqueado"
                 );
-
 
                 if (
                     configuracao.saldo <
@@ -6384,14 +4737,11 @@ function atualizarStatusJogos() {
 
                 }
 
-
                 contador.style.display =
                     "block";
 
-
                 contador.className =
                     "contador";
-
 
                 contador.textContent =
                     "⏳ Encerra em: " +
@@ -6402,7 +4752,6 @@ function atualizarStatusJogos() {
 
             }
         );
-
 
     atualizarProximoJogo();
 
@@ -6418,10 +4767,8 @@ function atualizarProximoJogo() {
     const agora =
         new Date();
 
-
     let proximo =
         null;
-
 
     Object.keys(jogos)
         .forEach(
@@ -6430,23 +4777,18 @@ function atualizarProximoJogo() {
                 const jogo =
                     jogos[chave];
 
-
                 if (
                     !jogo.data ||
                     !jogo.hora ||
                     !jogo.fixtureId
                 ) {
-
                     return;
-
                 }
-
 
                 const horario =
                     obterDataJogo(
                         jogo
                     );
-
 
                 if (
                     horario > agora &&
@@ -6467,17 +4809,14 @@ function atualizarProximoJogo() {
             }
         );
 
-
     const area =
         document.getElementById(
             "proximoJogo"
         );
 
-
     if (!area) {
         return;
     }
-
 
     if (!proximo) {
 
@@ -6488,13 +4827,11 @@ function atualizarProximoJogo() {
 
     }
 
-
     const tempo =
         obterDataJogo(
             proximo
         ) -
         agora;
-
 
     area.innerHTML = `
 
@@ -6567,24 +4904,20 @@ function abrirModalConfirmacao(
             "quantidadePlacares"
         );
 
-
     const valorElemento =
         document.getElementById(
             "valorPagarConfirmacao"
         );
-
 
     const premioElemento =
         document.getElementById(
             "valorReceberConfirmacao"
         );
 
-
     const modal =
         document.getElementById(
             "modalConfirmacao"
         );
-
 
     if (quantidadeElemento) {
 
@@ -6592,7 +4925,6 @@ function abrirModalConfirmacao(
             quantidade;
 
     }
-
 
     if (valorElemento) {
 
@@ -6603,7 +4935,6 @@ function abrirModalConfirmacao(
 
     }
 
-
     if (premioElemento) {
 
         premioElemento.textContent =
@@ -6612,7 +4943,6 @@ function abrirModalConfirmacao(
             );
 
     }
-
 
     if (modal) {
 
@@ -6636,7 +4966,6 @@ function fecharModalConfirmacao() {
             "modalConfirmacao"
         );
 
-
     if (modal) {
 
         modal.classList.remove(
@@ -6656,7 +4985,6 @@ function obterPalpitesSelecionados() {
 
     const palpites = {};
 
-
     for (
         let i = 1;
         i <= 6;
@@ -6668,7 +4996,6 @@ function obterPalpitesSelecionados() {
                 "jogo" + i
             );
 
-
         palpites[
             "jogo" + i
         ] =
@@ -6677,7 +5004,6 @@ function obterPalpitesSelecionados() {
                 : "";
 
     }
-
 
     return palpites;
 
@@ -6694,7 +5020,6 @@ function obterPalpitesValidos(
 
     const validos = {};
 
-
     Object.keys(jogos)
         .forEach(
             function(chave) {
@@ -6704,11 +5029,9 @@ function obterPalpitesValidos(
                         chave
                     ];
 
-
                 if (!palpite) {
                     return;
                 }
-
 
                 if (
                     jogos[chave] &&
@@ -6724,7 +5047,6 @@ function obterPalpitesValidos(
 
             }
         );
-
 
     return validos;
 
@@ -6744,12 +5066,10 @@ function verificarJogosSelecionados(
             palpites
         );
 
-
     const quantidadeValidos =
         Object.keys(
             validos
         ).length;
-
 
     if (
         quantidadeValidos < 2
@@ -6760,14 +5080,11 @@ function verificarJogosSelecionados(
             "Os jogos cujo horário já expirou não são considerados."
         );
 
-
         atualizarStatusJogos();
-
 
         return false;
 
     }
-
 
     return true;
 
@@ -6783,23 +5100,19 @@ async function enviarPalpite() {
     const nome =
         obterNome();
 
-
     if (!nome) {
         return;
     }
-
 
     const id =
         criarIdJogador(
             nome
         );
 
-
     const botao =
         document.getElementById(
             "btnEnviar"
         );
-
 
     try {
 
@@ -6813,12 +5126,10 @@ async function enviarPalpite() {
 
         }
 
-
         const jogadorSnap =
             await jogadoresRef
                 .child(id)
                 .once("value");
-
 
         if (
             !jogadorSnap.exists()
@@ -6845,40 +5156,32 @@ async function enviarPalpite() {
 
                 });
 
-
             abrirModalPix();
-
 
             return;
 
         }
 
-
         const jogador =
             jogadorSnap.val();
-
 
         const saldoAtual =
             Number(
                 jogador.saldo
             ) || 0;
 
-
         const valorLiberacao =
             Number(
                 jogador.valorLiberacao
             ) || 2;
 
-
         const palpites =
             obterPalpitesSelecionados();
-
 
         const palpitesValidos =
             obterPalpitesValidos(
                 palpites
             );
-
 
         const selecionados =
             Object.values(
@@ -6891,10 +5194,8 @@ async function enviarPalpite() {
                     ).trim() !== ""
             );
 
-
         const quantidade =
             selecionados.length;
-
 
         if (
             quantidade < 2
@@ -6905,11 +5206,9 @@ async function enviarPalpite() {
                 "Os placares de jogos já encerrados não contam."
             );
 
-
             return;
 
         }
-
 
         if (
             saldoAtual <
@@ -6918,17 +5217,14 @@ async function enviarPalpite() {
 
             abrirModalPix();
 
-
             return;
 
         }
-
 
         const premio =
             calcularPremiacao(
                 quantidade
             );
-
 
         if (
             premio <= 0
@@ -6940,11 +5236,9 @@ async function enviarPalpite() {
                 " jogos."
             );
 
-
             return;
 
         }
-
 
         palpiteParaConfirmar = {
 
@@ -6983,13 +5277,11 @@ async function enviarPalpite() {
 
         };
 
-
         abrirModalConfirmacao(
             quantidade,
             valorLiberacao,
             premio
         );
-
 
     } catch (erro) {
 
@@ -6998,12 +5290,10 @@ async function enviarPalpite() {
             erro
         );
 
-
         alert(
             "❌ Erro ao preparar o palpite:\n\n" +
             erro.message
         );
-
 
     } finally {
 
@@ -7040,10 +5330,8 @@ function criarDadosJogo(
 
     }
 
-
     const jogo =
         jogos[jogoId];
-
 
     if (!jogo) {
 
@@ -7052,23 +5340,18 @@ function criarDadosJogo(
             jogoId
         );
 
-
         return null;
 
     }
 
-
     const fixtureId =
         String(
-
             jogo.fixtureId ||
             jogo.apiFixtureId ||
             jogo.idAPI ||
             jogo.fixture?.id ||
             ""
-
         ).trim();
-
 
     if (!fixtureId) {
 
@@ -7079,7 +5362,6 @@ function criarDadosJogo(
         );
 
     }
-
 
     return {
 
@@ -7173,35 +5455,28 @@ async function confirmarPalpite() {
     const dados =
         palpiteParaConfirmar;
 
-
     if (!dados) {
         return;
     }
 
-
     fecharModalConfirmacao();
-
 
     const nome =
         obterNome();
 
-
     if (!nome) {
         return;
     }
-
 
     const id =
         criarIdJogador(
             nome
         );
 
-
     const botao =
         document.getElementById(
             "btnEnviar"
         );
-
 
     try {
 
@@ -7215,12 +5490,10 @@ async function confirmarPalpite() {
 
         }
 
-
         const jogadorSnap =
             await jogadoresRef
                 .child(id)
                 .once("value");
-
 
         if (
             !jogadorSnap.exists()
@@ -7230,27 +5503,22 @@ async function confirmarPalpite() {
                 "❌ Jogador não encontrado."
             );
 
-
             return;
 
         }
 
-
         const jogador =
             jogadorSnap.val();
-
 
         const saldoAtual =
             Number(
                 jogador.saldo
             ) || 0;
 
-
         const valor =
             Number(
                 dados.valor
             ) || 0;
-
 
         if (
             saldoAtual <
@@ -7259,23 +5527,19 @@ async function confirmarPalpite() {
 
             abrirModalPix();
 
-
             return;
 
         }
-
 
         const palpitesConfirmados =
             obterPalpitesValidos(
                 dados
             );
 
-
         const quantidadeValidos =
             Object.keys(
                 palpitesConfirmados
             ).length;
-
 
         if (
             quantidadeValidos < 2
@@ -7286,22 +5550,17 @@ async function confirmarPalpite() {
                 "Algum jogo pode ter expirado enquanto a confirmação estava aberta."
             );
 
-
             return;
 
         }
 
-
         const novoSaldo =
             Number(
-
                 (
                     saldoAtual -
                     valor
                 ).toFixed(2)
-
             );
-
 
         const novoPalpite = {
 
@@ -7309,8 +5568,6 @@ async function confirmarPalpite() {
                 "aguardando",
 
             resultados: {},
-
-            resultadosDetalhes: {},
 
             nome:
                 nome,
@@ -7387,9 +5644,10 @@ async function confirmarPalpite() {
 
 
         /*
-           Resultado inicial somente
-           dos jogos apostados.
+        Cria resultado inicial
+        somente para jogos realmente apostados.
         */
+
         for (
             let i = 1;
             i <= 6;
@@ -7415,16 +5673,10 @@ async function confirmarPalpite() {
         const novaReferencia =
             palpitesRef.push();
 
-
         await novaReferencia.set(
             novoPalpite
         );
 
-
-        /*
-           Atualiza saldo depois de salvar
-           o palpite.
-        */
         await jogadoresRef
             .child(id)
             .update({
@@ -7437,33 +5689,25 @@ async function confirmarPalpite() {
 
             });
 
-
         configuracao.saldo =
             novoSaldo;
 
-
         configuracao.valorLiberacao =
             valor;
-
 
         configuracao.premio =
             Number(
                 dados.premio
             ) || 0;
 
-
         atualizarTela();
 
-
         limparPalpites();
-
 
         palpiteParaConfirmar =
             null;
 
-
         await carregarMeusPalpites();
-
 
         abrirModalSucesso(
             dados.quantidade,
@@ -7472,19 +5716,16 @@ async function confirmarPalpite() {
             novoSaldo
         );
 
-
     } catch (erro) {
 
         console.error(
             erro
         );
 
-
         alert(
             "❌ Não foi possível enviar o palpite.\n\n" +
             erro.message
         );
-
 
     } finally {
 
@@ -7520,14 +5761,12 @@ function limparPalpites() {
                 "jogo" + i
             );
 
-
         const casa =
             document.getElementById(
                 "placar" +
                 i +
                 "Casa"
             );
-
 
         const fora =
             document.getElementById(
@@ -7536,23 +5775,19 @@ function limparPalpites() {
                 "Fora"
             );
 
-
         if (select) {
             select.value = "";
         }
 
-
         if (casa) {
             casa.textContent = "-";
         }
-
 
         if (fora) {
             fora.textContent = "-";
         }
 
     }
-
 
     atualizarPremio();
 
@@ -7563,21 +5798,17 @@ function limparPalpites() {
    NOME DO TIME PELA IMAGEM
 ========================================================= */
 
-function nomeDoTimeDaImagem(
-    src
-) {
+function nomeDoTimeDaImagem(src) {
 
     try {
 
         const url =
             new URL(src);
 
-
         const arquivo =
             url.pathname
                 .split("/")
                 .pop();
-
 
         let nome =
             arquivo
@@ -7587,16 +5818,13 @@ function nomeDoTimeDaImagem(
                     ""
                 );
 
-
         nome =
             nome.replace(
                 /[-_]+/g,
                 " "
             );
 
-
         return nome;
-
 
     } catch (erro) {
 
@@ -7621,7 +5849,6 @@ function atualizarNomesDosTimes() {
 
     }
 
-
     document
         .querySelectorAll(
             ".time img"
@@ -7634,23 +5861,19 @@ function atualizarNomesDosTimes() {
                         img.src
                     );
 
-
                 const time =
                     img.closest(
                         ".time"
                     );
 
-
                 if (!time) {
                     return;
                 }
-
 
                 const texto =
                     time.querySelector(
                         "p"
                     );
-
 
                 if (
                     texto &&
@@ -7664,7 +5887,6 @@ function atualizarNomesDosTimes() {
 
             }
         );
-
 
     atualizarConfrontos();
 
@@ -7683,12 +5905,10 @@ function obterConfrontoDasImagens(
         return "";
     }
 
-
     const imagens =
         duelo.querySelectorAll(
             ".time img"
         );
-
 
     if (
         imagens.length < 2
@@ -7698,18 +5918,15 @@ function obterConfrontoDasImagens(
 
     }
 
-
     const casa =
         nomeDoTimeDaImagem(
             imagens[0].src
         );
 
-
     const fora =
         nomeDoTimeDaImagem(
             imagens[1].src
         );
-
 
     if (
         !casa ||
@@ -7719,7 +5936,6 @@ function obterConfrontoDasImagens(
         return "";
 
     }
-
 
     return (
         casa +
@@ -7744,12 +5960,10 @@ function atualizarConfrontos() {
 
     }
 
-
     const duelos =
         document.querySelectorAll(
             ".duelo"
         );
-
 
     duelos.forEach(
         function(duelo, indice) {
@@ -7759,16 +5973,13 @@ function atualizarConfrontos() {
                     duelo
                 );
 
-
             if (!confronto) {
                 return;
             }
 
-
             const chave =
                 "jogo" +
                 (indice + 1);
-
 
             if (
                 jogos[chave]
@@ -7799,36 +6010,29 @@ function obterConfrontoAutomatico(
             numeroJogo
         ];
 
-
     if (jogo) {
 
         return (
-
             jogo.nome ||
             jogo.confronto ||
             `${jogo.casa || jogo.timeA || ""} × ${jogo.fora || jogo.timeB || ""}`
-
         );
 
     }
-
 
     const duelos =
         document.querySelectorAll(
             ".duelo"
         );
 
-
     const duelo =
         duelos[
             numeroJogo - 1
         ];
 
-
     if (!duelo) {
         return "";
     }
-
 
     return obterConfrontoDasImagens(
         duelo
@@ -7848,7 +6052,6 @@ function atualizarDatasHorasDosJogos() {
             ".duelo"
         );
 
-
     duelos.forEach(
         function(duelo, indice) {
 
@@ -7856,26 +6059,21 @@ function atualizarDatasHorasDosJogos() {
                 "jogo" +
                 (indice + 1);
 
-
             const jogo =
                 jogos[chave];
-
 
             if (!jogo) {
                 return;
             }
-
 
             const info =
                 duelo.querySelector(
                     ".jogo-info"
                 );
 
-
             if (!info) {
                 return;
             }
-
 
             if (
                 !jogo.data ||
@@ -7888,7 +6086,6 @@ function atualizarDatasHorasDosJogos() {
                 return;
 
             }
-
 
             info.innerHTML = `
 
@@ -7925,19 +6122,17 @@ function dataHoraJogo(
             numero
         ];
 
-
     if (!jogo) {
-        return "";
-    }
 
+        return "";
+
+    }
 
     const data =
         jogo.data || "";
 
-
     const hora =
         jogo.hora || "--:--";
-
 
     return `
 
@@ -7957,7 +6152,7 @@ function dataHoraJogo(
 
 
 /* =========================================================
-   FIXTURE ID
+   OBTER FIXTURE ID DO PALPITE
 ========================================================= */
 
 function obterFixtureIdDoPalpite(
@@ -7969,33 +6164,32 @@ function obterFixtureIdDoPalpite(
         return "";
     }
 
-
     let fixtureId =
         itemJogo.fixtureId ||
         itemJogo.apiFixtureId ||
         itemJogo.idAPI ||
         "";
 
-
     fixtureId =
         String(
             fixtureId
         ).trim();
-
 
     if (fixtureId) {
         return fixtureId;
     }
 
 
+    /*
+    Recupera pelo jogo atual.
+    */
+
     const chave =
         "jogo" +
         numero;
 
-
     const jogoAtual =
         jogos[chave];
-
 
     if (jogoAtual) {
 
@@ -8005,12 +6199,10 @@ function obterFixtureIdDoPalpite(
             jogoAtual.idAPI ||
             "";
 
-
         fixtureId =
             String(
                 fixtureId
             ).trim();
-
 
         if (fixtureId) {
             return fixtureId;
@@ -8018,6 +6210,11 @@ function obterFixtureIdDoPalpite(
 
     }
 
+
+    /*
+    Último recurso:
+    procura pelo nome dos times.
+    */
 
     const casa =
         String(
@@ -8028,7 +6225,6 @@ function obterFixtureIdDoPalpite(
         .trim()
         .toLowerCase();
 
-
     const fora =
         String(
             itemJogo.fora ||
@@ -8037,7 +6233,6 @@ function obterFixtureIdDoPalpite(
         )
         .trim()
         .toLowerCase();
-
 
     if (
         casa &&
@@ -8059,7 +6254,6 @@ function obterFixtureIdDoPalpite(
                         .trim()
                         .toLowerCase();
 
-
                     const foraAtual =
                         String(
                             jogo.fora ||
@@ -8069,18 +6263,14 @@ function obterFixtureIdDoPalpite(
                         .trim()
                         .toLowerCase();
 
-
                     return (
-
                         casaAtual === casa &&
                         foraAtual === fora &&
                         jogo.fixtureId
-
                     );
 
                 }
             );
-
 
         if (
             encontrados.length === 1
@@ -8094,35 +6284,10 @@ function obterFixtureIdDoPalpite(
 
     }
 
-
     return "";
 
 }
 
-
-/* =========================================================
-   NORMALIZAR PLACAR
-========================================================= */
-
-function normalizarPlacar(
-    placar
-) {
-
-    return String(
-        placar || ""
-    )
-        .trim()
-        .replace(
-            /\s+/g,
-            ""
-        );
-
-}
-
-
-/* =========================================================
-   BUSCAR RESULTADO API
-========================================================= */
 
 /* =========================================================
    BUSCAR RESULTADO API
@@ -8132,274 +6297,165 @@ async function buscarResultadoAPI(
     fixtureId
 ) {
 
-    const chave =
-        String(
-            fixtureId || ""
-        ).trim();
+    if (!fixtureId) {
 
-
-    if (!chave) {
         return null;
+
     }
 
+    try {
 
-    /*
-       Impede duas consultas simultâneas
-       do mesmo jogo neste navegador.
-    */
-    if (
-        consultasResultadoEmAndamento.has(
-            chave
-        )
-    ) {
-
-        return consultasResultadoEmAndamento.get(
-            chave
+        console.log(
+            "⚽ Consultando resultado:",
+            fixtureId
         );
 
-    }
+        const resposta =
+            await fetch(
 
+                `${API_BASE}/fixtures?id=${encodeURIComponent(fixtureId)}&timezone=${encodeURIComponent(API_TIMEZONE)}`,
 
-    const promessa =
-        (async function() {
+                {
 
-            try {
+                    method:
+                        "GET",
 
-                console.log(
-                    "🌐 Buscando resultado API:",
-                    chave
-                );
+                    headers: {
 
+                        "x-apisports-key":
+                            API_KEY
 
-                const endpoint =
-                    `/fixtures?id=${encodeURIComponent(chave)}&timezone=${encodeURIComponent(API_TIMEZONE)}`;
-
-
-                /*
-                   IMPORTANTE:
-                   passa obrigatoriamente por consultarAPI().
-                */
-                const dados =
-                    await consultarAPI(
-                        endpoint
-                    );
-
-
-                if (
-                    !dados ||
-                    !Array.isArray(
-                        dados.response
-                    ) ||
-                    !dados.response.length
-                ) {
-
-                    return null;
+                    }
 
                 }
 
-
-                const item =
-                    dados.response[0];
-
-
-                const fixture =
-                    item.fixture ||
-                    {};
-
-
-                const teams =
-                    item.teams ||
-                    {};
-
-
-                const goals =
-                    item.goals ||
-                    {};
-
-
-                const status =
-                    fixture.status ||
-                    {};
-
-
-                const statusCodigo =
-                    String(
-                        status.short || ""
-                    )
-                    .trim()
-                    .toUpperCase();
-
-
-                /*
-                   Não transforma null em zero.
-                */
-                const golsCasa =
-                    goals.home === null ||
-                    goals.home === undefined
-                        ? null
-                        : Number(
-                            goals.home
-                        );
-
-
-                const golsFora =
-                    goals.away === null ||
-                    goals.away === undefined
-                        ? null
-                        : Number(
-                            goals.away
-                        );
-
-
-                const finalizado =
-                    STATUS_FINAL.includes(
-                        statusCodigo
-                    );
-
-
-                const cancelado =
-                    STATUS_CANCELADO.includes(
-                        statusCodigo
-                    );
-
-
-                return {
-
-                    fixtureId:
-                        String(
-                            fixture.id ||
-                            chave
-                        ),
-
-                    casa:
-                        teams.home?.name ||
-                        "Casa",
-
-                    fora:
-                        teams.away?.name ||
-                        "Fora",
-
-                    golsCasa:
-                        Number.isFinite(
-                            golsCasa
-                        )
-                            ? golsCasa
-                            : null,
-
-                    golsFora:
-                        Number.isFinite(
-                            golsFora
-                        )
-                            ? golsFora
-                            : null,
-
-                    status:
-                        statusCodigo,
-
-                    descricaoStatus:
-                        status.long ||
-                        "",
-
-                    finalizado:
-                        finalizado,
-
-                    cancelado:
-                        cancelado,
-
-                    atualizadoEm:
-                        Date.now()
-
-                };
-
-
-            } catch (erro) {
-
-                console.error(
-                    "❌ Erro resultado API:",
-                    chave,
-                    erro
-                );
-
-
-                return null;
-
-            }
-
-        })();
-
-
-    consultasResultadoEmAndamento.set(
-        chave,
-        promessa
-    );
-
-
-    try {
-
-        return await promessa;
-
-    } finally {
-
-        consultasResultadoEmAndamento.delete(
-            chave
-        );
-
-    }
-
-}
-/* =========================================================
-   SALVAR RESULTADO NO CACHE
-========================================================= */
-
-async function salvarResultadoCache(
-    fixtureId,
-    resultado
-) {
-
-    if (
-        !fixtureId ||
-        !resultado
-    ) {
-
-        return;
-
-    }
-
-
-    const chave =
-        String(
-            fixtureId
-        ).trim();
-
-
-    if (!chave) {
-        return;
-    }
-
-
-    try {
-
-        await db
-            .ref(
-                `cacheMultiPlay/resultados/${chave}`
-            )
-            .set(
-                resultado
             );
 
+        if (
+            !resposta.ok
+        ) {
 
-        console.log(
-            "💾 Resultado salvo no cache:",
-            chave
-        );
+            throw new Error(
+                `HTTP ${resposta.status}`
+            );
 
+        }
+
+        const dados =
+            await resposta.json();
+
+        if (
+            !dados ||
+            !Array.isArray(
+                dados.response
+            ) ||
+            !dados.response.length
+        ) {
+
+            return null;
+
+        }
+
+        const jogo =
+            dados.response[0];
+
+        const fixture =
+            jogo.fixture ||
+            {};
+
+        const teams =
+            jogo.teams ||
+            {};
+
+        const goals =
+            jogo.goals ||
+            {};
+
+        const status =
+            fixture.status ||
+            {};
+
+        const statusCodigo =
+            String(
+                status.short ||
+                ""
+            ).toUpperCase();
+
+        const golsCasa =
+            Number.isFinite(
+                Number(
+                    goals.home
+                )
+            )
+                ? Number(
+                    goals.home
+                )
+                : null;
+
+        const golsFora =
+            Number.isFinite(
+                Number(
+                    goals.away
+                )
+            )
+                ? Number(
+                    goals.away
+                )
+                : null;
+
+        return {
+
+            fixtureId:
+                String(
+                    fixture.id ||
+                    fixtureId
+                ),
+
+            casa:
+                teams.home?.name ||
+                "Casa",
+
+            fora:
+                teams.away?.name ||
+                "Fora",
+
+            golsCasa:
+                golsCasa,
+
+            golsFora:
+                golsFora,
+
+            status:
+                statusCodigo,
+
+            descricaoStatus:
+                status.long ||
+                "",
+
+            finalizado:
+                STATUS_FINAL.includes(
+                    statusCodigo
+                ),
+
+            cancelado:
+                STATUS_CANCELADO.includes(
+                    statusCodigo
+                ),
+
+            atualizadoEm:
+                Date.now()
+
+        };
 
     } catch (erro) {
 
-        console.warn(
-            "⚠️ Erro salvando resultado:",
+        console.error(
+            "❌ Erro ao consultar resultado:",
+            fixtureId,
             erro
         );
+
+        return null;
 
     }
 
@@ -8418,39 +6474,19 @@ async function obterResultadoComCache(
         return null;
     }
 
-
     const chave =
         String(
             fixtureId
         ).trim();
 
-
     if (!chave) {
         return null;
     }
-
-
-    /*
-       Primeiro verifica memória.
-    */
-    if (
-        resultadosEmMemoria.has(
-            chave
-        )
-    ) {
-
-        return resultadosEmMemoria.get(
-            chave
-        );
-
-    }
-
 
     const ref =
         db.ref(
             `cacheMultiPlay/resultados/${chave}`
         );
-
 
     try {
 
@@ -8459,92 +6495,29 @@ async function obterResultadoComCache(
                 "value"
             );
 
-
         const cache =
             snapshot.val();
 
+        if (
+            cache &&
+            cache.atualizadoEm &&
+            (
+                Date.now() -
+                Number(
+                    cache.atualizadoEm
+                )
+            ) <
+            CACHE_RESULTADO_MS
+        ) {
 
-        if (cache) {
+            console.log(
+                "📦 Resultado vindo do cache:",
+                chave
+            );
 
-            /*
-               RESULTADO FINAL:
-               nunca mais precisa consultar a API.
-            */
-            if (
-                cache.finalizado &&
-                cache.golsCasa !== null &&
-                cache.golsFora !== null
-            ) {
-
-                console.log(
-                    "🔒 Resultado FINAL vindo do Firebase:",
-                    chave
-                );
-
-
-                resultadosEmMemoria.set(
-                    chave,
-                    cache
-                );
-
-
-                return cache;
-
-            }
-
-
-            /*
-               Cancelado também não precisa
-               ficar consultando infinitamente.
-            */
-            if (
-                cache.cancelado
-            ) {
-
-                resultadosEmMemoria.set(
-                    chave,
-                    cache
-                );
-
-
-                return cache;
-
-            }
-
-
-            /*
-               Resultado ainda não finalizado:
-               usa cache por 30 minutos.
-            */
-            if (
-                cache.atualizadoEm &&
-                (
-                    Date.now() -
-                    Number(
-                        cache.atualizadoEm
-                    )
-                ) <
-                CACHE_RESULTADO_MS
-            ) {
-
-                console.log(
-                    "📦 Resultado recente vindo do cache:",
-                    chave
-                );
-
-
-                resultadosEmMemoria.set(
-                    chave,
-                    cache
-                );
-
-
-                return cache;
-
-            }
+            return cache;
 
         }
-
 
     } catch (erro) {
 
@@ -8555,226 +6528,31 @@ async function obterResultadoComCache(
 
     }
 
-
-    /*
-       Cache inexistente ou expirado.
-       Agora consulta API.
-    */
     const resultado =
         await buscarResultadoAPI(
             chave
         );
 
-
     if (!resultado) {
         return null;
     }
 
-
-    resultadosEmMemoria.set(
-        chave,
-        resultado
-    );
-
-
-    await salvarResultadoCache(
-        chave,
-        resultado
-    );
-
-
-    return resultado;
-
-}
-
-
-/* =========================================================
-   SALVAR RESULTADO DENTRO DO PALPITE
-========================================================= */
-
-async function salvarResultadoNoPalpite(
-    palpiteId,
-    numero,
-    resultado
-) {
-
-    if (
-        !palpiteId ||
-        !numero ||
-        !resultado
-    ) {
-
-        return;
-
-    }
-
-
-    const placarReal =
-        (
-            resultado.golsCasa !== null &&
-            resultado.golsFora !== null
-        )
-            ? `${resultado.golsCasa} : ${resultado.golsFora}`
-            : "- : -";
-
-
-    const atualizacao = {};
-
-
-    atualizacao[
-        `resultados/jogo${numero}`
-    ] =
-        placarReal;
-
-
-    atualizacao[
-        `resultadosDetalhes/jogo${numero}`
-    ] = {
-
-        fixtureId:
-            resultado.fixtureId || "",
-
-        casa:
-            resultado.casa || "",
-
-        fora:
-            resultado.fora || "",
-
-        golsCasa:
-            resultado.golsCasa,
-
-        golsFora:
-            resultado.golsFora,
-
-        status:
-            resultado.status || "",
-
-        descricaoStatus:
-            resultado.descricaoStatus || "",
-
-        finalizado:
-            !!resultado.finalizado,
-
-        cancelado:
-            !!resultado.cancelado,
-
-        atualizadoEm:
-            resultado.atualizadoEm ||
-            Date.now()
-
-    };
-
-
-    atualizacao[
-        "resultadoAtualizadoEm"
-    ] =
-        Date.now();
-
-
     try {
 
-        await palpitesRef
-            .child(
-                palpiteId
-            )
-            .update(
-                atualizacao
-            );
-
-
-        console.log(
-            `💾 Resultado jogo${numero} salvo no palpite ${palpiteId}`
+        await ref.set(
+            resultado
         );
-
 
     } catch (erro) {
 
         console.warn(
-            "⚠️ Não foi possível salvar resultado no palpite:",
+            "⚠️ Erro salvando cache:",
             erro
         );
 
     }
 
-}
-
-
-/* =========================================================
-   RESULTADO SALVO NO PALPITE
-========================================================= */
-
-function obterResultadoSalvoNoPalpite(
-    itemJogo,
-    item,
-    numero
-) {
-
-    /*
-       Primeiro procura detalhes.
-    */
-    const detalhe =
-        item?.resultadosDetalhes?.[
-            "jogo" + numero
-        ];
-
-
-    if (
-        detalhe &&
-        (
-            detalhe.finalizado ||
-            detalhe.cancelado
-        )
-    ) {
-
-        return {
-
-            fixtureId:
-                detalhe.fixtureId ||
-                itemJogo?.fixtureId ||
-                "",
-
-            casa:
-                detalhe.casa ||
-                itemJogo?.casa ||
-                "Casa",
-
-            fora:
-                detalhe.fora ||
-                itemJogo?.fora ||
-                "Fora",
-
-            golsCasa:
-                detalhe.golsCasa ??
-                null,
-
-            golsFora:
-                detalhe.golsFora ??
-                null,
-
-            status:
-                detalhe.status ||
-                "",
-
-            descricaoStatus:
-                detalhe.descricaoStatus ||
-                "",
-
-            finalizado:
-                !!detalhe.finalizado,
-
-            cancelado:
-                !!detalhe.cancelado,
-
-            atualizadoEm:
-                detalhe.atualizadoEm ||
-                0
-
-        };
-
-    }
-
-
-    return null;
+    return resultado;
 
 }
 
@@ -8797,7 +6575,6 @@ function verificarAcertoPalpite(
 
     }
 
-
     if (
         !resultado.finalizado
     ) {
@@ -8805,7 +6582,6 @@ function verificarAcertoPalpite(
         return false;
 
     }
-
 
     if (
         resultado.golsCasa === null ||
@@ -8816,25 +6592,16 @@ function verificarAcertoPalpite(
 
     }
 
-
     const placarPalpite =
-        normalizarPlacar(
-
+        String(
             palpite.placar ||
             palpite.palpite ||
             palpite.resultado ||
             ""
-
-        );
-
+        ).trim();
 
     const placarReal =
-        normalizarPlacar(
-
-            `${resultado.golsCasa}:${resultado.golsFora}`
-
-        );
-
+        `${resultado.golsCasa}:${resultado.golsFora}`;
 
     return (
         placarPalpite ===
@@ -8850,9 +6617,7 @@ function verificarAcertoPalpite(
 
 async function obterResultadoDoJogoPalpite(
     itemJogo,
-    numero,
-    palpiteId,
-    itemCompleto
+    numero
 ) {
 
     if (!itemJogo) {
@@ -8869,86 +6634,19 @@ async function obterResultadoDoJogoPalpite(
 
     }
 
-
-    /*
-       PRIMEIRO:
-       procura resultado final já salvo
-       dentro do próprio palpite.
-    */
-    const resultadoSalvo =
-        obterResultadoSalvoNoPalpite(
-            itemJogo,
-            itemCompleto,
-            numero
-        );
-
-
-    if (resultadoSalvo) {
-
-        console.log(
-            `🔒 Resultado jogo${numero} já salvo no palpite.`
-        );
-
-
-        if (
-            resultadoSalvo.cancelado
-        ) {
-
-            return {
-
-                status:
-                    "aguardando",
-
-                resultado:
-                    resultadoSalvo
-
-            };
-
-        }
-
-
-        if (
-            resultadoSalvo.finalizado
-        ) {
-
-            const acertou =
-                verificarAcertoPalpite(
-                    itemJogo,
-                    resultadoSalvo
-                );
-
-
-            return {
-
-                status:
-                    acertou
-                        ? "ganhou"
-                        : "perdeu",
-
-                resultado:
-                    resultadoSalvo
-
-            };
-
-        }
-
-    }
-
-
     const fixtureId =
         obterFixtureIdDoPalpite(
             itemJogo,
             numero
         );
 
-
     if (!fixtureId) {
 
         console.warn(
             "⚠️ Jogo sem fixtureId:",
-            numero
+            numero,
+            itemJogo
         );
-
 
         return {
 
@@ -8962,12 +6660,10 @@ async function obterResultadoDoJogoPalpite(
 
     }
 
-
     const resultado =
         await obterResultadoComCache(
             fixtureId
         );
-
 
     if (!resultado) {
 
@@ -8982,21 +6678,6 @@ async function obterResultadoDoJogoPalpite(
         };
 
     }
-
-
-    /*
-       Salva resultado dentro do palpite.
-    */
-    if (palpiteId) {
-
-        await salvarResultadoNoPalpite(
-            palpiteId,
-            numero,
-            resultado
-        );
-
-    }
-
 
     if (
         resultado.cancelado
@@ -9014,7 +6695,6 @@ async function obterResultadoDoJogoPalpite(
 
     }
 
-
     if (
         !resultado.finalizado
     ) {
@@ -9031,13 +6711,11 @@ async function obterResultadoDoJogoPalpite(
 
     }
 
-
     const acertou =
         verificarAcertoPalpite(
             itemJogo,
             resultado
         );
-
 
     return {
 
@@ -9076,10 +6754,7 @@ async function obterStatusPalpiteAPI(
 
     }
 
-
-    const jogosDoPalpite =
-        [];
-
+    const jogosDoPalpite = [];
 
     for (
         let i = 1;
@@ -9092,25 +6767,19 @@ async function obterStatusPalpiteAPI(
                 "jogo" + i
             ];
 
+        if (
+            !itemJogo
+        ) {
 
-        if (!itemJogo) {
             continue;
-        }
 
+        }
 
         const retorno =
             await obterResultadoDoJogoPalpite(
-
                 itemJogo,
-
-                i,
-
-                item.id,
-
-                item
-
+                i
             );
-
 
         jogosDoPalpite.push({
 
@@ -9148,10 +6817,6 @@ async function obterStatusPalpiteAPI(
     }
 
 
-    /*
-       Se qualquer jogo perdeu,
-       o palpite completo perdeu.
-    */
     const algumPerdeu =
         jogosDoPalpite.some(
             function(itemJogo) {
@@ -9163,7 +6828,6 @@ async function obterStatusPalpiteAPI(
 
             }
         );
-
 
     if (algumPerdeu) {
 
@@ -9180,10 +6844,6 @@ async function obterStatusPalpiteAPI(
     }
 
 
-    /*
-       Só ganha quando TODOS os jogos
-       apostados foram acertados.
-    */
     const todosFinalizados =
         jogosDoPalpite.every(
             function(itemJogo) {
@@ -9195,7 +6855,6 @@ async function obterStatusPalpiteAPI(
 
             }
         );
-
 
     if (
         todosFinalizados
@@ -9248,7 +6907,6 @@ function criarStatusPalpiteHTML(
 
     }
 
-
     if (
         status ===
         "perdeu"
@@ -9262,7 +6920,6 @@ function criarStatusPalpiteHTML(
 
     }
 
-
     return `
         <div class="status-palpite status-aguardando">
             🟡 AGUARDANDO RESULTADO
@@ -9273,7 +6930,7 @@ function criarStatusPalpiteHTML(
 
 
 /* =========================================================
-   CARD MEUS PALPITES
+   CARD DOS MEUS PALPITES
 ========================================================= */
 
 function criarCardMeuPalpiteAPI(
@@ -9286,7 +6943,6 @@ function criarCardMeuPalpiteAPI(
         document.createElement(
             "div"
         );
-
 
     card.className =
         "meu-card";
@@ -9340,7 +6996,6 @@ function criarCardMeuPalpiteAPI(
             item[
                 "jogo" + i
             ];
-
 
         if (!jogo) {
             continue;
@@ -9415,7 +7070,6 @@ function criarCardMeuPalpiteAPI(
 
             </div>
 
-
             <div class="data-jogo">
 
                 ${dataHoraJogo(
@@ -9424,7 +7078,6 @@ function criarCardMeuPalpiteAPI(
                 )}
 
             </div>
-
 
             <div class="resultado-real">
 
@@ -9451,7 +7104,6 @@ function criarCardMeuPalpiteAPI(
             retorno.status
         )}
 
-
         <div class="meu-nome">
 
             👤
@@ -9463,9 +7115,7 @@ function criarCardMeuPalpiteAPI(
 
         </div>
 
-
         ${jogosHTML}
-
 
         <div class="data">
 
@@ -9525,23 +7175,19 @@ async function carregarMeusPalpites() {
             "meusPalpites"
         );
 
-
     const nomeMenu =
         document.getElementById(
             "nomeMenu"
         );
 
-
     if (!container) {
         return;
     }
-
 
     const nomeJogador =
         localStorage.getItem(
             "nomeJogador"
         );
-
 
     if (nomeMenu) {
 
@@ -9552,7 +7198,6 @@ async function carregarMeusPalpites() {
 
     }
 
-
     if (!nomeJogador) {
 
         container.innerHTML = `
@@ -9561,11 +7206,9 @@ async function carregarMeusPalpites() {
             </p>
         `;
 
-
         return;
 
     }
-
 
     try {
 
@@ -9574,11 +7217,9 @@ async function carregarMeusPalpites() {
                 "value"
             );
 
-
         const dados =
             snapshot.val() ||
             {};
-
 
         const palpites =
             Object.entries(
@@ -9610,7 +7251,6 @@ async function carregarMeusPalpites() {
                         .trim()
                         .toLowerCase();
 
-
                     return (
                         nome ===
                         String(
@@ -9634,7 +7274,6 @@ async function carregarMeusPalpites() {
                 </p>
             `;
 
-
             return;
 
         }
@@ -9650,14 +7289,12 @@ async function carregarMeusPalpites() {
                         0
                     );
 
-
                 const dataB =
                     Number(
                         b.timestamp ||
                         b.criadoEm ||
                         0
                     );
-
 
                 return (
                     dataB -
@@ -9678,127 +7315,20 @@ async function carregarMeusPalpites() {
         const resultados =
             [];
 
-
         /*
-           Se o palpite já está finalizado,
-           não precisa consultar seus jogos novamente.
+        Processa um palpite por vez.
+        Isso evita disparar muitas consultas
+        simultâneas na API.
         */
+
         for (
             const palpite of palpites
         ) {
 
-            if (
-                palpite.status ===
-                    "ganhou" ||
-                palpite.status ===
-                    "perdeu"
-            ) {
-
-                /*
-                   Mesmo finalizado, montamos o card
-                   usando os resultados salvos.
-                */
-
-                const jogosSalvos =
-                    [];
-
-
-                for (
-                    let i = 1;
-                    i <= 6;
-                    i++
-                ) {
-
-                    const itemJogo =
-                        palpite[
-                            "jogo" + i
-                        ];
-
-
-                    if (!itemJogo) {
-                        continue;
-                    }
-
-
-                    const salvo =
-                        obterResultadoSalvoNoPalpite(
-                            itemJogo,
-                            palpite,
-                            i
-                        );
-
-
-                    let statusJogo =
-                        "aguardando";
-
-
-                    if (
-                        salvo &&
-                        salvo.finalizado
-                    ) {
-
-                        statusJogo =
-                            verificarAcertoPalpite(
-                                itemJogo,
-                                salvo
-                            )
-                                ? "ganhou"
-                                : "perdeu";
-
-                    }
-
-
-                    jogosSalvos.push({
-
-                        numero:
-                            i,
-
-                        palpite:
-                            itemJogo,
-
-                        status:
-                            statusJogo,
-
-                        resultado:
-                            salvo
-
-                    });
-
-                }
-
-
-                resultados.push({
-
-                    palpite:
-                        palpite,
-
-                    retorno: {
-
-                        status:
-                            palpite.status,
-
-                        jogos:
-                            jogosSalvos
-
-                    }
-
-                });
-
-
-                continue;
-
-            }
-
-
-            /*
-               Palpite ainda aguardando.
-               Consulta somente o necessário.
-            */
             const retorno =
                 await obterStatusPalpiteAPI(
                     palpite
                 );
-
 
             resultados.push({
 
@@ -9835,8 +7365,11 @@ async function carregarMeusPalpites() {
 
 
         /*
-           Salva status final.
+        Atualiza o status geral no Firebase
+        somente quando todos os jogos
+        estiverem definidos.
         */
+
         for (
             const item of resultados
         ) {
@@ -9844,68 +7377,55 @@ async function carregarMeusPalpites() {
             const palpite =
                 item.palpite;
 
-
             const retorno =
                 item.retorno;
 
-
             if (
-                !palpite.id
-            ) {
-                continue;
-            }
-
-
-            if (
-                retorno.status !==
-                    "ganhou" &&
-                retorno.status !==
+                palpite.id &&
+                (
+                    retorno.status ===
+                    "ganhou" ||
+                    retorno.status ===
                     "perdeu"
+                )
             ) {
 
-                continue;
+                /*
+                Não altera o status se
+                já estiver definido manualmente.
+                */
 
-            }
-
-
-            /*
-               Só muda se ainda estiver aguardando.
-            */
-            if (
-                palpite.status !==
+                if (
+                    palpite.status !==
                     "ganhou" &&
-                palpite.status !==
+                    palpite.status !==
                     "perdeu"
-            ) {
+                ) {
 
-                try {
+                    try {
 
-                    await palpitesRef
-                        .child(
-                            palpite.id
-                        )
-                        .update({
+                        await palpitesRef
+                            .child(
+                                palpite.id
+                            )
+                            .update({
 
-                            status:
-                                retorno.status,
+                                status:
+                                    retorno.status,
 
-                            atualizadoEm:
-                                Date.now()
+                                atualizadoEm:
+                                    Date.now()
 
-                        });
+                            });
 
+                    } catch (erro) {
 
-                    console.log(
-                        `💾 Status do palpite ${palpite.id}: ${retorno.status}`
-                    );
+                        console.warn(
+                            "⚠️ Não foi possível salvar status:",
+                            erro
+                        );
 
-
-                } catch (erro) {
-
-                    console.warn(
-                        "⚠️ Não foi possível salvar status:",
-                        erro
-                    );
+                    }
 
                 }
 
@@ -9913,14 +7433,12 @@ async function carregarMeusPalpites() {
 
         }
 
-
     } catch (erro) {
 
         console.error(
             "❌ Erro ao carregar meus palpites:",
             erro
         );
-
 
         container.innerHTML = `
 
@@ -9949,22 +7467,18 @@ function abrirMenu() {
             "menuLateral"
         );
 
-
     const fundo =
         document.getElementById(
             "fundoMenu"
         );
 
-
     if (menu) {
         menu.classList.add("ativo");
     }
 
-
     if (fundo) {
         fundo.classList.add("ativo");
     }
-
 
     mostrarNome();
 
@@ -9978,17 +7492,14 @@ function fecharMenu() {
             "menuLateral"
         );
 
-
     const fundo =
         document.getElementById(
             "fundoMenu"
         );
 
-
     if (menu) {
         menu.classList.remove("ativo");
     }
-
 
     if (fundo) {
         fundo.classList.remove("ativo");
@@ -10004,17 +7515,14 @@ function mostrarNome() {
             "nomeJogador"
         );
 
-
     const area =
         document.getElementById(
             "nomeMenu"
         );
 
-
     if (!area) {
         return;
     }
-
 
     if (nome) {
 
@@ -10049,75 +7557,54 @@ function abrirModalSucesso(
             "modalSucesso"
         );
 
-
     const quantidadeEl =
         document.getElementById(
             "sucessoQuantidade"
         );
-
 
     const valorEl =
         document.getElementById(
             "sucessoValor"
         );
 
-
     const premioEl =
         document.getElementById(
             "sucessoPremio"
         );
-
 
     const saldoEl =
         document.getElementById(
             "sucessoSaldo"
         );
 
-
     if (quantidadeEl) {
-
         quantidadeEl.textContent =
             quantidade;
-
     }
 
-
     if (valorEl) {
-
         valorEl.textContent =
             formatarMoeda(
                 valor
             );
-
     }
 
-
     if (premioEl) {
-
         premioEl.textContent =
             formatarMoeda(
                 premio
             );
-
     }
 
-
     if (saldoEl) {
-
         saldoEl.textContent =
             formatarMoeda(
                 saldo
             );
-
     }
 
-
     if (modal) {
-
-        modal.classList.add(
-            "ativo"
-        );
-
+        modal.classList.add("ativo");
     }
 
 }
@@ -10130,77 +7617,11 @@ function fecharModalSucesso() {
             "modalSucesso"
         );
 
-
     if (modal) {
 
         modal.classList.remove(
             "ativo"
         );
-
-    }
-
-}
-
-
-/* =========================================================
-   ATUALIZAÇÃO RESULTADOS
-========================================================= */
-
-async function atualizarResultadosMeusPalpites() {
-
-    if (
-        atualizacaoResultadosEmAndamento
-    ) {
-
-        return;
-
-    }
-
-
-    atualizacaoResultadosEmAndamento =
-        true;
-
-
-    try {
-
-        /*
-           Limpa somente a memória de resultados
-           que ainda não são finais.
-
-           Resultados finais continuam no Firebase.
-        */
-        resultadosEmMemoria.forEach(
-            function(resultado, chave) {
-
-                if (
-                    !resultado ||
-                    !resultado.finalizado
-                ) {
-
-                    resultadosEmMemoria.delete(
-                        chave
-                    );
-
-                }
-
-            }
-        );
-
-
-        await carregarMeusPalpites();
-
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro atualizando resultados:",
-            erro
-        );
-
-    } finally {
-
-        atualizacaoResultadosEmAndamento =
-            false;
 
     }
 
@@ -10215,16 +7636,10 @@ document.addEventListener(
     "DOMContentLoaded",
     function() {
 
-
-        /* =================================================
-           SUCESSO
-        ================================================= */
-
         const btnFecharSucesso =
             document.getElementById(
                 "btnFecharSucesso"
             );
-
 
         if (btnFecharSucesso) {
 
@@ -10236,15 +7651,12 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           PIX
-        ================================================= */
+        /* PIX */
 
         const fecharPix =
             document.getElementById(
                 "fecharPix"
             );
-
 
         if (fecharPix) {
 
@@ -10255,12 +7667,10 @@ document.addEventListener(
 
         }
 
-
         const gerarPix =
             document.getElementById(
                 "gerarPix"
             );
-
 
         if (gerarPix) {
 
@@ -10271,12 +7681,10 @@ document.addEventListener(
 
         }
 
-
         const copiarPixBotao =
             document.getElementById(
                 "copiarPix"
             );
-
 
         if (copiarPixBotao) {
 
@@ -10288,15 +7696,12 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           CONFIRMAÇÃO
-        ================================================= */
+        /* CONFIRMAÇÃO */
 
         const cancelarConfirmacao =
             document.getElementById(
                 "btnCancelarConfirmacao"
             );
-
 
         if (cancelarConfirmacao) {
 
@@ -10307,12 +7712,10 @@ document.addEventListener(
 
         }
 
-
         const confirmarBotao =
             document.getElementById(
                 "btnConfirmarPalpite"
             );
-
 
         if (confirmarBotao) {
 
@@ -10324,9 +7727,7 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           SELECTS
-        ================================================= */
+        /* SELECTS */
 
         for (
             let i = 1;
@@ -10341,9 +7742,7 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           EVENTOS SELECT
-        ================================================= */
+        /* EVENTOS SELECT */
 
         for (
             let i = 1;
@@ -10354,18 +7753,15 @@ document.addEventListener(
             const numero =
                 i;
 
-
             const select =
                 document.getElementById(
                     "jogo" +
                     numero
                 );
 
-
             if (!select) {
                 continue;
             }
-
 
             select.addEventListener(
                 "change",
@@ -10386,7 +7782,6 @@ document.addEventListener(
 
                     );
 
-
                     atualizarPremio();
 
                 }
@@ -10395,15 +7790,12 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           MENU
-        ================================================= */
+        /* MENU */
 
         const btnMenu =
             document.getElementById(
                 "btnMenu"
             );
-
 
         if (btnMenu) {
 
@@ -10414,12 +7806,10 @@ document.addEventListener(
 
         }
 
-
         const btnFechar =
             document.getElementById(
                 "btnFechar"
             );
-
 
         if (btnFechar) {
 
@@ -10430,12 +7820,10 @@ document.addEventListener(
 
         }
 
-
         const fundoMenu =
             document.getElementById(
                 "fundoMenu"
             );
-
 
         if (fundoMenu) {
 
@@ -10447,15 +7835,12 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           ENVIAR
-        ================================================= */
+        /* ENVIAR */
 
         const btnEnviar =
             document.getElementById(
                 "btnEnviar"
             );
-
 
         if (btnEnviar) {
 
@@ -10467,23 +7852,17 @@ document.addEventListener(
         }
 
 
-        /* =================================================
-           CONFIGURAÇÃO
-        ================================================= */
+        /* CONFIGURAÇÃO */
 
         carregarConfiguracao();
 
 
-        /* =================================================
-           MEUS PALPITES
-        ================================================= */
+        /* MEUS PALPITES */
 
         carregarMeusPalpites();
 
 
-        /* =================================================
-           FIREBASE CONEXÃO
-        ================================================= */
+        /* FIREBASE */
 
         db.ref(
             ".info/connected"
@@ -10496,11 +7875,9 @@ document.addEventListener(
                         "status"
                     );
 
-
                 if (!status) {
                     return;
                 }
-
 
                 if (
                     snap.val() === true
@@ -10509,7 +7886,6 @@ document.addEventListener(
                     status.textContent =
                         "🟢 Conectado ao servidor";
 
-
                     status.style.color =
                         "#22c55e";
 
@@ -10517,7 +7893,6 @@ document.addEventListener(
 
                     status.textContent =
                         "🔴 Sem conexão";
-
 
                     status.style.color =
                         "#ef4444";
@@ -10528,23 +7903,17 @@ document.addEventListener(
         );
 
 
-        /* =================================================
-           STATUS
-        ================================================= */
+        /* STATUS */
 
         atualizarStatusJogos();
 
 
-        /* =================================================
-           JOGOS API
-        ================================================= */
+        /* JOGOS API */
 
         carregarJogos();
 
 
-        /* =================================================
-           CONTADOR DOS JOGOS
-        ================================================= */
+        /* CONTADOR */
 
         setInterval(
             atualizarStatusJogos,
@@ -10552,11 +7921,12 @@ document.addEventListener(
         );
 
 
-        /* =================================================
-           RESULTADOS
-           
-           Só atualiza a cada 30 minutos.
-        ================================================= */
+        /*
+        RESULTADOS:
+
+        Não executa a cada segundo.
+        Apenas a cada 30 minutos.
+        */
 
         setInterval(
             function() {
@@ -10573,4 +7943,41 @@ document.addEventListener(
     }
 );
 
+
+/* =========================================================
+   ATUALIZAÇÃO RESULTADOS
+========================================================= */
+
+async function atualizarResultadosMeusPalpites() {
+
+    if (
+        atualizacaoResultadosEmAndamento
+    ) {
+
+        return;
+
+    }
+
+    atualizacaoResultadosEmAndamento =
+        true;
+
+    try {
+
+        await carregarMeusPalpites();
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro atualizando resultados:",
+            erro
+        );
+
+    } finally {
+
+        atualizacaoResultadosEmAndamento =
+            false;
+
+    }
+
+}
 </script></body></html>
