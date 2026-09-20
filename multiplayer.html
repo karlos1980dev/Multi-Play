@@ -3031,7 +3031,9 @@ const app = initializeApp(firebaseConfig);
 
 const db = getDatabase(app);
 let jogos = [];
+let codigoCashOutModal = null;
 
+let valorCashOutModal = 0;
 const jogosPorData = {};
 let offsetDiaSelecionado = 0;
 let carregamentoJogosEmAndamento = false;
@@ -15512,31 +15514,21 @@ obterElemento(
             ============================================= */
 
             await update(
+    ref(db, `apostas/${apostaSaqueAtual}`),
+    {
+        status: "sacado",
+        saqueSolicitado: true,
+        cashOut: true,
+        cashOutProcessado: true,
+        valorSaque: Number(valorSaqueAtual) || 0,
+        saqueEm: Date.now()
+    }
+);
 
-                ref(
-                    db,
-                    "apostas/" +
-                    apostaSaqueAtual
-                ),
-
-                {
-
-                    saqueSolicitado:
-                        true,
-
-                    codigoSaque:
-                        codigoSaque,
-
-                    chavePixSaque:
-                        chavePixSaque,
-
-                    statusSaque:
-                        "aguardando"
-
-                }
-
-            );
-
+console.log(
+    "✅ APOSTA ALTERADA AUTOMATICAMENTE PARA SACADO:",
+    apostaSaqueAtual
+);
 
             fecharModalPix();
 
@@ -16914,103 +16906,156 @@ function obterOddSelecaoCashOut(selecao) {
    ANALISAR CASH OUT
    ============================================================ */
 
+/* ============================================================
+   ANALISAR CASH OUT
+   MÍNIMO DE 2 JOGOS
+============================================================ */
+
 function analisarCashOut(aposta) {
 
     if (!aposta) {
+
         return {
             permitido: false,
             motivo: "Aposta não encontrada."
         };
+
     }
 
 
     const statusAposta =
-        normalizarStatusCashOut(aposta.status);
+        normalizarStatusCashOut(
+            aposta.status
+        );
 
 
-    /*
-       Aposta já encerrada não pode fazer Cash Out.
-    */
+    /* ========================================================
+       A APOSTA PRECISA TER NO MÍNIMO 2 JOGOS
+    ======================================================== */
+
+    const selecoes =
+        obterJogosDaApostaCashOut(
+            aposta
+        );
+
+
+    if (selecoes.length < 2) {
+
+        return {
+
+            permitido: false,
+
+            motivo:
+                "O Cash Out está disponível somente para apostas com 2 ou mais jogos."
+
+        };
+
+    }
+
+
+    /* ========================================================
+       APOSTA JÁ ENCERRADA
+    ======================================================== */
 
     const statusFechados = [
+
         "ganhou",
         "ganha",
         "won",
+
         "perdeu",
         "perdida",
         "lost",
+
         "sacada",
         "liberada",
         "bloqueada",
         "cancelada",
         "finalizada"
+
     ];
 
 
-    if (statusFechados.includes(statusAposta)) {
-
-        return {
-            permitido: false,
-            motivo: "Esta aposta já foi encerrada."
-        };
-
-    }
-
-
-    /*
-       Se já houve Cash Out.
-    */
-
     if (
-        aposta.cashOut === true ||
-        aposta.cashOutProcessado === true
+        statusFechados.includes(
+            statusAposta
+        )
     ) {
 
         return {
+
             permitido: false,
-            motivo: "O Cash Out desta aposta já foi realizado."
+
+            motivo:
+                "Esta aposta já foi encerrada."
+
         };
 
     }
 
 
-    const selecoes =
-        obterJogosDaApostaCashOut(aposta);
+    /* ========================================================
+       CASH OUT JÁ REALIZADO
+    ======================================================== */
 
-
-    if (!selecoes.length) {
+    if (
+        aposta.cashOut === true ||
+        aposta.cashOutProcessado === true ||
+        aposta.saqueSolicitado === true
+    ) {
 
         return {
+
             permitido: false,
-            motivo: "Nenhum jogo encontrado nesta aposta."
+
+            motivo:
+                "O saque desta aposta já foi solicitado."
+
         };
 
     }
 
 
+    /* ========================================================
+       CONTADORES
+    ======================================================== */
+
     let jogosGanhados = 0;
+
     let jogosPendentes = 0;
+
     let jogosPerdidos = 0;
 
     let multiplicadorGanhos = 1;
 
 
-    for (const selecao of selecoes) {
+    /* ========================================================
+       ANALISAR CADA JOGO
+    ======================================================== */
 
-        const status = normalizarStatusCashOut(
-            selecao?.status ||
-            selecao?.resultado
-        );
+    for (
+        const selecao of selecoes
+    ) {
+
+        const status =
+            normalizarStatusCashOut(
+
+                selecao?.status ||
+                selecao?.resultado
+
+            );
 
 
-        /*
-           JOGO PERDIDO
-        */
+        /* ================================================
+           PERDEU
+        ================================================ */
 
         if (
+
             status === "perdeu" ||
             status === "perdida" ||
             status === "lost"
+
         ) {
 
             jogosPerdidos++;
@@ -17020,104 +17065,139 @@ function analisarCashOut(aposta) {
         }
 
 
-        /*
-           JOGO GANHO
-        */
+        /* ================================================
+           GANHOU
+        ================================================ */
 
         if (
+
             status === "ganhou" ||
             status === "ganha" ||
             status === "won"
+
         ) {
 
             jogosGanhados++;
 
+
             multiplicadorGanhos *=
-                obterOddSelecaoCashOut(selecao);
+                obterOddSelecaoCashOut(
+                    selecao
+                );
+
 
             continue;
 
         }
 
 
-        /*
-           JOGO PENDENTE
-        */
+        /* ================================================
+           PENDENTE
+        ================================================ */
 
         jogosPendentes++;
 
     }
 
 
-    /*
-       Se algum jogo perdeu,
-       não existe Cash Out.
-    */
+    /* ========================================================
+       SE ALGUM JOGO PERDEU
+    ======================================================== */
 
-    if (jogosPerdidos > 0) {
+    if (
+        jogosPerdidos > 0
+    ) {
 
         return {
+
             permitido: false,
-            motivo: "Esta aposta possui jogo perdido."
+
+            motivo:
+                "Esta aposta possui jogo perdido."
+
         };
 
     }
 
 
-    /*
-       Precisa ter pelo menos um jogo ganho.
-    */
+    /* ========================================================
+       PRECISA TER JOGO GANHO
+    ======================================================== */
 
-    if (jogosGanhados <= 0) {
+    if (
+        jogosGanhados < 1
+    ) {
 
         return {
+
             permitido: false,
-            motivo: "Ainda não existe jogo ganho para calcular o Cash Out."
+
+            motivo:
+                "O Cash Out será liberado após pelo menos 1 jogo ser ganho."
+
         };
 
     }
 
 
-    /*
-       Precisa existir jogo pendente.
-    */
+    /* ========================================================
+       PRECISA TER JOGO PENDENTE
+    ======================================================== */
 
-    if (jogosPendentes <= 0) {
+    if (
+        jogosPendentes < 1
+    ) {
 
         return {
+
             permitido: false,
-            motivo: "Todos os jogos já foram finalizados."
+
+            motivo:
+                "Todos os jogos já foram finalizados."
+
         };
 
     }
 
+
+    /* ========================================================
+       VALOR DA APOSTA
+    ======================================================== */
 
     const valorAposta =
-        obterValorApostaCashOut(aposta);
+        obterValorApostaCashOut(
+            aposta
+        );
 
 
-    if (valorAposta <= 0) {
+    if (
+        valorAposta <= 0
+    ) {
 
         return {
+
             permitido: false,
-            motivo: "Valor da aposta inválido."
+
+            motivo:
+                "Valor da aposta inválido."
+
         };
 
     }
 
 
-    /*
-       Retorno correspondente aos jogos
-       que já foram ganhos.
-    */
+    /* ========================================================
+       RETORNO DOS JOGOS GANHOS
+    ======================================================== */
 
     const retornoGanhos =
-        valorAposta * multiplicadorGanhos;
+        valorAposta *
+        multiplicadorGanhos;
 
 
-    /*
-       Aplica 80% do retorno atual.
-    */
+    /* ========================================================
+       CASH OUT = 80%
+    ======================================================== */
 
     let valorCashOut =
         retornoGanhos *
@@ -17136,30 +17216,48 @@ function analisarCashOut(aposta) {
     ) {
 
         return {
+
             permitido: false,
-            motivo: "Valor de Cash Out muito baixo."
+
+            motivo:
+                "Valor de Cash Out muito baixo."
+
         };
 
     }
 
 
+    /* ========================================================
+       LIBERADO
+    ======================================================== */
+
     return {
 
         permitido: true,
 
-        valorAposta,
+        valorAposta:
+            valorAposta,
 
-        valorCashOut,
+        valorCashOut:
+            valorCashOut,
 
-        retornoGanhos,
+        retornoGanhos:
+            retornoGanhos,
 
-        multiplicadorGanhos,
+        multiplicadorGanhos:
+            multiplicadorGanhos,
 
-        jogosGanhados,
+        jogosGanhados:
+            jogosGanhados,
 
-        jogosPendentes,
+        jogosPendentes:
+            jogosPendentes,
 
-        jogosPerdidos,
+        jogosPerdidos:
+            jogosPerdidos,
+
+        totalJogos:
+            selecoes.length,
 
         percentual:
             CASHOUT_CONFIG.PERCENTUAL_CASHOUT
@@ -17167,7 +17265,6 @@ function analisarCashOut(aposta) {
     };
 
 }
-
 
 /* ============================================================
    FORMATAR DINHEIRO
@@ -17741,10 +17838,19 @@ async function executarCashOutFirebase(
    CONFIRMAR CASH OUT
    ============================================================ */
 
+/* ============================================================
+   CONFIRMAR CASH OUT
+   ABRE O MODAL DE SAQUE
+============================================================ */
+
 async function confirmarCashOut() {
 
-    if (!apostaCashOutAtual) {
+    if (
+        !apostaCashOutAtual
+    ) {
+
         return;
+
     }
 
 
@@ -17755,44 +17861,57 @@ async function confirmarCashOut() {
 
 
     if (confirmar) {
+
         confirmar.disabled = true;
-        confirmar.textContent = "PROCESSANDO...";
+
+        confirmar.textContent =
+            "ABRINDO...";
+
     }
 
 
     try {
 
-        /*
-           Usa o código real da aposta.
-
-           Suas apostas são salvas como:
-           apostas/MJxxxxxxxx
-        */
+        /* ====================================================
+           CÓDIGO DA APOSTA
+        ==================================================== */
 
         const codigoAposta =
             String(
+
                 apostaCashOutAtual.codigo ||
                 apostaCashOutAtual.id ||
+
                 ""
-            );
+
+            ).trim();
 
 
         if (!codigoAposta) {
+
             throw new Error(
                 "Código da aposta não encontrado."
             );
+
         }
 
 
+        /* ====================================================
+           JOGADOR
+        ==================================================== */
+
         const jogadorIdCashOut =
             String(
+
                 apostaCashOutAtual.jogadorId ||
                 jogadorId ||
                 localStorage.getItem(
                     "multiPlayJogadorId"
                 ) ||
+
                 ""
-            );
+
+            ).trim();
 
 
         if (!jogadorIdCashOut) {
@@ -17804,23 +17923,24 @@ async function confirmarCashOut() {
         }
 
 
-        /*
-           BUSCAR A APOSTA NOVAMENTE NO FIREBASE.
-
-           Isso é importante porque o objeto mostrado
-           na tela pode estar desatualizado.
-        */
+        /* ====================================================
+           BUSCAR APOSTA ATUALIZADA
+        ==================================================== */
 
         const snap =
             await get(
+
                 ref(
                     db,
                     `apostas/${codigoAposta}`
                 )
+
             );
 
 
-        if (!snap.exists()) {
+        if (
+            !snap.exists()
+        ) {
 
             throw new Error(
                 "Aposta não encontrada no Firebase."
@@ -17833,15 +17953,18 @@ async function confirmarCashOut() {
             snap.val();
 
 
-        /*
-           Confirma que a aposta pertence ao jogador.
-        */
+        /* ====================================================
+           VERIFICAR DONO
+        ==================================================== */
 
         if (
+
             String(
-                apostaAtual.jogadorId || ""
+                apostaAtual.jogadorId ||
+                ""
             ) !==
             jogadorIdCashOut
+
         ) {
 
             throw new Error(
@@ -17851,17 +17974,23 @@ async function confirmarCashOut() {
         }
 
 
-        /*
-           REANALISAÇÃO COM DADOS ATUAIS.
-        */
+        /* ====================================================
+           ANALISAR NOVAMENTE
+        ==================================================== */
 
         const analise =
             analisarCashOut(
-                apostaAtual
+                {
+                    ...apostaAtual,
+                    codigo:
+                        codigoAposta
+                }
             );
 
 
-        if (!analise.permitido) {
+        if (
+            !analise.permitido
+        ) {
 
             throw new Error(
                 analise.motivo ||
@@ -17871,83 +18000,69 @@ async function confirmarCashOut() {
         }
 
 
-        await executarCashOutFirebase(
-            jogadorIdCashOut,
-            codigoAposta,
-            analise.valorCashOut
-        );
+        /* ====================================================
+           GUARDAR DADOS PARA O MODAL PIX
+        ==================================================== */
 
+        codigoCashOutModal =
+            codigoAposta;
+
+
+        valorCashOutModal =
+            analise.valorCashOut;
+
+
+        apostaSaqueAtual =
+            codigoAposta;
+
+
+        valorSaqueAtual =
+            analise.valorCashOut;
+
+
+        /* ====================================================
+           FECHAR MODAL CASH OUT
+        ==================================================== */
 
         fecharModalCashOut();
 
 
-        /*
-           Atualiza variável local.
-        */
+        /* ====================================================
+           ABRIR MODAL DE SAQUE
+        ==================================================== */
 
-        saldoJogador =
-            Number(
-                saldoJogador || 0
-            ) +
-            Number(
-                analise.valorCashOut
-            );
+        abrirModalPix(
 
+            codigoAposta,
 
-        /*
-           Atualiza a tela.
-        */
+            analise.valorCashOut
 
-        if (
-            typeof atualizarSaldoTela ===
-            "function"
-        ) {
-
-            atualizarSaldoTela();
-
-        }
-
-
-        /*
-           Atualiza Jogos Feitos.
-        */
-
-        if (
-            typeof carregarJogosFeitosMenu ===
-            "function"
-        ) {
-
-            await carregarJogosFeitosMenu();
-
-        }
-
-
-        alert(
-            "💰 Cash Out realizado com sucesso!\n\n" +
-            "Valor recebido: " +
-            formatarRealCashOut(
-                analise.valorCashOut
-            )
         );
 
 
     } catch (erro) {
 
         console.error(
-            "Erro Cash Out:",
+            "❌ ERRO AO ABRIR SAQUE:",
             erro
         );
 
 
         alert(
+
             erro?.message ||
-            "Não foi possível realizar o Cash Out."
+
+            "Não foi possível abrir o saque."
+
         );
 
 
+    } finally {
+
         if (confirmar) {
 
-            confirmar.disabled = false;
+            confirmar.disabled =
+                false;
 
             confirmar.textContent =
                 "💰 SACAR AGORA";
@@ -17957,7 +18072,6 @@ async function confirmarCashOut() {
     }
 
 }
-
 
 /* ============================================================
    CRIAR BOTÃO
