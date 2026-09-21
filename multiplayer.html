@@ -9529,7 +9529,54 @@ container.appendChild(card);
     }
 
 }
+function mostrarDia(dia) {
 
+    document
+        .querySelectorAll(".conteudo-dia")
+        .forEach(function(elemento) {
+
+            elemento.style.display = "none";
+
+        });
+
+    const conteudo =
+        document.getElementById(
+            "conteudo-" + dia
+        );
+
+    if (conteudo) {
+        conteudo.style.display = "block";
+    }
+
+    document
+        .querySelectorAll(".btn-dia")
+        .forEach(function(botao) {
+
+            botao.classList.remove("ativo");
+
+        });
+
+    const botaoAtivo =
+        document.querySelector(
+            `[data-dia="${dia}"]`
+        );
+
+    if (botaoAtivo) {
+        botaoAtivo.classList.add("ativo");
+    }
+
+    diaAtual = dia;
+
+    console.log(
+        "📅 Dia selecionado:",
+        dia
+    );
+
+    console.log(
+        "🎯 Seleções mantidas:",
+        selecoesPorJogo
+    );
+}
 /* =========================================================
    MOSTRAR DIA
 ========================================================= */
@@ -10660,48 +10707,60 @@ async function carregarJogos(dataSelecionada = null) {
             ============================================= */
 
             const hojeAPI =
-                String(
-                    obterDataDia(0)
-                ).trim();
+    String(
+        obterDataDia(0)
+    ).trim();
 
 
-            if (
-                dataDoCarregamento ===
-                hojeAPI
-            ) {
+// =========================================================
+// HOJE
+// Mostrar somente jogos que ainda não começaram.
+// =========================================================
 
-                const agora =
-                    Date.now();
+if (dataDoCarregamento === hojeAPI) {
 
+    const agora = Date.now();
 
-                jogosDia =
-                    jogosDia.filter(
-                        function(jogo) {
+    jogosDia = jogosDia.filter(function(jogo) {
 
-                            const info =
-                                obterDataHoraBrasil(
-                                    jogo
-                                );
+        const info = obterDataHoraBrasil(jogo);
 
+        if (!info) {
+            console.warn(
+                "⚠️ Sem data/hora:",
+                jogo
+            );
+            return false;
+        }
 
-                            if (!info) {
+        const timestamp =
+            Number(info.timestamp);
 
-                                return false;
+        if (!Number.isFinite(timestamp)) {
+            console.warn(
+                "⚠️ Timestamp inválido:",
+                jogo,
+                info
+            );
+            return false;
+        }
 
-                            }
+        const mostrar =
+            timestamp > agora;
 
+        console.log(
+            `🕐 ${jogo.timeA} x ${jogo.timeB} | ` +
+            `${info.hora} | ` +
+            `timestamp=${timestamp} | ` +
+            `agora=${agora} | ` +
+            `${mostrar ? "✅ MOSTRA" : "❌ OCULTA"}`
+        );
 
-                            return (
-                                info.timestamp >
-                                agora
-                            );
+        return mostrar;
 
-                        }
-                    );
+    });
 
-            }
-
-
+}
             /* =============================================
                REMOVER DUPLICADOS
                
@@ -19780,7 +19839,34 @@ function configurarBotaoCashOut() {
     return true;
 
 }
+function salvarSelecao(jogo, selecao) {
 
+    const fixtureId =
+        String(
+            jogo.fixtureId ||
+            jogo.apiFixtureId ||
+            jogo.id
+        );
+
+    if (!fixtureId) {
+        console.warn("⚠️ Fixture ID não encontrado:", jogo);
+        return;
+    }
+
+    selecoesPorJogo[fixtureId] = {
+        fixtureId: fixtureId,
+        dia: jogo.data,
+        timeA: jogo.timeA,
+        timeB: jogo.timeB,
+        selecao: selecao,
+        cotacao: jogo.cotacao
+    };
+
+    console.log(
+        "✅ Seleção salva:",
+        selecoesPorJogo[fixtureId]
+    );
+}
 /* ============================================================
    DEIXAR FUNÇÃO DISPONÍVEL PARA onclick="" DO HTML
 ============================================================ */
