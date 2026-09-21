@@ -2553,12 +2553,262 @@ body.cor5 {
         bold;
 
 }
+.modal-sucesso-saldo {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.78);
+
+    z-index: 9999999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
+
+
+.modal-sucesso-saldo.ativo {
+
+    display: flex;
+
+}
+
+
+.modal-sucesso-saldo-box {
+
+    width: 100%;
+
+    max-width: 380px;
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    padding: 28px 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.40);
+
+    animation:
+        aparecerSucessoSaldo
+        0.25s ease;
+
+}
+
+
+@keyframes aparecerSucessoSaldo {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(.85)
+            translateY(20px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            translateY(0);
+
+    }
+
+}
+
+
+.saldo-sucesso-icone {
+
+    font-size: 55px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.modal-sucesso-saldo-box h2 {
+
+    margin:
+        5px 0 8px;
+
+    color: #111;
+
+    font-size: 24px;
+
+}
+
+
+.modal-sucesso-saldo-box p {
+
+    margin:
+        0 0 20px;
+
+    color: #666;
+
+    font-size: 15px;
+
+}
+
+
+.dados-solicitacao-saldo {
+
+    background: #f4f4f4;
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    text-align: left;
+
+    margin-bottom: 20px;
+
+}
+
+
+.dados-solicitacao-saldo > div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid #ddd;
+
+}
+
+
+.dados-solicitacao-saldo > div:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.dados-solicitacao-saldo span {
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+.dados-solicitacao-saldo strong {
+
+    color: #111;
+
+    font-size: 14px;
+
+    text-align: right;
+
+}
+
+
+.btn-fechar-sucesso-saldo {
+
+    width: 100%;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 14px;
+
+    background: #111;
+
+    color: #fff;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.btn-fechar-sucesso-saldo:active {
+
+    transform: scale(.98);
+
+}
 </style>
 
 </head>
 
 
 <body>
+    <div id="modalSucessoSaldo" class="modal-sucesso-saldo">
+
+    <div class="modal-sucesso-saldo-box">
+
+        <div class="saldo-sucesso-icone">
+            ✅
+        </div>
+
+        <h2>Solicitação enviada!</h2>
+
+        <p>
+            Sua solicitação de saldo foi enviada
+            com sucesso.
+        </p>
+
+        <div class="dados-solicitacao-saldo">
+
+            <div>
+                <span>Código</span>
+                <strong id="codigoSucessoSaldo">
+                    -
+                </strong>
+            </div>
+
+            <div>
+                <span>Valor</span>
+                <strong id="valorSucessoSaldo">
+                    R$ 0,00
+                </strong>
+            </div>
+
+            <div>
+                <span>Status</span>
+                <strong>
+                    Aguardando liberação
+                </strong>
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            id="btnFecharSucessoSaldo"
+            class="btn-fechar-sucesso-saldo"
+        >
+            OK
+        </button>
+
+    </div>
+
+</div>
     <!-- =====================================================
      MODAL SUCESSO SAQUE
 ===================================================== -->
@@ -16193,12 +16443,9 @@ async function() {
             "Informe um valor válido."
         );
 
-
         input.focus();
 
-
         return;
-
     }
 
 
@@ -16252,16 +16499,18 @@ async function() {
         fecharModalSaldo();
 
 
-        alert(
-            "Solicitação enviada!\n\n" +
-            "Código: " +
-            codigoSolicitacao +
-            "\n\n" +
-            "Valor: " +
-            dinheiro(valor) +
-            "\n\n" +
-            "Aguarde a liberação do saldo."
+        // =====================================
+        // MOSTRA MODAL DE SUCESSO
+        // =====================================
+
+        abrirModalSucessoSaldo(
+            codigoSolicitacao,
+            valor
         );
+
+
+        // Limpa o campo
+        input.value = "";
 
     }
 
@@ -21863,7 +22112,81 @@ if (btnFecharSucesso) {
     );
 
 }
+function abrirModalSucessoSaldo(
+    codigo,
+    valor
+) {
 
+    const modal =
+        document.getElementById(
+            "modalSucessoSaldo"
+        );
+
+    if (!modal) {
+
+        console.error(
+            "❌ #modalSucessoSaldo não encontrado."
+        );
+
+        return;
+    }
+
+
+    const campoCodigo =
+        document.getElementById(
+            "codigoSucessoSaldo"
+        );
+
+    const campoValor =
+        document.getElementById(
+            "valorSucessoSaldo"
+        );
+
+
+    if (campoCodigo) {
+
+        campoCodigo.textContent =
+            codigo || "-";
+    }
+
+
+    if (campoValor) {
+
+        campoValor.textContent =
+            dinheiro(valor);
+    }
+
+
+    modal.classList.add("ativo");
+}
+
+
+function fecharModalSucessoSaldo() {
+
+    const modal =
+        document.getElementById(
+            "modalSucessoSaldo"
+        );
+
+    if (!modal) return;
+
+    modal.classList.remove("ativo");
+}
+
+
+const btnFecharSucessoSaldo =
+    document.getElementById(
+        "btnFecharSucessoSaldo"
+    );
+
+
+if (btnFecharSucessoSaldo) {
+
+    btnFecharSucessoSaldo.addEventListener(
+        "click",
+        fecharModalSucessoSaldo
+    );
+}
 </script>
 </body>
 
