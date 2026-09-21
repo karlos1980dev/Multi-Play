@@ -7534,22 +7534,67 @@ function normalizarJogoData(jogo) {
    VERIFICAR DATA
 ========================================================= */
 
-function jogoPertenceAoDia(
-    jogo,
-    dataSolicitada
-) {
+function jogoPertenceAData(jogo, dataSolicitada) {
 
-    const dataReal =
-        obterDataRealDoJogo(jogo);
+    if (!jogo || !dataSolicitada) {
+        return false;
+    }
 
-    return (
-        dataReal === dataSolicitada
-    );
+
+    const fixtureId =
+        jogo.fixtureId ||
+        jogo.idAPI ||
+        jogo.fixture?.id ||
+        "";
+
+
+    const dataJogo =
+        String(
+            jogo.data ||
+            jogo.date ||
+            jogo.fixture?.date ||
+            ""
+        ).substring(0, 10);
+
+
+    const dataBusca =
+        String(
+            dataSolicitada
+        ).substring(0, 10);
+
+
+    if (!dataJogo) {
+
+        console.warn(
+            "⚠️ JOGO SEM DATA:",
+            fixtureId
+        );
+
+        return false;
+
+    }
+
+
+    if (dataJogo !== dataBusca) {
+
+        console.warn(
+            "🛑 JOGO IGNORADO - DATA DIFERENTE",
+            "\nData solicitada:",
+            dataBusca,
+            "\nData do jogo:",
+            dataJogo,
+            "\nFixture:",
+            fixtureId
+        );
+
+        return false;
+
+    }
+
+
+    return true;
+
 }
-
-/* =========================================================
-   BUSCAR JOGOS COM CACHE + LIMITE API
-========================================================= */
 
 /* =========================================================
    BUSCAR JOGOS COM CACHE
@@ -7559,19 +7604,36 @@ function jogoPertenceAoDia(
    - API SOMENTE SE REALMENTE NÃO EXISTIR DADO
 ========================================================= */
 
+/* =========================================================
+   BUSCAR JOGOS COM CACHE
+   - TODOS OS HORÁRIOS DO DIA
+   - NÃO LIMITA EM 20:30
+   - NÃO USA LIMITE DE 6 JOGOS
+   - CACHE SÓ É ACEITO SE FOR DO DIA CORRETO
+========================================================= */
+
 async function buscarJogosComCache(dataAPI) {
 
-    dataAPI = String(dataAPI).trim();
+    dataAPI =
+        String(
+            dataAPI
+        )
+        .trim()
+        .substring(0, 10);
+
 
     console.log(
-        "🔎 Buscando jogos do dia:",
+        "🔎 Buscando TODOS os jogos do dia:",
         dataAPI
     );
 
+
     /* =====================================================
-       1. PRIMEIRO: FIREBASE
-       Se já existem jogos salvos para esta data,
-       NÃO consulta a API.
+       1. FIREBASE
+       
+       IMPORTANTE:
+       Não retornar imediatamente o cache se ele estiver
+       incompleto.
     ===================================================== */
 
     try {
@@ -7582,249 +7644,517 @@ async function buscarJogosComCache(dataAPI) {
                 dataAPI
             );
 
+
         if (
             cache &&
-            Array.isArray(cache.dados) &&
+            Array.isArray(
+                cache.dados
+            ) &&
             cache.dados.length > 0
         ) {
 
             const jogosFirebase =
                 cache.dados
-                    .map(normalizarJogoData)
-                    .filter(jogo =>
-                        jogo &&
-                        jogoPertenceAoDia(
-                            jogo,
-                            dataAPI
-                        )
+                    .map(
+                        normalizarJogoData
+                    )
+                    .filter(
+                        jogo => {
+
+                            if (!jogo) {
+                                return false;
+                            }
+
+
+                            return jogoPertenceAoDia(
+                                jogo,
+                                dataAPI
+                            );
+
+                        }
                     );
 
-            if (jogosFirebase.length > 0) {
 
-                console.log(
-                    "🟢 JOGOS VIERAM DO FIREBASE:",
-                    dataAPI,
-                    jogosFirebase.length
-                );
+            console.log(
+                "💾 CACHE FIREBASE:",
+                dataAPI,
+                jogosFirebase.length,
+                "jogos"
+            );
 
-                return jogosFirebase;
-            }
+
+            /*
+             * NÃO RETORNAMOS AQUI.
+             *
+             * Vamos verificar também o localStorage
+             * e depois consultar a API para garantir
+             * que não existem jogos faltando.
+             */
+
         }
 
-    } catch (erro) {
+    }
+
+    catch (erro) {
 
         console.warn(
             "⚠️ Erro lendo cache Firebase:",
             erro
         );
+
     }
 
 
     /* =====================================================
        2. LOCALSTORAGE
-       Também não chama API.
     ===================================================== */
+
+    let jogosLocais = [];
+
 
     try {
 
-        const locais =
-            Array.isArray(jogosSalvos)
-                ? jogosSalvos
-                : [];
+        const chave =
+            `jogos_${dataAPI}`;
 
-        const jogosLocais =
-            locais
-                .map(normalizarJogoData)
-                .filter(jogo =>
-                    jogo &&
-                    jogoPertenceAoDia(
-                        jogo,
-                        dataAPI
-                    )
+
+        const salvo =
+            localStorage.getItem(
+                chave
+            );
+
+
+        if (salvo) {
+
+            const dadosLocais =
+                JSON.parse(
+                    salvo
                 );
 
-        if (jogosLocais.length > 0) {
 
-            console.log(
-                "📦 JOGOS VIERAM DO LOCALSTORAGE:",
-                dataAPI,
-                jogosLocais.length
-            );
+            if (
+                Array.isArray(
+                    dadosLocais
+                )
+            ) {
 
-            /* =============================================
-               REGRAVA NO FIREBASE
-            ============================================= */
+                jogosLocais =
+                    dadosLocais
+                        .map(
+                            normalizarJogoData
+                        )
+                        .filter(
+                            jogo => {
 
-            await salvarCacheFirebase(
-                "jogos",
-                dataAPI,
-                jogosLocais
-            );
+                                if (!jogo) {
+                                    return false;
+                                }
 
-            return jogosLocais;
+
+                                return jogoPertenceAoDia(
+                                    jogo,
+                                    dataAPI
+                                );
+
+                            }
+                        );
+
+            }
+
         }
 
-    } catch (erro) {
+    }
+
+    catch (erro) {
 
         console.warn(
             "⚠️ Erro lendo localStorage:",
             erro
         );
+
     }
 
 
     /* =====================================================
-       3. NÃO TEM CACHE
-       SOMENTE AGORA CONSULTA A API
+       3. CONSULTAR API
+       
+       Agora vamos buscar a data inteira.
+       
+       Não existe filtro de:
+       - horário
+       - 20:30
+       - quantidade de jogos
+       - cotação
     ===================================================== */
 
     console.log(
-        "🌐 NÃO EXISTE CACHE.",
-        "Consultando API uma única vez:",
+        "🌐 CONSULTANDO API PARA A DATA INTEIRA:",
         dataAPI
     );
 
 
-    const respostaAPI =
-        await consultarAPI(
-            `/fixtures?date=${dataAPI}`
+    let respostaAPI = null;
+
+
+    try {
+
+        respostaAPI =
+            await consultarAPI(
+                `/fixtures?date=${dataAPI}`
+            );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "❌ Erro consultando API:",
+            erro
         );
 
-
-    /* =====================================================
-       DEBUG
-    ===================================================== */
-
-    console.log(
-        "🌐 TOTAL BRUTO DA API:",
-        dataAPI,
-        respostaAPI?.response?.length || 0
-    );
+    }
 
 
-    /* =====================================================
-       4. API NÃO RESPONDEU
-    ===================================================== */
+    let jogosAPI = [];
+
 
     if (
-        !respostaAPI ||
-        !Array.isArray(
+        respostaAPI &&
+        Array.isArray(
             respostaAPI.response
         )
     ) {
 
+        console.log(
+            "🌐 TOTAL BRUTO DA API:",
+            dataAPI,
+            respostaAPI.response.length
+        );
+
+
+        jogosAPI =
+            respostaAPI.response
+                .map(
+                    normalizarJogoData
+                )
+                .filter(
+                    jogo => {
+
+                        if (!jogo) {
+                            return false;
+                        }
+
+
+                        /*
+                         * SOMENTE A DATA.
+                         *
+                         * NÃO EXISTE FILTRO DE HORÁRIO.
+                         */
+
+                        return jogoPertenceAoDia(
+                            jogo,
+                            dataAPI
+                        );
+
+                    }
+                );
+
+
+    }
+
+    else {
+
         console.warn(
-            "⚠️ API indisponível:",
+            "⚠️ API não retornou jogos:",
             dataAPI
         );
 
-        return [];
     }
 
 
-    /* =====================================================
-       5. PEGA TODOS OS JOGOS DA DATA
-       
-       IMPORTANTE:
-       NÃO FILTRAR POR COTAÇÃO.
-       NÃO FILTRAR POR HORÁRIO.
-    ===================================================== */
-
-    const jogosValidos =
-        respostaAPI.response
-            .map(normalizarJogoData)
-            .filter(jogo => {
-
-                if (!jogo) {
-                    return false;
-                }
-
-                return jogoPertenceAoDia(
-                    jogo,
-                    dataAPI
-                );
-
-            });
-
-
     console.log(
-        "⚽ TOTAL DE JOGOS VÁLIDOS:",
-        dataAPI,
-        jogosValidos.length
+        "⚽ JOGOS DA API APÓS FILTRO DE DATA:",
+        jogosAPI.length
     );
 
 
     /* =====================================================
-       6. REMOVE DUPLICADOS
+       4. JUNTAR CACHE + LOCAL + API
+       
+       Isso é importante.
+       
+       Se o Firebase tinha 20 jogos e a API encontrou
+       mais 5, teremos os 25.
+    ===================================================== */
+
+    const todosJogos = [];
+
+
+    /*
+     * Firebase
+     */
+
+    try {
+
+        const cache =
+            await lerCacheFirebase(
+                "jogos",
+                dataAPI
+            );
+
+
+        if (
+            cache &&
+            Array.isArray(
+                cache.dados
+            )
+        ) {
+
+            cache.dados
+                .map(
+                    normalizarJogoData
+                )
+                .forEach(
+                    jogo => {
+
+                        if (
+                            jogo &&
+                            jogoPertenceAoDia(
+                                jogo,
+                                dataAPI
+                            )
+                        ) {
+
+                            todosJogos.push(
+                                jogo
+                            );
+
+                        }
+
+                    }
+                );
+
+        }
+
+    }
+
+    catch (erro) {
+
+        console.warn(
+            "⚠️ Não foi possível adicionar cache Firebase:",
+            erro
+        );
+
+    }
+
+
+    /*
+     * LocalStorage
+     */
+
+    jogosLocais.forEach(
+        jogo => {
+
+            if (
+                jogo &&
+                jogoPertenceAoDia(
+                    jogo,
+                    dataAPI
+                )
+            ) {
+
+                todosJogos.push(
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+     * API
+     */
+
+    jogosAPI.forEach(
+        jogo => {
+
+            if (
+                jogo &&
+                jogoPertenceAoDia(
+                    jogo,
+                    dataAPI
+                )
+            ) {
+
+                todosJogos.push(
+                    jogo
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       5. REMOVER DUPLICADOS
     ===================================================== */
 
     const mapa =
         new Map();
 
-    jogosValidos.forEach(jogo => {
 
-        const fixtureId =
-            String(
-                jogo?.fixtureId ||
-                jogo?.idAPI ||
-                jogo?.fixture?.id ||
-                ""
-            ).trim();
+    todosJogos.forEach(
+        jogo => {
 
-        if (!fixtureId) {
-            return;
+            const fixtureId =
+                String(
+                    jogo?.fixtureId ||
+                    jogo?.idAPI ||
+                    jogo?.fixture?.id ||
+                    ""
+                ).trim();
+
+
+            if (!fixtureId) {
+
+                return;
+
+            }
+
+
+            mapa.set(
+                fixtureId,
+                jogo
+            );
+
         }
-
-        mapa.set(
-            fixtureId,
-            jogo
-        );
-
-    });
+    );
 
 
-    const jogosFinais =
+    let jogosFinais =
         Array.from(
             mapa.values()
         );
 
 
     /* =====================================================
-       7. SALVA TODOS NO FIREBASE
+       6. ORDENAR POR HORÁRIO
+       
+       MAIS CEDO → MAIS TARDE
     ===================================================== */
 
-    if (jogosFinais.length > 0) {
+    jogosFinais.sort(
+        function(a, b) {
 
-        await salvarCacheFirebase(
-            "jogos",
-            dataAPI,
-            jogosFinais
-        );
+            const dataA =
+                obterDataHoraBrasil(
+                    a
+                );
 
-        console.log(
-            "💾 TODOS OS JOGOS SALVOS NO FIREBASE:",
-            dataAPI,
-            jogosFinais.length
-        );
+
+            const dataB =
+                obterDataHoraBrasil(
+                    b
+                );
+
+
+            return (
+                new Date(dataA).getTime() -
+                new Date(dataB).getTime()
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       7. LOG DOS HORÁRIOS
+    ===================================================== */
+
+    console.log(
+        "🟢 TOTAL FINAL DE JOGOS:",
+        dataAPI,
+        jogosFinais.length
+    );
+
+
+    jogosFinais.forEach(
+        function(jogo) {
+
+            console.log(
+                "⚽",
+                jogo.timeA,
+                "x",
+                jogo.timeB,
+                "|",
+                jogo.hora,
+                "|",
+                jogo.fixtureId
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       8. SALVAR FIREBASE
+    ===================================================== */
+
+    if (
+        jogosFinais.length > 0
+    ) {
+
+        try {
+
+            await salvarCacheFirebase(
+                "jogos",
+                dataAPI,
+                jogosFinais
+            );
+
+
+            console.log(
+                "💾 TODOS OS JOGOS SALVOS NO FIREBASE:",
+                dataAPI,
+                jogosFinais.length
+            );
+
+        }
+
+        catch (erro) {
+
+            console.warn(
+                "⚠️ Erro salvando cache Firebase:",
+                erro
+            );
+
+        }
 
     }
 
 
     /* =====================================================
-       8. SALVA LOCALMENTE TAMBÉM
+       9. SALVAR LOCALSTORAGE
     ===================================================== */
 
     try {
 
         localStorage.setItem(
             `jogos_${dataAPI}`,
-            JSON.stringify(jogosFinais)
+            JSON.stringify(
+                jogosFinais
+            )
         );
 
-    } catch (erro) {
+    }
+
+    catch (erro) {
 
         console.warn(
-            "⚠️ Não foi possível salvar localStorage:",
+            "⚠️ Erro salvando jogos localmente:",
             erro
         );
 
@@ -7832,6 +8162,7 @@ async function buscarJogosComCache(dataAPI) {
 
 
     return jogosFinais;
+
 }
 /* =========================================================
    BUSCAR JOGOS DOS PRÓXIMOS DIAS
@@ -9566,7 +9897,15 @@ async function carregarJogosEmAndamentoAPI() {
 function renderizarJogosPorCompeticao(
     container,
     jogos
-) {
+) {console.log(
+    "⚽ JOGOS FINAIS PARA EXIBIR:",
+    jogosDoDia.map(j => ({
+        fixture: j.fixtureId,
+        jogo: `${j.timeA} x ${j.timeB}`,
+        data: j.data,
+        hora: j.hora
+    }))
+);
 
     if (!container) {
 
@@ -9855,7 +10194,117 @@ function jogoEhDoBrasil(jogo) {
     );
 
 }
+/* =========================================================
+   VERIFICAR SE O JOGO PERTENCE AO DIA SOLICITADO
+========================================================= */
 
+function jogoPertenceAoDia(jogo, dataSolicitada) {
+
+    if (!jogo || !dataSolicitada) {
+        return false;
+    }
+
+
+    const fixtureId =
+        jogo.fixtureId ||
+        jogo.idAPI ||
+        jogo.fixture?.id ||
+        "";
+
+
+    /* =====================================================
+       DATA DO JOGO
+    ===================================================== */
+
+    let dataJogo =
+        jogo.data ||
+        jogo.date ||
+        jogo.fixture?.date ||
+        "";
+
+
+    dataJogo =
+        String(
+            dataJogo
+        ).trim();
+
+
+    /* =====================================================
+       PEGAR SOMENTE YYYY-MM-DD
+    ===================================================== */
+
+    if (
+        dataJogo.includes("T")
+    ) {
+
+        dataJogo =
+            dataJogo
+                .split("T")[0];
+
+    }
+
+    else if (
+        dataJogo.includes(" ")
+    ) {
+
+        dataJogo =
+            dataJogo
+                .split(" ")[0];
+
+    }
+
+
+    const dataBusca =
+        String(
+            dataSolicitada
+        )
+        .trim()
+        .substring(0, 10);
+
+
+    /* =====================================================
+       SEM DATA = DESCARTAR
+    ===================================================== */
+
+    if (!dataJogo) {
+
+        console.warn(
+            "⚠️ JOGO SEM DATA - IGNORADO:",
+            fixtureId
+        );
+
+        return false;
+
+    }
+
+
+    /* =====================================================
+       COMPARAÇÃO
+    ===================================================== */
+
+    if (
+        dataJogo !==
+        dataBusca
+    ) {
+
+        console.warn(
+            "🛑 JOGO IGNORADO - DATA DIFERENTE",
+            "\nData solicitada:",
+            dataBusca,
+            "\nData do jogo:",
+            dataJogo,
+            "\nFixture:",
+            fixtureId
+        );
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
 /* =========================================================
    CARREGAR JOGOS
 ========================================================= */
@@ -14138,8 +14587,7 @@ async function abrirJogosFeitos() {
 
     if (jogosFeitosModal) {
 
-        jogosFeitosModal.style.display =
-            "flex    ";
+        jogosFeitosModal.style.display = "flex";
 
     }
 
@@ -14150,7 +14598,9 @@ async function abrirJogosFeitos() {
         );
 
 
-    if (!listaModal) return;
+    if (!listaModal) {
+        return;
+    }
 
 
     listaModal.innerHTML =
@@ -14168,13 +14618,10 @@ async function abrirJogosFeitos() {
             );
 
 
-        if (
-            !snapshot.exists()
-        ) {
+        if (!snapshot.exists()) {
 
             listaModal.innerHTML =
                 "<p>Você ainda não fez nenhuma aposta.</p>";
-
 
             return;
 
@@ -14186,42 +14633,36 @@ async function abrirJogosFeitos() {
 
 
         const apostas =
-            Object.values(
-                dados
-            )
-            .filter(
-                aposta =>
-                    aposta &&
-                    aposta.jogadorId ===
-                    jogadorId
-            )
-            .sort(
-                (a, b) =>
-                    String(
-                        b.dataHora || ""
-                    ).localeCompare(
+            Object.values(dados)
+                .filter(
+                    aposta =>
+                        aposta &&
+                        aposta.jogadorId ===
+                        jogadorId
+                )
+                .sort(
+                    (a, b) =>
                         String(
-                            a.dataHora || ""
+                            b.dataHora || ""
+                        ).localeCompare(
+                            String(
+                                a.dataHora || ""
+                            )
                         )
-                    )
-            );
+                );
 
 
-        if (
-            apostas.length === 0
-        ) {
+        if (apostas.length === 0) {
 
             listaModal.innerHTML =
                 "<p>Você ainda não fez nenhuma aposta.</p>";
-
 
             return;
 
         }
 
 
-        listaModal.innerHTML =
-            "";
+        listaModal.innerHTML = "";
 
 
         apostas.forEach(
@@ -14237,11 +14678,17 @@ async function abrirJogosFeitos() {
                     "aposta-card";
 
 
+                /* =================================================
+                   STATUS DA APOSTA
+                ================================================= */
+
                 const status =
                     String(
                         aposta.status ||
                         "aguardando"
-                    ).toLowerCase();
+                    )
+                    .toLowerCase()
+                    .trim();
 
 
                 let classeStatus =
@@ -14312,6 +14759,23 @@ async function abrirJogosFeitos() {
 
                 }
 
+                else if (
+                    status === "sacado" ||
+                    status === "sacada"
+                ) {
+
+                    classeStatus =
+                        "status-liberada";
+
+                    textoStatus =
+                        "Sacado";
+
+                }
+
+
+                /* =================================================
+                   QUANTIDADE DE JOGOS
+                ================================================= */
 
                 const quantidade =
                     Number(
@@ -14325,6 +14789,10 @@ async function abrirJogosFeitos() {
                             : 0
                     );
 
+
+                /* =================================================
+                   CARD
+                ================================================= */
 
                 card.innerHTML = `
 
@@ -14346,7 +14814,8 @@ async function abrirJogosFeitos() {
 
                         ${escapeHTML(
                             aposta.nome ||
-                            nomeJogador
+                            nomeJogador ||
+                            ""
                         )}
 
                     </div>
@@ -14413,6 +14882,84 @@ async function abrirJogosFeitos() {
                 `;
 
 
+                /* =================================================
+                   CASH OUT
+                   
+                   IMPORTANTE:
+                   O BOTÃO SÓ É CRIADO SE
+                   analisarCashOut() PERMITIR.
+                   
+                   Se tiver UM jogo perdido,
+                   não cria o botão.
+                ================================================= */
+
+                const areaCashOut =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                areaCashOut.className =
+                    "areaCashOut";
+
+
+                let analiseCashOut = null;
+
+
+                try {
+
+                    analiseCashOut =
+                        analisarCashOut(
+                            aposta
+                        );
+
+                }
+
+                catch (erroCashOut) {
+
+                    console.error(
+                        "❌ Erro ao analisar Cash Out:",
+                        erroCashOut
+                    );
+
+                }
+
+
+                /* =================================================
+                   SÓ MOSTRA SE FOR PERMITIDO
+                ================================================= */
+
+                if (
+                    analiseCashOut &&
+                    analiseCashOut.permitido === true &&
+                    Number(
+                        analiseCashOut.jogosPerdidos || 0
+                    ) === 0
+                ) {
+
+                    criarBotaoCashOut(
+                        aposta,
+                        areaCashOut
+                    );
+
+
+                    if (
+                        areaCashOut.children.length > 0
+                    ) {
+
+                        card.appendChild(
+                            areaCashOut
+                        );
+
+                    }
+
+                }
+
+
+                /* =================================================
+                   ADICIONAR CARD
+                ================================================= */
+
                 listaModal.appendChild(
                     card
                 );
@@ -14420,11 +14967,13 @@ async function abrirJogosFeitos() {
             }
         );
 
+
     }
 
     catch (erro) {
 
         console.error(
+            "❌ Erro ao carregar apostas:",
             erro
         );
 
@@ -14435,7 +14984,6 @@ async function abrirJogosFeitos() {
     }
 
 }
-
 
 /* =========================================================
    FECHAR JOGOS FEITOS
@@ -16814,6 +17362,62 @@ function testarBotoesDias() {
         );
     });
 }
+
+function abrirModalSaqueCashOut(codigoAposta, valor) {
+
+    codigoCashOutModal =
+        String(codigoAposta || "").trim();
+
+    valorCashOutModal =
+        Number(valor) || 0;
+
+    console.log("💰 ABRINDO MODAL DE SAQUE:", {
+        codigo: codigoCashOutModal,
+        valor: valorCashOutModal
+    });
+
+    /* =====================================================
+       TENTE USAR SUA FUNÇÃO EXISTENTE
+    ===================================================== */
+
+    if (
+        typeof window.abrirModalPix === "function"
+    ) {
+
+        window.abrirModalPix(
+            codigoCashOutModal,
+            valorCashOutModal
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       FALLBACK: ABRIR O MODAL DIRETAMENTE
+    ===================================================== */
+
+    const modal =
+        document.getElementById("pixModal") ||
+        document.getElementById("modalPix") ||
+        document.getElementById("modalSaque");
+
+    if (!modal) {
+
+    console.error(
+        "❌ MODAL DE SAQUE NÃO ENCONTRADO."
+    );
+
+    return;
+}
+
+    modal.style.display = "flex";
+
+    modal.classList.add("ativo");
+
+}
+
 /* ============================================================
    CASH OUT - MULTI PLAY.BET
    ============================================================ */
@@ -16911,63 +17515,58 @@ function obterOddSelecaoCashOut(selecao) {
    MÍNIMO DE 2 JOGOS
 ============================================================ */
 
+/* ============================================================
+   ANALISAR CASH OUT
+============================================================ */
+
 function analisarCashOut(aposta) {
 
     if (!aposta) {
 
         return {
             permitido: false,
-            motivo: "Aposta não encontrada."
+            motivo: "Aposta inválida."
         };
 
     }
 
 
-    const statusAposta =
-        normalizarStatusCashOut(
-            aposta.status
-        );
-
-
-    /* ========================================================
-       A APOSTA PRECISA TER NO MÍNIMO 2 JOGOS
-    ======================================================== */
-
     const selecoes =
-        obterJogosDaApostaCashOut(
-            aposta
-        );
+        Array.isArray(aposta.selecoes)
+            ? aposta.selecoes
+            : [];
 
 
     if (selecoes.length < 2) {
 
         return {
-
             permitido: false,
-
-            motivo:
-                "O Cash Out está disponível somente para apostas com 2 ou mais jogos."
-
+            motivo: "Cash Out exige pelo menos 2 jogos."
         };
 
     }
 
 
     /* ========================================================
-       APOSTA JÁ ENCERRADA
+       STATUS DA APOSTA
     ======================================================== */
 
-    const statusFechados = [
+    const status =
+        normalizarStatusCashOut(
+            aposta.status
+        );
 
-        "ganhou",
-        "ganha",
-        "won",
+
+    const statusBloqueados = [
 
         "perdeu",
         "perdida",
         "lost",
-
         "sacada",
+        "sacado",
+        "ganhou",
+        "ganha",
+        "won",
         "liberada",
         "bloqueada",
         "cancelada",
@@ -16977,143 +17576,107 @@ function analisarCashOut(aposta) {
 
 
     if (
-        statusFechados.includes(
-            statusAposta
+        statusBloqueados.includes(
+            status
         )
     ) {
 
         return {
-
             permitido: false,
-
             motivo:
-                "Esta aposta já foi encerrada."
-
+                "Cash Out indisponível para esta aposta."
         };
 
     }
 
 
     /* ========================================================
-       CASH OUT JÁ REALIZADO
+       VERIFICAR SE EXISTE JOGO PERDIDO
+       
+       SE TIVER UM ÚNICO PERDIDO:
+       CASH OUT É BLOQUEADO.
     ======================================================== */
-
-    if (
-        aposta.cashOut === true ||
-        aposta.cashOutProcessado === true ||
-        aposta.saqueSolicitado === true
-    ) {
-
-        return {
-
-            permitido: false,
-
-            motivo:
-                "O saque desta aposta já foi solicitado."
-
-        };
-
-    }
-
-
-    /* ========================================================
-       CONTADORES
-    ======================================================== */
-
-    let jogosGanhados = 0;
-
-    let jogosPendentes = 0;
 
     let jogosPerdidos = 0;
-
-    let multiplicadorGanhos = 1;
-
-
-    /* ========================================================
-       ANALISAR CADA JOGO
-    ======================================================== */
-
-    for (
-        const selecao of selecoes
-    ) {
-
-        const status =
-            normalizarStatusCashOut(
-
-                selecao?.status ||
-                selecao?.resultado
-
-            );
+    let jogosGanhos = 0;
+    let jogosPendentes = 0;
 
 
-        /* ================================================
-           PERDEU
-        ================================================ */
+    selecoes.forEach(
+        function(selecao) {
 
-        if (
-
-            status === "perdeu" ||
-            status === "perdida" ||
-            status === "lost"
-
-        ) {
-
-            jogosPerdidos++;
-
-            continue;
-
-        }
-
-
-        /* ================================================
-           GANHOU
-        ================================================ */
-
-        if (
-
-            status === "ganhou" ||
-            status === "ganha" ||
-            status === "won"
-
-        ) {
-
-            jogosGanhados++;
-
-
-            multiplicadorGanhos *=
-                obterOddSelecaoCashOut(
-                    selecao
+            const statusSelecao =
+                normalizarStatusCashOut(
+                    selecao.status
                 );
 
 
-            continue;
+            if (
+                [
+                    "perdeu",
+                    "perdida",
+                    "lost",
+                    "erro"
+                ].includes(
+                    statusSelecao
+                )
+            ) {
+
+                jogosPerdidos++;
+
+            }
+
+
+            else if (
+                [
+                    "ganhou",
+                    "ganha",
+                    "won",
+                    "acertou"
+                ].includes(
+                    statusSelecao
+                )
+            ) {
+
+                jogosGanhos++;
+
+            }
+
+
+            else {
+
+                jogosPendentes++;
+
+            }
 
         }
-
-
-        /* ================================================
-           PENDENTE
-        ================================================ */
-
-        jogosPendentes++;
-
-    }
+    );
 
 
     /* ========================================================
-       SE ALGUM JOGO PERDEU
+       REGRA PRINCIPAL
+       
+       SE QUALQUER JOGO PERDEU,
+       NÃO EXISTE CASH OUT.
     ======================================================== */
 
-    if (
-        jogosPerdidos > 0
-    ) {
+    if (jogosPerdidos > 0) {
 
         return {
 
             permitido: false,
 
             motivo:
-                "Esta aposta possui jogo perdido."
+                "Cash Out indisponível: existe jogo perdido nesta aposta.",
+
+            jogosPerdidos:
+                jogosPerdidos,
+
+            jogosGanhos:
+                jogosGanhos,
+
+            jogosPendentes:
+                jogosPendentes
 
         };
 
@@ -17121,19 +17684,26 @@ function analisarCashOut(aposta) {
 
 
     /* ========================================================
-       PRECISA TER JOGO GANHO
+       PRECISA TER PELO MENOS UM GANHO
     ======================================================== */
 
-    if (
-        jogosGanhados < 1
-    ) {
+    if (jogosGanhos <= 0) {
 
         return {
 
             permitido: false,
 
             motivo:
-                "O Cash Out será liberado após pelo menos 1 jogo ser ganho."
+                "Cash Out ainda não está disponível.",
+
+            jogosPerdidos:
+                0,
+
+            jogosGanhos:
+                jogosGanhos,
+
+            jogosPendentes:
+                jogosPendentes
 
         };
 
@@ -17144,16 +17714,23 @@ function analisarCashOut(aposta) {
        PRECISA TER JOGO PENDENTE
     ======================================================== */
 
-    if (
-        jogosPendentes < 1
-    ) {
+    if (jogosPendentes <= 0) {
 
         return {
 
             permitido: false,
 
             motivo:
-                "Todos os jogos já foram finalizados."
+                "Todos os jogos já foram finalizados.",
+
+            jogosPerdidos:
+                0,
+
+            jogosGanhos:
+                jogosGanhos,
+
+            jogosPendentes:
+                0
 
         };
 
@@ -17161,16 +17738,21 @@ function analisarCashOut(aposta) {
 
 
     /* ========================================================
-       VALOR DA APOSTA
+       CALCULAR VALOR DOS JOGOS GANHOS
     ======================================================== */
 
     const valorAposta =
-        obterValorApostaCashOut(
-            aposta
+        Number(
+            aposta.valorUnico ||
+            aposta.valor ||
+            0
         );
 
 
     if (
+        !Number.isFinite(
+            valorAposta
+        ) ||
         valorAposta <= 0
     ) {
 
@@ -17186,33 +17768,68 @@ function analisarCashOut(aposta) {
     }
 
 
-    /* ========================================================
-       RETORNO DOS JOGOS GANHOS
-    ======================================================== */
+    let multiplicadorGanhos = 1;
+
+
+    selecoes.forEach(
+        function(selecao) {
+
+            const statusSelecao =
+                normalizarStatusCashOut(
+                    selecao.status
+                );
+
+
+            if (
+                [
+                    "ganhou",
+                    "ganha",
+                    "won",
+                    "acertou"
+                ].includes(
+                    statusSelecao
+                )
+            ) {
+
+                const odd =
+                    obterOddSelecaoCashOut(
+                        selecao
+                    );
+
+
+                if (
+                    Number.isFinite(
+                        odd
+                    ) &&
+                    odd > 0
+                ) {
+
+                    multiplicadorGanhos *=
+                        odd;
+
+                }
+
+            }
+
+        }
+    );
+
 
     const retornoGanhos =
         valorAposta *
         multiplicadorGanhos;
 
 
-    /* ========================================================
-       CASH OUT = 80%
-    ======================================================== */
-
-    let valorCashOut =
+    const valorCashOut =
         retornoGanhos *
-        CASHOUT_CONFIG.PERCENTUAL_CASHOUT;
-
-
-    valorCashOut =
-        Math.round(
-            valorCashOut * 100
-        ) / 100;
+        CASHOUT_CONFIG
+            .PERCENTUAL_CASHOUT;
 
 
     if (
         valorCashOut <
-        CASHOUT_CONFIG.MINIMO_CASHOUT
+        CASHOUT_CONFIG
+            .MINIMO_CASHOUT
     ) {
 
         return {
@@ -17220,7 +17837,7 @@ function analisarCashOut(aposta) {
             permitido: false,
 
             motivo:
-                "Valor de Cash Out muito baixo."
+                "Valor do Cash Out muito baixo."
 
         };
 
@@ -17228,39 +17845,30 @@ function analisarCashOut(aposta) {
 
 
     /* ========================================================
-       LIBERADO
+       CASH OUT PERMITIDO
     ======================================================== */
 
     return {
 
         permitido: true,
 
-        valorAposta:
-            valorAposta,
+        jogosPerdidos:
+            jogosPerdidos,
 
-        valorCashOut:
-            valorCashOut,
-
-        retornoGanhos:
-            retornoGanhos,
-
-        multiplicadorGanhos:
-            multiplicadorGanhos,
-
-        jogosGanhados:
-            jogosGanhados,
+        jogosGanhos:
+            jogosGanhos,
 
         jogosPendentes:
             jogosPendentes,
 
-        jogosPerdidos:
-            jogosPerdidos,
+        multiplicadorGanhos:
+            multiplicadorGanhos,
 
-        totalJogos:
-            selecoes.length,
+        retornoGanhos:
+            retornoGanhos,
 
-        percentual:
-            CASHOUT_CONFIG.PERCENTUAL_CASHOUT
+        valorCashOut:
+            valorCashOut
 
     };
 
@@ -17504,7 +18112,9 @@ function abrirModalCashOut(aposta) {
 
 
     apostaCashOutAtual = {
-        ...aposta
+        ...aposta,
+        valorCashOut:
+            analise.valorCashOut
     };
 
 
@@ -17516,54 +18126,75 @@ function abrirModalCashOut(aposta) {
             "cashOutModal"
         );
 
+
     const mensagem =
         document.getElementById(
             "cashoutMensagem"
         );
+
 
     const valor =
         document.getElementById(
             "cashoutValor"
         );
 
-    const confirmar =
-        document.getElementById(
-            "btnConfirmarCashOut"
+
+    if (!modal) {
+
+        console.error(
+            "❌ cashOutModal não encontrado."
         );
 
+        return;
 
-    mensagem.innerHTML = `
-
-        Você já acertou
-        <b>${analise.jogosGanhados}</b>
-        jogo(s).
-
-        <br><br>
-
-        Ainda existem
-        <b>${analise.jogosPendentes}</b>
-        jogo(s) pendente(s).
-
-    `;
+    }
 
 
-    valor.textContent =
-        formatarRealCashOut(
-            analise.valorCashOut
-        );
+    if (mensagem) {
+
+        mensagem.innerHTML = `
+
+            Você já acertou
+            <b>${analise.jogosGanhados}</b>
+            jogo(s).
+
+            <br><br>
+
+            Ainda existem
+            <b>${analise.jogosPendentes}</b>
+            jogo(s) pendente(s).
+
+        `;
+
+    }
 
 
-    confirmar.disabled = false;
+    if (valor) {
 
-    confirmar.onclick =
-        confirmarCashOut;
+        valor.textContent =
+            formatarRealCashOut(
+                analise.valorCashOut
+            );
+
+    }
 
 
-    modal.style.display = "block";
+    /* CONFIGURA O BOTÃO DEPOIS QUE ELE EXISTE */
+
+    configurarBotaoCashOut();
+
+
+    /* ABRE O MODAL */
+
+    modal.style.display =
+        "flex";
+
+
+    console.log(
+        "✅ CASH OUT ABERTO"
+    );
 
 }
-
-
 /* ============================================================
    FECHAR MODAL
    ============================================================ */
@@ -17834,245 +18465,160 @@ async function executarCashOutFirebase(
 }
 
 
-/* ============================================================
-   CONFIRMAR CASH OUT
-   ============================================================ */
-
-/* ============================================================
-   CONFIRMAR CASH OUT
-   ABRE O MODAL DE SAQUE
-============================================================ */
-
 async function confirmarCashOut() {
 
-    if (
-        !apostaCashOutAtual
-    ) {
+    if (!apostaCashOutAtual) {
+
+        console.error(
+            "❌ Nenhuma aposta de Cash Out selecionada."
+        );
 
         return;
 
     }
 
-
-    const confirmar =
-        document.getElementById(
-            "btnConfirmarCashOut"
-        );
-
-
-    if (confirmar) {
-
-        confirmar.disabled = true;
-
-        confirmar.textContent =
-            "ABRINDO...";
-
-    }
-
-
     try {
-
-        /* ====================================================
-           CÓDIGO DA APOSTA
-        ==================================================== */
 
         const codigoAposta =
             String(
-
                 apostaCashOutAtual.codigo ||
                 apostaCashOutAtual.id ||
-
                 ""
-
             ).trim();
-
 
         if (!codigoAposta) {
 
-            throw new Error(
+            alert(
                 "Código da aposta não encontrado."
             );
 
-        }
-
-
-        /* ====================================================
-           JOGADOR
-        ==================================================== */
-
-        const jogadorIdCashOut =
-            String(
-
-                apostaCashOutAtual.jogadorId ||
-                jogadorId ||
-                localStorage.getItem(
-                    "multiPlayJogadorId"
-                ) ||
-
-                ""
-
-            ).trim();
-
-
-        if (!jogadorIdCashOut) {
-
-            throw new Error(
-                "Jogador não identificado."
-            );
+            return;
 
         }
 
 
-        /* ====================================================
-           BUSCAR APOSTA ATUALIZADA
-        ==================================================== */
+        /* ================================================
+           BUSCAR APOSTA ATUAL
+        ================================================ */
 
         const snap =
             await get(
-
                 ref(
                     db,
                     `apostas/${codigoAposta}`
                 )
-
             );
 
 
-        if (
-            !snap.exists()
-        ) {
+        if (!snap.exists()) {
 
-            throw new Error(
-                "Aposta não encontrada no Firebase."
+            alert(
+                "Aposta não encontrada."
             );
+
+            return;
 
         }
 
 
-        const apostaAtual =
+        const aposta =
             snap.val();
 
 
-        /* ====================================================
-           VERIFICAR DONO
-        ==================================================== */
-
-        if (
-
-            String(
-                apostaAtual.jogadorId ||
-                ""
-            ) !==
-            jogadorIdCashOut
-
-        ) {
-
-            throw new Error(
-                "Esta aposta não pertence a este jogador."
-            );
-
-        }
-
-
-        /* ====================================================
-           ANALISAR NOVAMENTE
-        ==================================================== */
+        /* ================================================
+           ANALISAR CASH OUT
+        ================================================ */
 
         const analise =
             analisarCashOut(
                 {
-                    ...apostaAtual,
-                    codigo:
-                        codigoAposta
+                    ...aposta,
+                    codigo: codigoAposta
                 }
             );
 
 
-        if (
-            !analise.permitido
-        ) {
+        if (!analise.permitido) {
 
-            throw new Error(
+            alert(
                 analise.motivo ||
-                "Cash Out não está mais disponível."
+                "Cash Out não disponível."
             );
+
+            return;
 
         }
 
 
-        /* ====================================================
-           GUARDAR DADOS PARA O MODAL PIX
-        ==================================================== */
+        /* ================================================
+           GUARDAR DADOS
+        ================================================ */
 
         codigoCashOutModal =
             codigoAposta;
 
-
         valorCashOutModal =
-            analise.valorCashOut;
+            Number(
+                analise.valorCashOut
+            );
 
 
         apostaSaqueAtual =
             codigoAposta;
 
-
         valorSaqueAtual =
-            analise.valorCashOut;
+            Number(
+                analise.valorCashOut
+            );
 
 
-        /* ====================================================
+        console.log(
+            "💰 CASH OUT LIBERADO:",
+            {
+                codigo: codigoAposta,
+                valor: valorCashOutModal
+            }
+        );
+
+
+        /* ================================================
            FECHAR MODAL CASH OUT
-        ==================================================== */
+        ================================================ */
 
-        fecharModalCashOut();
+        if (
+            typeof fecharModalCashOut ===
+            "function"
+        ) {
+
+            fecharModalCashOut();
+
+        }
 
 
-        /* ====================================================
+        /* ================================================
            ABRIR MODAL DE SAQUE
-        ==================================================== */
+        ================================================ */
 
-        abrirModalPix(
-
+        abrirModalSaqueCashOut(
             codigoAposta,
-
-            analise.valorCashOut
-
+            valorCashOutModal
         );
 
 
     } catch (erro) {
 
         console.error(
-            "❌ ERRO AO ABRIR SAQUE:",
+            "❌ ERRO AO ABRIR MODAL DE SAQUE:",
             erro
         );
 
-
         alert(
-
-            erro?.message ||
-
-            "Não foi possível abrir o saque."
-
+            "Não foi possível abrir o modal de saque."
         );
-
-
-    } finally {
-
-        if (confirmar) {
-
-            confirmar.disabled =
-                false;
-
-            confirmar.textContent =
-                "💰 SACAR AGORA";
-
-        }
 
     }
 
 }
-
 /* ============================================================
    CRIAR BOTÃO
    ============================================================ */
@@ -18197,66 +18743,81 @@ if (
 }
 async function verificarCashOutDisponivel() {
 
-    if (!jogadorId) {
-        return;
-    }
-
     try {
 
-        const snapshot = await get(
-            ref(db, "apostas")
-        );
+        const snapshot =
+            await get(
+                ref(db, "apostas")
+            );
+
 
         if (!snapshot.exists()) {
             return;
         }
 
-        const dados = snapshot.val();
 
-        Object.entries(dados).forEach(
-            ([codigo, aposta]) => {
+        const apostas =
+            snapshot.val();
 
-                if (!aposta) {
-                    return;
+
+        Object.values(apostas)
+            .forEach(
+                function(aposta) {
+
+                    if (
+                        !aposta ||
+                        aposta.jogadorId !==
+                        jogadorId
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const analise =
+                        analisarCashOut(
+                            aposta
+                        );
+
+
+                    /* ========================================
+                       QUALQUER PERDA = NÃO MOSTRA
+                    ======================================== */
+
+                    if (
+                        analise.jogosPerdidos > 0
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        analise.permitido
+                    ) {
+
+                        mostrarAlertaCashOut(
+                            aposta,
+                            analise
+                        );
+
+                    }
+
                 }
+            );
 
-                if (
-                    String(aposta.jogadorId || "") !==
-                    String(jogadorId)
-                ) {
-                    return;
-                }
-
-                const apostaCompleta = {
-                    ...aposta,
-                    codigo: codigo
-                };
-
-                const analise =
-                    analisarCashOut(
-                        apostaCompleta
-                    );
-
-                if (!analise.permitido) {
-                    return;
-                }
-
-                mostrarAlertaCashOut(
-                    apostaCompleta,
-                    analise
-                );
-
-            }
-        );
 
     } catch (erro) {
 
         console.error(
-            "Erro ao verificar Cash Out:",
+            "❌ Erro ao verificar Cash Out:",
             erro
         );
 
     }
+
 }
 function mostrarAlertaCashOut(
     aposta,
@@ -18267,16 +18828,23 @@ function mostrarAlertaCashOut(
         "alertaCashOut_" +
         aposta.codigo;
 
+
     if (
-        document.getElementById(idAlerta)
+        document.getElementById(
+            idAlerta
+        )
     ) {
         return;
     }
 
+
     const alerta =
         document.createElement("div");
 
-    alerta.id = idAlerta;
+
+    alerta.id =
+        idAlerta;
+
 
     alerta.style.cssText = `
         position: fixed;
@@ -18293,25 +18861,34 @@ function mostrarAlertaCashOut(
         font-weight: 700;
     `;
 
+
     alerta.innerHTML = `
 
         <div style="font-size:20px;">
             💰 CASH OUT DISPONÍVEL!
         </div>
 
+
         <div style="margin:8px 0;">
+
             Você já acertou
             ${analise.jogosGanhados}
             jogo(s).
+
         </div>
 
+
         <div style="font-size:22px;">
+
             ${formatarRealCashOut(
                 analise.valorCashOut
             )}
+
         </div>
 
+
         <button
+            type="button"
             id="btnAlertaCashOut"
             style="
                 margin-top:12px;
@@ -18330,21 +18907,41 @@ function mostrarAlertaCashOut(
 
     `;
 
-    document.body.appendChild(alerta);
 
-    document
-        .getElementById("btnAlertaCashOut")
-        .onclick = function() {
+    document.body.appendChild(
+        alerta
+    );
 
-            alerta.remove();
 
-            abrirModalCashOut(
-                aposta
-            );
+    const botao =
+        alerta.querySelector(
+            "#btnAlertaCashOut"
+        );
 
-        };
+
+    if (botao) {
+
+        botao.onclick =
+            function() {
+
+                console.log(
+                    "💰 ALERTA CASH OUT CLICADO"
+                );
+
+
+                alerta.remove();
+
+
+                abrirModalCashOut(
+                    aposta
+                );
+
+            };
+
+    }
 
 }
+
 function normalizarTexto(valor) {
     return String(valor || "")
         .normalize("NFD")
@@ -19011,8 +19608,186 @@ function esconderEsperaJogos() {
     }
 
 }
+function configurarBotaoCashOut() {
+
+    const botao =
+        document.getElementById(
+            "btnConfirmarCashOut"
+        );
 
 
+    if (!botao) {
+
+        console.warn(
+            "⚠️ btnConfirmarCashOut ainda não existe."
+        );
+
+        return false;
+
+    }
+
+
+    /* Evita adicionar vários eventos */
+    botao.onclick = null;
+
+
+    botao.onclick =
+        async function () {
+
+            console.log(
+                "💰 SACAR AGORA CLICADO"
+            );
+
+
+            if (!apostaCashOutAtual) {
+
+                alert(
+                    "Aposta de Cash Out não encontrada."
+                );
+
+                return;
+
+            }
+
+
+            const codigo =
+                String(
+                    apostaCashOutAtual.codigo ||
+                    apostaCashOutAtual.id ||
+                    apostaCashOutAtual.codigoAposta ||
+                    ""
+                ).trim();
+
+
+            const valor =
+                Number(
+                    apostaCashOutAtual.valorCashOut ||
+                    apostaCashOutAtual.valorSaque ||
+                    0
+                );
+
+
+            console.log(
+                "📦 DADOS DO SAQUE:",
+                {
+                    codigo,
+                    valor
+                }
+            );
+
+
+            if (!codigo) {
+
+                alert(
+                    "Código da aposta não encontrado."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !Number.isFinite(valor) ||
+                valor <= 0
+            ) {
+
+                alert(
+                    "Valor do saque inválido."
+                );
+
+                return;
+
+            }
+
+
+            /* =========================================
+               GUARDAR DADOS
+            ========================================= */
+
+            codigoCashOutModal =
+                codigo;
+
+
+            valorCashOutModal =
+                valor;
+
+
+            apostaSaqueAtual =
+                codigo;
+
+
+            valorSaqueAtual =
+                valor;
+
+
+            /* =========================================
+               FECHAR CASH OUT
+            ========================================= */
+
+            const modalCashOut =
+                document.getElementById(
+                    "cashOutModal"
+                );
+
+
+            if (modalCashOut) {
+
+                modalCashOut.style.display =
+                    "none";
+
+            }
+
+
+            /* =========================================
+               ABRIR PIX
+            ========================================= */
+
+            if (
+                typeof window.abrirModalPix ===
+                "function"
+            ) {
+
+                console.log(
+                    "🟢 ABRINDO MODAL PIX:",
+                    {
+                        codigo,
+                        valor
+                    }
+                );
+
+
+                window.abrirModalPix(
+                    codigo,
+                    valor
+                );
+
+
+                return;
+
+            }
+
+
+            console.error(
+                "❌ abrirModalPix() não encontrada."
+            );
+
+
+            alert(
+                "A função do modal de saque não foi encontrada."
+            );
+
+        };
+
+
+    console.log(
+        "✅ BOTÃO btnConfirmarCashOut CONFIGURADO"
+    );
+
+
+    return true;
+
+}
 
 /* ============================================================
    DEIXAR FUNÇÃO DISPONÍVEL PARA onclick="" DO HTML
