@@ -18379,7 +18379,7 @@ function abrirModalSaqueCashOut(codigoAposta, valor) {
    ============================================================ */
 
 const CASHOUT_CONFIG = {
-    PERCENTUAL_CASHOUT: 0.30,
+    PERCENTUAL_CASHOUT: 0.15,
     MINIMO_CASHOUT: 0.01
 };
 
@@ -19745,153 +19745,25 @@ function adicionarCSSCashOut() {
 
 /* ============================================================ ABRIR CASH OUT ============================================================ */ function abrirModalCashOut(aposta) {
 
-    console.log(
-        "💰 abrirModalCashOut()",
-        aposta
-    );
+    const analise = analisarCashOut(aposta);
 
-
-    if (!aposta) {
-
-        console.error(
-            "❌ Aposta não recebida no Cash Out."
-        );
+    if (!analise.permitido) {
 
         alert(
-            "Não foi possível localizar esta aposta."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       ANALISAR CASH OUT
-    ===================================================== */
-
-    const analise =
-        analisarCashOut(aposta);
-
-
-    console.log(
-        "🔎 ANÁLISE CASH OUT:",
-        analise
-    );
-
-
-    if (
-        !analise ||
-        !analise.permitido
-    ) {
-
-        alert(
-            analise?.motivo ||
+            analise.motivo ||
             "Cash Out indisponível."
         );
 
         return;
-
     }
 
-
-    /* =====================================================
-       PEGAR VALOR DO CASH OUT
-    ===================================================== */
-
-    let valorCashOut =
-        Number(
-            analise.valorCashOut
-        );
-
-
-    /*
-       Caso analisarCashOut() use outro nome
-       para o valor.
-    */
-
-    if (
-        !Number.isFinite(valorCashOut) ||
-        valorCashOut <= 0
-    ) {
-
-        valorCashOut =
-            Number(
-                analise.valorSaque
-            );
-
-    }
-
-
-    if (
-        !Number.isFinite(valorCashOut) ||
-        valorCashOut <= 0
-    ) {
-
-        valorCashOut =
-            Number(
-                analise.valor
-            );
-
-    }
-
-
-    if (
-        !Number.isFinite(valorCashOut) ||
-        valorCashOut <= 0
-    ) {
-
-        valorCashOut =
-            Number(
-                analise.cashOut
-            );
-
-    }
-
-
-    console.log(
-        "💰 VALOR FINAL CASH OUT:",
-        valorCashOut
-    );
-
-
-    /* =====================================================
-       VALIDAR VALOR
-    ===================================================== */
-
-    if (
-        !Number.isFinite(valorCashOut) ||
-        valorCashOut <= 0
-    ) {
-
-        console.error(
-            "❌ NÃO FOI POSSÍVEL ENCONTRAR O VALOR:",
-            {
-                analise: analise,
-                valorCashOut: analise.valorCashOut,
-                valorSaque: analise.valorSaque,
-                valor: analise.valor,
-                cashOut: analise.cashOut
-            }
-        );
-
-        alert(
-            "Valor do saque inválido."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       SALVAR APOSTA ATUAL
-    ===================================================== */
+    // ============================================
+    // SALVA APOSTA ATUAL
+    // ============================================
 
     apostaCashOutAtual = {
         ...aposta
     };
-
 
     codigoCashOutModal =
         String(
@@ -19901,125 +19773,121 @@ function adicionarCSSCashOut() {
             ""
         ).trim();
 
-
-    if (!codigoCashOutModal) {
-
-        console.error(
-            "❌ Código da aposta não encontrado."
-        );
-
-        alert(
-            "Código da aposta não encontrado."
-        );
-
-        return;
-
-    }
-
-
     valorCashOutModal =
-        valorCashOut;
-
+        Number(analise.valorCashOut) || 0;
 
     apostaSaqueAtual =
         codigoCashOutModal;
 
-
     valorSaqueAtual =
-        valorCashOut;
+        valorCashOutModal;
 
 
-    console.log(
-        "💾 DADOS CASH OUT:",
-        {
-            codigo: codigoCashOutModal,
-            valor: valorCashOutModal
-        }
-    );
-
-
-    /* =====================================================
-       CRIAR MODAL
-    ===================================================== */
-
-    criarModalCashOut();
-
+    // ============================================
+    // CRIA / RECUPERA MODAL
+    // ============================================
 
     const modal =
-        document.getElementById(
-            "cashOutModal"
-        );
-
+        criarModalCashOut();
 
     if (!modal) {
-
         console.error(
-            "❌ #cashOutModal não existe."
+            "❌ Modal Cash Out não foi criado."
         );
-
         return;
-
     }
 
 
-    /* =====================================================
-       PREENCHER MENSAGEM
-    ===================================================== */
+    // ============================================
+    // MENSAGEM
+    // ============================================
 
     const mensagem =
         document.getElementById(
             "cashoutMensagem"
         );
 
-
     if (mensagem) {
 
-    const selecoes =
-        Array.isArray(aposta.selecoes)
-            ? aposta.selecoes
-            : [];
+        mensagem.textContent =
+            "Você já acertou " +
+            analise.jogosGanhos +
+            " jogo(s).";
+    }
 
 
-    const jogosGanhos =
-    selecoes.filter(
-        function(selecao) {
+    // ============================================
+    // POSSÍVEL RETORNO
+    // ============================================
 
-            const resultado =
-                String(
-                    selecao.status ||
-                    selecao.resultado ||
-                    ""
-                ).toLowerCase();
-
-            return (
-                resultado === "ganhou" ||
-                resultado === "ganho"
-            );
-
-        }
-    ).length;
-
-
-    mensagem.textContent =
-        `Você já acertou ${jogosGanhos} jogo(s).`;
-
-}
-
-
-    /* =====================================================
-       PREENCHER VALOR
-    ===================================================== */
-
-    const campoValor =
+    const campoPossivelRetorno =
         document.getElementById(
-            "cashoutValor"
+            "cashoutPossivelRetorno"
         );
 
+    /*
+       Pega o possível retorno diretamente
+       da aposta.
+    */
 
-    if (campoValor) {
+    let possivelRetorno =
+        Number(
+            aposta.possivelRetorno
+        );
 
-        campoValor.textContent =
-            valorCashOut.toLocaleString(
+    // tenta outros campos caso não exista
+    if (
+        !Number.isFinite(possivelRetorno) ||
+        possivelRetorno <= 0
+    ) {
+
+        possivelRetorno =
+            Number(
+                aposta.retorno
+            );
+    }
+
+    if (
+        !Number.isFinite(possivelRetorno) ||
+        possivelRetorno <= 0
+    ) {
+
+        possivelRetorno =
+            Number(
+                aposta.premio
+            );
+    }
+
+    // usa o valor retornado pela análise
+    if (
+        !Number.isFinite(possivelRetorno) ||
+        possivelRetorno <= 0
+    ) {
+
+        possivelRetorno =
+            Number(
+                analise.possivelRetorno
+            );
+    }
+
+
+    console.log(
+        "💰 POSSÍVEL RETORNO:",
+        possivelRetorno
+    );
+
+    console.log(
+        "💰 CASH OUT:",
+        analise.valorCashOut
+    );
+
+
+    if (campoPossivelRetorno) {
+
+        campoPossivelRetorno.textContent =
+            Number(
+                possivelRetorno || 0
+            ).toLocaleString(
                 "pt-BR",
                 {
                     style: "currency",
@@ -20027,57 +19895,52 @@ function adicionarCSSCashOut() {
                 }
             );
 
-    }
-
-
-    /* =====================================================
-       ABRIR MODAL
-    ===================================================== */
-
-    modal.style.display =
-        "block";
-
-
-    modal.classList.add(
-        "ativo"
-    );
-
-
-    /* =====================================================
-       CONFIGURAR BOTÕES
-    ===================================================== */
-
-    if (
-        typeof configurarBotoesCashOut ===
-        "function"
-    ) {
-
-        configurarBotoesCashOut();
-
-    } else if (
-        typeof configurarBotaoCashOut ===
-        "function"
-    ) {
-
-        configurarBotaoCashOut();
-
     } else {
 
         console.error(
-            "❌ Nenhuma função de configuração do Cash Out encontrada."
+            "❌ Elemento #cashoutPossivelRetorno não encontrado."
         );
-
     }
 
 
-    console.log(
-        "✅ MODAL CASH OUT ABERTO",
-        {
-            codigo: codigoCashOutModal,
-            valor: valorCashOutModal
-        }
-    );
+    // ============================================
+    // VALOR DO CASH OUT
+    // ============================================
 
+    const campoValor =
+        document.getElementById(
+            "cashoutValor"
+        );
+
+    if (campoValor) {
+
+        campoValor.textContent =
+            Number(
+                analise.valorCashOut
+            ).toLocaleString(
+                "pt-BR",
+                {
+                    style: "currency",
+                    currency: "BRL"
+                }
+            );
+    }
+
+
+    // ============================================
+    // ABRIR MODAL
+    // ============================================
+
+    modal.style.display = "block";
+
+    modal.classList.add("ativo");
+
+
+    // ============================================
+    // GARANTE BOTÕES
+    // ============================================
+
+    configurarBotoesCashOut();
 }
 /* ============================================================
    FECHAR MODAL
