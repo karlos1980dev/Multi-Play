@@ -9897,15 +9897,7 @@ async function carregarJogosEmAndamentoAPI() {
 function renderizarJogosPorCompeticao(
     container,
     jogos
-) {console.log(
-    "⚽ JOGOS FINAIS PARA EXIBIR:",
-    jogosDoDia.map(j => ({
-        fixture: j.fixtureId,
-        jogo: `${j.timeA} x ${j.timeB}`,
-        data: j.data,
-        hora: j.hora
-    }))
-);
+) {
 
     if (!container) {
 
