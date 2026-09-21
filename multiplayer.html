@@ -18714,246 +18714,104 @@ if (
 
 function verificarCashOutAposDoisJogos(aposta) {
 
-    if (!aposta) {
-        return;
-    }
+    if (!aposta) return;
 
     const controle =
-        inicializarControleCashOut(aposta);
+        aposta.cashOutControle ||
+        (aposta.cashOutControle = {
+            ultimoCiclo: 0,
+            sacado: false,
+            encerrado: false
+        });
 
-    /* Já sacou */
-    if (controle.sacado) {
-
-        console.log(
-            "💰 CASH OUT JÁ SACADO"
-        );
-
+    if (controle.sacado || controle.encerrado) {
         return;
     }
 
-    /* Já perdeu */
-    if (controle.perdido) {
-
-        console.log(
-            "❌ APOSTA PERDIDA - CASH OUT ENCERRADO"
-        );
-
-        return;
-    }
-
-    /*
-       Pega os confrontos da aposta.
-       Ajuste 'aposta.jogos' caso no seu objeto
-       o nome seja diferente.
-    */
-
-    const confrontos =
+    const jogos =
         Array.isArray(aposta.jogos)
             ? aposta.jogos
             : [];
 
-    let finalizados = [];
+    let ganhos = 0;
+    let perdidos = 0;
+    let finalizados = 0;
 
-    confrontos.forEach(function(jogo) {
+    jogos.forEach(function(jogo) {
 
         if (!jogo) return;
 
-        const status =
+        const resultado =
             String(
-                jogo.status ||
                 jogo.resultado ||
+                jogo.status ||
                 ""
             )
             .trim()
             .toLowerCase();
 
-        /*
-           Considera somente confrontos
-           que já possuem resultado.
-        */
-
         if (
-            status === "ganhou" ||
-            status === "perdeu" ||
-            status === "perde" ||
-            status === "perdido" ||
-            status === "win" ||
-            status === "lose"
+            resultado === "ganhou" ||
+            resultado === "win"
         ) {
-            finalizados.push(jogo);
+
+            ganhos++;
+            finalizados++;
+
+        } else if (
+            resultado === "perdeu" ||
+            resultado === "perdido" ||
+            resultado === "lose"
+        ) {
+
+            perdidos++;
+            finalizados++;
         }
     });
 
-    /*
-       Se algum confronto perdeu,
-       encerra o Cash Out.
-    */
+    /* Se perdeu qualquer confronto,
+       encerra o Cash Out */
 
-    const tevePerdido =
-        finalizados.some(function(jogo) {
+    if (perdidos > 0) {
 
-            const resultado =
-                String(
-                    jogo.status ||
-                    jogo.resultado ||
-                    ""
-                )
-                .trim()
-                .toLowerCase();
-
-            return (
-                resultado === "perdeu" ||
-                resultado === "perde" ||
-                resultado === "lose" ||
-                resultado === "perdido"
-            );
-        });
-
-    if (tevePerdido) {
-
-        controle.perdido = true;
-        controle.oferecido = false;
+        controle.encerrado = true;
 
         console.log(
-            "❌ FOI ENCONTRADO UM CONFRONTO PERDIDO."
+            "❌ CASH OUT ENCERRADO: aposta perdeu."
         );
 
         return;
     }
 
     /*
-       Quantidade de confrontos ganhos.
+       Só verifica quando existem
+       múltiplos completos de 2 ganhos.
     */
 
-    const ganhos =
-        finalizados.filter(function(jogo) {
-
-            const resultado =
-                String(
-                    jogo.status ||
-                    jogo.resultado ||
-                    ""
-                )
-                .trim()
-                .toLowerCase();
-
-            return (
-                resultado === "ganhou" ||
-                resultado === "win"
-            );
-        }).length;
-
-
-    /*
-       Só trabalha em blocos de 2.
-       
-       Exemplo:
-
-       2 ganhos  → oferece
-       4 ganhos  → oferece novamente
-       6 ganhos  → oferece novamente
-    */
-
-    const cicloAtual =
+    const ciclo =
         Math.floor(ganhos / 2);
 
-    if (cicloAtual <= 0) {
+    if (ciclo <= controle.ultimoCiclo) {
         return;
     }
 
     /*
-       Já ofereceu neste ciclo.
+       Novo bloco de 2 ganhos.
     */
 
-    if (
-        cicloAtual <=
-        Number(controle.ultimoCiclo || 0)
-    ) {
-        return;
-    }
-
-    /*
-       Novo ciclo de 2 ganhos.
-    */
-
-    controle.ultimoCiclo =
-        cicloAtual;
-
-    controle.confrontosVerificados =
-        ganhos;
-
-    controle.oferecido =
-        true;
+    controle.ultimoCiclo = ciclo;
 
     console.log(
-        "💰 CASH OUT DISPONÍVEL",
+        "💰 NOVO CASH OUT DISPONÍVEL:",
         {
-            ganhos: ganhos,
-            ciclo: cicloAtual
+            ganhos,
+            finalizados,
+            ciclo
         }
     );
 
-    /*
-       Abre o modal.
-    */
-
     abrirModalCashOut(aposta);
 }
-
-function continuarSemSacarCashOut() {
-
-    if (!apostaCashOutAtual) {
-        return;
-    }
-
-    const controle =
-        inicializarControleCashOut(
-            apostaCashOutAtual
-        );
-
-    /*
-       Não marca como sacado.
-       Apenas permite que o próximo ciclo
-       de 2 confrontos ofereça novamente.
-    */
-
-    controle.oferecido = false;
-
-    fecharModalCashOut();
-
-    console.log(
-        "⏳ CASH OUT NÃO SACADO."
-    );
-
-    console.log(
-        "⏳ AGUARDANDO MAIS 2 CONFRONTOS."
-    );
-}
-
-function finalizarCashOut(aposta) {
-
-    if (!aposta) {
-        return;
-    }
-
-    const controle =
-        inicializarControleCashOut(aposta);
-
-    controle.sacado = true;
-    controle.oferecido = false;
-
-    aposta.cashOutSacado = true;
-    aposta.statusCashOut = "sacado";
-
-    console.log(
-        "💰 CASH OUT SACADO"
-    );
-
-    fecharModalCashOut();
-
-    atualizarBotaoCashOut(aposta);
-}
-
 async function verificarCashOutDisponivel() {
 
     try {
