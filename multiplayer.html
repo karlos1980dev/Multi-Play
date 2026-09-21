@@ -10243,106 +10243,91 @@ function jogoPertenceAoDia(jogo, dataSolicitada) {
         return false;
     }
 
-
     const fixtureId =
-        jogo.fixtureId ||
-        jogo.idAPI ||
-        jogo.fixture?.id ||
-        "";
-
-
-    /* =====================================================
-       DATA DO JOGO
-    ===================================================== */
-
-    let dataJogo =
-        jogo.data ||
-        jogo.date ||
-        jogo.fixture?.date ||
-        "";
-
-
-    dataJogo =
         String(
-            dataJogo
+            jogo.fixtureId ||
+            jogo.idAPI ||
+            jogo.fixture?.id ||
+            ""
         ).trim();
 
-
-    /* =====================================================
-       PEGAR SOMENTE YYYY-MM-DD
-    ===================================================== */
-
-    if (
-        dataJogo.includes("T")
-    ) {
-
-        dataJogo =
-            dataJogo
-                .split("T")[0];
-
-    }
-
-    else if (
-        dataJogo.includes(" ")
-    ) {
-
-        dataJogo =
-            dataJogo
-                .split(" ")[0];
-
-    }
-
-
     const dataBusca =
+        String(dataSolicitada)
+            .trim()
+            .substring(0, 10);
+
+    if (!dataBusca) {
+        return false;
+    }
+
+    /*
+     * PRIORIDADE:
+     * data original da API
+     */
+    const dataOriginal =
+        jogo.fixture?.date ||
+        jogo.dataOriginalAPI ||
+        jogo.dateOriginalAPI ||
+        "";
+
+    if (dataOriginal) {
+
+        const dataObj =
+            new Date(dataOriginal);
+
+        if (!isNaN(dataObj.getTime())) {
+
+            const partes =
+                new Intl.DateTimeFormat(
+                    "en-CA",
+                    {
+                        timeZone: "America/Sao_Paulo",
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit"
+                    }
+                ).formatToParts(dataObj);
+
+            let ano = "";
+            let mes = "";
+            let dia = "";
+
+            partes.forEach(function(parte) {
+
+                if (parte.type === "year") {
+                    ano = parte.value;
+                }
+
+                if (parte.type === "month") {
+                    mes = parte.value;
+                }
+
+                if (parte.type === "day") {
+                    dia = parte.value;
+                }
+
+            });
+
+            const dataBrasil =
+                `${ano}-${mes}-${dia}`;
+
+            return dataBrasil === dataBusca;
+        }
+    }
+
+    /*
+     * FALLBACK
+     */
+    const dataJogo =
         String(
-            dataSolicitada
+            jogo.data ||
+            jogo.date ||
+            ""
         )
         .trim()
         .substring(0, 10);
 
-
-    /* =====================================================
-       SEM DATA = DESCARTAR
-    ===================================================== */
-
-    if (!dataJogo) {
-
-        console.warn(
-            "⚠️ JOGO SEM DATA - IGNORADO:",
-            fixtureId
-        );
-
-        return false;
-
-    }
-
-
-    /* =====================================================
-       COMPARAÇÃO
-    ===================================================== */
-
-    if (
-        dataJogo !==
-        dataBusca
-    ) {
-
-        console.warn(
-            "🛑 JOGO IGNORADO - DATA DIFERENTE",
-            "\nData solicitada:",
-            dataBusca,
-            "\nData do jogo:",
-            dataJogo,
-            "\nFixture:",
-            fixtureId
-        );
-
-        return false;
-
-    }
-
-
-    return true;
-
+    return dataJogo === dataBusca;
 }
 /* =========================================================
    CARREGAR JOGOS
@@ -10588,79 +10573,7 @@ async function carregarJogos(dataSelecionada = null) {
                FILTRAR DATA REAL
             ============================================= */
 
-            jogosDia =
-                jogosDia.filter(
-                    function(jogo) {
-
-                        if (!jogo) {
-
-                            return false;
-
-                        }
-
-
-                        const info =
-                            obterDataHoraBrasil(
-                                jogo
-                            );
-
-
-                        if (!info) {
-
-                            return false;
-
-                        }
-
-
-                        if (
-                            info.data !==
-                            dataDoCarregamento
-                        ) {
-
-                            console.warn(
-                                "🛑 JOGO IGNORADO - DATA DIFERENTE"
-                            );
-
-
-                            console.log(
-                                "Data solicitada:",
-                                String(
-                                    dataDoCarregamento
-                                )
-                            );
-
-
-                            console.log(
-                                "Data do jogo:",
-                                String(
-                                    info.data
-                                )
-                            );
-
-
-                            console.log(
-                                "Fixture:",
-                                String(
-                                    jogo.fixture &&
-                                    jogo.fixture.id ||
-                                    jogo.fixtureId ||
-                                    jogo.idAPI ||
-                                    ""
-                                )
-                            );
-
-
-                            return false;
-
-                        }
-
-
-                        return true;
-
-                    }
-                );
-
-
+            
             /* =============================================
                REMOVER CANCELADOS
             ============================================= */
@@ -10912,61 +10825,90 @@ if (dataDoCarregamento === hojeAPI) {
                BRASIL PRIMEIRO
             ============================================= */
 
-            jogosDia.sort(
-                function(a, b) {
+            /* =========================================================
+   ORDEM DOS JOGOS
+   1º - BRASILEIRÃO SÉRIE A
+   2º - BRASILEIRÃO SÉRIE B
+   3º - OUTROS JOGOS DO BRASIL
+   4º - DEMAIS CAMPEONATOS
+========================================================= */
 
-                    const brasilA =
-                        jogoEhDoBrasil(
-                            a
-                        );
+function prioridadeCampeonato(jogo) {
+
+    const texto = String(
+        jogo.campeonato ||
+        jogo.league?.name ||
+        jogo.fixture?.league?.name ||
+        ""
+    )
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+    /* SÉRIE A */
+    if (
+        texto.includes("brasileirao serie a") ||
+        texto.includes("brazilian serie a") ||
+        texto === "serie a"
+    ) {
+        return 1;
+    }
+
+    /* SÉRIE B */
+    if (
+        texto.includes("brasileirao serie b") ||
+        texto.includes("brazilian serie b") ||
+        texto === "serie b"
+    ) {
+        return 2;
+    }
+
+    /* OUTROS CAMPEONATOS DO BRASIL */
+    if (
+        texto.includes("brasil") ||
+        texto.includes("brazil")
+    ) {
+        return 3;
+    }
+
+    /* RESTANTE DO MUNDO */
+    return 4;
+}
 
 
-                    const brasilB =
-                        jogoEhDoBrasil(
-                            b
-                        );
+jogosDia.sort(function(a, b) {
 
+    const prioridadeA =
+        prioridadeCampeonato(a);
 
-                    if (
-                        brasilA &&
-                        !brasilB
-                    ) {
+    const prioridadeB =
+        prioridadeCampeonato(b);
 
-                        return -1;
+    /* PRIMEIRO PELO CAMPEONATO */
+    if (prioridadeA !== prioridadeB) {
+        return prioridadeA - prioridadeB;
+    }
 
-                    }
+    /* DENTRO DA MESMA PRIORIDADE,
+       ORDENA PELO HORÁRIO */
+    const dataA =
+        obterDataHoraBrasil(a);
 
+    const dataB =
+        obterDataHoraBrasil(b);
 
-                    if (
-                        !brasilA &&
-                        brasilB
-                    ) {
+    const timestampA =
+        dataA && Number.isFinite(Number(dataA.timestamp))
+            ? Number(dataA.timestamp)
+            : Infinity;
 
-                        return 1;
+    const timestampB =
+        dataB && Number.isFinite(Number(dataB.timestamp))
+            ? Number(dataB.timestamp)
+            : Infinity;
 
-                    }
-
-
-                    const dataA =
-                        obterDataHoraBrasil(
-                            a
-                        );
-
-
-                    const dataB =
-                        obterDataHoraBrasil(
-                            b
-                        );
-
-
-                    return (
-                        dataA.timestamp -
-                        dataB.timestamp
-                    );
-
-                }
-            );
-
+    return timestampA - timestampB;
+});
 
             /* =============================================
                NORMALIZAR PARA SALVAR
@@ -15247,13 +15189,26 @@ setInterval(
     3000
 );
 /* =========================================================
-   INICIALIZAÇÃO DOS JOGOS
+   CONTROLE DO CASH OUT A CADA 2 CONFRONTOS
 ========================================================= */
 
-/* =========================================================
-   INICIALIZAR JOGOS
-========================================================= */
+function inicializarControleCashOut(aposta) {
 
+    if (!aposta) return;
+
+    if (!aposta.cashOutControle) {
+
+        aposta.cashOutControle = {
+            confrontosVerificados: 0,
+            ultimoCiclo: 0,
+            oferecido: false,
+            sacado: false,
+            perdido: false
+        };
+    }
+
+    return aposta.cashOutControle;
+}
 /* =========================================================
    INICIALIZAR JOGOS
    CORRIGE A ORDEM DOS BOTÕES
@@ -18146,105 +18101,69 @@ function adicionarCSSCashOut() {
 
 function abrirModalCashOut(aposta) {
 
+    console.log(
+        "💰 abrirModalCashOut()",
+        aposta
+    );
+
+    if (!aposta) {
+
+        console.error(
+            "❌ Aposta não recebida no Cash Out."
+        );
+
+        alert(
+            "Não foi possível localizar esta aposta."
+        );
+
+        return;
+    }
+
     const analise =
         analisarCashOut(aposta);
 
+    console.log(
+        "🔎 ANÁLISE CASH OUT:",
+        analise
+    );
 
-    if (!analise.permitido) {
+    if (!analise || !analise.permitido) {
 
         alert(
-            analise.motivo ||
+            analise?.motivo ||
             "Cash Out indisponível."
         );
 
         return;
-
     }
 
-
     apostaCashOutAtual = {
-        ...aposta,
-        valorCashOut:
-            analise.valorCashOut
+        ...aposta
     };
-
 
     criarModalCashOut();
 
-
     const modal =
         document.getElementById(
-            "cashOutModal"
+            "modalCashOut"
         );
-
-
-    const mensagem =
-        document.getElementById(
-            "cashoutMensagem"
-        );
-
-
-    const valor =
-        document.getElementById(
-            "cashoutValor"
-        );
-
 
     if (!modal) {
 
         console.error(
-            "❌ cashOutModal não encontrado."
+            "❌ #modalCashOut não existe no HTML."
         );
 
         return;
-
     }
 
+    modal.style.display = "flex";
 
-    if (mensagem) {
-
-        mensagem.innerHTML = `
-
-            Você já acertou
-            <b>${analise.jogosGanhados}</b>
-            jogo(s).
-
-            <br><br>
-
-            Ainda existem
-            <b>${analise.jogosPendentes}</b>
-            jogo(s) pendente(s).
-
-        `;
-
-    }
-
-
-    if (valor) {
-
-        valor.textContent =
-            formatarRealCashOut(
-                analise.valorCashOut
-            );
-
-    }
-
-
-    /* CONFIGURA O BOTÃO DEPOIS QUE ELE EXISTE */
-
-    configurarBotaoCashOut();
-
-
-    /* ABRE O MODAL */
-
-    modal.style.display =
-        "flex";
-
+    modal.classList.add("ativo");
 
     console.log(
-        "✅ CASH OUT ABERTO"
+        "✅ MODAL CASH OUT ABERTO"
     );
-
 }
 /* ============================================================
    FECHAR MODAL
@@ -18792,6 +18711,249 @@ if (
     inicializarCashOut();
 
 }
+
+function verificarCashOutAposDoisJogos(aposta) {
+
+    if (!aposta) {
+        return;
+    }
+
+    const controle =
+        inicializarControleCashOut(aposta);
+
+    /* Já sacou */
+    if (controle.sacado) {
+
+        console.log(
+            "💰 CASH OUT JÁ SACADO"
+        );
+
+        return;
+    }
+
+    /* Já perdeu */
+    if (controle.perdido) {
+
+        console.log(
+            "❌ APOSTA PERDIDA - CASH OUT ENCERRADO"
+        );
+
+        return;
+    }
+
+    /*
+       Pega os confrontos da aposta.
+       Ajuste 'aposta.jogos' caso no seu objeto
+       o nome seja diferente.
+    */
+
+    const confrontos =
+        Array.isArray(aposta.jogos)
+            ? aposta.jogos
+            : [];
+
+    let finalizados = [];
+
+    confrontos.forEach(function(jogo) {
+
+        if (!jogo) return;
+
+        const status =
+            String(
+                jogo.status ||
+                jogo.resultado ||
+                ""
+            )
+            .trim()
+            .toLowerCase();
+
+        /*
+           Considera somente confrontos
+           que já possuem resultado.
+        */
+
+        if (
+            status === "ganhou" ||
+            status === "perdeu" ||
+            status === "perde" ||
+            status === "perdido" ||
+            status === "win" ||
+            status === "lose"
+        ) {
+            finalizados.push(jogo);
+        }
+    });
+
+    /*
+       Se algum confronto perdeu,
+       encerra o Cash Out.
+    */
+
+    const tevePerdido =
+        finalizados.some(function(jogo) {
+
+            const resultado =
+                String(
+                    jogo.status ||
+                    jogo.resultado ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+            return (
+                resultado === "perdeu" ||
+                resultado === "perde" ||
+                resultado === "lose" ||
+                resultado === "perdido"
+            );
+        });
+
+    if (tevePerdido) {
+
+        controle.perdido = true;
+        controle.oferecido = false;
+
+        console.log(
+            "❌ FOI ENCONTRADO UM CONFRONTO PERDIDO."
+        );
+
+        return;
+    }
+
+    /*
+       Quantidade de confrontos ganhos.
+    */
+
+    const ganhos =
+        finalizados.filter(function(jogo) {
+
+            const resultado =
+                String(
+                    jogo.status ||
+                    jogo.resultado ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
+
+            return (
+                resultado === "ganhou" ||
+                resultado === "win"
+            );
+        }).length;
+
+
+    /*
+       Só trabalha em blocos de 2.
+       
+       Exemplo:
+
+       2 ganhos  → oferece
+       4 ganhos  → oferece novamente
+       6 ganhos  → oferece novamente
+    */
+
+    const cicloAtual =
+        Math.floor(ganhos / 2);
+
+    if (cicloAtual <= 0) {
+        return;
+    }
+
+    /*
+       Já ofereceu neste ciclo.
+    */
+
+    if (
+        cicloAtual <=
+        Number(controle.ultimoCiclo || 0)
+    ) {
+        return;
+    }
+
+    /*
+       Novo ciclo de 2 ganhos.
+    */
+
+    controle.ultimoCiclo =
+        cicloAtual;
+
+    controle.confrontosVerificados =
+        ganhos;
+
+    controle.oferecido =
+        true;
+
+    console.log(
+        "💰 CASH OUT DISPONÍVEL",
+        {
+            ganhos: ganhos,
+            ciclo: cicloAtual
+        }
+    );
+
+    /*
+       Abre o modal.
+    */
+
+    abrirModalCashOut(aposta);
+}
+
+function continuarSemSacarCashOut() {
+
+    if (!apostaCashOutAtual) {
+        return;
+    }
+
+    const controle =
+        inicializarControleCashOut(
+            apostaCashOutAtual
+        );
+
+    /*
+       Não marca como sacado.
+       Apenas permite que o próximo ciclo
+       de 2 confrontos ofereça novamente.
+    */
+
+    controle.oferecido = false;
+
+    fecharModalCashOut();
+
+    console.log(
+        "⏳ CASH OUT NÃO SACADO."
+    );
+
+    console.log(
+        "⏳ AGUARDANDO MAIS 2 CONFRONTOS."
+    );
+}
+
+function finalizarCashOut(aposta) {
+
+    if (!aposta) {
+        return;
+    }
+
+    const controle =
+        inicializarControleCashOut(aposta);
+
+    controle.sacado = true;
+    controle.oferecido = false;
+
+    aposta.cashOutSacado = true;
+    aposta.statusCashOut = "sacado";
+
+    console.log(
+        "💰 CASH OUT SACADO"
+    );
+
+    fecharModalCashOut();
+
+    atualizarBotaoCashOut(aposta);
+}
+
 async function verificarCashOutDisponivel() {
 
     try {
@@ -19878,6 +20040,64 @@ await carregarJogosFeitosMenu();
 
 verificarCashOutDisponivel();
 
+document.addEventListener("click", function(event) {
+
+    const botao = event.target.closest(
+        "[data-cashout], .btnCashOut, #btnCashOut, #btnAlertaCashOut"
+    );
+
+    if (!botao) {
+        return;
+    }
+
+    console.log("🟢 CLIQUE NO CASH OUT DETECTADO");
+
+    let aposta = null;
+
+    /* Tenta recuperar a aposta pelo objeto armazenado */
+    if (typeof apostaCashOutAtual !== "undefined" &&
+        apostaCashOutAtual) {
+
+        aposta = apostaCashOutAtual;
+
+    }
+
+    /* Tenta recuperar pelo índice */
+    const indice =
+        botao.dataset.indice ||
+        botao.dataset.index ||
+        botao.dataset.aposta;
+
+    if (
+        indice !== undefined &&
+        typeof apostas !== "undefined" &&
+        Array.isArray(apostas)
+    ) {
+        aposta = apostas[Number(indice)];
+    }
+
+    if (!aposta) {
+
+        console.error(
+            "❌ Não foi possível encontrar a aposta do Cash Out."
+        );
+
+        console.log(
+            "Botão:",
+            botao
+        );
+
+        return;
+    }
+
+    console.log(
+        "💰 ABRINDO CASH OUT:",
+        aposta
+    );
+
+    abrirModalCashOut(aposta);
+});
+verificarCashOutAposDoisJogos(aposta);
 
 </script>
 </body>
