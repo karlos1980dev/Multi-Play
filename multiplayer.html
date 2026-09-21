@@ -2267,14 +2267,355 @@ body.cor5 {
     border-color: #28a745;
 }
 
+/* =====================================================
+   MODAL SUCESSO SAQUE
+===================================================== */
+
+.modal-sucesso-saque {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0, 0, 0, 0.78);
+
+    z-index: 9999999;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+}
 
 
+.modal-sucesso-saque.ativo {
+
+    display: flex;
+
+}
+
+
+.modal-sucesso-saque-box {
+
+    width: 100%;
+
+    max-width: 380px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 28px 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.40);
+
+    animation:
+        aparecerSucessoSaque
+        .25s ease;
+
+}
+
+
+@keyframes aparecerSucessoSaque {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            scale(.85)
+            translateY(20px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            translateY(0);
+
+    }
+
+}
+
+
+.sucesso-icone {
+
+    font-size: 55px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.modal-sucesso-saque-box h2 {
+
+    margin: 5px 0 8px;
+
+    color: #111;
+
+    font-size: 24px;
+
+}
+
+
+.modal-sucesso-saque-box p {
+
+    margin: 0 0 20px;
+
+    color: #666;
+
+    font-size: 15px;
+
+}
+
+
+.dados-sucesso-saque {
+
+    background: #f4f4f4;
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    text-align: left;
+
+    margin-bottom: 20px;
+
+}
+
+
+.dados-sucesso-saque > div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 0;
+
+    border-bottom:
+        1px solid #ddd;
+
+}
+
+
+.dados-sucesso-saque > div:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.dados-sucesso-saque span {
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+.dados-sucesso-saque strong {
+
+    color: #111;
+
+    font-size: 14px;
+
+    text-align: right;
+
+}
+
+
+.btn-fechar-sucesso-saque {
+
+    width: 100%;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 14px;
+
+    background: #111;
+
+    color: #fff;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.btn-fechar-sucesso-saque:active {
+
+    transform: scale(.98);
+
+}
+.cashout-valores {
+
+    width: 100%;
+
+    margin:
+        15px 0;
+
+    background:
+        #f5f5f5;
+
+    border-radius:
+        12px;
+
+    padding:
+        12px;
+
+    box-sizing:
+        border-box;
+
+}
+
+
+.cashout-linha {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    padding:
+        10px 0;
+
+    border-bottom:
+        1px solid #ddd;
+
+}
+
+
+.cashout-linha:last-child {
+
+    border-bottom:
+        none;
+
+}
+
+
+.cashout-linha span {
+
+    font-size:
+        14px;
+
+    color:
+        #666;
+
+}
+
+
+.cashout-linha strong {
+
+    font-size:
+        16px;
+
+    color:
+        #111;
+
+}
+
+
+.cashout-linha-principal strong {
+
+    font-size:
+        21px;
+
+    font-weight:
+        bold;
+
+}
 </style>
 
 </head>
 
 
 <body>
+    <!-- =====================================================
+     MODAL SUCESSO SAQUE
+===================================================== -->
+
+<div id="modalSucessoSaque" class="modal-sucesso-saque">
+
+    <div class="modal-sucesso-saque-box">
+
+        <div class="sucesso-icone">
+            ✅
+        </div>
+
+        <h2 id="tituloSucessoSaque">
+            Saque solicitado!
+        </h2>
+
+        <p id="mensagemSucessoSaque">
+            Sua solicitação foi enviada com sucesso.
+        </p>
+
+        <div class="dados-sucesso-saque">
+
+            <div>
+                <span>Código</span>
+                <strong id="codigoSucessoSaque">
+                    -
+                </strong>
+            </div>
+
+            <div>
+                <span>Valor</span>
+                <strong id="valorSucessoSaque">
+                    R$ 0,00
+                </strong>
+            </div>
+
+            <div>
+                <span>Status</span>
+                <strong>
+                    Aguardando pagamento
+                </strong>
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            id="btnFecharSucessoSaque"
+            class="btn-fechar-sucesso-saque">
+
+            OK
+
+        </button>
+
+    </div>
+
+</div>
     <!-- BOTÃO FLUTUANTE WHATSAPP --> <a style="display:none;"href="https://wa.me/5571992290058" class="whatsapp-flutuante" target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp" > <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" > </a> <style> .whatsapp-flutuante { position: fixed; width: 60px; height: 60px; right: 18px; bottom: 20px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.30); text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; } .whatsapp-flutuante img { width: 38px; height: 38px; display: block; } .whatsapp-flutuante:hover { transform: scale(1.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); } .whatsapp-flutuante:active { transform: scale(0.94); } /* Animação suave */ @keyframes whatsappPulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55), 0 4px 12px rgba(0, 0, 0, 0.30); } 70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0), 0 4px 12px rgba(0, 0, 0, 0.30); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 4px 12px rgba(0, 0, 0, 0.30); } } .whatsapp-flutuante { animation: whatsappPulse 2s infinite; } /* Celular */ @media (max-width: 600px) { .whatsapp-flutuante { width: 56px; height: 56px; right: 15px; bottom: 18px; } .whatsapp-flutuante img { width: 35px; height: 35px; } } </style> 
 <!-- =====================================================
      TOPO
@@ -18038,7 +18379,7 @@ function abrirModalSaqueCashOut(codigoAposta, valor) {
    ============================================================ */
 
 const CASHOUT_CONFIG = {
-    PERCENTUAL_CASHOUT: 0.80,
+    PERCENTUAL_CASHOUT: 0.30,
     MINIMO_CASHOUT: 0.01
 };
 
@@ -18156,7 +18497,7 @@ function analisarCashOut(aposta) {
 
         return {
             permitido: false,
-            motivo: "Cash Out exige pelo menos 2 jogos."
+            motivo: "Cash Out exige pelo menos 3 jogos."
         };
 
     }
@@ -18575,15 +18916,34 @@ function criarModalCashOut() {
 
                 <!-- VALOR -->
 
-                <div
-                    id="cashoutValor"
-                    class="cashout-valor">
+                <div class="cashout-valores">
 
-                    R$ 0,00
+    <div class="cashout-linha">
 
-                </div>
+        <span>
+            Possível retorno
+        </span>
+
+        <strong id="cashoutPossivelRetorno">
+            R$ 0,00
+        </strong>
+
+    </div>
 
 
+    <div class="cashout-linha cashout-linha-principal">
+
+        <span>
+            💰 Valor do Cash Out
+        </span>
+
+        <strong id="cashoutValor">
+            R$ 0,00
+        </strong>
+
+    </div>
+
+</div>
                 <!-- AVISO -->
 
                 <div class="cashout-aviso">
@@ -19614,11 +19974,36 @@ function adicionarCSSCashOut() {
 
     if (mensagem) {
 
-        mensagem.textContent =
-            `Você pode sacar agora após acertar ` +
-            `${analise.jogosGanhos || 0} jogo(s).`;
+    const selecoes =
+        Array.isArray(aposta.selecoes)
+            ? aposta.selecoes
+            : [];
 
-    }
+
+    const jogosGanhos =
+    selecoes.filter(
+        function(selecao) {
+
+            const resultado =
+                String(
+                    selecao.status ||
+                    selecao.resultado ||
+                    ""
+                ).toLowerCase();
+
+            return (
+                resultado === "ganhou" ||
+                resultado === "ganho"
+            );
+
+        }
+    ).length;
+
+
+    mensagem.textContent =
+        `Você já acertou ${jogosGanhos} jogo(s).`;
+
+}
 
 
     /* =====================================================
@@ -20008,7 +20393,34 @@ botao.addEventListener("click", () => {
   // 1. Pega os valores necessários (ajuste os seletores se precisar!)
   const campoValor = document.querySelector("#valor-cashout"); // ou onde está o valor exibido
   const codigo = aposta?.codigo || aposta; // vem do objeto aposta
+const campoPossivelRetorno =
+    document.getElementById(
+        "cashoutPossivelRetorno"
+    );
 
+
+if (campoPossivelRetorno) {
+
+    const possivelRetorno =
+        Number(
+            analise.possivelRetorno ||
+            aposta.possivelRetorno ||
+            aposta.retorno ||
+            aposta.premio ||
+            0
+        );
+
+
+    campoPossivelRetorno.textContent =
+        possivelRetorno.toLocaleString(
+            "pt-BR",
+            {
+                style: "currency",
+                currency: "BRL"
+            }
+        );
+
+}
   if (!campoValor) {
     alert("Campo de valor não encontrado.");
     return;
@@ -20209,7 +20621,7 @@ if (
        PRECISA TER PELO MENOS 2 GANHOS
     ===================================================== */
 
-    if (ganhos < 2) {
+    if (ganhos < 3) {
         return;
     }
 
@@ -20224,7 +20636,7 @@ if (
     ===================================================== */
 
     const blocoAtual =
-        Math.floor(ganhos / 2);
+        Math.floor(ganhos / 3);
 
 
     /* =====================================================
@@ -21474,7 +21886,136 @@ document.addEventListener("click", function(event) {
 
     abrirModalCashOut(aposta);
 });
+/* =====================================================
+   MODAL SUCESSO SAQUE
+===================================================== */
 
+function abrirModalSucessoSaque(
+    codigoSaque,
+    valor,
+    ehCashOut
+) {
+
+    const modal =
+        document.getElementById(
+            "modalSucessoSaque"
+        );
+
+    if (!modal) {
+
+        console.error(
+            "❌ #modalSucessoSaque não encontrado."
+        );
+
+        return;
+
+    }
+
+
+    const titulo =
+        document.getElementById(
+            "tituloSucessoSaque"
+        );
+
+
+    const mensagem =
+        document.getElementById(
+            "mensagemSucessoSaque"
+        );
+
+
+    const codigo =
+        document.getElementById(
+            "codigoSucessoSaque"
+        );
+
+
+    const valorElemento =
+        document.getElementById(
+            "valorSucessoSaque"
+        );
+
+
+    if (titulo) {
+
+        titulo.textContent =
+            ehCashOut
+                ? "Cash Out solicitado!"
+                : "Saque solicitado!";
+
+    }
+
+
+    if (mensagem) {
+
+        mensagem.textContent =
+            ehCashOut
+                ? "Seu Cash Out foi registrado com sucesso."
+                : "Sua solicitação de saque foi enviada com sucesso.";
+
+    }
+
+
+    if (codigo) {
+
+        codigo.textContent =
+            codigoSaque || "-";
+
+    }
+
+
+    if (valorElemento) {
+
+        valorElemento.textContent =
+            dinheiro(valor);
+
+    }
+
+
+    modal.classList.add(
+        "ativo"
+    );
+
+}
+
+
+/* =====================================================
+   FECHAR MODAL SUCESSO
+===================================================== */
+
+function fecharModalSucessoSaque() {
+
+    const modal =
+        document.getElementById(
+            "modalSucessoSaque"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
+        "ativo"
+    );
+
+}
+
+
+const btnFecharSucesso =
+    document.getElementById(
+        "btnFecharSucessoSaque"
+    );
+
+
+if (btnFecharSucesso) {
+
+    btnFecharSucesso.addEventListener(
+        "click",
+        fecharModalSucessoSaque
+    );
+
+}
 
 </script>
 </body>
