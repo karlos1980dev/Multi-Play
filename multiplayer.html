@@ -3665,14 +3665,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 800;
+const LIMITE_API_DIA = 200;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 1000;
+const LIMITE_SEGURANCA = 300;
 
 
 
@@ -11489,6 +11489,60 @@ function prioridadeCampeonato(jogo) {
     )
     .toLowerCase()
     .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
+
+    // 🇧🇷 BRASILEIRÃO SÉRIE A
+
+    if (
+        texto.includes("brasileirao serie a") ||
+        texto.includes("brazilian serie a") ||
+        texto === "serie a"
+    ) {
+
+        return 1;
+    }
+
+
+    // 🇧🇷 BRASILEIRÃO SÉRIE B
+
+    if (
+        texto.includes("brasileirao serie b") ||
+        texto.includes("brazilian serie b") ||
+        texto === "serie b"
+    ) {
+
+        return 2;
+    }
+
+
+    // 🇧🇷 OUTROS DO BRASIL
+
+    if (
+        texto.includes("brasil") ||
+        texto.includes("brazil")
+    ) {
+
+        return 3;
+    }
+
+
+    // 🌎 RESTO DO MUNDO
+
+    return 4;
+}
+
+function prioridadeCampeonato(jogo) {
+
+    const texto = String(
+        jogo.campeonato ||
+        jogo.league?.name ||
+        jogo.fixture?.league?.name ||
+        ""
+    )
+    .toLowerCase()
+    .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
     /* SÉRIE A */
@@ -11784,7 +11838,110 @@ jogosDia.sort(function(a, b) {
             );
 
         })();
+function verificarHojeSemJogosMostrarAmanha(
+    jogosHoje,
+    dataHoje
+) {
 
+    const temJogosHoje =
+        Array.isArray(jogosHoje) &&
+        jogosHoje.length > 0;
+
+
+    // ==========================================
+    // BOTÃO HOJE
+    // ==========================================
+
+    const botoesHoje = document.querySelectorAll(
+        '[data-dia="hoje"], #btnHoje, .btn-hoje'
+    );
+
+
+    botoesHoje.forEach(function(botao) {
+
+        botao.style.display =
+            temJogosHoje
+                ? ""
+                : "none";
+
+    });
+
+
+    // ==========================================
+    // SE HOJE TEM JOGO
+    // NÃO FAZ NADA
+    // ==========================================
+
+    if (temJogosHoje) {
+
+        console.log(
+            "⚽ Hoje possui",
+            jogosHoje.length,
+            "jogo(s)."
+        );
+
+        return false;
+    }
+
+
+    // ==========================================
+    // HOJE NÃO TEM JOGO
+    // ==========================================
+
+    console.log(
+        "⚠️ Hoje não possui jogos."
+    );
+
+    console.log(
+        "➡️ Carregando jogos de amanhã..."
+    );
+
+
+    // ==========================================
+    // AMANHÃ
+    // ==========================================
+
+    const dataAmanha =
+        new Date(
+            dataHoje + "T00:00:00"
+        );
+
+
+    dataAmanha.setDate(
+        dataAmanha.getDate() + 1
+    );
+
+
+    const ano =
+        dataAmanha.getFullYear();
+
+    const mes =
+        String(
+            dataAmanha.getMonth() + 1
+        ).padStart(2, "0");
+
+    const dia =
+        String(
+            dataAmanha.getDate()
+        ).padStart(2, "0");
+
+
+    const amanha =
+        ano +
+        "-" +
+        mes +
+        "-" +
+        dia;
+
+
+    console.log(
+        "📅 Amanhã:",
+        amanha
+    );
+
+
+    return amanha;
+}
 
     /* =====================================================
        GUARDAR PROMESSA
