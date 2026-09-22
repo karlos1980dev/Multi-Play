@@ -3616,14 +3616,19 @@ const firebaseConfig = {
         "https://jogo-60a9e-default-rtdb.firebaseio.com/"
 
 };
-let timerFecharCashOut = null;
+
 
 const app = initializeApp(firebaseConfig);
-
 const db = getDatabase(app);
+/* =====================================================
+   Iniciado
+===================================================== */
+
+
+
+let timerFecharCashOut = null;
 let jogos = [];
 let codigoCashOutModal = null;
-
 let valorCashOutModal = 0;
 const jogosPorData = {};
 let offsetDiaSelecionado = 0;
@@ -4139,7 +4144,7 @@ let saldoJogador = 0;
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 2000;
+const LIMITE = 3000;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
@@ -18785,7 +18790,7 @@ function abrirModalSaqueCashOut(codigoAposta, valor) {
    ============================================================ */
 
 const CASHOUT_CONFIG = {
-    PERCENTUAL_CASHOUT: 0.15,
+    PERCENTUAL_CASHOUT: 0.12,
     MINIMO_CASHOUT: 0.01
 };
 
