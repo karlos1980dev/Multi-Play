@@ -3670,14 +3670,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 200;
+const LIMITE_API_DIA = 300;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 300;
+const LIMITE_SEGURANCA = 200;
 
 
 
@@ -11027,90 +11027,135 @@ async function carregarJogos(dataSelecionada = null) {
     );
 
 
-    /* =====================================================
-       SE ESTE DIA JÁ ESTÁ CARREGADO NA MEMÓRIA
-    ===================================================== */
+  /* =====================================================
+   SE ESTE DIA JÁ ESTÁ CARREGADO NA MEMÓRIA
+===================================================== */
+
+if (
+    Array.isArray(
+        jogosPorData[dataDoCarregamento]
+    )
+) {
+
+    const jogosCache =
+        jogosPorData[dataDoCarregamento];
+
+    console.log(
+        "♻️ USANDO CACHE DA MEMÓRIA:",
+        dataDoCarregamento,
+        jogosCache.length
+    );
+
+
+    const diaAtualSelecionado =
+        String(
+            obterDataDia(
+                offsetDiaSelecionado
+            )
+        ).trim();
+
+
+    // ================================================
+    // CONFIRMA QUE O USUÁRIO AINDA ESTÁ NESSE DIA
+    // ================================================
 
     if (
-        Array.isArray(
-            jogosPorData[
-                dataDoCarregamento
-            ]
-        )
+        diaAtualSelecionado ===
+        dataDoCarregamento
     ) {
 
-        console.log(
-            "♻️ USANDO CACHE DA MEMÓRIA:",
-            dataDoCarregamento,
-            jogosPorData[
-                dataDoCarregamento
-            ].length
-        );
+        const container =
+            document.getElementById(
+                "conteudoJogosDia"
+            );
 
 
-        const diaAtualSelecionado =
-            String(
-                obterDataDia(
-                    offsetDiaSelecionado
-                )
-            ).trim();
+        if (!container) {
+
+            console.error(
+                "❌ #conteudoJogosDia não encontrado."
+            );
+
+            esconderEsperaJogos();
+
+            return;
+        }
+
+
+        // ============================================
+        // GARANTE QUE O CONTAINER APAREÇA NOVAMENTE
+        // ============================================
+
+        container.style.display =
+            "block";
+
+
+        // ============================================
+        // IMPORTANTE:
+        // LIMPA O CONTEÚDO ANTIGO
+        // E RENDERIZA NOVAMENTE
+        // ============================================
+
+        container.innerHTML = "";
 
 
         if (
-            diaAtualSelecionado ===
-            dataDoCarregamento
+            jogosCache.length === 0
         ) {
 
-            const container =
-                document.getElementById(
-                    "conteudoJogosDia"
-                );
+            container.innerHTML = `
+                <div class="sem-jogos">
+                    ⚽ Nenhum jogo disponível para este dia.
+                </div>
+            `;
 
+        } else {
 
-            if (container) {
-
-                container.style.display =
-                    "block";
-
-
-                renderizarJogosPorCompeticao(
-                    container,
-                    jogosPorData[
-                        dataDoCarregamento
-                    ]
-                );
-
-
-                if (
-                    typeof atualizarSelecoes ===
-                    "function"
-                ) {
-
-                    atualizarSelecoes();
-
-                }
-
-
-                if (
-                    typeof atualizarTotal ===
-                    "function"
-                ) {
-
-                    atualizarTotal();
-
-                }
-
-            }
+            renderizarJogosPorCompeticao(
+                container,
+                jogosCache
+            );
 
         }
 
 
-        esconderEsperaJogos();
+        // ============================================
+        // RESTAURA AS SELEÇÕES
+        // ============================================
 
-        return;
+        if (
+            typeof atualizarSelecoes ===
+            "function"
+        ) {
+
+            atualizarSelecoes();
+
+        }
+
+
+        if (
+            typeof atualizarTotal ===
+            "function"
+        ) {
+
+            atualizarTotal();
+
+        }
+
+
+        console.log(
+            "✅ JOGOS DO CACHE RENDERIZADOS NOVAMENTE:",
+            dataDoCarregamento,
+            jogosCache.length
+        );
 
     }
 
+
+    esconderEsperaJogos();
+
+    return;
+}
 
     /* =====================================================
        SE JÁ EXISTE BUSCA DESTE MESMO DIA
@@ -18120,10 +18165,67 @@ function atualizarBotoesDias() {
     }
 }
 
-/* =====================================================
-   CLIQUE NOS BOTÕES
-===================================================== */
+async function selecionarDia(offset) {
 
+    offsetDiaSelecionado = offset;
+
+    // Atualiza visual dos botões
+    document.querySelectorAll(".btn-dia").forEach(btn => {
+        btn.classList.remove("ativo");
+    });
+
+    const botao = document.querySelector(
+        `.btn-dia[data-offset="${offset}"]`
+    );
+
+    if (botao) {
+        botao.classList.add("ativo");
+    }
+
+    // Mostra mensagem enquanto carrega
+    const container =
+        document.getElementById("diasContainer");
+
+    if (container) {
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                padding:30px;
+                font-weight:bold;
+            ">
+                Aguarde, carregando jogos...
+            </div>
+        `;
+    }
+
+    try {
+
+    await carregarJogosDoDia(offset);
+
+} catch (erro) {
+
+    console.error(
+        "❌ Erro ao carregar jogos do dia:",
+        erro
+    );
+
+    const container =
+        document.getElementById("diasContainer");
+
+    if (container) {
+
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                padding:30px;
+                color:#fff;
+            ">
+                Não foi possível carregar os jogos.
+            </div>
+            `;
+        }
+    }
+}
 /* =========================================================
    SELECIONAR DIA
 ========================================================= */
