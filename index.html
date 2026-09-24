@@ -3670,14 +3670,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 200;
+const LIMITE_API_DIA = 150;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 300;
+const LIMITE_SEGURANCA = 200;
 
 
 
@@ -22349,6 +22349,30 @@ if (btnFecharSucessoSaldo) {
         fecharModalSucessoSaldo
     );
 }
+function obterIndicacaoDaURL() {
+
+    const caminho =
+        window.location.pathname
+            .replace(/^\/+|\/+$/g, "");
+
+    if (!caminho) {
+        return null;
+    }
+
+    return decodeURIComponent(caminho)
+        .trim()
+        .toLowerCase();
+
+}
+
+
+const indicacao =
+    obterIndicacaoDaURL();
+
+console.log(
+    "🔗 INDICAÇÃO:",
+    indicacao
+);
 </script>
 </body>
 
