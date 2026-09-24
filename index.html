@@ -7606,6 +7606,10 @@ async function carregarJogador() {
             );
 
 
+        /* =========================================
+           JOGADOR JÁ EXISTE
+        ========================================= */
+
         if (
             snapshot.exists()
         ) {
@@ -7638,10 +7642,23 @@ async function carregarJogador() {
 
         }
 
+
+        /* =========================================
+           NOVO JOGADOR
+        ========================================= */
+
         else {
 
             saldoJogador =
                 0;
+
+
+            /*
+             * Verifica se o jogador chegou
+             * através de uma indicação.
+             */
+            const indicacao =
+                obterIndicadorCadastro();
 
 
             await set(
@@ -7659,10 +7676,44 @@ async function carregarJogador() {
 
                     criadoEm:
                         new Date()
-                            .toISOString()
+                            .toISOString(),
+
+
+                    /* =============================
+                       INDICAÇÃO
+                    ============================= */
+
+                    indicadoPor:
+                        indicacao.indicadoPor,
+
+                    indicadoPorNome:
+                        indicacao.indicadoPorNome,
+
+                    indicadoPorSlug:
+                        indicacao.indicadoPorSlug
 
                 }
             );
+
+
+            console.log(
+                "✅ Novo jogador cadastrado"
+            );
+
+
+            if (
+                indicacao.indicadoPor
+            ) {
+
+                console.log(
+                    "🎁 Indicado por:",
+                    indicacao.indicadoPorNome,
+                    "(" +
+                    indicacao.indicadoPorSlug +
+                    ")"
+                );
+
+            }
 
         }
 
@@ -7674,6 +7725,7 @@ async function carregarJogador() {
             "Erro ao carregar jogador:",
             erro
         );
+
 
         saldoJogador =
             0;
@@ -7687,7 +7739,6 @@ async function carregarJogador() {
     return true;
 
 }
-
 
 /* =========================================================
    SALVAR NOME
@@ -22373,6 +22424,219 @@ console.log(
     "🔗 INDICAÇÃO:",
     indicacao
 );
+let indicacaoAtual = null;
+
+
+function obterSlugIndicacao() {
+
+    const partes =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    if (!partes.length) {
+        return null;
+    }
+
+
+    const slug =
+        decodeURIComponent(
+            partes[0]
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        !slug ||
+        slug.includes(".") ||
+        slug === "admin" ||
+        slug === "index"
+    ) {
+
+        return null;
+
+    }
+
+
+    return slug;
+
+}
+
+
+async function carregarIndicacao() {
+
+    const slug =
+        obterSlugIndicacao();
+
+
+    if (!slug) {
+        return null;
+    }
+
+
+    try {
+
+        const referencia =
+            ref(
+                db,
+                "indicacoes/" +
+                slug
+            );
+
+
+        const snapshot =
+            await get(
+                referencia
+            );
+
+
+        if (
+            !snapshot.exists()
+        ) {
+
+            console.log(
+                "ℹ️ Nenhuma indicação encontrada:",
+                slug
+            );
+
+            return null;
+
+        }
+
+
+        const dados =
+            snapshot.val();
+
+
+        if (
+            dados.ativo === false
+        ) {
+
+            return null;
+
+        }
+
+
+        indicacaoAtual = {
+
+            slug:
+                slug,
+
+            jogadorId:
+                String(
+                    dados.jogadorId ||
+                    ""
+                ),
+
+            nome:
+                dados.nome ||
+                ""
+
+        };
+
+
+        localStorage.setItem(
+            "multiPlayIndicacaoSlug",
+            indicacaoAtual.slug
+        );
+
+
+        localStorage.setItem(
+            "multiPlayIndicacaoId",
+            indicacaoAtual.jogadorId
+        );
+
+
+        localStorage.setItem(
+            "multiPlayIndicacaoNome",
+            indicacaoAtual.nome
+        );
+
+
+        console.log(
+            "✅ INDICAÇÃO ENCONTRADA:",
+            indicacaoAtual
+        );
+
+
+        return indicacaoAtual;
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "❌ Erro ao carregar indicação:",
+            erro
+        );
+
+        return null;
+
+    }
+
+}
+
+
+function obterIndicadorCadastro() {
+
+    const indicadorId =
+        localStorage.getItem(
+            "multiPlayIndicacaoId"
+        );
+
+
+    const indicadorNome =
+        localStorage.getItem(
+            "multiPlayIndicacaoNome"
+        );
+
+
+    const indicadorSlug =
+        localStorage.getItem(
+            "multiPlayIndicacaoSlug"
+        );
+
+
+    if (!indicadorId) {
+
+        return {
+
+            indicadoPor:
+                null,
+
+            indicadoPorNome:
+                null,
+
+            indicadoPorSlug:
+                null
+
+        };
+
+    }
+
+
+    return {
+
+        indicadoPor:
+            indicadorId,
+
+        indicadoPorNome:
+            indicadorNome ||
+            null,
+
+        indicadoPorSlug:
+            indicadorSlug ||
+            null
+
+    };
+
+}
+
+await carregarIndicacao();
+await carregarJogador();
+
 </script>
 </body>
 
