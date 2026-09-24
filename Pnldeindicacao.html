@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MULTI PLAY.BET - Painel de Indicações</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f2f2f2;
+    color:#111;
+}
+
+.header{
+    background:#000;
+    color:#fff;
+    padding:20px;
+    text-align:center;
+}
+
+.header h1{
+    font-size:25px;
+    font-weight:900;
+}
+
+.header p{
+    margin-top:5px;
+    color:#aaa;
+    font-size:14px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+/* =========================
+   GERADOR DE LINK
+========================= */
+
+.gerador{
+    background:#fff;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.gerador h2{
+    font-size:20px;
+    margin-bottom:6px;
+}
+
+.gerador p{
+    color:#666;
+    font-size:14px;
+    margin-bottom:15px;
+}
+
+.form-gerador{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.form-gerador input{
+    flex:1;
+    min-width:220px;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:9px;
+    font-size:16px;
+    outline:none;
+}
+
+.form-gerador input:focus{
+    border-color:#000;
+}
+
+.btn{
+    border:0;
+    border-radius:9px;
+    padding:14px 18px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-gerar{
+    background:#000;
+    color:#fff;
+}
+
+.btn-gerar:hover{
+    background:#222;
+}
+
+.resultado-link{
+    display:none;
+    margin-top:18px;
+    padding:15px;
+    background:#f5f5f5;
+    border-radius:10px;
+}
+
+.resultado-link.ativo{
+    display:block;
+}
+
+.nome-link{
+    font-size:14px;
+    color:#555;
+    margin-bottom:7px;
+}
+
+.link-box{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.link-box input{
+    flex:1;
+    min-width:220px;
+    padding:13px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+    background:#fff;
+}
+
+.btn-copiar{
+    background:#111;
+    color:#fff;
+}
+
+.btn-compartilhar{
+    background:#25D366;
+    color:#fff;
+}
+
+.info-link{
+    margin-top:10px;
+    font-size:12px;
+    color:#777;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 3px 12px rgba(0,0,0,.07);
+}
+
+.card span{
+    display:block;
+    color:#777;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.card strong{
+    font-size:27px;
+}
+
+/* =========================
+   BUSCA
+========================= */
+
+.painel{
+    background:#fff;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.07);
+}
+
+.painel h2{
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+.busca{
+    width:100%;
+    padding:13px;
+    border:1px solid #ccc;
+    border-radius:9px;
+    font-size:15px;
+    margin-bottom:15px;
+}
+
+/* =========================
+   TABELA
+========================= */
+
+.tabela-container{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:700px;
+}
+
+th{
+    background:#000;
+    color:#fff;
+    padding:12px;
+    text-align:left;
+    font-size:13px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    font-size:13px;
+}
+
+tr:hover{
+    background:#fafafa;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.status.ativo{
+    background:#dff7e5;
+    color:#138a36;
+}
+
+.status.bloqueado{
+    background:#ffe0e0;
+    color:#c00000;
+}
+
+.sem-dados{
+    text-align:center;
+    padding:25px;
+    color:#777;
+}
+
+/* =========================
+   RANKING
+========================= */
+
+.ranking-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:13px 5px;
+    border-bottom:1px solid #eee;
+}
+
+.ranking-item:last-child{
+    border-bottom:0;
+}
+
+.ranking-nome{
+    font-weight:bold;
+}
+
+.ranking-total{
+    background:#000;
+    color:#fff;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.loading.ativo{
+    display:flex;
+}
+
+.loading-box{
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media(max-width:800px){
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:500px){
+
+    .container{
+        padding:12px;
+    }
+
+    .cards{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .card{
+        padding:15px;
+    }
+
+    .card strong{
+        font-size:22px;
+    }
+
+    .form-gerador{
+        flex-direction:column;
+    }
+
+    .form-gerador input,
+    .btn-gerar{
+        width:100%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <h1>MULTI PLAY.BET</h1>
+
+    <p>Painel de Indicações</p>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- ==========================================
+     GERADOR DE LINK
+========================================== -->
+
+<section class="gerador">
+
+    <h2>🔗 Gerar link de indicação</h2>
+
+    <p>
+        Digite o nome do cliente para criar um link personalizado.
+        Exemplo: <b>Paulo</b> → <b>/paulo</b>
+    </p>
+
+    <div class="form-gerador">
+
+        <input
+            id="nomeCliente"
+            type="text"
+            placeholder="Digite o nome do cliente"
+            autocomplete="off"
+        >
+
+        <button
+            id="btnGerarLink"
+            class="btn btn-gerar"
+        >
+            GERAR LINK
+        </button>
+
+    </div>
+
+
+    <div
+        id="resultadoLink"
+        class="resultado-link"
+    >
+
+        <div
+            id="nomeLink"
+            class="nome-link"
+        ></div>
+
+
+        <div class="link-box">
+
+            <input
+                id="linkGerado"
+                type="text"
+                readonly
+            >
+
+            <button
+                id="btnCopiarLink"
+                class="btn btn-copiar"
+            >
+                📋 COPIAR
+            </button>
+
+            <button
+                id="btnCompartilharLink"
+                class="btn btn-compartilhar"
+            >
+                📲 COMPARTILHAR
+            </button>
+
+        </div>
+
+
+        <div class="info-link">
+
+            Esse link identifica o cliente responsável pela indicação.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     CARDS
+========================================== -->
+
+<section class="cards">
+
+    <div class="card">
+
+        <span>Total de jogadores</span>
+
+        <strong id="totalJogadores">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <span>Jogadores indicados</span>
+
+        <strong id="totalIndicados">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <span>Indicadores</span>
+
+        <strong id="totalIndicadores">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <span>Total de indicações</span>
+
+        <strong id="totalIndicacoes">
+            0
+        </strong>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     JOGADORES
+========================================== -->
+
+<section class="painel">
+
+    <h2>👥 Jogadores e indicações</h2>
+
+    <input
+        id="campoBusca"
+        class="busca"
+        type="text"
+        placeholder="🔎 Pesquisar jogador..."
+    >
+
+
+    <div class="tabela-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Jogador</th>
+
+                    <th>Indicado por</th>
+
+                    <th>Código</th>
+
+                    <th>ID</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tabelaJogadores">
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="sem-dados"
+                    >
+                        Carregando...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     RANKING
+========================================== -->
+
+<section class="painel">
+
+    <h2>🏆 Ranking de indicações</h2>
+
+    <div id="ranking">
+
+        <div class="sem-dados">
+            Carregando...
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- ==========================================
+     LOADING
+========================================== -->
+
+<div
+    id="loading"
+    class="loading"
+>
+
+    <div class="loading-box">
+
+        Salvando link...
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     FIREBASE
+========================================== -->
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+
+
+import {
+    getDatabase,
+    ref,
+    get,
+    set,
+    onValue
+} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+
+/* ==========================================
+   FIREBASE
+========================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyA5a-2HzvcljnAfXE7P3ThDnq6m6E568ZA",
+
+    authDomain:
+        "jogo-60a9e.firebaseapp.com",
+
+    projectId:
+        "jogo-60a9e",
+
+    storageBucket:
+        "jogo-60a9e.appspot.com",
+
+    messagingSenderId:
+        "352852303591",
+
+    appId:
+        "1:352852303591:web:8083c950047c9026bd8c42",
+
+    databaseURL:
+        "https://jogo-60a9e-default-rtdb.firebaseio.com/"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const db =
+    getDatabase(app);
+
+
+/* ==========================================
+   ELEMENTOS
+========================================== */
+
+const nomeCliente =
+    document.getElementById("nomeCliente");
+
+const btnGerarLink =
+    document.getElementById("btnGerarLink");
+
+const resultadoLink =
+    document.getElementById("resultadoLink");
+
+const nomeLink =
+    document.getElementById("nomeLink");
+
+const linkGerado =
+    document.getElementById("linkGerado");
+
+const btnCopiarLink =
+    document.getElementById("btnCopiarLink");
+
+const btnCompartilharLink =
+    document.getElementById("btnCompartilharLink");
+
+const campoBusca =
+    document.getElementById("campoBusca");
+
+const tabelaJogadores =
+    document.getElementById("tabelaJogadores");
+
+const ranking =
+    document.getElementById("ranking");
+
+const loading =
+    document.getElementById("loading");
+
+
+/* ==========================================
+   DADOS
+========================================== */
+
+let jogadores = {};
+
+let linkAtual = "";
+
+let listaIndicacoes = [];
+
+
+/* ==========================================
+   NORMALIZAR TEXTO
+========================================== */
+
+function normalizarTexto(texto){
+
+    return String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .toLowerCase()
+        .trim();
+
+}
+
+
+/* ==========================================
+   GERAR SLUG
+========================================== */
+
+function gerarSlug(nome){
+
+    return normalizarTexto(nome)
+
+        .replace(/[^a-z0-9\s-]/g,"")
+
+        .replace(/\s+/g,"-")
+
+        .replace(/-+/g,"-")
+
+        .replace(/^-|-$/g,"");
+
+}
+
+
+/* ==========================================
+   ESCAPAR HTML
+========================================== */
+
+function escaparHTML(valor){
+
+    return String(valor ?? "")
+
+        .replace(/&/g,"&amp;")
+
+        .replace(/</g,"&lt;")
+
+        .replace(/>/g,"&gt;")
+
+        .replace(/"/g,"&quot;")
+
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* ==========================================
+   ENCONTRAR CLIENTE
+========================================== */
+
+function encontrarCliente(nome){
+
+    const procurado =
+        normalizarTexto(nome);
+
+
+    if(!procurado){
+
+        return null;
+
+    }
+
+
+    const entradas =
+        Object.entries(jogadores);
+
+
+    for(const [id,jogador] of entradas){
+
+        if(!jogador){
+
+            continue;
+
+        }
+
+
+        const nomeJogador =
+            normalizarTexto(jogador.nome);
+
+
+        if(nomeJogador === procurado){
+
+            return {
+
+                id:id,
+
+                jogador:jogador
+
+            };
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ==========================================
+   GERAR LINK
+========================================== */
+
+async function gerarLink(){
+
+    const nome =
+        nomeCliente.value.trim();
+
+
+    if(!nome){
+
+        alert(
+            "Digite o nome do cliente."
+        );
+
+        nomeCliente.focus();
+
+        return;
+
+    }
+
+
+    const slug =
+        gerarSlug(nome);
+
+
+    if(!slug){
+
+        alert(
+            "Nome inválido para gerar o link."
+        );
+
+        return;
+
+    }
+
+
+    const cliente =
+        encontrarCliente(nome);
+
+
+    if(!cliente){
+
+        alert(
+            "Cliente não encontrado no cadastro de jogadores."
+        );
+
+        return;
+
+    }
+
+
+    const jogadorId =
+        cliente.id;
+
+
+    const nomeReal =
+        cliente.jogador.nome ||
+        nome;
+
+
+    loading.classList.add("ativo");
+
+
+    try{
+
+        /*
+         ==========================================
+         VERIFICA SE O SLUG JÁ EXISTE
+         ==========================================
+        */
+
+        const indicacaoRef =
+            ref(
+                db,
+                "indicacoes/" + slug
+            );
+
+
+        const snapshot =
+            await get(indicacaoRef);
+
+
+        if(snapshot.exists()){
+
+            const existente =
+                snapshot.val();
+
+
+            if(
+                String(existente.jogadorId) !==
+                String(jogadorId)
+            ){
+
+                loading.classList.remove(
+                    "ativo"
+                );
+
+                alert(
+                    "Esse link já está sendo usado por outro cliente."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /*
+         ==========================================
+         SALVA O LINK NO FIREBASE
+         ==========================================
+        */
+
+        await set(
+            indicacaoRef,
+            {
+
+                jogadorId:
+                    jogadorId,
+
+                nome:
+                    nomeReal,
+
+                slug:
+                    slug,
+
+                criadoEm:
+                    Date.now()
+
+            }
+        );
+
+
+        /*
+         ==========================================
+         LINK FINAL
+         ==========================================
+        */
+
+        linkAtual =
+            window.location.origin.replace(
+                /\/+$/,
+                ""
+            ) +
+            "/" +
+            slug;
+
+
+        linkGerado.value =
+            linkAtual;
+
+
+        nomeLink.innerHTML =
+            "Link de <b>" +
+            escaparHTML(nomeReal) +
+            "</b>:";
+
+
+        resultadoLink.classList.add(
+            "ativo"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Erro ao gerar link:",
+            error
+        );
+
+
+        alert(
+            "Não foi possível gerar o link."
+        );
+
+    }
+
+
+    loading.classList.remove(
+        "ativo"
+    );
+
+}
+
+
+/* ==========================================
+   COPIAR
+========================================== */
+
+async function copiarLink(){
+
+    if(!linkAtual){
+
+        return;
+
+    }
+
+
+    try{
+
+        await navigator.clipboard.writeText(
+            linkAtual
+        );
+
+        btnCopiarLink.textContent =
+            "✅ COPIADO!";
+
+
+        setTimeout(() => {
+
+            btnCopiarLink.textContent =
+                "📋 COPIAR";
+
+        },2000);
+
+
+    }catch(error){
+
+        linkGerado.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+        alert(
+            "Link copiado!"
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   COMPARTILHAR
+========================================== */
+
+async function compartilharLink(){
+
+    if(!linkAtual){
+
+        return;
+
+    }
+
+
+    const nome =
+        nomeCliente.value.trim();
+
+
+    if(
+        navigator.share
+    ){
+
+        try{
+
+            await navigator.share({
+
+                title:
+                    "MULTI PLAY.BET",
+
+                text:
+                    "Acesse o MULTI PLAY.BET pelo meu link de indicação:",
+
+                url:
+                    linkAtual
+
+            });
+
+        }catch(error){
+
+            console.log(
+                "Compartilhamento cancelado."
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    await copiarLink();
+
+
+    alert(
+        "Seu celular não possui compartilhamento direto. O link foi copiado."
+    );
+
+}
+
+
+/* ==========================================
+   EVENTOS
+========================================== */
+
+btnGerarLink.addEventListener(
+    "click",
+    gerarLink
+);
+
+
+btnCopiarLink.addEventListener(
+    "click",
+    copiarLink
+);
+
+
+btnCompartilharLink.addEventListener(
+    "click",
+    compartilharLink
+);
+
+
+nomeCliente.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key === "Enter"
+        ){
+
+            gerarLink();
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   CARREGAR JOGADORES
+========================================== */
+
+onValue(
+    ref(db,"jogadores"),
+    snapshot => {
+
+        jogadores =
+            snapshot.val() || {};
+
+
+        processarIndicacoes();
+
+        renderizarTabela();
+
+        renderizarRanking();
+
+        atualizarCards();
+
+    },
+    error => {
+
+        console.error(
+            "Erro Firebase:",
+            error
+        );
+
+
+        tabelaJogadores.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="sem-dados"
+                >
+                    Erro ao carregar jogadores.
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+);
+
+
+/* ==========================================
+   PROCESSAR INDICAÇÕES
+========================================== */
+
+function processarIndicacoes(){
+
+    listaIndicacoes = [];
+
+
+    const entradas =
+        Object.entries(jogadores);
+
+
+    for(
+        const [id,jogador]
+        of entradas
+    ){
+
+        if(!jogador){
+
+            continue;
+
+        }
+
+
+        const indicadoPor =
+            jogador.indicadoPor;
+
+
+        if(
+            indicadoPor &&
+            jogadores[indicadoPor]
+        ){
+
+            listaIndicacoes.push({
+
+                jogadorId:
+                    id,
+
+                jogador:
+                    jogador,
+
+                indicadorId:
+                    indicadoPor,
+
+                indicador:
+                    jogadores[indicadoPor]
+
+            });
+
+        }
+
+    }
+
+}
+
+
+/* ==========================================
+   ATUALIZAR CARDS
+========================================== */
+
+function atualizarCards(){
+
+    const totalJogadores =
+        Object.keys(jogadores).length;
+
+
+    const totalIndicados =
+        listaIndicacoes.length;
+
+
+    const indicadores =
+        new Set(
+            listaIndicacoes.map(
+                item =>
+                    item.indicadorId
+            )
+        ).size;
+
+
+    document.getElementById(
+        "totalJogadores"
+    ).textContent =
+        totalJogadores;
+
+
+    document.getElementById(
+        "totalIndicados"
+    ).textContent =
+        totalIndicados;
+
+
+    document.getElementById(
+        "totalIndicadores"
+    ).textContent =
+        indicadores;
+
+
+    document.getElementById(
+        "totalIndicacoes"
+    ).textContent =
+        totalIndicados;
+
+}
+
+
+/* ==========================================
+   TABELA
+========================================== */
+
+function renderizarTabela(){
+
+    const busca =
+        normalizarTexto(
+            campoBusca.value
+        );
+
+
+    let lista =
+        Object.entries(jogadores);
+
+
+    if(busca){
+
+        lista =
+            lista.filter(
+                ([id,jogador]) => {
+
+                    const nome =
+                        normalizarTexto(
+                            jogador?.nome
+                        );
+
+
+                    const codigo =
+                        normalizarTexto(
+                            jogador?.codigo
+                        );
+
+
+                    const indicadoPor =
+                        normalizarTexto(
+                            jogadores[
+                                jogador?.indicadoPor
+                            ]?.nome
+                        );
+
+
+                    return (
+
+                        nome.includes(busca) ||
+
+                        codigo.includes(busca) ||
+
+                        id.toLowerCase()
+                            .includes(busca) ||
+
+                        indicadoPor.includes(busca)
+
+                    );
+
+                }
+            );
+
+    }
+
+
+    if(!lista.length){
+
+        tabelaJogadores.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="sem-dados"
+                >
+                    Nenhum jogador encontrado.
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    tabelaJogadores.innerHTML =
+        lista.map(
+            ([id,jogador]) => {
+
+                const indicador =
+                    jogadores[
+                        jogador?.indicadoPor
+                    ];
+
+
+                const nomeIndicador =
+                    indicador?.nome ||
+                    "-";
+
+
+                const status =
+                    jogador?.status ||
+                    jogador?.situacao ||
+                    "ativo";
+
+
+                const statusNormalizado =
+                    normalizarTexto(
+                        status
+                    );
+
+
+                const classeStatus =
+                    statusNormalizado.includes(
+                        "bloque"
+                    )
+                    ? "bloqueado"
+                    : "ativo";
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            <b>
+                                ${escaparHTML(
+                                    jogador?.nome ||
+                                    "Sem nome"
+                                )}
+                            </b>
+                        </td>
+
+                        <td>
+                            ${escaparHTML(
+                                nomeIndicador
+                            )}
+                        </td>
+
+                        <td>
+                            ${escaparHTML(
+                                jogador?.codigo ||
+                                "-"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escaparHTML(id)}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="status ${classeStatus}"
+                            >
+                                ${escaparHTML(status)}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+/* ==========================================
+   BUSCA
+========================================== */
+
+campoBusca.addEventListener(
+    "input",
+    renderizarTabela
+);
+
+
+/* ==========================================
+   RANKING
+========================================== */
+
+function renderizarRanking(){
+
+    const contagem = {};
+
+
+    listaIndicacoes.forEach(
+        item => {
+
+            const id =
+                item.indicadorId;
+
+
+            if(!contagem[id]){
+
+                contagem[id] = {
+
+                    nome:
+                        item.indicador?.nome ||
+                        "Sem nome",
+
+                    total:0
+
+                };
+
+            }
+
+
+            contagem[id].total++;
+
+        }
+    );
+
+
+    const rankingArray =
+        Object.entries(contagem)
+            .map(
+                ([id,dados]) => ({
+
+                    id:id,
+
+                    nome:
+                        dados.nome,
+
+                    total:
+                        dados.total
+
+                })
+            )
+            .sort(
+                (a,b) =>
+                    b.total - a.total
+            );
+
+
+    if(!rankingArray.length){
+
+        ranking.innerHTML = `
+
+            <div class="sem-dados">
+
+                Ainda não existem indicações.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    ranking.innerHTML =
+        rankingArray.map(
+            (item,index) => `
+
+                <div class="ranking-item">
+
+                    <div>
+
+                        <span
+                            style="
+                                display:inline-block;
+                                width:30px;
+                                font-weight:bold;
+                            "
+                        >
+                            ${index + 1}º
+                        </span>
+
+                        <span
+                            class="ranking-nome"
+                        >
+                            ${escaparHTML(
+                                item.nome
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <span
+                        class="ranking-total"
+                    >
+                        ${item.total}
+                        ${
+                            item.total === 1
+                            ? " indicação"
+                            : " indicações"
+                        }
+                    </span>
+
+                </div>
+
+            `
+        ).join("");
+
+}
+
+</script>
+
+</body>
+</html>
