@@ -3670,14 +3670,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 399;
+const LIMITE_API_DIA = 599;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 400;
+const LIMITE_SEGURANCA = 700;
 
 const TEMPO_ATUALIZACAO_COTACAO =
     10 * 60 * 1000; // 10 minutos
@@ -18795,7 +18795,7 @@ function abrirModalSaqueCashOut(codigoAposta, valor) {
    ============================================================ */
 
 const CASHOUT_CONFIG = {
-    PERCENTUAL_CASHOUT: 0.80,
+    PERCENTUAL_CASHOUT: 0.05, // mantido para outras partes do sistema
     MINIMO_CASHOUT: 0.01,
     MAXIMO_CASHOUT: 100.00
 };
@@ -19188,6 +19188,73 @@ function analisarCashOut(aposta) {
 
         valorCashOut: valorCashOut
     };
+    // ==========================================
+// VALOR DO CASH OUT PELO NÚMERO DE ACERTOS
+// ==========================================
+
+
+
+switch (jogosGanhos) {
+
+    case 3:
+        valorCashOut = 20.00;
+        break;
+
+    case 4:
+        valorCashOut = 25.00;
+        break;
+
+    case 5:
+        valorCashOut = 30.00;
+        break;
+
+    case 6:
+        valorCashOut = 50.00;
+        break;
+
+    case 7:
+        valorCashOut = 80.00;
+        break;
+
+    case 8:
+        valorCashOut = 100.00;
+        break;
+
+    default:
+        valorCashOut = 0;
+        break;
+}
+
+
+// ==========================================
+// LIMITE MÁXIMO CONFIGURADO
+// ==========================================
+
+const maximoCashOut =
+    Number(CASHOUT_CONFIG.MAXIMO_CASHOUT) || 100.00;
+
+if (valorCashOut > maximoCashOut) {
+    valorCashOut = maximoCashOut;
+}
+
+
+// ==========================================
+// VALOR MÍNIMO CONFIGURADO
+// ==========================================
+
+const minimoCashOut =
+    Number(CASHOUT_CONFIG.MINIMO_CASHOUT) || 0.01;
+
+if (
+    valorCashOut > 0 &&
+    valorCashOut < minimoCashOut
+) {
+    valorCashOut = minimoCashOut;
+}
+
+
+valorCashOut =
+    Number(valorCashOut.toFixed(2));
 }
 // ==========================================
 // MARCA ESTE CICLO COMO JÁ OFERECIDO
