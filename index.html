@@ -3679,6 +3679,8 @@ const LIMITE_API_DIA = 399;
 */
 const LIMITE_SEGURANCA = 400;
 
+const TEMPO_ATUALIZACAO_COTACAO =
+    10 * 60 * 1000; // 10 minutos
 
 
 /* =========================================================
@@ -13043,214 +13045,127 @@ function aplicarCotacoesNaTela(
 ========================================================= */
 
 async function atualizarCotacoesJogo(
-    divJogo,
+    duelo,
     fixtureId
 ) {
 
-    if (!divJogo || !fixtureId) {
-
-        console.warn(
-            "⚠️ DADOS INVÁLIDOS PARA COTAÇÃO:",
-            fixtureId
-        );
+    if (
+        !duelo ||
+        !fixtureId
+    ) {
 
         return;
     }
 
 
     const chave =
-        String(fixtureId).trim();
+        String(
+            fixtureId
+        ).trim();
 
 
-    try {
+    /* =====================================================
+       MOSTRA CARREGANDO SOMENTE SE NÃO TIVER VALOR
+    ===================================================== */
 
-        console.log(
-            "🔎 BUSCANDO COTAÇÃO:",
-            chave
-        );
+    duelo
+        .querySelectorAll(
+            ".valor-cotacao"
+        )
+        .forEach(
+            span => {
 
+                if (
+                    !span.textContent ||
+                    span.textContent === "-"
+                ) {
 
-        /* =================================================
-           1. PRIMEIRO: FIREBASE
-        ================================================= */
+                    span.textContent =
+                        "...";
 
-        const cache =
-            await lerCacheFirebase(
-                "cotacoes",
-                chave
-            );
-
-
-        if (
-            cache &&
-            cache.dados
-        ) {
-
-            const dados =
-                cache.dados;
-
-
-            const temCotacao =
-                Number.isFinite(Number(dados.casa)) ||
-                Number.isFinite(Number(dados.empate)) ||
-                Number.isFinite(Number(dados.fora));
-
-
-            if (temCotacao) {
-
-                console.log(
-                    "🟢 COTAÇÃO ENCONTRADA NO FIREBASE:",
-                    chave
-                );
-
-
-                aplicarCotacaoNoJogo(
-                    divJogo,
-                    dados
-                );
-
-
-                return;
+                }
 
             }
+        );
 
-        }
 
+    /* =====================================================
+       BUSCAR
+    ===================================================== */
 
-        /* =================================================
-           2. NÃO TEM FIREBASE → API
-        ================================================= */
-
-        console.log(
-            "🌐 COTAÇÃO NÃO ESTÁ NO FIREBASE.",
-            "CONSULTANDO API:",
+    const cotacao =
+        await buscarCotacao(
             chave
         );
 
 
-        const resposta =
-            await consultarAPI(
-                "/odds?fixture=" +
-                encodeURIComponent(chave)
-            );
+    /* =====================================================
+       API OU FIREBASE
+    ===================================================== */
 
+    if (cotacao) {
 
-        if (
-            resposta &&
-            Array.isArray(
-                resposta.response
-            ) &&
-            resposta.response.length > 0
-        ) {
-
-            const cotacao =
-                extrairCotacoesAPI(
-                    resposta.response
-                );
-
-
-            const temCotacaoAPI =
-                Number.isFinite(Number(cotacao.casa)) ||
-                Number.isFinite(Number(cotacao.empate)) ||
-                Number.isFinite(Number(cotacao.fora));
-
-
-            if (temCotacaoAPI) {
-
-                console.log(
-                    "🟢 COTAÇÃO VEIO DA API:",
-                    chave,
-                    cotacao
-                );
-
-
-                /* =========================================
-                   SALVAR NO FIREBASE
-                ========================================= */
-
-                await salvarCacheFirebase(
-                    "cotacoes",
-                    chave,
-                    cotacao
-                );
-
-
-                console.log(
-                    "💾 COTAÇÃO DA API SALVA NO FIREBASE:",
-                    chave
-                );
-
-
-                /* =========================================
-                   MOSTRAR COTAÇÃO REAL
-                ========================================= */
-
-                aplicarCotacaoNoJogo(
-                    divJogo,
-                    cotacao
-                );
-
-
-                return;
-
-            }
-
-        }
-
-
-        /* =================================================
-           3. FIREBASE + API NÃO CONSEGUIRAM
-           → COTAÇÃO PADRÃO
-        ================================================= */
-
-        console.warn(
-            "⚠️ API NÃO RETORNOU COTAÇÃO.",
-            "USANDO COTAÇÃO PADRÃO:",
-            chave
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Casa",
+            cotacao.casa
         );
 
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Empate",
+            cotacao.empate
+        );
 
-        const cotacoesPadrao =
-            gerarCotacoesPadrao();
-
-
-        aplicarCotacaoNoJogo(
-            divJogo,
-            cotacoesPadrao
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Fora",
+            cotacao.fora
         );
 
 
         console.log(
-            "🎲 COTAÇÃO PADRÃO APLICADA:",
-            chave,
-            cotacoesPadrao
+            "✅ COTAÇÃO APLICADA:",
+            chave
         );
 
+
+        return;
     }
 
-    catch (erro) {
 
-        console.error(
-            "❌ ERRO AO BUSCAR COTAÇÃO:",
-            chave,
-            erro
-        );
+    /* =====================================================
+       SEM API E SEM CACHE
+       → PADRÃO
+    ===================================================== */
 
-
-        /* =================================================
-           ERRO → COTAÇÃO PADRÃO
-        ================================================= */
-
-        const cotacoesPadrao =
-            gerarCotacoesPadrao();
+    console.warn(
+        "⚠️ SEM COTAÇÃO — USANDO PADRÃO:",
+        chave
+    );
 
 
-        aplicarCotacaoNoJogo(
-            divJogo,
-            cotacoesPadrao
-        );
+    const padrao =
+        gerarCotacoesPadrao();
 
-    }
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Casa",
+        padrao.casa
+    );
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Empate",
+        padrao.empate
+    );
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Fora",
+        padrao.fora
+    );
 
 }
 /* =========================================================
@@ -13797,153 +13712,6 @@ function salvarCotacaoCache(fixtureId, cotacao) {
         "cacheMultiPlay/cotacoes/" +
         String(fixtureId)
     ).set(dados);
-
-}
-async function obterCotacaoComCache(fixtureId) {
-
-    if (!fixtureId) {
-        return null;
-    }
-
-    var chave =
-        String(fixtureId);
-
-
-    /* =============================================
-       1. VERIFICAR MEMÓRIA
-    ============================================= */
-
-    if (
-        cotacoesEmMemoria &&
-        cotacoesEmMemoria[chave]
-    ) {
-
-        console.log(
-            "🟢 COTAÇÃO VEM DA MEMÓRIA:",
-            chave
-        );
-
-        return cotacoesEmMemoria[chave];
-
-    }
-
-
-    /* =============================================
-       2. VERIFICAR FIREBASE
-    ============================================= */
-
-    try {
-
-        var snapshot =
-            await db.ref(
-                "cacheMultiPlay/cotacoes/" +
-                chave
-            ).once("value");
-
-
-        var cache =
-            snapshot.val();
-
-
-        if (
-            cache &&
-            cache.cotacao
-        ) {
-
-            console.log(
-                "🟢 COTAÇÃO VEM DO CACHE:",
-                chave
-            );
-
-
-            if (
-                !cotacoesEmMemoria
-            ) {
-
-                cotacoesEmMemoria = {};
-
-            }
-
-
-            cotacoesEmMemoria[chave] =
-                cache.cotacao;
-
-
-            return cache.cotacao;
-
-        }
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Erro ao ler cache da cotação:",
-            erro
-        );
-
-    }
-
-
-    /* =============================================
-       3. CACHE NÃO EXISTE
-       BUSCAR NA API
-    ============================================= */
-
-    console.log(
-        "🌐 BUSCANDO COTAÇÃO NA API:",
-        chave
-    );
-
-
-    var cotacaoAPI =
-        await buscarCotacao(chave);
-
-
-    if (!cotacaoAPI) {
-
-        console.warn(
-            "⚠️ API não retornou cotação:",
-            chave
-        );
-
-        return null;
-
-    }
-
-
-    /* =============================================
-       4. SALVAR NA MEMÓRIA
-    ============================================= */
-
-    if (
-        !cotacoesEmMemoria
-    ) {
-
-        cotacoesEmMemoria = {};
-
-    }
-
-
-    cotacoesEmMemoria[chave] =
-        cotacaoAPI;
-
-
-    /* =============================================
-       5. SALVAR NO FIREBASE
-    ============================================= */
-
-    await salvarCotacaoCache(
-        chave,
-        cotacaoAPI
-    );
-
-
-    console.log(
-        "💾 COTAÇÃO SALVA NO CACHE:",
-        chave
-    );
-
-
-    return cotacaoAPI;
 
 }
 
@@ -17625,206 +17393,225 @@ if (typeof cotacoesEmBusca === "undefined") {
 
 
 
-async function buscarCotacao(
-    fixtureId
-) {
+async function buscarCotacao(fixtureId) {
 
-    const chave =
-        String(
-            fixtureId || ""
-        ).trim();
-
+    const chave = String(fixtureId || "").trim();
 
     if (!chave) {
-
+        console.warn("⚠️ Fixture ID inválido");
         return null;
-
     }
 
-
-    /* =====================================================
-       EVITAR DUAS BUSCAS SIMULTÂNEAS
-    ===================================================== */
-
-    if (
-        cotacoesEmBusca.has(
-            chave
-        )
-    ) {
-
+    if (cotacoesEmBusca.has(chave)) {
         console.log(
             "⏳ COTAÇÃO JÁ ESTÁ SENDO BUSCADA:",
             chave
         );
 
-
-        return await cotacoesEmBusca.get(
-            chave
-        );
-
+        return await cotacoesEmBusca.get(chave);
     }
 
+    const promessa = (async () => {
 
-    const promessa =
-        (async function() {
+        let cacheFirebase = null;
 
-            try {
+        try {
 
-                /* =========================================
-                   1. FIREBASE
-                ========================================= */
+            /* =========================================
+               1. PRIMEIRO LÊ O FIREBASE
+            ========================================= */
 
-                const cache =
-                    await lerCacheFirebase(
-                        "cotacoes",
-                        chave
-                    );
-
-
-                if (
-                    cache &&
-                    cache.dados
-                ) {
-
-                    const dados =
-                        cache.dados;
-
-
-                    /*
-                     * NOVO FORMATO
-                     */
-
-                    if (
-                        Number.isFinite(
-                            Number(
-                                dados.casa
-                            )
-                        ) &&
-                        Number.isFinite(
-                            Number(
-                                dados.empate
-                            )
-                        ) &&
-                        Number.isFinite(
-                            Number(
-                                dados.fora
-                            )
-                        )
-                    ) {
-
-                        console.log(
-                            "🟢 COTAÇÃO DO FIREBASE:",
-                            chave
-                        );
-
-
-                        return dados;
-
-                    }
-
-                }
-
-
-                /* =========================================
-                   2. API
-                ========================================= */
-
-                console.log(
-                    "🌐 COTAÇÃO NÃO EXISTE NO CACHE:",
-                    chave
-                );
-
-
-                const resposta =
-                    await consultarAPI(
-                        "/odds?fixture=" +
-                        encodeURIComponent(
-                            chave
-                        )
-                    );
-
-
-                if (
-                    !resposta ||
-                    !Array.isArray(
-                        resposta.response
-                    ) ||
-                    resposta.response.length === 0
-                ) {
-
-                    console.warn(
-                        "⚠️ API NÃO RETORNOU ODDS:",
-                        chave
-                    );
-
-
-                    return null;
-
-                }
-
-
-                /* =========================================
-                   3. EXTRAIR ODDS
-                ========================================= */
-
-                const resultado =
-                    extrairCotacoesAPI(
-                        resposta.response
-                    );
-
-
-                if (
-                    resultado.casa === null &&
-                    resultado.empate === null &&
-                    resultado.fora === null
-                ) {
-
-                    console.warn(
-                        "⚠️ API SEM 1X2:",
-                        chave
-                    );
-
-
-                    return null;
-
-                }
-
-
-                /* =========================================
-                   4. SALVAR PERMANENTEMENTE
-                ========================================= */
-
-                await salvarCacheFirebase(
+            cacheFirebase =
+                await lerCacheFirebase(
                     "cotacoes",
-                    chave,
-                    resultado
-                );
-
-
-                console.log(
-                    "💾 COTAÇÃO SALVA PERMANENTEMENTE:",
                     chave
                 );
 
+            const cotacaoAntiga =
+                cacheFirebase?.dados || null;
 
-                return resultado;
+            const atualizadoEm =
+                Number(
+                    cacheFirebase?.atualizadoEm || 0
+                );
 
+            const idade =
+                atualizadoEm
+                    ? Date.now() - atualizadoEm
+                    : Infinity;
+
+            console.log(
+                "📦 CACHE:",
+                chave,
+                "idade:",
+                Math.round(idade / 1000),
+                "segundos"
+            );
+
+
+            /* =========================================
+               2. SE TEM MENOS DE 10 MINUTOS
+                  USA O CACHE
+            ========================================= */
+
+            const CACHE_VALIDO =
+                10 * 60 * 1000;
+
+            if (
+                cotacaoAntiga &&
+                idade < CACHE_VALIDO
+            ) {
+
+                console.log(
+                    "🟢 COTAÇÃO DO CACHE:",
+                    chave,
+                    cotacaoAntiga
+                );
+
+                return cotacaoAntiga;
             }
 
-            catch (erro) {
 
-                console.error(
-                    "❌ ERRO BUSCANDO COTAÇÃO:",
-                    chave,
-                    erro
+            /* =========================================
+               3. CACHE VENCIDO
+                  TENTA API NOVAMENTE
+            ========================================= */
+
+            console.log(
+                "🌐 TENTANDO ATUALIZAR COTAÇÃO NA API:",
+                chave
+            );
+
+            const resposta =
+                await consultarAPI(
+                    "/odds?fixture=" +
+                    encodeURIComponent(chave)
                 );
 
+
+            /* =========================================
+               4. API NÃO RESPONDEU
+                  USA CACHE ANTIGO
+            ========================================= */
+
+            if (
+                !resposta ||
+                !Array.isArray(resposta.response) ||
+                resposta.response.length === 0
+            ) {
+
+                console.warn(
+                    "⚠️ API SEM ODDS:",
+                    chave
+                );
+
+                if (cotacaoAntiga) {
+
+                    console.log(
+                        "↩️ USANDO COTAÇÃO ANTIGA:",
+                        chave
+                    );
+
+                    return cotacaoAntiga;
+                }
 
                 return null;
-
             }
 
-        })();
+
+            /* =========================================
+               5. EXTRAI ODDS DA API
+            ========================================= */
+
+            const novaCotacao =
+                extrairCotacoesAPI(
+                    resposta.response
+                );
+
+
+            console.log(
+                "🔥 ODDS RECEBIDAS DA API:",
+                chave,
+                novaCotacao
+            );
+
+
+            /* =========================================
+               6. VERIFICA SE REALMENTE VEIO ODDS
+            ========================================= */
+
+            const temOdds =
+                Number.isFinite(
+                    Number(novaCotacao?.casa)
+                ) ||
+                Number.isFinite(
+                    Number(novaCotacao?.empate)
+                ) ||
+                Number.isFinite(
+                    Number(novaCotacao?.fora)
+                );
+
+
+            if (!temOdds) {
+
+                console.warn(
+                    "⚠️ API NÃO RETORNOU ODDS 1X2:",
+                    chave
+                );
+
+                if (cotacaoAntiga) {
+                    return cotacaoAntiga;
+                }
+
+                return null;
+            }
+
+
+            /* =========================================
+               7. SALVA NOVA COTAÇÃO NO FIREBASE
+            ========================================= */
+
+            await salvarCacheFirebase(
+                "cotacoes",
+                chave,
+                novaCotacao
+            );
+
+            console.log(
+                "💾 NOVA COTAÇÃO SALVA:",
+                chave,
+                novaCotacao
+            );
+
+
+            /* =========================================
+               8. RETORNA A NOVA ODDS
+            ========================================= */
+
+            return novaCotacao;
+
+        } catch (erro) {
+
+            console.error(
+                "❌ ERRO NA COTAÇÃO:",
+                chave,
+                erro
+            );
+
+            if (cacheFirebase?.dados) {
+
+                console.log(
+                    "↩️ FALLBACK PARA CACHE:",
+                    chave
+                );
+
+                return cacheFirebase.dados;
+            }
+
+            return null;
+        }
+
+    })();
 
 
     cotacoesEmBusca.set(
@@ -17832,20 +17619,187 @@ async function buscarCotacao(
         promessa
     );
 
-
     try {
 
         return await promessa;
 
+    } finally {
+
+        cotacoesEmBusca.delete(chave);
+    }
+}
+async function carregarCotacaoDoJogo(
+    duelo,
+    fixtureId
+) {
+
+    if (!duelo || !fixtureId) {
+        return;
     }
 
-    finally {
 
-        cotacoesEmBusca.delete(
-            chave
+    /* =========================================
+       MOSTRAR CARREGANDO
+    ========================================= */
+
+    duelo
+        .querySelectorAll(
+            ".valor-cotacao"
+        )
+        .forEach(
+            span => {
+                span.textContent = "...";
+            }
         );
 
+
+    /* =========================================
+       TENTA API PRIMEIRO
+    ========================================= */
+
+    const cotacao =
+        await buscarCotacao(
+            fixtureId
+        );
+
+
+    /* =========================================
+       API/FIREBASE ENCONTROU
+    ========================================= */
+
+    if (cotacao) {
+
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Casa",
+            cotacao.casa
+        );
+
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Empate",
+            cotacao.empate
+        );
+
+        aplicarCotacaoNoBotao(
+            duelo,
+            "Fora",
+            cotacao.fora
+        );
+
+        console.log(
+            "✅ COTAÇÃO APLICADA:",
+            fixtureId
+        );
+
+        return;
+
     }
+
+
+    /* =========================================
+       NENHUMA COTAÇÃO
+       → PADRÃO
+    ========================================= */
+
+    console.warn(
+        "⚠️ API/FIREBASE SEM COTAÇÃO. USANDO PADRÃO:",
+        fixtureId
+    );
+
+
+    const padrao =
+        gerarCotacoesPadrao();
+
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Casa",
+        padrao.casa
+    );
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Empate",
+        padrao.empate
+    );
+
+    aplicarCotacaoNoBotao(
+        duelo,
+        "Fora",
+        padrao.fora
+    );
+
+}
+
+function aplicarCotacaoNoBotao(
+    duelo,
+    escolha,
+    valor
+) {
+
+    if (!duelo) {
+        return;
+    }
+
+
+    const odd =
+        Number(valor);
+
+
+    if (
+        !Number.isFinite(odd) ||
+        odd <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    duelo
+        .querySelectorAll(".btn")
+        .forEach(
+            botao => {
+
+                const escolhaBotao =
+                    String(
+                        botao.dataset.escolha ||
+                        ""
+                    ).trim();
+
+
+                if (
+                    escolhaBotao !==
+                    String(
+                        escolha
+                    ).trim()
+                ) {
+
+                    return;
+
+                }
+
+
+                botao.dataset.valor =
+                    odd.toFixed(2);
+
+
+                const span =
+                    botao.querySelector(
+                        ".valor-cotacao"
+                    );
+
+
+                if (span) {
+
+                    span.textContent =
+                        odd.toFixed(2);
+
+                }
+
+            }
+        );
 
 }
 /* =========================================================
@@ -18841,8 +18795,9 @@ function abrirModalSaqueCashOut(codigoAposta, valor) {
    ============================================================ */
 
 const CASHOUT_CONFIG = {
-    PERCENTUAL_CASHOUT: 0.12,
-    MINIMO_CASHOUT: 0.01
+    PERCENTUAL_CASHOUT: 0.80,
+    MINIMO_CASHOUT: 0.01,
+    MAXIMO_CASHOUT: 100.00
 };
 
 let apostaCashOutAtual = null;
@@ -19184,13 +19139,22 @@ function analisarCashOut(aposta) {
         ) || 0.80;
 
     let valorCashOut =
-        valorBase * percentual;
+    valorBase * percentual;
 
-    valorCashOut =
-        Number(
-            valorCashOut.toFixed(2)
-        );
+// LIMITE MÁXIMO DO CASH OUT
+const maximoCashOut =
+    Number(
+        CASHOUT_CONFIG?.MAXIMO_CASHOUT
+    ) || 100.00;
 
+if (valorCashOut > maximoCashOut) {
+    valorCashOut = maximoCashOut;
+}
+
+valorCashOut =
+    Number(
+        valorCashOut.toFixed(2)
+    );
 
     if (
         !Number.isFinite(valorCashOut) ||
