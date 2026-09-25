@@ -18879,19 +18879,6 @@ function obterOddSelecaoCashOut(selecao) {
 }
 
 
-/* ============================================================
-   ANALISAR CASH OUT
-   ============================================================ */
-
-/* ============================================================
-   ANALISAR CASH OUT
-   MÍNIMO DE 2 JOGOS
-============================================================ */
-
-/* ============================================================
-   ANALISAR CASH OUT
-============================================================ */
-
 function analisarCashOut(aposta) {
 
     if (!aposta) {
@@ -18913,6 +18900,11 @@ function analisarCashOut(aposta) {
 
     const totalJogos = selecoes.length;
 
+
+    // ==========================================
+    // MÍNIMO DE 3 JOGOS
+    // ==========================================
+
     if (totalJogos < 3) {
         return {
             permitido: false,
@@ -18924,6 +18916,7 @@ function analisarCashOut(aposta) {
             valorCashOut: 0
         };
     }
+
 
     // ==========================================
     // JÁ SACOU
@@ -18955,6 +18948,7 @@ function analisarCashOut(aposta) {
     let jogosPerdidos = 0;
     let jogosPendentes = 0;
 
+
     selecoes.forEach(function(selecao) {
 
         const status =
@@ -18963,6 +18957,7 @@ function analisarCashOut(aposta) {
                 selecao.resultado ||
                 ""
             );
+
 
         if (
             status === "ganhou" ||
@@ -18986,6 +18981,7 @@ function analisarCashOut(aposta) {
 
             jogosPendentes++;
         }
+
     });
 
 
@@ -18998,9 +18994,9 @@ function analisarCashOut(aposta) {
         return {
             permitido: false,
             motivo: "Existe jogo perdido.",
-            jogosGanhos,
-            jogosPerdidos,
-            jogosPendentes,
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
             blocoAtual: 0,
             valorCashOut: 0
         };
@@ -19008,7 +19004,9 @@ function analisarCashOut(aposta) {
 
 
     // ==========================================
-    // NÃO PODE OFERECER QUANDO RESTAM 2 OU MENOS
+    // RESTAM 2 OU MENOS
+    //
+    // NÃO OFERECE MAIS
     // ==========================================
 
     if (jogosPendentes <= 2) {
@@ -19019,9 +19017,9 @@ function analisarCashOut(aposta) {
                 "Restam apenas " +
                 jogosPendentes +
                 " jogo(s). Cash Out não será mais oferecido.",
-            jogosGanhos,
-            jogosPerdidos,
-            jogosPendentes,
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
             blocoAtual: 0,
             valorCashOut: 0
         };
@@ -19029,7 +19027,7 @@ function analisarCashOut(aposta) {
 
 
     // ==========================================
-    // PRECISA TER PELO MENOS 3 ACERTOS
+    // MENOS DE 3 ACERTOS
     // ==========================================
 
     if (jogosGanhos < 3) {
@@ -19037,9 +19035,9 @@ function analisarCashOut(aposta) {
         return {
             permitido: false,
             motivo: "Ainda não atingiu 3 jogos ganhos.",
-            jogosGanhos,
-            jogosPerdidos,
-            jogosPendentes,
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
             blocoAtual: 0,
             valorCashOut: 0
         };
@@ -19047,114 +19045,109 @@ function analisarCashOut(aposta) {
 
 
     // ==========================================
-    // CICLOS:
+    // CASH OUT POR QUANTIDADE DE ACERTOS
     //
-    // 3
-    // 6
-    // 8
-    //
-    // Depois disso não oferece mais.
+    // 3 = R$ 20
+    // 4 = R$ 25
+    // 5 = R$ 30
+    // 6 = R$ 50
+    // 7 = R$ 80
+    // 8 = R$ 100
     // ==========================================
 
-    let blocoAtual = 0;
+    let blocoAtual = jogosGanhos;
 
-    if (jogosGanhos >= 8) {
-
-        blocoAtual = 8;
-
-    } else if (jogosGanhos >= 6) {
-
-        blocoAtual = 6;
-
-    } else if (jogosGanhos >= 3) {
-
-        blocoAtual = 3;
-    }
+    let valorCashOut = 0;
 
 
-    // ==========================================
-    // CONTROLE DO ÚLTIMO CICLO OFERECIDO
-    // ==========================================
+    if (jogosGanhos === 3) {
 
-    inicializarControleCashOut(aposta);
+        valorCashOut = 20.00;
 
-    const ultimoBloco =
-        Number(
-            aposta.cashOutControle
-                ?.ultimoBlocoOferecido
-        ) || 0;
+    } else if (jogosGanhos === 4) {
 
+        valorCashOut = 25.00;
 
-    if (blocoAtual <= ultimoBloco) {
+    } else if (jogosGanhos === 5) {
+
+        valorCashOut = 30.00;
+
+    } else if (jogosGanhos === 6) {
+
+        valorCashOut = 50.00;
+
+    } else if (jogosGanhos === 7) {
+
+        valorCashOut = 80.00;
+
+    } else if (jogosGanhos === 8) {
+
+        valorCashOut = 100.00;
+
+    } else {
 
         return {
             permitido: false,
-            motivo: "Cash Out deste ciclo já foi oferecido.",
-            jogosGanhos,
-            jogosPerdidos,
-            jogosPendentes,
-            blocoAtual,
+            motivo: "Cash Out encerrado.",
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
+            blocoAtual: blocoAtual,
             valorCashOut: 0
         };
     }
 
 
     // ==========================================
-    // POSSÍVEL RETORNO
+    // INICIALIZAR CONTROLE
     // ==========================================
 
-    const valorAposta =
+    inicializarControleCashOut(aposta);
+
+
+    const ultimoBloco =
         Number(
-            aposta.valor ||
-            aposta.valorAposta ||
-            aposta.valorUnico ||
-            aposta.valorTotal ||
-            0
-        );
-
-    const possivelRetorno =
-        Number(
-            aposta.possivelRetorno ||
-            aposta.retorno ||
-            aposta.premio ||
-            0
-        );
+            aposta.cashOutControle?.ultimoBlocoOferecido
+        ) || 0;
 
 
-    let valorBase =
-        possivelRetorno;
+    // ==========================================
+    // JÁ FOI OFERECIDO NESSE NÍVEL
+    // ==========================================
 
-    if (valorBase <= 0) {
-        valorBase = valorAposta;
+    if (blocoAtual <= ultimoBloco) {
+
+        return {
+            permitido: false,
+            motivo:
+                "Cash Out deste nível já foi oferecido.",
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
+            blocoAtual: blocoAtual,
+            valorCashOut: 0
+        };
     }
 
 
     // ==========================================
-    // CASH OUT = 80%
+    // GARANTIR LIMITE DE R$100
     // ==========================================
 
-    const percentual =
+    if (valorCashOut > 100) {
+        valorCashOut = 100;
+    }
+
+
+    valorCashOut =
         Number(
-            CASHOUT_CONFIG?.PERCENTUAL_CASHOUT
-        ) || 0.80;
+            valorCashOut.toFixed(2)
+        );
 
-    let valorCashOut =
-    valorBase * percentual;
 
-// LIMITE MÁXIMO DO CASH OUT
-const maximoCashOut =
-    Number(
-        CASHOUT_CONFIG?.MAXIMO_CASHOUT
-    ) || 100.00;
-
-if (valorCashOut > maximoCashOut) {
-    valorCashOut = maximoCashOut;
-}
-
-valorCashOut =
-    Number(
-        valorCashOut.toFixed(2)
-    );
+    // ==========================================
+    // VALIDAR VALOR
+    // ==========================================
 
     if (
         !Number.isFinite(valorCashOut) ||
@@ -19164,10 +19157,10 @@ valorCashOut =
         return {
             permitido: false,
             motivo: "Valor de Cash Out inválido.",
-            jogosGanhos,
-            jogosPerdidos,
-            jogosPendentes,
-            blocoAtual,
+            jogosGanhos: jogosGanhos,
+            jogosPerdidos: jogosPerdidos,
+            jogosPendentes: jogosPendentes,
+            blocoAtual: blocoAtual,
             valorCashOut: 0
         };
     }
@@ -19183,24 +19176,19 @@ valorCashOut =
 
         motivo: "Cash Out disponível.",
 
-        jogosGanhos,
+        jogosGanhos: jogosGanhos,
 
-        jogosPerdidos,
+        jogosPerdidos: jogosPerdidos,
 
-        jogosPendentes,
+        jogosPendentes: jogosPendentes,
 
-        totalJogos,
+        totalJogos: totalJogos,
 
-        blocoAtual,
+        blocoAtual: blocoAtual,
 
-        valorAposta,
-
-        possivelRetorno,
-
-        valorCashOut
+        valorCashOut: valorCashOut
     };
 }
-
 // ==========================================
 // MARCA ESTE CICLO COMO JÁ OFERECIDO
 // ==========================================
