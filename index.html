@@ -16,6 +16,33 @@ href="https://res.cloudinary.com/dtw3turzb/image/upload/v1784485917/looogi.png"
 >
 
 <style>
+    
+    .aviso-final-jogos {
+    width: calc(100% - 20px);
+    margin: 18px auto 25px;
+    padding: 15px 12px;
+
+    background: #eeeeee;
+
+    border: 1px solid #cccccc;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    box-sizing: border-box;
+}
+
+.aviso-final-jogos .aviso-titulo {
+    font-size: 17px;
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
     .cabecalho-competicao {
     background: #000000;
     color: #ffffff;
@@ -10795,7 +10822,49 @@ jogos.sort(function(a, b) {
                 card
             );
 
-        }
+              }
+    );
+
+
+    /* =============================================
+       AVISO NO FINAL DOS CARDS
+    ============================================= */
+
+    const avisoFinal =
+        document.createElement("div");
+
+    avisoFinal.className =
+        "aviso-final-jogos";
+
+    avisoFinal.innerHTML = `
+
+        <div class="aviso-titulo">
+            ⚽ ATENÇÃO
+        </div>
+
+        <div>
+            Os jogos de hoje ficam disponíveis
+            até <strong>20:30</strong>.
+        </div>
+
+        <div>
+            🕗 A partir das <strong>20:00</strong>,
+            os jogos começam a ser encerrados.
+        </div>
+
+        <div>
+            ⏰ <strong>20:30 — encerramento dos jogos.</strong>
+        </div>
+
+        <div>
+            Após o encerramento, serão exibidos
+            os jogos do próximo dia.
+        </div>
+
+    `;
+
+    container.appendChild(
+        avisoFinal
     );
 
 }
@@ -11834,7 +11903,7 @@ jogosDia.sort(function(a, b) {
 
                 container.innerHTML = `
                     <div class="sem-jogos">
-                        ⚽ Nenhum jogo disponível para este dia.
+                        ⚽ CLICK NO BOTAO DO DIA DE JOGO
                     </div>
                 `;
 
@@ -12037,6 +12106,214 @@ function verificarHojeSemJogosMostrarAmanha(
     }
 
 }
+let mudouParaAmanha2030 = false;
+
+async function verificarHorarioDosDias() {
+
+    const agora = new Date();
+
+    const passou2030 =
+        agora.getHours() > 20 ||
+        (
+            agora.getHours() === 20 &&
+            agora.getMinutes() >= 30
+        );
+
+    if (!passou2030) {
+        return;
+    }
+
+    console.log("🌙 20:30 DETECTADO");
+
+    // ==========================================
+    // ESCONDE O BOTÃO DE HOJE
+    // ==========================================
+
+    const botaoHoje =
+        document.querySelector(
+            '#diasContainer .btn-dia[data-offset="0"]'
+        );
+
+    if (botaoHoje) {
+        botaoHoje.style.display = "none";
+    }
+
+    // ==========================================
+    // NÃO EXECUTAR NOVAMENTE
+    // ==========================================
+
+    if (mudouParaAmanha2030) {
+        return;
+    }
+
+    mudouParaAmanha2030 = true;
+
+    // ==========================================
+    // SELECIONA AMANHÃ
+    // ==========================================
+
+    offsetDiaSelecionado = 1;
+
+    const botoes =
+        document.querySelectorAll(
+            "#diasContainer .btn-dia"
+        );
+
+    botoes.forEach(function(botao) {
+        botao.classList.remove("ativo");
+    });
+
+    const botaoAmanha =
+        document.querySelector(
+            '#diasContainer .btn-dia[data-offset="1"]'
+        );
+
+    if (botaoAmanha) {
+        botaoAmanha.classList.add("ativo");
+    }
+
+    // ==========================================
+    // DATA DE AMANHÃ
+    // ==========================================
+
+    const dataAmanha =
+        String(
+            obterDataDia(1)
+        ).trim();
+
+    console.log(
+        "📅 AMANHÃ:",
+        dataAmanha
+    );
+
+    try {
+
+        // ======================================
+        // MOSTRA ÁREA DE JOGOS
+        // ======================================
+
+        const container =
+            document.getElementById(
+                "conteudoJogosDia"
+            );
+
+        if (!container) {
+            throw new Error(
+                "#conteudoJogosDia não encontrado"
+            );
+        }
+
+        container.style.display = "block";
+
+        container.innerHTML = `
+            <div class="carregando-jogos">
+                ⚽ Carregando jogos de amanhã...
+            </div>
+        `;
+
+        // ======================================
+        // BUSCA OS JOGOS
+        // ======================================
+
+        await carregarJogos(dataAmanha);
+
+        // ======================================
+        // PEGA OS JOGOS QUE FORAM SALVOS
+        // ======================================
+
+        const jogosAmanha =
+            Array.isArray(
+                jogosPorData[dataAmanha]
+            )
+                ? jogosPorData[dataAmanha]
+                : [];
+
+        jogos = jogosAmanha;
+
+        console.log(
+            "⚽ JOGOS DE AMANHÃ:",
+            jogosAmanha.length
+        );
+
+        // ======================================
+        // FORÇA A TELA A MOSTRAR OS JOGOS
+        // ======================================
+
+        if (jogosAmanha.length > 0) {
+
+            container.style.display = "block";
+
+            renderizarJogosPorCompeticao(
+                container,
+                jogosAmanha
+            );
+
+            if (
+                typeof atualizarSelecoes === "function"
+            ) {
+                atualizarSelecoes();
+            }
+
+            if (
+                typeof atualizarTotal === "function"
+            ) {
+                atualizarTotal();
+            }
+
+            console.log(
+                "✅ JOGOS DE AMANHÃ MOSTRADOS SEM CLIQUE"
+            );
+
+        } else {
+
+            container.innerHTML = `
+                <div class="sem-jogos">
+                    ⚽ Nenhum jogo disponível para amanhã.
+                </div>
+            `;
+
+            console.log(
+                "⚠️ API/CACHE NÃO RETORNOU JOGOS PARA:",
+                dataAmanha
+            );
+        }
+
+    } catch (erro) {
+
+        console.error(
+            "❌ ERRO AO CARREGAR AMANHÃ:",
+            erro
+        );
+
+        mudouParaAmanha2030 = false;
+
+    } finally {
+
+        if (
+            typeof esconderEsperaJogos === "function"
+        ) {
+            esconderEsperaJogos();
+        }
+    }
+}
+
+
+// ==========================================
+// EXECUTA IMEDIATAMENTE
+// ==========================================
+
+verificarHorarioDosDias();
+
+
+// ==========================================
+// VERIFICA A CADA 30 SEGUNDOS
+// ==========================================
+
+setInterval(
+    verificarHorarioDosDias,
+    30000
+);
+
 /* =========================================================
    FAIXAS DAS COTAÇÕES PADRÃO
 ========================================================= */
