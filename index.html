@@ -19411,8 +19411,8 @@ function analisarCashOut(aposta) {
     // GARANTIR LIMITE DE R$100
     // ==========================================
 
-    if (valorCashOut > 100) {
-        valorCashOut = 100;
+    if (valorCashOut > 50) {
+        valorCashOut = 50;
     }
 
 
@@ -19474,27 +19474,27 @@ function analisarCashOut(aposta) {
 switch (jogosGanhos) {
 
     case 3:
-        valorCashOut = 20.00;
+        valorCashOut = 10.00;
         break;
 
     case 4:
-        valorCashOut = 25.00;
+        valorCashOut = 15.00;
         break;
 
     case 5:
-        valorCashOut = 30.00;
+        valorCashOut = 20.00;
         break;
 
     case 6:
-        valorCashOut = 50.00;
+        valorCashOut = 25.00;
         break;
 
     case 7:
-        valorCashOut = 80.00;
+        valorCashOut = 30.00;
         break;
 
     case 8:
-        valorCashOut = 100.00;
+        valorCashOut = 50.00;
         break;
 
     default:
