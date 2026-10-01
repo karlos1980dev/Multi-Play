@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MULTI PLAY.BET - Painel de Indicações</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>MULTI PLAY.BET - Indicações</title>
 
 <style>
 
@@ -39,14 +45,16 @@ body{
 }
 
 .container{
+    width:100%;
     max-width:1200px;
     margin:auto;
     padding:20px;
 }
 
-/* =========================
-   GERADOR DE LINK
-========================= */
+
+/* =================================================
+   GERADOR
+================================================= */
 
 .gerador{
     background:#fff;
@@ -58,7 +66,7 @@ body{
 
 .gerador h2{
     font-size:20px;
-    margin-bottom:6px;
+    margin-bottom:7px;
 }
 
 .gerador p{
@@ -91,7 +99,7 @@ body{
     border:0;
     border-radius:9px;
     padding:14px 18px;
-    font-size:15px;
+    font-size:14px;
     font-weight:bold;
     cursor:pointer;
 }
@@ -101,8 +109,14 @@ body{
     color:#fff;
 }
 
-.btn-gerar:hover{
-    background:#222;
+.btn-copiar{
+    background:#111;
+    color:#fff;
+}
+
+.btn-compartilhar{
+    background:#25D366;
+    color:#fff;
 }
 
 .resultado-link{
@@ -120,7 +134,7 @@ body{
 .nome-link{
     font-size:14px;
     color:#555;
-    margin-bottom:7px;
+    margin-bottom:8px;
 }
 
 .link-box{
@@ -139,25 +153,16 @@ body{
     background:#fff;
 }
 
-.btn-copiar{
-    background:#111;
-    color:#fff;
-}
-
-.btn-compartilhar{
-    background:#25D366;
-    color:#fff;
-}
-
 .info-link{
     margin-top:10px;
     font-size:12px;
     color:#777;
 }
 
-/* =========================
+
+/* =================================================
    CARDS
-========================= */
+================================================= */
 
 .cards{
     display:grid;
@@ -184,9 +189,10 @@ body{
     font-size:27px;
 }
 
-/* =========================
-   BUSCA
-========================= */
+
+/* =================================================
+   PAINEL
+================================================= */
 
 .painel{
     background:#fff;
@@ -197,8 +203,8 @@ body{
 }
 
 .painel h2{
-    margin-bottom:15px;
     font-size:20px;
+    margin-bottom:15px;
 }
 
 .busca{
@@ -208,20 +214,23 @@ body{
     border-radius:9px;
     font-size:15px;
     margin-bottom:15px;
+    outline:none;
 }
 
-/* =========================
+
+/* =================================================
    TABELA
-========================= */
+================================================= */
 
 .tabela-container{
+    width:100%;
     overflow-x:auto;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    min-width:700px;
+    min-width:850px;
 }
 
 th{
@@ -242,6 +251,12 @@ tr:hover{
     background:#fafafa;
 }
 
+.sem-dados{
+    text-align:center;
+    padding:25px;
+    color:#777;
+}
+
 .status{
     display:inline-block;
     padding:5px 9px;
@@ -260,15 +275,18 @@ tr:hover{
     color:#c00000;
 }
 
-.sem-dados{
-    text-align:center;
-    padding:25px;
-    color:#777;
+.indicador{
+    font-weight:bold;
 }
 
-/* =========================
+.indicador-vazio{
+    color:#999;
+}
+
+
+/* =================================================
    RANKING
-========================= */
+================================================= */
 
 .ranking-item{
     display:flex;
@@ -294,9 +312,10 @@ tr:hover{
     font-size:12px;
 }
 
-/* =========================
+
+/* =================================================
    LOADING
-========================= */
+================================================= */
 
 .loading{
     position:fixed;
@@ -305,7 +324,7 @@ tr:hover{
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:9999;
+    z-index:99999;
 }
 
 .loading.ativo{
@@ -320,9 +339,10 @@ tr:hover{
     font-weight:bold;
 }
 
-/* =========================
+
+/* =================================================
    RESPONSIVO
-========================= */
+================================================= */
 
 @media(max-width:800px){
 
@@ -339,7 +359,6 @@ tr:hover{
     }
 
     .cards{
-        grid-template-columns:1fr 1fr;
         gap:10px;
     }
 
@@ -360,12 +379,24 @@ tr:hover{
         width:100%;
     }
 
+    .link-box{
+        flex-direction:column;
+    }
+
+    .link-box input,
+    .link-box button{
+        width:100%;
+    }
+
 }
 
 </style>
+
 </head>
 
+
 <body>
+
 
 <header class="header">
 
@@ -379,18 +410,19 @@ tr:hover{
 <main class="container">
 
 
-<!-- ==========================================
+<!-- =================================================
      GERADOR DE LINK
-========================================== -->
+================================================= -->
 
 <section class="gerador">
 
     <h2>🔗 Gerar link de indicação</h2>
 
     <p>
-        Digite o nome do cliente para criar um link personalizado.
-        Exemplo: <b>Paulo</b> → <b>/paulo</b>
+        Digite o nome do cliente para criar o link personalizado.
+        Exemplo: <b>Paulo</b> → /paulo
     </p>
+
 
     <div class="form-gerador">
 
@@ -430,12 +462,14 @@ tr:hover{
                 readonly
             >
 
+
             <button
                 id="btnCopiarLink"
                 class="btn btn-copiar"
             >
                 📋 COPIAR
             </button>
+
 
             <button
                 id="btnCompartilharLink"
@@ -458,15 +492,19 @@ tr:hover{
 </section>
 
 
-<!-- ==========================================
+
+<!-- =================================================
      CARDS
-========================================== -->
+================================================= -->
 
 <section class="cards">
 
+
     <div class="card">
 
-        <span>Total de jogadores</span>
+        <span>
+            Total de jogadores
+        </span>
 
         <strong id="totalJogadores">
             0
@@ -477,7 +515,9 @@ tr:hover{
 
     <div class="card">
 
-        <span>Jogadores indicados</span>
+        <span>
+            Jogadores indicados
+        </span>
 
         <strong id="totalIndicados">
             0
@@ -488,7 +528,9 @@ tr:hover{
 
     <div class="card">
 
-        <span>Indicadores</span>
+        <span>
+            Indicadores
+        </span>
 
         <strong id="totalIndicadores">
             0
@@ -499,7 +541,9 @@ tr:hover{
 
     <div class="card">
 
-        <span>Total de indicações</span>
+        <span>
+            Total de indicações
+        </span>
 
         <strong id="totalIndicacoes">
             0
@@ -507,22 +551,27 @@ tr:hover{
 
     </div>
 
+
 </section>
 
 
-<!-- ==========================================
+
+<!-- =================================================
      JOGADORES
-========================================== -->
+================================================= -->
 
 <section class="painel">
 
-    <h2>👥 Jogadores e indicações</h2>
+    <h2>
+        👥 Jogadores e indicações
+    </h2>
+
 
     <input
         id="campoBusca"
         class="busca"
         type="text"
-        placeholder="🔎 Pesquisar jogador..."
+        placeholder="🔎 Pesquisar jogador ou indicador..."
     >
 
 
@@ -534,15 +583,25 @@ tr:hover{
 
                 <tr>
 
-                    <th>Jogador</th>
+                    <th>
+                        Jogador
+                    </th>
 
-                    <th>Indicado por</th>
+                    <th>
+                        Indicado por
+                    </th>
 
-                    <th>Código</th>
+                    <th>
+                        Código
+                    </th>
 
-                    <th>ID</th>
+                    <th>
+                        ID
+                    </th>
 
-                    <th>Status</th>
+                    <th>
+                        Status
+                    </th>
 
                 </tr>
 
@@ -571,13 +630,17 @@ tr:hover{
 </section>
 
 
-<!-- ==========================================
+
+<!-- =================================================
      RANKING
-========================================== -->
+================================================= -->
 
 <section class="painel">
 
-    <h2>🏆 Ranking de indicações</h2>
+    <h2>
+        🏆 Ranking de indicações
+    </h2>
+
 
     <div id="ranking">
 
@@ -593,9 +656,10 @@ tr:hover{
 </main>
 
 
-<!-- ==========================================
+
+<!-- =================================================
      LOADING
-========================================== -->
+================================================= -->
 
 <div
     id="loading"
@@ -611,15 +675,13 @@ tr:hover{
 </div>
 
 
-<!-- ==========================================
-     FIREBASE
-========================================== -->
 
 <script type="module">
 
 import {
     initializeApp
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 
 
 import {
@@ -628,12 +690,14 @@ import {
     get,
     set,
     onValue
-} from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+} from
+"https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 
-/* ==========================================
+
+/* =================================================
    FIREBASE
-========================================== */
+================================================= */
 
 const firebaseConfig = {
 
@@ -669,113 +733,189 @@ const db =
     getDatabase(app);
 
 
-/* ==========================================
+
+/* =================================================
    ELEMENTOS
-========================================== */
+================================================= */
 
 const nomeCliente =
-    document.getElementById("nomeCliente");
+    document.getElementById(
+        "nomeCliente"
+    );
+
 
 const btnGerarLink =
-    document.getElementById("btnGerarLink");
+    document.getElementById(
+        "btnGerarLink"
+    );
+
 
 const resultadoLink =
-    document.getElementById("resultadoLink");
+    document.getElementById(
+        "resultadoLink"
+    );
+
 
 const nomeLink =
-    document.getElementById("nomeLink");
+    document.getElementById(
+        "nomeLink"
+    );
+
 
 const linkGerado =
-    document.getElementById("linkGerado");
+    document.getElementById(
+        "linkGerado"
+    );
+
 
 const btnCopiarLink =
-    document.getElementById("btnCopiarLink");
+    document.getElementById(
+        "btnCopiarLink"
+    );
+
 
 const btnCompartilharLink =
-    document.getElementById("btnCompartilharLink");
+    document.getElementById(
+        "btnCompartilharLink"
+    );
+
 
 const campoBusca =
-    document.getElementById("campoBusca");
+    document.getElementById(
+        "campoBusca"
+    );
+
 
 const tabelaJogadores =
-    document.getElementById("tabelaJogadores");
+    document.getElementById(
+        "tabelaJogadores"
+    );
+
 
 const ranking =
-    document.getElementById("ranking");
+    document.getElementById(
+        "ranking"
+    );
+
 
 const loading =
-    document.getElementById("loading");
+    document.getElementById(
+        "loading"
+    );
 
 
-/* ==========================================
-   DADOS
-========================================== */
+
+/* =================================================
+   VARIÁVEIS
+================================================= */
 
 let jogadores = {};
 
-let linkAtual = "";
+let indicacoes = {};
 
 let listaIndicacoes = [];
 
+let linkAtual = "";
 
-/* ==========================================
-   NORMALIZAR TEXTO
-========================================== */
+
+
+/* =================================================
+   NORMALIZAR
+================================================= */
 
 function normalizarTexto(texto){
 
     return String(texto || "")
+
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"")
+
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+
         .toLowerCase()
+
         .trim();
 
 }
 
 
-/* ==========================================
-   GERAR SLUG
-========================================== */
+
+/* =================================================
+   SLUG
+================================================= */
 
 function gerarSlug(nome){
 
     return normalizarTexto(nome)
 
-        .replace(/[^a-z0-9\s-]/g,"")
+        .replace(
+            /[^a-z0-9\s-]/g,
+            ""
+        )
 
-        .replace(/\s+/g,"-")
+        .replace(
+            /\s+/g,
+            "-"
+        )
 
-        .replace(/-+/g,"-")
+        .replace(
+            /-+/g,
+            "-"
+        )
 
-        .replace(/^-|-$/g,"");
+        .replace(
+            /^-|-$/g,
+            ""
+        );
 
 }
 
 
-/* ==========================================
+
+/* =================================================
    ESCAPAR HTML
-========================================== */
+================================================= */
 
 function escaparHTML(valor){
 
-    return String(valor ?? "")
+    return String(
+        valor ?? ""
+    )
 
-        .replace(/&/g,"&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g,"&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g,"&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g,"&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g,"&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
 
-/* ==========================================
+
+/* =================================================
    ENCONTRAR CLIENTE
-========================================== */
+================================================= */
 
 function encontrarCliente(nome){
 
@@ -790,11 +930,10 @@ function encontrarCliente(nome){
     }
 
 
-    const entradas =
-        Object.entries(jogadores);
-
-
-    for(const [id,jogador] of entradas){
+    for(
+        const [id,jogador]
+        of Object.entries(jogadores)
+    ){
 
         if(!jogador){
 
@@ -804,10 +943,15 @@ function encontrarCliente(nome){
 
 
         const nomeJogador =
-            normalizarTexto(jogador.nome);
+            normalizarTexto(
+                jogador.nome
+            );
 
 
-        if(nomeJogador === procurado){
+        if(
+            nomeJogador ===
+            procurado
+        ){
 
             return {
 
@@ -827,9 +971,10 @@ function encontrarCliente(nome){
 }
 
 
-/* ==========================================
+
+/* =================================================
    GERAR LINK
-========================================== */
+================================================= */
 
 async function gerarLink(){
 
@@ -841,23 +986,6 @@ async function gerarLink(){
 
         alert(
             "Digite o nome do cliente."
-        );
-
-        nomeCliente.focus();
-
-        return;
-
-    }
-
-
-    const slug =
-        gerarSlug(nome);
-
-
-    if(!slug){
-
-        alert(
-            "Nome inválido para gerar o link."
         );
 
         return;
@@ -880,25 +1008,27 @@ async function gerarLink(){
     }
 
 
-    const jogadorId =
-        cliente.id;
+    const slug =
+        gerarSlug(nome);
 
 
-    const nomeReal =
-        cliente.jogador.nome ||
-        nome;
+    if(!slug){
+
+        alert(
+            "Nome inválido."
+        );
+
+        return;
+
+    }
 
 
-    loading.classList.add("ativo");
+    loading.classList.add(
+        "ativo"
+    );
 
 
     try{
-
-        /*
-         ==========================================
-         VERIFICA SE O SLUG JÁ EXISTE
-         ==========================================
-        */
 
         const indicacaoRef =
             ref(
@@ -907,19 +1037,25 @@ async function gerarLink(){
             );
 
 
-        const snapshot =
-            await get(indicacaoRef);
+        const snap =
+            await get(
+                indicacaoRef
+            );
 
 
-        if(snapshot.exists()){
+        if(snap.exists()){
 
             const existente =
-                snapshot.val();
+                snap.val();
 
 
             if(
-                String(existente.jogadorId) !==
-                String(jogadorId)
+                String(
+                    existente.jogadorId
+                ) !==
+                String(
+                    cliente.id
+                )
             ){
 
                 loading.classList.remove(
@@ -927,7 +1063,7 @@ async function gerarLink(){
                 );
 
                 alert(
-                    "Esse link já está sendo usado por outro cliente."
+                    "Esse link já pertence a outro cliente."
                 );
 
                 return;
@@ -937,44 +1073,31 @@ async function gerarLink(){
         }
 
 
-        /*
-         ==========================================
-         SALVA O LINK NO FIREBASE
-         ==========================================
-        */
-
         await set(
             indicacaoRef,
             {
 
                 jogadorId:
-                    jogadorId,
+                    cliente.id,
 
                 nome:
-                    nomeReal,
+                    cliente.jogador.nome,
 
                 slug:
                     slug,
 
                 criadoEm:
-                    Date.now()
+                    Date.now(),
+
+                ativo:
+                    true
 
             }
         );
 
 
-        /*
-         ==========================================
-         LINK FINAL
-         ==========================================
-        */
-
         linkAtual =
-            window.location.origin.replace(
-                /\/+$/,
-                ""
-            ) +
-            "/" +
+            "https://multiplaybet.netlify.app/" +
             slug;
 
 
@@ -984,7 +1107,9 @@ async function gerarLink(){
 
         nomeLink.innerHTML =
             "Link de <b>" +
-            escaparHTML(nomeReal) +
+            escaparHTML(
+                cliente.jogador.nome
+            ) +
             "</b>:";
 
 
@@ -996,13 +1121,11 @@ async function gerarLink(){
     }catch(error){
 
         console.error(
-            "Erro ao gerar link:",
             error
         );
 
-
         alert(
-            "Não foi possível gerar o link."
+            "Erro ao gerar o link."
         );
 
     }
@@ -1015,9 +1138,10 @@ async function gerarLink(){
 }
 
 
-/* ==========================================
+
+/* =================================================
    COPIAR
-========================================== */
+================================================= */
 
 async function copiarLink(){
 
@@ -1034,8 +1158,9 @@ async function copiarLink(){
             linkAtual
         );
 
+
         btnCopiarLink.textContent =
-            "✅ COPIADO!";
+            "✅ COPIADO";
 
 
         setTimeout(() => {
@@ -1063,9 +1188,10 @@ async function copiarLink(){
 }
 
 
-/* ==========================================
+
+/* =================================================
    COMPARTILHAR
-========================================== */
+================================================= */
 
 async function compartilharLink(){
 
@@ -1074,10 +1200,6 @@ async function compartilharLink(){
         return;
 
     }
-
-
-    const nome =
-        nomeCliente.value.trim();
 
 
     if(
@@ -1092,7 +1214,7 @@ async function compartilharLink(){
                     "MULTI PLAY.BET",
 
                 text:
-                    "Acesse o MULTI PLAY.BET pelo meu link de indicação:",
+                    "Estou te indicando para o MULTI PLAY.BET! Acesse pelo meu link:",
 
                 url:
                     linkAtual
@@ -1116,15 +1238,16 @@ async function compartilharLink(){
 
 
     alert(
-        "Seu celular não possui compartilhamento direto. O link foi copiado."
+        "Link copiado para compartilhar."
     );
 
 }
 
 
-/* ==========================================
+
+/* =================================================
    EVENTOS
-========================================== */
+================================================= */
 
 btnGerarLink.addEventListener(
     "click",
@@ -1146,7 +1269,7 @@ btnCompartilharLink.addEventListener(
 
 nomeCliente.addEventListener(
     "keydown",
-    function(event){
+    event => {
 
         if(
             event.key === "Enter"
@@ -1160,70 +1283,279 @@ nomeCliente.addEventListener(
 );
 
 
-/* ==========================================
+campoBusca.addEventListener(
+    "input",
+    renderizarTabela
+);
+
+
+
+/* =================================================
    CARREGAR JOGADORES
-========================================== */
+================================================= */
 
 onValue(
-    ref(db,"jogadores"),
+
+    ref(
+        db,
+        "jogadores"
+    ),
+
     snapshot => {
 
         jogadores =
             snapshot.val() || {};
 
 
-        processarIndicacoes();
-
-        renderizarTabela();
-
-        renderizarRanking();
-
-        atualizarCards();
+        atualizarTudo();
 
     },
+
     error => {
 
         console.error(
-            "Erro Firebase:",
+            "Erro jogadores:",
             error
         );
 
-
-        tabelaJogadores.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    class="sem-dados"
-                >
-                    Erro ao carregar jogadores.
-                </td>
-
-            </tr>
-
-        `;
-
     }
+
 );
 
 
-/* ==========================================
-   PROCESSAR INDICAÇÕES
-========================================== */
+
+/* =================================================
+   CARREGAR LINKS / INDICAÇÕES
+================================================= */
+
+onValue(
+
+    ref(
+        db,
+        "indicacoes"
+    ),
+
+    snapshot => {
+
+        indicacoes =
+            snapshot.val() || {};
+
+
+        atualizarTudo();
+
+    },
+
+    error => {
+
+        console.error(
+            "Erro indicacoes:",
+            error
+        );
+
+    }
+
+);
+
+
+
+/* =================================================
+   ATUALIZAR TUDO
+================================================= */
+
+function atualizarTudo(){
+
+    processarIndicacoes();
+
+    renderizarTabela();
+
+    renderizarRanking();
+
+    atualizarCards();
+
+}
+
+
+
+/* =================================================
+   ENCONTRAR INDICADOR
+================================================= */
+
+function encontrarIndicador(jogador) {
+
+    if (!jogador) {
+        return null;
+    }
+
+    // =================================================
+    // POSSÍVEIS CAMPOS DE INDICAÇÃO
+    // =================================================
+
+    const referencias = [
+
+        jogador.indicadoPor,
+        jogador.codigoIndicacao,
+        jogador.codigoIndicacaoPor,
+        jogador.indicador,
+        jogador.indicadorId,
+        jogador.ref,
+        jogador.referencia,
+        jogador.slugIndicacao
+
+    ];
+
+
+    // =================================================
+    // PROCURA A REFERÊNCIA
+    // =================================================
+
+    for (const referenciaBruta of referencias) {
+
+        if (
+            referenciaBruta === undefined ||
+            referenciaBruta === null ||
+            String(referenciaBruta).trim() === ""
+        ) {
+            continue;
+        }
+
+
+        const referencia =
+            String(referenciaBruta).trim();
+
+
+        // =================================================
+        // 1. É ID DO JOGADOR
+        // =================================================
+
+        if (jogadores[referencia]) {
+
+            return {
+
+                id: referencia,
+
+                jogador:
+                    jogadores[referencia]
+
+            };
+
+        }
+
+
+        // =================================================
+        // 2. É SLUG DO LINK
+        // =================================================
+
+        if (indicacoes[referencia]) {
+
+            const dados =
+                indicacoes[referencia];
+
+
+            const id =
+                dados?.jogadorId;
+
+
+            if (
+                id &&
+                jogadores[id]
+            ) {
+
+                return {
+
+                    id: id,
+
+                    jogador:
+                        jogadores[id]
+
+                };
+
+            }
+
+        }
+
+
+        // =================================================
+        // 3. PROCURA PELO NOME / SLUG / CÓDIGO
+        // =================================================
+
+        const refNormalizada =
+            normalizarTexto(
+                referencia
+            );
+
+
+        for (
+            const [id, indicador]
+            of Object.entries(jogadores)
+        ) {
+
+            if (!indicador) {
+                continue;
+            }
+
+
+            const nome =
+                normalizarTexto(
+                    indicador.nome
+                );
+
+
+            const codigo =
+                normalizarTexto(
+                    indicador.codigo
+                );
+
+
+            const codigoIndicacao =
+                normalizarTexto(
+                    indicador.codigoIndicacao
+                );
+
+
+            const slug =
+                normalizarTexto(
+                    indicador.slug
+                );
+
+
+            if (
+                refNormalizada === nome ||
+                refNormalizada === codigo ||
+                refNormalizada === codigoIndicacao ||
+                refNormalizada === slug
+            ) {
+
+                return {
+
+                    id: id,
+
+                    jogador:
+                        indicador
+
+                };
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+
+}
+/* =================================================
+   PROCESSAR
+================================================= */
 
 function processarIndicacoes(){
 
     listaIndicacoes = [];
 
 
-    const entradas =
-        Object.entries(jogadores);
-
-
     for(
         const [id,jogador]
-        of entradas
+        of Object.entries(jogadores)
     ){
 
         if(!jogador){
@@ -1233,13 +1565,14 @@ function processarIndicacoes(){
         }
 
 
-        const indicadoPor =
-            jogador.indicadoPor;
+        const indicador =
+            encontrarIndicador(
+                jogador
+            );
 
 
         if(
-            indicadoPor &&
-            jogadores[indicadoPor]
+            indicador
         ){
 
             listaIndicacoes.push({
@@ -1251,10 +1584,10 @@ function processarIndicacoes(){
                     jogador,
 
                 indicadorId:
-                    indicadoPor,
+                    indicador.id,
 
                 indicador:
-                    jogadores[indicadoPor]
+                    indicador.jogador
 
             });
 
@@ -1265,14 +1598,17 @@ function processarIndicacoes(){
 }
 
 
-/* ==========================================
-   ATUALIZAR CARDS
-========================================== */
+
+/* =================================================
+   CARDS
+================================================= */
 
 function atualizarCards(){
 
     const totalJogadores =
-        Object.keys(jogadores).length;
+        Object.keys(
+            jogadores
+        ).length;
 
 
     const totalIndicados =
@@ -1314,9 +1650,10 @@ function atualizarCards(){
 }
 
 
-/* ==========================================
+
+/* =================================================
    TABELA
-========================================== */
+================================================= */
 
 function renderizarTabela(){
 
@@ -1327,7 +1664,9 @@ function renderizarTabela(){
 
 
     let lista =
-        Object.entries(jogadores);
+        Object.entries(
+            jogadores
+        );
 
 
     if(busca){
@@ -1348,24 +1687,42 @@ function renderizarTabela(){
                         );
 
 
-                    const indicadoPor =
+                    const indicador =
+                        encontrarIndicador(
+                            jogador
+                        );
+
+
+                    const nomeIndicador =
                         normalizarTexto(
-                            jogadores[
-                                jogador?.indicadoPor
-                            ]?.nome
+                            indicador?.jogador?.nome
                         );
 
 
                     return (
 
-                        nome.includes(busca) ||
+                        nome.includes(
+                            busca
+                        )
 
-                        codigo.includes(busca) ||
+                        ||
+
+                        codigo.includes(
+                            busca
+                        )
+
+                        ||
 
                         id.toLowerCase()
-                            .includes(busca) ||
+                            .includes(
+                                busca
+                            )
 
-                        indicadoPor.includes(busca)
+                        ||
+
+                        nomeIndicador.includes(
+                            busca
+                        )
 
                     );
 
@@ -1398,18 +1755,18 @@ function renderizarTabela(){
 
 
     tabelaJogadores.innerHTML =
+
         lista.map(
             ([id,jogador]) => {
 
                 const indicador =
-                    jogadores[
-                        jogador?.indicadoPor
-                    ];
+                    encontrarIndicador(
+                        jogador
+                    );
 
 
                 const nomeIndicador =
-                    indicador?.nome ||
-                    "-";
+                    indicador?.jogador?.nome;
 
 
                 const status =
@@ -1418,61 +1775,101 @@ function renderizarTabela(){
                     "ativo";
 
 
-                const statusNormalizado =
+                const bloqueado =
                     normalizarTexto(
                         status
-                    );
-
-
-                const classeStatus =
-                    statusNormalizado.includes(
+                    ).includes(
                         "bloque"
-                    )
-                    ? "bloqueado"
-                    : "ativo";
+                    );
 
 
                 return `
 
-                    <tr>
+                <tr>
 
-                        <td>
-                            <b>
-                                ${escaparHTML(
-                                    jogador?.nome ||
-                                    "Sem nome"
-                                )}
-                            </b>
-                        </td>
+                    <td>
 
-                        <td>
+                        <b>
                             ${escaparHTML(
-                                nomeIndicador
+                                jogador?.nome ||
+                                "Sem nome"
                             )}
-                        </td>
+                        </b>
 
-                        <td>
-                            ${escaparHTML(
-                                jogador?.codigo ||
-                                "-"
-                            )}
-                        </td>
+                    </td>
 
-                        <td>
-                            ${escaparHTML(id)}
-                        </td>
 
-                        <td>
+                    <td>
 
+                        ${
+                            nomeIndicador
+
+                            ?
+
+                            `
                             <span
-                                class="status ${classeStatus}"
+                                class="indicador"
                             >
-                                ${escaparHTML(status)}
+                                👤
+                                ${escaparHTML(
+                                    nomeIndicador
+                                )}
                             </span>
+                            `
 
-                        </td>
+                            :
 
-                    </tr>
+                            `
+                            <span
+                                class="indicador-vazio"
+                            >
+                                Não informado
+                            </span>
+                            `
+
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${escaparHTML(
+                            jogador?.codigo ||
+                            "-"
+                        )}
+
+                    </td>
+
+
+                    <td>
+
+                        ${escaparHTML(
+                            id
+                        )}
+
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status ${
+                                bloqueado
+                                ? "bloqueado"
+                                : "ativo"
+                            }"
+                        >
+
+                            ${escaparHTML(
+                                status
+                            )}
+
+                        </span>
+
+                    </td>
+
+                </tr>
 
                 `;
 
@@ -1482,19 +1879,10 @@ function renderizarTabela(){
 }
 
 
-/* ==========================================
-   BUSCA
-========================================== */
 
-campoBusca.addEventListener(
-    "input",
-    renderizarTabela
-);
-
-
-/* ==========================================
+/* =================================================
    RANKING
-========================================== */
+================================================= */
 
 function renderizarRanking(){
 
@@ -1508,7 +1896,9 @@ function renderizarRanking(){
                 item.indicadorId;
 
 
-            if(!contagem[id]){
+            if(
+                !contagem[id]
+            ){
 
                 contagem[id] = {
 
@@ -1516,7 +1906,8 @@ function renderizarRanking(){
                         item.indicador?.nome ||
                         "Sem nome",
 
-                    total:0
+                    total:
+                        0
 
                 };
 
@@ -1529,28 +1920,32 @@ function renderizarRanking(){
     );
 
 
-    const rankingArray =
-        Object.entries(contagem)
-            .map(
-                ([id,dados]) => ({
+    const lista =
+        Object.entries(
+            contagem
+        )
 
-                    id:id,
+        .map(
+            ([id,dados]) => ({
 
-                    nome:
-                        dados.nome,
+                id:id,
 
-                    total:
-                        dados.total
+                nome:
+                    dados.nome,
 
-                })
-            )
-            .sort(
-                (a,b) =>
-                    b.total - a.total
-            );
+                total:
+                    dados.total
+
+            })
+        )
+
+        .sort(
+            (a,b) =>
+                b.total - a.total
+        );
 
 
-    if(!rankingArray.length){
+    if(!lista.length){
 
         ranking.innerHTML = `
 
@@ -1568,22 +1963,26 @@ function renderizarRanking(){
 
 
     ranking.innerHTML =
-        rankingArray.map(
+
+        lista.map(
             (item,index) => `
 
-                <div class="ranking-item">
+                <div
+                    class="ranking-item"
+                >
 
                     <div>
 
                         <span
                             style="
                                 display:inline-block;
-                                width:30px;
+                                width:35px;
                                 font-weight:bold;
                             "
                         >
                             ${index + 1}º
                         </span>
+
 
                         <span
                             class="ranking-nome"
@@ -1599,12 +1998,15 @@ function renderizarRanking(){
                     <span
                         class="ranking-total"
                     >
+
                         ${item.total}
+
                         ${
                             item.total === 1
                             ? " indicação"
                             : " indicações"
                         }
+
                     </span>
 
                 </div>
@@ -1617,4 +2019,5 @@ function renderizarRanking(){
 </script>
 
 </body>
+
 </html>
