@@ -3697,14 +3697,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 200;
+const LIMITE_API_DIA = 450;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 180;
+const LIMITE_SEGURANCA = 430;
 
 const TEMPO_ATUALIZACAO_COTACAO =
     10 * 60 * 1000; // 10 minutos
@@ -10138,50 +10138,40 @@ function mostrarDia(dia) {
    MOSTRAR DIA
 ========================================================= */
 
-window.mostrarDia =
-function(dia) {
+window.mostrarDia = function(dia) {
 
     document
-        .querySelectorAll(
-            ".conteudo-dia"
-        )
-        .forEach(
-            el => {
+        .querySelectorAll(".conteudo-dia")
+        .forEach(function(el) {
 
-                el.style.display =
-                    "none";
+            el.style.display = "none";
 
-            }
-        );
+        });
 
 
     const container =
         document.getElementById(
-            "conteudo-" +
-            dia
+            "conteudo-" + dia
         );
 
 
     if (!container) return;
 
 
-    container.style.display =
-        "block";
+    container.style.display = "block";
 
+
+    /* =====================================================
+       MARCAR BOTÃO ATIVO
+    ===================================================== */
 
     document
-        .querySelectorAll(
-            ".dias button"
-        )
-        .forEach(
-            btn => {
+        .querySelectorAll(".dias button")
+        .forEach(function(btn) {
 
-                btn.classList.remove(
-                    "ativo"
-                );
+            btn.classList.remove("ativo");
 
-            }
-        );
+        });
 
 
     const botao =
@@ -10192,19 +10182,47 @@ function(dia) {
 
     if (botao) {
 
-        botao.classList.add(
-            "ativo"
-        );
+        botao.classList.add("ativo");
 
     }
 
 
-    diaAtual =
-        dia;
+    diaAtual = dia;
 
 };
 
 
+/* =====================================================
+   BOTÃO DO DIA → SALVA + REFRESH
+===================================================== */
+
+document
+    .querySelectorAll(".dias button[data-dia]")
+    .forEach(function(btn) {
+
+        btn.addEventListener("click", function() {
+
+            const dia =
+                this.getAttribute("data-dia");
+
+            console.log(
+                "📅 Dia selecionado:",
+                dia
+            );
+
+
+            localStorage.setItem(
+                "diaSelecionado",
+                dia
+            );
+
+
+            /* REFRESH DA PÁGINA */
+            window.location.reload();
+
+        });
+
+    });
 /* =========================================================
    CACHE API LOCAL
 ========================================================= */
