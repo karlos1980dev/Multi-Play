@@ -3697,14 +3697,14 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 650;
+const LIMITE_API_DIA = 1050;
 
 /*
    Limite que o sistema realmente vai utilizar.
    Mesmo que a API permita 100, o MULTI PLAY.BET
    nunca passará de 250 chamadas por dia.
 */
-const LIMITE_SEGURANCA = 630;
+const LIMITE_SEGURANCA = 1030;
 
 const TEMPO_ATUALIZACAO_COTACAO =
     10 * 60 * 1000; // 10 minutos
@@ -8641,7 +8641,15 @@ async function buscarJogosComCache(dataAPI) {
 
     }
 
-
+console.log(
+    "🕐 HORÁRIOS RECEBIDOS:",
+    jogosAPI.map(jogo => ({
+        id: jogo.fixtureId || jogo.idAPI,
+        hora: jogo.hora,
+        dataHora: jogo.dataHora,
+        fixtureDate: jogo?.fixture?.date
+    }))
+);
     console.log(
         "⚽ JOGOS DA API:",
         dataAPI,
@@ -11282,59 +11290,102 @@ async function carregarJogos(dataSelecionada = null) {
                SOMENTE HOJE
             ============================================= */
 
-            const hojeAPI =
+            /* =============================================
+   OCULTAR JOGOS QUE JÁ COMEÇARAM
+   SOMENTE PARA HOJE
+============================================= */
+
+const hojeAPI =
     String(
         obterDataDia(0)
     ).trim();
 
 
-// =========================================================
-// HOJE
-// Mostrar somente jogos que ainda não começaram.
-// =========================================================
-
 if (dataDoCarregamento === hojeAPI) {
 
-    const agora = Date.now();
+    const agora = new Date();
 
-    jogosDia = jogosDia.filter(function(jogo) {
+    jogosDia =
+        jogosDia.filter(function(jogo) {
 
-        const info = obterDataHoraBrasil(jogo);
+            if (!jogo) {
+                return false;
+            }
 
-        if (!info) {
-            console.warn(
-                "⚠️ Sem data/hora:",
-                jogo
+            const info =
+                obterDataHoraBrasil(jogo);
+
+            if (!info) {
+                console.warn(
+                    "⚠️ Não foi possível obter data/hora:",
+                    jogo
+                );
+
+                return false;
+            }
+
+            /*
+             * Monta a hora do jogo como horário
+             * local do Brasil.
+             */
+
+            const partesData =
+                String(info.data || "")
+                    .split("-")
+                    .map(Number);
+
+            const partesHora =
+                String(info.hora || "00:00")
+                    .substring(0, 5)
+                    .split(":")
+                    .map(Number);
+
+            if (
+                partesData.length !== 3 ||
+                partesHora.length !== 2 ||
+                partesData.some(
+                    numero => !Number.isFinite(numero)
+                ) ||
+                partesHora.some(
+                    numero => !Number.isFinite(numero)
+                )
+            ) {
+
+                return false;
+            }
+
+            const inicioJogo =
+                new Date(
+                    partesData[0],
+                    partesData[1] - 1,
+                    partesData[2],
+                    partesHora[0],
+                    partesHora[1],
+                    0,
+                    0
+                );
+
+            const mostrar =
+                inicioJogo.getTime() >
+                agora.getTime();
+
+            console.log(
+                "🕐 JOGO:",
+                jogo.timeA,
+                "x",
+                jogo.timeB,
+                "|",
+                info.data,
+                info.hora,
+                "|",
+                mostrar
+                    ? "✅ FUTURO"
+                    : "❌ JÁ COMEÇOU"
             );
-            return false;
-        }
 
-        const timestamp =
-            Number(info.timestamp);
+            return mostrar;
 
-        if (!Number.isFinite(timestamp)) {
-            console.warn(
-                "⚠️ Timestamp inválido:",
-                jogo,
-                info
-            );
-            return false;
-        }
-
-        const mostrar =
-            timestamp > agora;
-
-        console.log(
-            `🕐 ${jogo.timeA} x ${jogo.timeB} | ` +
-            `${info.hora} | ` +
-            `timestamp=${timestamp} | ` +
-            `agora=${agora} | ` +
-            `${mostrar ? "✅ MOSTRA" : "❌ OCULTA"}`
-        );
-
-        return mostrar;
-
-    });
+        });
 
 }
             /* =============================================
@@ -11467,19 +11518,7 @@ if (dataDoCarregamento === hojeAPI) {
                 );
 
 
-            console.log(
-                "🆔 FIXTURES VÁLIDOS:",
-                jogosDia.map(
-                    function(jogo) {
-
-                        return String(
-                            jogo.fixtureId ||
-                            ""
-                        );
-
-                    }
-                )
-            );
+            
 
 
             /* =============================================
@@ -12003,9 +12042,9 @@ async function verificarHorarioDosDias() {
     const agora = new Date();
 
     const passou2030 =
-        agora.getHours() > 20 ||
+        agora.getHours() > 22 ||
         (
-            agora.getHours() === 20 &&
+            agora.getHours() === 22 &&
             agora.getMinutes() >= 30
         );
 
@@ -12013,7 +12052,7 @@ async function verificarHorarioDosDias() {
         return;
     }
 
-    console.log("🌙 20:30 DETECTADO");
+    console.log("🌙 22:30 DETECTADO");
 
     // ==========================================
     // ESCONDE O BOTÃO DE HOJE
