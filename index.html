@@ -3697,14 +3697,9 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 1050;
+const LIMITE_API_DIA = 5000;
 
-/*
-   Limite que o sistema realmente vai utilizar.
-   Mesmo que a API permita 100, o MULTI PLAY.BET
-   nunca passará de 250 chamadas por dia.
-*/
-const LIMITE_SEGURANCA = 1030;
+const LIMITE_SEGURANCA = 4800;
 
 const TEMPO_ATUALIZACAO_COTACAO =
     10 * 60 * 1000; // 10 minutos
@@ -4031,7 +4026,6 @@ async function reservarChamadaAPI() {
 
 }
 
-
 /* =========================================================
    CONSULTAR QUANTAS CHAMADAS RESTAM
 ========================================================= */
@@ -4178,7 +4172,7 @@ let saldoJogador = 0;
    CONFIGURAÇÕES
 ========================================================= */
 
-const LIMITE = 2000;
+const LIMITE = 1000;
 
 const chavePix =
     "a779076a-56a2-46ad-bb37-f0de8b87e2be";
@@ -4253,9 +4247,7 @@ function obterElemento(id) {
 
 }
 
-/* =========================================================
-   CONSULTAR API COM LIMITE CENTRAL
-========================================================= */
+
 
 /* =========================================================
    CONSULTAR API COM LIMITE CENTRAL
@@ -8082,36 +8074,172 @@ function montarMenu() {
 
 function obterDataRealDoJogo(jogo) {
 
-    if (!jogo) return "";
+    if (!jogo) {
+        return "";
+    }
+
+    // Se já temos data e hora brasileiras salvas,
+    // elas têm prioridade.
+    if (
+        jogo.data &&
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            String(jogo.data).trim()
+        )
+    ) {
+        return String(jogo.data).trim();
+    }
 
     const fontes = [
+
         jogo?.fixture?.date,
+
         jogo?.dataOriginalAPI,
+
         jogo?.dataHoraAPI,
-        jogo?.dataHora
+
+        jogo?.dataHora,
+
+        jogo?.dataAPI
+
     ];
 
-    for (const fonte of fontes) {
+    for (
+        const fonte of fontes
+    ) {
 
         const texto =
-            String(fonte || "").trim();
+            String(
+                fonte || ""
+            ).trim();
 
-        if (texto.length >= 10) {
+        if (!texto) {
+            continue;
+        }
 
-            const data =
-                texto.substring(0, 10);
+        // Se já for uma data brasileira YYYY-MM-DD
+        if (
+            /^\d{4}-\d{2}-\d{2}$/.test(
+                texto
+            )
+        ) {
+
+            return texto;
+
+        }
+
+        // Se for ISO da API
+        if (
+            texto.includes("T")
+        ) {
+
+            const convertido =
+                converterDataHoraBrasil(
+                    texto
+                );
 
             if (
-                /^\d{4}-\d{2}-\d{2}$/
-                    .test(data)
+                convertido &&
+                convertido.data
             ) {
-                return data;
+
+                return convertido.data;
+
             }
+
         }
+
     }
 
     return "";
+
 }
+function converterDataHoraBrasil(
+    dataISO
+) {
+
+    if (!dataISO) {
+        return null;
+    }
+
+    const data =
+        new Date(
+            dataISO
+        );
+
+    if (
+        Number.isNaN(
+            data.getTime()
+        )
+    ) {
+
+        return null;
+
+    }
+
+    const partes =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+
+                timeZone:
+                    "America/Sao_Paulo",
+
+                year:
+                    "numeric",
+
+                month:
+                    "2-digit",
+
+                day:
+                    "2-digit",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                hour12:
+                    false
+
+            }
+        ).formatToParts(
+            data
+        );
+
+    const valores = {};
+
+    partes.forEach(
+        function(parte) {
+
+            if (
+                parte.type !==
+                "literal"
+            ) {
+
+                valores[
+                    parte.type
+                ] =
+                    parte.value;
+
+            }
+
+        }
+    );
+
+    return {
+
+        data:
+            `${valores.year}-${valores.month}-${valores.day}`,
+
+        hora:
+            `${valores.hour}:${valores.minute}`
+
+    };
+
+}
+
+
 
 
 /* =========================================================
@@ -8269,83 +8397,329 @@ function normalizarJogoData(jogo) {
    VERIFICAR DATA
 ========================================================= */
 
-function jogoPertenceAData(jogo, dataSolicitada) {
+function jogoPertenceAData(
+    jogo,
+    dataSolicitada
+) {
 
-    if (!jogo || !dataSolicitada) {
+    if (!jogo) {
         return false;
     }
-
-
-    const fixtureId =
-        jogo.fixtureId ||
-        jogo.idAPI ||
-        jogo.fixture?.id ||
-        "";
-
-
-    const dataJogo =
-        String(
-            jogo.data ||
-            jogo.date ||
-            jogo.fixture?.date ||
-            ""
-        ).substring(0, 10);
-
 
     const dataBusca =
         String(
-            dataSolicitada
-        ).substring(0, 10);
-
-
-    if (!dataJogo) {
-
-        console.warn(
-            "⚠️ JOGO SEM DATA:",
-            fixtureId
+            dataSolicitada || ""
+        )
+        .trim()
+        .substring(
+            0,
+            10
         );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            dataBusca
+        )
+    ) {
 
         return false;
 
     }
 
-
-    if (dataJogo !== dataBusca) {
-
-        console.warn(
-            "🛑 JOGO IGNORADO - DATA DIFERENTE",
-            "\nData solicitada:",
-            dataBusca,
-            "\nData do jogo:",
-            dataJogo,
-            "\nFixture:",
-            fixtureId
+    const info =
+        obterDataHoraBrasil(
+            jogo
         );
+
+    if (
+        !info.data
+    ) {
 
         return false;
 
     }
 
-
-    return true;
+    return (
+        info.data ===
+        dataBusca
+    );
 
 }
 
-/* =========================================================
-   BUSCAR JOGOS COM CACHE
-   - PRIMEIRO FIREBASE
-   - DEPOIS CACHE ANTIGO
-   - DEPOIS LOCALSTORAGE
-   - API SOMENTE SE REALMENTE NÃO EXISTIR DADO
-========================================================= */
+async function buscarJogosAPI(
+    data
+) {
 
-/* =========================================================
-   BUSCAR JOGOS COM CACHE
-   - TODOS OS HORÁRIOS DO DIA
-   - NÃO LIMITA EM 20:30
-   - NÃO USA LIMITE DE 6 JOGOS
-   - CACHE SÓ É ACEITO SE FOR DO DIA CORRETO
-========================================================= */
+    const dataBusca =
+        String(
+            data || ""
+        )
+        .trim()
+        .substring(
+            0,
+            10
+        );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            dataBusca
+        )
+    ) {
+
+        console.error(
+            "❌ Data inválida para API:",
+            data
+        );
+
+        return [];
+
+    }
+
+    const url =
+        `${API_BASE}/fixtures` +
+        `?date=${encodeURIComponent(dataBusca)}` +
+        `&timezone=${encodeURIComponent(API_TIMEZONE)}`;
+
+    console.log(
+        "🌐 BUSCANDO TODOS OS JOGOS:",
+        dataBusca
+    );
+
+    try {
+
+        const resposta =
+            await fetch(
+                url,
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "x-apisports-key":
+                            API_KEY
+
+                    }
+
+                }
+            );
+
+        if (
+            !resposta.ok
+        ) {
+
+            throw new Error(
+                `HTTP ${resposta.status}`
+            );
+
+        }
+
+        const dados =
+            await resposta.json();
+
+        if (
+            !dados ||
+            !Array.isArray(
+                dados.response
+            )
+        ) {
+
+            console.warn(
+                "⚠️ API não retornou lista:",
+                dados
+            );
+
+            return [];
+
+        }
+
+        console.log(
+            `✅ API retornou ${dados.response.length} jogos para ${dataBusca}`
+        );
+
+        return dados.response;
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao buscar jogos:",
+            erro
+        );
+
+        return [];
+
+    }
+
+}
+
+function transformarJogoAPI(
+    item
+) {
+
+    if (
+        !item ||
+        !item.fixture
+    ) {
+
+        return null;
+
+    }
+
+    const fixture =
+        item.fixture || {};
+
+    const league =
+        item.league || {};
+
+    const teams =
+        item.teams || {};
+
+    const goals =
+        item.goals || {};
+
+    const convertido =
+        converterDataHoraBrasil(
+            fixture.date
+        );
+
+    if (
+        !convertido
+    ) {
+
+        return null;
+
+    }
+
+    const fixtureId =
+        String(
+            fixture.id || ""
+        ).trim();
+
+    if (!fixtureId) {
+
+        return null;
+
+    }
+
+    const timeA =
+        teams.home?.name ||
+        "Time A";
+
+    const timeB =
+        teams.away?.name ||
+        "Time B";
+
+    const logoA =
+        teams.home?.logo ||
+        "";
+
+    const logoB =
+        teams.away?.logo ||
+        "";
+
+    const status =
+        String(
+            fixture.status?.short ||
+            "NS"
+        )
+        .trim()
+        .toUpperCase();
+
+    return {
+
+        fixtureId:
+            fixtureId,
+
+        apiFixtureId:
+            fixtureId,
+
+        idAPI:
+            fixtureId,
+
+        timeA:
+            timeA,
+
+        timeB:
+            timeB,
+
+        casa:
+            timeA,
+
+        fora:
+            timeB,
+
+        imagemA:
+            logoA,
+
+        imagemB:
+            logoB,
+
+        casaImagem:
+            logoA,
+
+        foraImagem:
+            logoB,
+
+        campeonato:
+            league.name ||
+            "Futebol",
+
+        pais:
+            league.country ||
+            "",
+
+        ligaId:
+            Number(
+                league.id || 0
+            ),
+
+        temporada:
+            league.season ||
+            "",
+
+        data:
+            convertido.data,
+
+        hora:
+            convertido.hora,
+
+        dataAPI:
+            fixture.date,
+
+        dataOriginalAPI:
+            fixture.date,
+
+        status:
+            status,
+
+        statusLong:
+            fixture.status?.long ||
+            "",
+
+        finalizado:
+            STATUS_FINAL.includes(
+                status
+            ),
+
+        placarA:
+            goals.home ?? null,
+
+        placarB:
+            goals.away ?? null,
+
+        nome:
+            `${timeA} × ${timeB}`,
+
+        confronto:
+            `${timeA} × ${timeB}`,
+
+        cotacoes:
+            null
+
+    };
+
+}
 
 /* =========================================================
    BUSCAR JOGOS COM CACHE FIREBASE
@@ -8361,35 +8735,122 @@ function jogoPertenceAData(jogo, dataSolicitada) {
 
 async function buscarJogosComCache(dataAPI) {
 
-    dataAPI =
-        String(dataAPI || "")
-            .trim()
-            .substring(0, 10);
+    dataAPI = String(dataAPI || "")
+        .trim()
+        .substring(0, 10);
 
-
-    if (!dataAPI) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataAPI)) {
+        console.error("❌ DATA INVÁLIDA:", dataAPI);
         return [];
     }
 
+    console.log("🔎 BUSCANDO JOGOS DO DIA:", dataAPI);
 
-    console.log(
-        "🔎 Buscando jogos:",
-        dataAPI
-    );
+    /* =====================================================
+       CONVERTER DATA DA API PARA HORÁRIO DO BRASIL
+    ===================================================== */
+
+    function converterDataHoraBrasilInterno(dataISO) {
+
+        if (!dataISO) return null;
+
+        const data = new Date(dataISO);
+
+        if (Number.isNaN(data.getTime())) {
+            console.warn("⚠️ Data inválida:", dataISO);
+            return null;
+        }
+
+        const partes = new Intl.DateTimeFormat("en-CA", {
+            timeZone: "America/Sao_Paulo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        }).formatToParts(data);
+
+        const valores = {};
+
+        partes.forEach(parte => {
+            if (parte.type !== "literal") {
+                valores[parte.type] = parte.value;
+            }
+        });
+
+        return {
+            data:
+                `${valores.year}-${valores.month}-${valores.day}`,
+
+            hora:
+                `${valores.hour}:${valores.minute}`
+        };
+    }
 
 
     /* =====================================================
-       1. FIREBASE
+       NORMALIZAR UM JOGO
+    ===================================================== */
+
+    function prepararJogo(jogo) {
+
+        if (!jogo) return null;
+
+        /*
+         * IMPORTANTE:
+         * Sempre pegar primeiro a data original da API.
+         */
+        const dataOriginal =
+            jogo?.fixture?.date ||
+            jogo?.dataOriginalAPI ||
+            jogo?.dataAPI ||
+            jogo?.dataHoraAPI ||
+            jogo?.dataHora ||
+            "";
+
+        const convertido =
+            converterDataHoraBrasilInterno(dataOriginal);
+
+        if (convertido) {
+
+            jogo.data = convertido.data;
+            jogo.hora = convertido.hora;
+
+            jogo.dataOriginalAPI = dataOriginal;
+            jogo.dataHoraAPI = dataOriginal;
+
+        }
+
+        return jogo;
+    }
+
+
+    /* =====================================================
+       FILTRAR PELO DIA CORRETO
+    ===================================================== */
+
+    function pertenceAoDia(jogo) {
+
+        if (!jogo) return false;
+
+        const dataJogo =
+            String(jogo.data || "")
+                .trim()
+                .substring(0, 10);
+
+        return dataJogo === dataAPI;
+    }
+
+
+    /* =====================================================
+       1. TENTAR CACHE FIREBASE
     ===================================================== */
 
     try {
 
         const cache =
-            await lerCacheFirebase(
-                "jogos",
-                dataAPI
-            );
-
+            await lerCacheFirebase("jogos", dataAPI);
 
         if (
             cache &&
@@ -8397,19 +8858,10 @@ async function buscarJogosComCache(dataAPI) {
         ) {
 
             const atualizadoEm =
-                Number(
-                    cache.atualizadoEm || 0
-                );
-
+                Number(cache.atualizadoEm || 0);
 
             const idadeCache =
-                Date.now() -
-                atualizadoEm;
-
-
-            /* =============================================
-               CACHE VÁLIDO
-            ============================================= */
+                Date.now() - atualizadoEm;
 
             if (
                 atualizadoEm > 0 &&
@@ -8419,115 +8871,76 @@ async function buscarJogosComCache(dataAPI) {
 
                 const jogosFirebase =
                     cache.dados
-                        .map(normalizarJogoData)
-                        .filter(jogo => {
-
-                            if (!jogo) {
-                                return false;
-                            }
-
-                            return jogoPertenceAoDia(
-                                jogo,
-                                dataAPI
-                            );
-
-                        });
-
+                        .map(prepararJogo)
+                        .filter(pertenceAoDia);
 
                 console.log(
-                    "💾 CACHE FIREBASE VÁLIDO:",
+                    "💾 CACHE FIREBASE:",
                     dataAPI,
                     jogosFirebase.length,
                     "jogos"
                 );
 
-
                 console.log(
-                    "⏱️ Cache:",
-                    Math.round(
-                        idadeCache / 60000
-                    ),
-                    "minutos"
+                    "🕐 HORÁRIOS CACHE:",
+                    jogosFirebase.map(j => ({
+                        id:
+                            j.fixtureId ||
+                            j.apiFixtureId ||
+                            j.idAPI,
+
+                        data: j.data,
+                        hora: j.hora
+                    }))
                 );
 
-
-                /*
-                 * IMPORTANTE:
-                 *
-                 * NÃO CONSULTA API.
-                 *
-                 * O Firebase já possui os jogos.
-                 */
-
                 return jogosFirebase;
-
             }
-
 
             console.log(
                 "♻️ CACHE EXPIRADO:",
                 dataAPI
             );
-
         }
 
-        else {
-
-            console.log(
-                "📭 CACHE NÃO ENCONTRADO:",
-                dataAPI
-            );
-
-        }
-
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.warn(
-            "⚠️ Erro lendo cache Firebase:",
+            "⚠️ ERRO AO LER CACHE:",
             erro
         );
-
     }
 
 
     /* =====================================================
-       2. CACHE NÃO EXISTE OU EXPIROU
-          → CONSULTAR API
+       2. CONSULTAR API
     ===================================================== */
 
     console.log(
-        "🌐 CACHE INVÁLIDO → CONSULTANDO API:",
+        "🌐 CONSULTANDO API:",
         dataAPI
     );
 
-
     let respostaAPI = null;
-
 
     try {
 
         respostaAPI =
             await consultarAPI(
-                `/fixtures?date=${dataAPI}`
+                `/fixtures?date=${encodeURIComponent(dataAPI)}` +
+                `&timezone=${encodeURIComponent("America/Sao_Paulo")}`
             );
 
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.error(
-            "❌ Erro consultando API:",
+            "❌ ERRO API:",
             erro
         );
 
-
         /*
-         * Se a API falhar, tenta usar
-         * o cache antigo como emergência.
+         * Tenta usar cache antigo mesmo expirado.
          */
-
         try {
 
             const cacheAntigo =
@@ -8536,199 +8949,216 @@ async function buscarJogosComCache(dataAPI) {
                     dataAPI
                 );
 
-
             if (
                 cacheAntigo &&
-                Array.isArray(
-                    cacheAntigo.dados
-                )
+                Array.isArray(cacheAntigo.dados)
             ) {
 
                 const jogosAntigos =
                     cacheAntigo.dados
-                        .map(normalizarJogoData)
-                        .filter(jogo => {
+                        .map(prepararJogo)
+                        .filter(pertenceAoDia);
 
-                            if (!jogo) {
-                                return false;
-                            }
+                console.log(
+                    "♻️ USANDO CACHE ANTIGO:",
+                    jogosAntigos.length
+                );
 
-                            return jogoPertenceAoDia(
-                                jogo,
-                                dataAPI
-                            );
-
-                        });
-
-
-                if (
-                    jogosAntigos.length > 0
-                ) {
-
-                    console.warn(
-                        "⚠️ API falhou → usando cache antigo:",
-                        dataAPI
-                    );
-
-
-                    return jogosAntigos;
-
-                }
-
+                return jogosAntigos;
             }
 
-        }
-
-        catch (erroCache) {
+        } catch (erroCache) {
 
             console.warn(
-                "⚠️ Erro recuperando cache antigo:",
+                "⚠️ Não conseguiu usar cache antigo:",
                 erroCache
             );
-
         }
 
-
         return [];
-
     }
 
 
     /* =====================================================
-       3. PROCESSAR RESPOSTA DA API
+       3. VALIDAR RESPOSTA
     ===================================================== */
 
-    let jogosAPI = [];
-
-
     if (
-        respostaAPI &&
-        Array.isArray(
-            respostaAPI.response
-        )
+        !respostaAPI ||
+        !Array.isArray(respostaAPI.response)
     ) {
 
-        console.log(
-            "🌐 TOTAL BRUTO DA API:",
-            dataAPI,
-            respostaAPI.response.length
+        console.error(
+            "❌ RESPOSTA API INVÁLIDA:",
+            respostaAPI
         );
 
-
-        jogosAPI =
-            respostaAPI.response
-                .map(normalizarJogoData)
-                .filter(jogo => {
-
-                    if (!jogo) {
-                        return false;
-                    }
-
-
-                    /*
-                     * SOMENTE DATA.
-                     *
-                     * NENHUM LIMITE DE 20:00.
-                     * NENHUM LIMITE DE HORÁRIO.
-                     */
-
-                    return jogoPertenceAoDia(
-                        jogo,
-                        dataAPI
-                    );
-
-                });
-
+        return [];
     }
 
-console.log(
-    "🕐 HORÁRIOS RECEBIDOS:",
-    jogosAPI.map(jogo => ({
-        id: jogo.fixtureId || jogo.idAPI,
-        hora: jogo.hora,
-        dataHora: jogo.dataHora,
-        fixtureDate: jogo?.fixture?.date
-    }))
-);
+
     console.log(
-        "⚽ JOGOS DA API:",
-        dataAPI,
-        jogosAPI.length
+        "🌐 TOTAL BRUTO API:",
+        respostaAPI.response.length
     );
 
 
     /* =====================================================
-       4. SALVAR NO FIREBASE
+       4. NORMALIZAR TODOS OS JOGOS
     ===================================================== */
 
-    if (
-        jogosAPI.length > 0
-    ) {
+    const jogosConvertidos = [];
+
+    respostaAPI.response.forEach(item => {
+
+        try {
+
+            let jogo =
+                normalizarJogoData(item);
+
+            if (!jogo) {
+                return;
+            }
+
+            jogo =
+                prepararJogo(jogo);
+
+            if (!jogo) {
+                return;
+            }
+
+            /*
+             * NÃO FILTRAR PELO fixture.date ORIGINAL.
+             * Aqui já estamos usando a data convertida
+             * para São Paulo.
+             */
+
+            if (pertenceAoDia(jogo)) {
+
+                jogosConvertidos.push(jogo);
+
+            }
+
+        } catch (erro) {
+
+            console.warn(
+                "⚠️ Erro normalizando jogo:",
+                erro,
+                item
+            );
+        }
+    });
+
+
+    /* =====================================================
+       5. MOSTRAR HORÁRIOS RECEBIDOS
+    ===================================================== */
+
+    console.log(
+        "🕐 JOGOS CONVERTIDOS:",
+        jogosConvertidos.map(jogo => ({
+            id:
+                jogo.fixtureId ||
+                jogo.apiFixtureId ||
+                jogo.idAPI,
+
+            casa:
+                jogo.timeA ||
+                jogo.casa,
+
+            fora:
+                jogo.timeB ||
+                jogo.fora,
+
+            data:
+                jogo.data,
+
+            hora:
+                jogo.hora,
+
+            original:
+                jogo.dataOriginalAPI
+        }))
+    );
+
+
+    /* =====================================================
+       6. ORDENAR POR HORÁRIO
+    ===================================================== */
+
+    jogosConvertidos.sort((a, b) => {
+
+        const horaA =
+            String(a.hora || "99:99");
+
+        const horaB =
+            String(b.hora || "99:99");
+
+        return horaA.localeCompare(horaB);
+    });
+
+
+    console.log(
+        "⚽ JOGOS DO DIA:",
+        dataAPI,
+        jogosConvertidos.length
+    );
+
+
+    /* =====================================================
+       7. SALVAR CACHE
+    ===================================================== */
+
+    if (jogosConvertidos.length > 0) {
 
         try {
 
             await salvarCacheFirebase(
                 "jogos",
                 dataAPI,
-                jogosAPI
+                jogosConvertidos
             );
-
 
             console.log(
-                "💾 API → FIREBASE:",
+                "💾 CACHE SALVO:",
                 dataAPI,
-                jogosAPI.length,
-                "jogos"
+                jogosConvertidos.length
             );
 
-        }
-
-        catch (erro) {
+        } catch (erro) {
 
             console.warn(
-                "⚠️ Erro salvando cache Firebase:",
+                "⚠️ Erro salvando cache:",
                 erro
             );
-
         }
-
     }
 
 
     /* =====================================================
-       5. SALVAR LOCALSTORAGE
-       
-       Apenas como cache local auxiliar.
+       8. LOCAL STORAGE
     ===================================================== */
 
     try {
 
         localStorage.setItem(
             `jogos_${dataAPI}`,
-            JSON.stringify(
-                jogosAPI
-            )
+            JSON.stringify(jogosConvertidos)
         );
 
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.warn(
-            "⚠️ Erro salvando localStorage:",
+            "⚠️ Erro localStorage:",
             erro
         );
-
     }
 
 
-    /* =====================================================
-       6. RETORNAR JOGOS
-    ===================================================== */
-
-    return jogosAPI;
-
+    return jogosConvertidos;
 }
+
+
 /* =========================================================
    BUSCAR JOGOS DOS PRÓXIMOS DIAS
 ========================================================= */
@@ -10380,88 +10810,148 @@ function salvarCacheAPI(
 
 }
 
-function obterDataHoraBrasil(jogo) {
+function obterDataHoraBrasil(
+    jogo
+) {
 
-    if (!jogo) return null;
+    if (!jogo) {
+
+        return {
+
+            data: "",
+
+            hora: "",
+
+            timestamp: NaN
+
+        };
+
+    }
+
+    /*
+    =====================================================
+    1. DATA + HORA JÁ CONVERTIDAS
+    =====================================================
+    */
+
+    const data =
+        String(
+            jogo.data || ""
+        ).trim();
+
+    const hora =
+        String(
+            jogo.hora || ""
+        ).trim();
+
+    if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            data
+        ) &&
+        /^\d{2}:\d{2}/.test(
+            hora
+        )
+    ) {
+
+        const timestamp =
+            new Date(
+                `${data}T${hora}:00-03:00`
+            ).getTime();
+
+        return {
+
+            data:
+                data,
+
+            hora:
+                hora.substring(
+                    0,
+                    5
+                ),
+
+            timestamp:
+                timestamp
+
+        };
+
+    }
+
+
+    /*
+    =====================================================
+    2. DATA ORIGINAL DA API
+    =====================================================
+    */
 
     const fontes = [
+
         jogo?.fixture?.date,
+
         jogo?.dataOriginalAPI,
+
         jogo?.dataHoraAPI,
-        jogo?.dataHora
+
+        jogo?.dataHora,
+
+        jogo?.dataAPI
+
     ];
 
-    let valor = "";
+    for (
+        const fonte of fontes
+    ) {
 
-    for (const fonte of fontes) {
+        const texto =
+            String(
+                fonte || ""
+            ).trim();
 
-        const texto = String(fonte || "").trim();
-
-        if (texto) {
-            valor = texto;
-            break;
+        if (!texto) {
+            continue;
         }
+
+        const convertido =
+            converterDataHoraBrasil(
+                texto
+            );
+
+        if (
+            convertido
+        ) {
+
+            const timestamp =
+                new Date(
+                    `${convertido.data}T${convertido.hora}:00-03:00`
+                ).getTime();
+
+            return {
+
+                data:
+                    convertido.data,
+
+                hora:
+                    convertido.hora,
+
+                timestamp:
+                    timestamp
+
+            };
+
+        }
+
     }
-
-    if (!valor) return null;
-
-    const data = new Date(valor);
-
-    if (Number.isNaN(data.getTime())) {
-        return null;
-    }
-
-    const partesData =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "America/Sao_Paulo",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        ).formatToParts(data);
-
-    const mapaData = {};
-
-    partesData.forEach(parte => {
-        mapaData[parte.type] = parte.value;
-    });
-
-
-    const partesHora =
-        new Intl.DateTimeFormat(
-            "pt-BR",
-            {
-                timeZone: "America/Sao_Paulo",
-                hour: "2-digit",
-                minute: "2-digit",
-                hourCycle: "h23"
-            }
-        ).formatToParts(data);
-
-    const mapaHora = {};
-
-    partesHora.forEach(parte => {
-        mapaHora[parte.type] = parte.value;
-    });
-
 
     return {
 
-        data:
-            `${mapaData.year}-${mapaData.month}-${mapaData.day}`,
+        data: "",
 
-        hora:
-            `${mapaHora.hour}:${mapaHora.minute}`,
+        hora: "",
 
-        timestamp:
-            data.getTime()
+        timestamp: NaN
 
     };
+
 }
-
-
 /* =====================================================
    DATA REAL DO JOGO
 ===================================================== */
@@ -10751,7 +11241,7 @@ jogos.sort(function(a, b) {
 
         <div>
             ⏰  Os jogos de hoje ficam disponíveis
-            até <strong>20:30</strong>.
+            até <strong>23:50</strong>.
         </div>   </div>
 
         <div>
@@ -10859,39 +11349,40 @@ function jogoPertenceAoDia(jogo, dataSolicitada) {
         return false;
     }
 
-    const fixtureId =
-        String(
-            jogo.fixtureId ||
-            jogo.idAPI ||
-            jogo.fixture?.id ||
-            ""
-        ).trim();
-
     const dataBusca =
         String(dataSolicitada)
             .trim()
             .substring(0, 10);
 
-    if (!dataBusca) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dataBusca)) {
         return false;
     }
 
     /*
-     * PRIORIDADE:
-     * data original da API
+     * PRIMEIRA PRIORIDADE:
+     * Data original da API.
+     *
+     * Isso corrige jogos como:
+     *
+     * 2026-10-05T00:00:00+00:00
+     *
+     * que no Brasil são:
+     *
+     * 2026-10-04 21:00
      */
+
     const dataOriginal =
-        jogo.fixture?.date ||
-        jogo.dataOriginalAPI ||
-        jogo.dateOriginalAPI ||
+        jogo?.fixture?.date ||
+        jogo?.dataOriginalAPI ||
+        jogo?.dateOriginalAPI ||
+        jogo?.dataAPI ||
         "";
 
     if (dataOriginal) {
 
-        const dataObj =
-            new Date(dataOriginal);
+        const dataObj = new Date(dataOriginal);
 
-        if (!isNaN(dataObj.getTime())) {
+        if (!Number.isNaN(dataObj.getTime())) {
 
             const partes =
                 new Intl.DateTimeFormat(
@@ -10904,28 +11395,18 @@ function jogoPertenceAoDia(jogo, dataSolicitada) {
                     }
                 ).formatToParts(dataObj);
 
-            let ano = "";
-            let mes = "";
-            let dia = "";
+            const valores = {};
 
             partes.forEach(function(parte) {
 
-                if (parte.type === "year") {
-                    ano = parte.value;
-                }
-
-                if (parte.type === "month") {
-                    mes = parte.value;
-                }
-
-                if (parte.type === "day") {
-                    dia = parte.value;
+                if (parte.type !== "literal") {
+                    valores[parte.type] = parte.value;
                 }
 
             });
 
             const dataBrasil =
-                `${ano}-${mes}-${dia}`;
+                `${valores.year}-${valores.month}-${valores.day}`;
 
             return dataBrasil === dataBusca;
         }
@@ -10934,6 +11415,7 @@ function jogoPertenceAoDia(jogo, dataSolicitada) {
     /*
      * FALLBACK
      */
+
     const dataJogo =
         String(
             jogo.data ||
@@ -10945,42 +11427,106 @@ function jogoPertenceAoDia(jogo, dataSolicitada) {
 
     return dataJogo === dataBusca;
 }
+
+
 function jogoAindaNaoComecou(jogo) {
 
-    if (!jogo) return false;
-
-    const agora = new Date();
-
-    let dataJogo = String(
-        jogo.data ||
-        jogo.date ||
-        ""
-    ).trim();
-
-    let horaJogo = String(
-        jogo.hora ||
-        jogo.time ||
-        "00:00"
-    ).trim();
-
-    if (!dataJogo) return false;
-
-    // API normalmente retorna YYYY-MM-DD
-    if (dataJogo.includes("T")) {
-        dataJogo = dataJogo.split("T")[0];
-    }
-
-    // Aceita HH:mm:ss
-    horaJogo = horaJogo.substring(0, 5);
-
-    if (!/^\d{2}:\d{2}$/.test(horaJogo)) {
+    if (!jogo) {
         return false;
     }
 
     /*
-       Criamos a data como horário local do Brasil.
-       Não coloque Z aqui.
-    */
+     * PRIMEIRA PRIORIDADE:
+     * usar a data original da API.
+     *
+     * Assim não dependemos do timezone
+     * do celular/navegador.
+     */
+
+    const dataOriginal =
+        jogo?.fixture?.date ||
+        jogo?.dataOriginalAPI ||
+        jogo?.dateOriginalAPI ||
+        jogo?.dataAPI ||
+        "";
+
+    if (dataOriginal) {
+
+        const dataObj =
+            new Date(dataOriginal);
+
+        if (!Number.isNaN(dataObj.getTime())) {
+
+            const agoraBrasil =
+                new Date(
+                    new Date().toLocaleString(
+                        "en-US",
+                        {
+                            timeZone:
+                                "America/Sao_Paulo"
+                        }
+                    )
+                );
+
+            const jogoBrasil =
+                new Date(
+                    dataObj.toLocaleString(
+                        "en-US",
+                        {
+                            timeZone:
+                                "America/Sao_Paulo"
+                        }
+                    )
+                );
+
+            return jogoBrasil.getTime() >
+                   agoraBrasil.getTime();
+        }
+    }
+
+    /*
+     * FALLBACK:
+     * usa data + hora já normalizadas.
+     */
+
+    const dataJogo =
+        String(
+            jogo.data ||
+            jogo.date ||
+            ""
+        )
+        .trim()
+        .substring(0, 10);
+
+    let horaJogo =
+        String(
+            jogo.hora ||
+            jogo.time ||
+            ""
+        )
+        .trim();
+
+    horaJogo =
+        horaJogo.substring(0, 5);
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(dataJogo) ||
+        !/^\d{2}:\d{2}$/.test(horaJogo)
+    ) {
+        return false;
+    }
+
+    const agoraBrasil =
+        new Date(
+            new Date().toLocaleString(
+                "en-US",
+                {
+                    timeZone:
+                        "America/Sao_Paulo"
+                }
+            )
+        );
+
     const [ano, mes, dia] =
         dataJogo.split("-").map(Number);
 
@@ -10998,8 +11544,119 @@ function jogoAindaNaoComecou(jogo) {
             0
         );
 
-    return inicioJogo.getTime() > agora.getTime();
+    return inicioJogo.getTime() >
+           agoraBrasil.getTime();
 }
+/* =====================================================
+   HORÁRIO ATUAL DO BRASIL
+   ===================================================== */
+
+function obterMinutosAgoraBrasil() {
+
+    try {
+
+        const agora = new Date();
+
+        const partes =
+            new Intl.DateTimeFormat("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            })
+            .formatToParts(agora);
+
+        let hora =
+            Number(
+                partes.find(
+                    p => p.type === "hour"
+                )?.value
+            );
+
+        const minuto =
+            Number(
+                partes.find(
+                    p => p.type === "minute"
+                )?.value
+            );
+
+        /*
+         * Alguns navegadores podem retornar
+         * 24:00 em determinados casos.
+         */
+        if (hora === 24) {
+            hora = 0;
+        }
+
+        if (
+            !Number.isFinite(hora) ||
+            !Number.isFinite(minuto)
+        ) {
+            console.error(
+                "❌ Não foi possível obter horário do Brasil"
+            );
+
+            return null;
+        }
+
+        return (
+            hora * 60 +
+            minuto
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "❌ Erro ao obter horário do Brasil:",
+            erro
+        );
+
+        return null;
+    }
+}
+
+/* =====================================================
+   CONVERTER HH:MM PARA MINUTOS
+   ===================================================== */
+
+function obterMinutosHora(hora) {
+
+    const texto =
+        String(hora || "")
+            .trim()
+            .substring(0, 5);
+
+    const partes =
+        texto
+            .split(":")
+            .map(Number);
+
+    if (
+        partes.length !== 2 ||
+        !Number.isFinite(partes[0]) ||
+        !Number.isFinite(partes[1])
+    ) {
+        return null;
+    }
+
+    const horas = partes[0];
+    const minutos = partes[1];
+
+    if (
+        horas < 0 ||
+        horas > 23 ||
+        minutos < 0 ||
+        minutos > 59
+    ) {
+        return null;
+    }
+
+    return (
+        horas * 60 +
+        minutos
+    );
+}
+
 /* =========================================================
    CARREGAR JOGOS
 ========================================================= */
@@ -11290,9 +11947,11 @@ async function carregarJogos(dataSelecionada = null) {
                SOMENTE HOJE
             ============================================= */
 
-            /* =============================================
+            /* /* =============================================
    OCULTAR JOGOS QUE JÁ COMEÇARAM
    SOMENTE PARA HOJE
+
+   USA HORÁRIO DE BRASÍLIA
 ============================================= */
 
 const hojeAPI =
@@ -11303,90 +11962,86 @@ const hojeAPI =
 
 if (dataDoCarregamento === hojeAPI) {
 
-    const agora = new Date();
+    const agoraMinutos =
+        obterMinutosAgoraBrasil();
 
-    jogosDia =
-        jogosDia.filter(function(jogo) {
+    if (agoraMinutos === null) {
 
-            if (!jogo) {
-                return false;
-            }
+        console.error(
+            "❌ Não foi possível obter o horário atual do Brasil"
+        );
 
-            const info =
-                obterDataHoraBrasil(jogo);
+    } else {
 
-            if (!info) {
-                console.warn(
-                    "⚠️ Não foi possível obter data/hora:",
-                    jogo
+        jogosDia =
+            jogosDia.filter(function(jogo) {
+
+                if (!jogo) {
+                    return false;
+                }
+
+                const info =
+                    obterDataHoraBrasil(jogo);
+
+                if (!info) {
+                    return false;
+                }
+
+                const horaJogo =
+                    String(
+                        info.hora || ""
+                    )
+                    .trim()
+                    .substring(0, 5);
+
+                const minutosJogo =
+                    obterMinutosHora(
+                        horaJogo
+                    );
+
+                if (
+                    minutosJogo === null
+                ) {
+                    console.warn(
+                        "⚠️ Horário inválido:",
+                        jogo
+                    );
+
+                    return false;
+                }
+
+                const mostrar =
+                    minutosJogo >
+                    agoraMinutos;
+
+                console.log(
+                    "🕐 JOGO:",
+                    jogo.timeA,
+                    "x",
+                    jogo.timeB,
+                    "|",
+                    horaJogo,
+                    "| Agora Brasil:",
+                    Math.floor(
+                        agoraMinutos / 60
+                    )
+                    .toString()
+                    .padStart(2, "0"),
+                    ":",
+                    (
+                        agoraMinutos % 60
+                    )
+                    .toString()
+                    .padStart(2, "0"),
+                    "|",
+                    mostrar
+                        ? "✅ FUTURO"
+                        : "❌ JÁ COMEÇOU"
                 );
 
-                return false;
-            }
-
-            /*
-             * Monta a hora do jogo como horário
-             * local do Brasil.
-             */
-
-            const partesData =
-                String(info.data || "")
-                    .split("-")
-                    .map(Number);
-
-            const partesHora =
-                String(info.hora || "00:00")
-                    .substring(0, 5)
-                    .split(":")
-                    .map(Number);
-
-            if (
-                partesData.length !== 3 ||
-                partesHora.length !== 2 ||
-                partesData.some(
-                    numero => !Number.isFinite(numero)
-                ) ||
-                partesHora.some(
-                    numero => !Number.isFinite(numero)
-                )
-            ) {
-
-                return false;
-            }
-
-            const inicioJogo =
-                new Date(
-                    partesData[0],
-                    partesData[1] - 1,
-                    partesData[2],
-                    partesHora[0],
-                    partesHora[1],
-                    0,
-                    0
-                );
-
-            const mostrar =
-                inicioJogo.getTime() >
-                agora.getTime();
-
-            console.log(
-                "🕐 JOGO:",
-                jogo.timeA,
-                "x",
-                jogo.timeB,
-                "|",
-                info.data,
-                info.hora,
-                "|",
-                mostrar
-                    ? "✅ FUTURO"
-                    : "❌ JÁ COMEÇOU"
-            );
-
-            return mostrar;
-
-        });
-
+                return mostrar;
+            });
+    }
 }
             /* =============================================
                REMOVER DUPLICADOS
@@ -11634,38 +12289,98 @@ function prioridadeCampeonato(jogo) {
 
 jogosDia.sort(function(a, b) {
 
+    /* ============================================
+       1. PRIORIDADE DO CAMPEONATO
+    ============================================ */
+
     const prioridadeA =
-        prioridadeCampeonato(a);
+        Number(prioridadeCampeonato(a));
 
     const prioridadeB =
-        prioridadeCampeonato(b);
+        Number(prioridadeCampeonato(b));
 
-    /* PRIMEIRO PELO CAMPEONATO */
     if (prioridadeA !== prioridadeB) {
         return prioridadeA - prioridadeB;
     }
 
-    /* DENTRO DA MESMA PRIORIDADE,
-       ORDENA PELO HORÁRIO */
+
+    /* ============================================
+       2. DATA E HORÁRIO DO JOGO
+    ============================================ */
+
     const dataA =
         obterDataHoraBrasil(a);
 
     const dataB =
         obterDataHoraBrasil(b);
 
-    const timestampA =
-        dataA && Number.isFinite(Number(dataA.timestamp))
-            ? Number(dataA.timestamp)
-            : Infinity;
 
-    const timestampB =
-        dataB && Number.isFinite(Number(dataB.timestamp))
-            ? Number(dataB.timestamp)
-            : Infinity;
+    /* ============================================
+       3. CONVERTE DATA + HORA PARA NÚMERO
+    ============================================ */
 
-    return timestampA - timestampB;
+    function valorDataHora(info) {
+
+        if (!info) {
+            return Infinity;
+        }
+
+        const data =
+            String(info.data || "")
+                .trim();
+
+        const hora =
+            String(info.hora || "00:00")
+                .trim()
+                .substring(0, 5);
+
+
+        /*
+         * YYYY-MM-DD
+         */
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+            return Infinity;
+        }
+
+
+        /*
+         * HH:MM
+         */
+        if (!/^\d{2}:\d{2}$/.test(hora)) {
+            return Infinity;
+        }
+
+
+        /*
+         * Exemplo:
+         *
+         * 2026-10-04 19:00
+         *
+         * vira:
+         *
+         * 202610041900
+         */
+
+        return Number(
+            data.replace(/-/g, "") +
+            hora.replace(":", "")
+        );
+    }
+
+
+    const valorA =
+        valorDataHora(dataA);
+
+    const valorB =
+        valorDataHora(dataB);
+
+
+    /* ============================================
+       4. ORDENA PELO HORÁRIO
+    ============================================ */
+
+    return valorA - valorB;
 });
-
             /* =============================================
                NORMALIZAR PARA SALVAR
             ============================================= */
@@ -12042,17 +12757,17 @@ async function verificarHorarioDosDias() {
     const agora = new Date();
 
     const passou2030 =
-        agora.getHours() > 22 ||
+        agora.getHours() > 23 ||
         (
-            agora.getHours() === 22 &&
-            agora.getMinutes() >= 30
+            agora.getHours() === 23 &&
+            agora.getMinutes() >= 50
         );
 
     if (!passou2030) {
         return;
     }
 
-    console.log("🌙 22:30 DETECTADO");
+    console.log("🌙 22:50 DETECTADO");
 
     // ==========================================
     // ESCONDE O BOTÃO DE HOJE
