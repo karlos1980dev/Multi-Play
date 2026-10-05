@@ -3697,9 +3697,9 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 100;
+const LIMITE_API_DIA = 300;
 
-const LIMITE_SEGURANCA = 80;
+const LIMITE_SEGURANCA = 280;
 
 const TEMPO_ATUALIZACAO_COTACAO =
     10 * 60 * 1000; // 10 minutos
@@ -8912,96 +8912,162 @@ async function buscarJogosComCache(dataAPI) {
     }
 
 
-    /* =====================================================
-       2. CONSULTAR API
-    ===================================================== */
+/* =====================================================
+   2. CONSULTAR API
+===================================================== */
 
-    console.log(
-        "🌐 CONSULTANDO API:",
+console.log(
+    "🌐 CONSULTANDO API:",
+    dataAPI
+);
+
+let respostaAPI = null;
+
+try {
+
+    respostaAPI =
+        await consultarAPI(
+            `/fixtures?date=${encodeURIComponent(dataAPI)}` +
+            `&timezone=${encodeURIComponent("America/Sao_Paulo")}`
+        );
+
+} catch (erro) {
+
+    console.error(
+        "❌ ERRO API:",
+        erro
+    );
+
+}
+
+
+/* =====================================================
+   3. API NÃO DISPONÍVEL
+===================================================== */
+
+if (
+    respostaAPI === null
+) {
+
+    console.warn(
+        "⚠️ API não disponível para:",
         dataAPI
     );
 
-    let respostaAPI = null;
+    /*
+     * IMPORTANTE:
+     *
+     * Não considerar como "nenhum jogo".
+     *
+     * A API pode ter sido bloqueada pelo
+     * LIMITE_SEGURANCA.
+     *
+     * Primeiro tenta cache antigo.
+     */
 
     try {
 
-        respostaAPI =
-            await consultarAPI(
-                `/fixtures?date=${encodeURIComponent(dataAPI)}` +
-                `&timezone=${encodeURIComponent("America/Sao_Paulo")}`
+        const cacheAntigo =
+            await lerCacheFirebase(
+                "jogos",
+                dataAPI
             );
 
-    } catch (erro) {
 
-        console.error(
-            "❌ ERRO API:",
-            erro
-        );
+        if (
+            cacheAntigo &&
+            Array.isArray(
+                cacheAntigo.dados
+            )
+        ) {
 
-        /*
-         * Tenta usar cache antigo mesmo expirado.
-         */
-        try {
+            const jogosAntigos =
+                cacheAntigo.dados
+                    .map(prepararJogo)
+                    .filter(pertenceAoDia);
 
-            const cacheAntigo =
-                await lerCacheFirebase(
-                    "jogos",
-                    dataAPI
-                );
 
-            if (
-                cacheAntigo &&
-                Array.isArray(cacheAntigo.dados)
-            ) {
-
-                const jogosAntigos =
-                    cacheAntigo.dados
-                        .map(prepararJogo)
-                        .filter(pertenceAoDia);
-
-                console.log(
-                    "♻️ USANDO CACHE ANTIGO:",
-                    jogosAntigos.length
-                );
-
-                return jogosAntigos;
-            }
-
-        } catch (erroCache) {
-
-            console.warn(
-                "⚠️ Não conseguiu usar cache antigo:",
-                erroCache
+            console.log(
+                "♻️ USANDO CACHE ANTIGO:",
+                dataAPI,
+                jogosAntigos.length,
+                "jogos"
             );
+
+
+            return jogosAntigos;
+
         }
 
-        return [];
     }
 
+    catch (erroCache) {
 
-    /* =====================================================
-       3. VALIDAR RESPOSTA
-    ===================================================== */
-
-    if (
-        !respostaAPI ||
-        !Array.isArray(respostaAPI.response)
-    ) {
-
-        console.error(
-            "❌ RESPOSTA API INVÁLIDA:",
-            respostaAPI
+        console.warn(
+            "⚠️ ERRO AO LER CACHE ANTIGO:",
+            erroCache
         );
 
-        return [];
     }
 
 
-    console.log(
-        "🌐 TOTAL BRUTO API:",
-        respostaAPI.response.length
+    /*
+     * Não existe cache.
+     *
+     * Retorna array vazio para não quebrar
+     * a interface.
+     */
+
+    return [];
+
+}
+
+
+/* =====================================================
+   4. VALIDAR RESPOSTA DA API
+===================================================== */
+
+if (
+    typeof respostaAPI !== "object"
+) {
+
+    console.error(
+        "❌ RESPOSTA API INVÁLIDA:",
+        respostaAPI
     );
 
+    return [];
+
+}
+
+
+if (
+    !Array.isArray(
+        respostaAPI.response
+    )
+) {
+
+    console.error(
+        "❌ CAMPO response INVÁLIDO:",
+        respostaAPI
+    );
+
+    return [];
+
+}
+
+
+/*
+ * Aqui a API respondeu corretamente.
+ *
+ * response vazio significa simplesmente:
+ * "nenhum jogo encontrado".
+ */
+
+console.log(
+    "🌐 TOTAL BRUTO API:",
+    respostaAPI.response.length
+);
 
     /* =====================================================
        4. NORMALIZAR TODOS OS JOGOS
@@ -9163,7 +9229,9 @@ async function buscarJogosComCache(dataAPI) {
    BUSCAR JOGOS DOS PRÓXIMOS DIAS
 ========================================================= */
 
-async function buscarJogosProximosDias(quantidadeDias = 7) {
+async function buscarJogosProximosDias(
+    quantidadeDias = 3
+) {
 
     const hoje = new Date();
 
