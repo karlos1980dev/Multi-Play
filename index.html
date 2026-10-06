@@ -3697,12 +3697,12 @@ function stringToByteArray$1(str) {
    CONTROLE CENTRAL DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 500;
+const LIMITE_API_DIA = 900;
 
-const LIMITE_SEGURANCA = 480;
+const LIMITE_SEGURANCA = 800;
 
 const TEMPO_ATUALIZACAO_COTACAO =
-    5 * 60 * 1000; // 10 minutos
+    10 * 60 * 1000; // 10 minutos
 
 
 /* =========================================================
@@ -3867,163 +3867,99 @@ function agruparJogosPorCompeticao(jogos) {
 
 async function reservarChamadaAPI() {
 
-    const controleRef =
-        ref(
-            db,
-            "cacheMultiPlay/controle"
-        );
-
+    const controleRef = ref(
+        db,
+        "cacheMultiPlay/controle"
+    );
 
     try {
 
-        const resultado =
-            await runTransaction(
-                controleRef,
-                controleAtual => {
+        const resultado = await runTransaction(
+            controleRef,
+            controleAtual => {
 
-                    const hoje =
-                        obterDataUTCControle();
+                const hoje = obterDataUTCControle();
 
+                const controle =
+                    controleAtual &&
+                    typeof controleAtual === "object"
+                        ? controleAtual
+                        : {};
 
-                    const controle =
-                        controleAtual &&
-                        typeof controleAtual === "object"
-                            ? controleAtual
-                            : {};
+                const dataControle =
+                    String(controle.dataControle || "");
 
+                let chamadas =
+                    Number(controle.chamadasHoje || 0);
 
-                    const dataControle =
-                        String(
-                            controle.dataControle || ""
-                        );
-
-
-                    let chamadas =
-                        Number(
-                            controle.chamadasHoje || 0
-                        );
-
-
-                    /*
-                     * NOVO DIA
-                     *
-                     * Reinicia o contador.
-                     */
-
-                    if (
-                        dataControle !== hoje
-                    ) {
-
-                        chamadas = 0;
-
-                    }
-
-
-                    /*
-                     * LIMITE DE SEGURANÇA
-                     */
-
-                    if (
-                        chamadas >=
-                        LIMITE_SEGURANCA
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    const novasChamadas =
-                        chamadas + 1;
-
-
-                    return {
-
-                        ...controle,
-
-                        dataControle:
-                            hoje,
-
-                        chamadasHoje:
-                            novasChamadas,
-
-                        chamadasRestantes:
-                            Math.max(
-                                0,
-                                LIMITE_SEGURANCA -
-                                novasChamadas
-                            ),
-
-                        limiteDiario:
-                            LIMITE_SEGURANCA,
-
-                        ultimaChamada:
-                            Date.now()
-
-                    };
-
+                // NOVO DIA
+                if (dataControle !== hoje) {
+                    chamadas = 0;
                 }
-            );
 
+                // LIMITE REAL DA API
+                if (chamadas >= LIMITE_API_DIA) {
+                    return;
+                }
 
-        /*
-         * Transaction abortada porque chegou ao limite.
-         */
+                const novasChamadas = chamadas + 1;
 
-        if (
-            !resultado.committed
-        ) {
+                return {
+
+                    ...controle,
+
+                    dataControle: hoje,
+
+                    chamadasHoje: novasChamadas,
+
+                    chamadasRestantes:
+                        Math.max(
+                            0,
+                            LIMITE_API_DIA - novasChamadas
+                        ),
+
+                    limiteDiario:
+                        LIMITE_API_DIA,
+
+                    ultimaChamada:
+                        Date.now()
+                };
+
+            }
+        );
+
+        if (!resultado.committed) {
 
             console.warn(
-                "🛑 LIMITE INTERNO DE 5000 CHAMADAS ATINGIDO."
+                "🛑 LIMITE DIÁRIO DA API ATINGIDO."
             );
-
 
             mostrarAvisoAtualizacao();
 
-
             return false;
-
         }
 
-
         const controleFinal =
-            resultado.snapshot.val() ||
-            {};
-
+            resultado.snapshot.val() || {};
 
         console.log(
             "📡 Chamada API autorizada:",
             controleFinal.chamadasHoje +
             "/" +
-            LIMITE_SEGURANCA
+            LIMITE_API_DIA
         );
-
 
         return true;
 
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.error(
             "❌ Erro controlando limite da API:",
             erro
         );
 
-
-        /*
-         * Em caso de erro no controle,
-         * NÃO fazemos a chamada.
-         *
-         * Isso evita gastar chamadas sem
-         * conseguir controlar o limite.
-         */
-
         return false;
-
     }
-
 }
 
 /* =========================================================
@@ -4034,72 +3970,45 @@ async function obterChamadasRestantesAPI() {
 
     try {
 
-        const snapshot =
-            await get(
-                ref(
-                    db,
-                    "cacheMultiPlay/controle"
-                )
-            );
+        const snapshot = await get(
+            ref(
+                db,
+                "cacheMultiPlay/controle"
+            )
+        );
 
-
-        if (
-            !snapshot.exists()
-        ) {
-
-            return LIMITE_SEGURANCA;
-
+        if (!snapshot.exists()) {
+            return LIMITE_API_DIA;
         }
 
+        const dados = snapshot.val() || {};
 
-        const dados =
-            snapshot.val() || {};
-
-
-        const hoje =
-            obterDataUTCControle();
-
+        const hoje = obterDataUTCControle();
 
         if (
-            String(
-                dados.dataControle || ""
-            ) !== hoje
+            String(dados.dataControle || "") !== hoje
         ) {
-
-            return LIMITE_SEGURANCA;
-
+            return LIMITE_API_DIA;
         }
-
 
         const chamadas =
-            Number(
-                dados.chamadasHoje || 0
-            );
-
+            Number(dados.chamadasHoje || 0);
 
         return Math.max(
             0,
-            LIMITE_SEGURANCA -
-            chamadas
+            LIMITE_API_DIA - chamadas
         );
 
-    }
-
-    catch (erro) {
+    } catch (erro) {
 
         console.warn(
             "⚠️ Não foi possível consultar o limite:",
             erro
         );
 
-
         return 0;
-
     }
-
 }
-
-
 /* =========================================================
    MOSTRAR STATUS DO LIMITE
 ========================================================= */
