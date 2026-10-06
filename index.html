@@ -3694,17 +3694,601 @@ function stringToByteArray$1(str) {
   return bytes;
 }
 /* =========================================================
-   CONTROLE CENTRAL DA API
+   CONFIGURAÇÃO DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 900;
+const LIMITE_API_DIA = 100;
 
-const LIMITE_SEGURANCA = 800;
+const LIMITE_MADRUGADA = 1000;
 
 const TEMPO_ATUALIZACAO_COTACAO =
-    10 * 60 * 1000; // 10 minutos
+    10 * 60 * 1000;
 
 
+/* =========================================================
+   ESTADO
+========================================================= */
+
+let modoMadrugadaAPI = false;
+
+let buscaMadrugadaExecutada = false;
+
+let dataBuscaMadrugada = "";
+
+
+/* =========================================================
+   DATA/HORA DE SÃO PAULO
+========================================================= */
+
+function obterDataHoraSaoPaulo() {
+
+    const agora = new Date();
+
+    const partes =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "America/Sao_Paulo",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hourCycle: "h23"
+            }
+        ).formatToParts(agora);
+
+
+    const valores = {};
+
+    partes.forEach(parte => {
+
+        if (
+            parte.type !== "literal"
+        ) {
+
+            valores[parte.type] =
+                parte.value;
+
+        }
+
+    });
+
+
+    return {
+
+        ano:
+            Number(valores.year),
+
+        mes:
+            Number(valores.month),
+
+        dia:
+            Number(valores.day),
+
+        hora:
+            Number(valores.hour),
+
+        minuto:
+            Number(valores.minute),
+
+        segundo:
+            Number(valores.second),
+
+        data:
+            `${valores.year}-${valores.month}-${valores.day}`
+
+    };
+
+}
+
+
+/* =========================================================
+   VERIFICAR SE É 00:01
+========================================================= */
+
+function estaNoHorarioMadrugada() {
+
+    const agora =
+        obterDataHoraSaoPaulo();
+
+
+    return (
+        agora.hora === 0 &&
+        agora.minuto === 1
+    );
+
+}
+
+
+/* =========================================================
+   LIMITE ATUAL
+========================================================= */
+
+function obterLimiteAtualAPI() {
+
+    if (
+        modoMadrugadaAPI
+    ) {
+
+        return LIMITE_MADRUGADA;
+
+    }
+
+
+    return LIMITE_API_DIA;
+
+}
+
+
+/* =========================================================
+   ATIVAR MADRUGADA
+========================================================= */
+
+function ativarModoMadrugada() {
+
+    modoMadrugadaAPI =
+        true;
+
+
+    console.log(
+        "🌙 MODO MADRUGADA ATIVADO"
+    );
+
+
+    console.log(
+        "🚀 LIMITE TEMPORÁRIO:",
+        LIMITE_MADRUGADA
+    );
+
+}
+
+
+/* =========================================================
+   DESATIVAR MADRUGADA
+========================================================= */
+
+function desativarModoMadrugada() {
+
+    modoMadrugadaAPI =
+        false;
+
+
+    console.log(
+        "🔒 MODO MADRUGADA ENCERRADO"
+    );
+
+
+    console.log(
+        "📊 LIMITE NORMAL:",
+        LIMITE_API_DIA
+    );
+
+}
+
+
+/* =========================================================
+   RESERVAR CHAMADA DA API
+========================================================= */
+
+async function reservarChamadaAPI() {
+
+    const controleRef =
+        ref(
+            db,
+            "cacheMultiPlay/controle"
+        );
+
+
+    try {
+
+        const resultado =
+            await runTransaction(
+                controleRef,
+                controleAtual => {
+
+                    const hoje =
+                        obterDataUTCControle();
+
+
+                    const controle =
+                        controleAtual &&
+                        typeof controleAtual === "object"
+                            ? controleAtual
+                            : {};
+
+
+                    const dataControle =
+                        String(
+                            controle.dataControle || ""
+                        );
+
+
+                    let chamadas =
+                        Number(
+                            controle.chamadasHoje || 0
+                        );
+
+
+                    /*
+                     * NOVO DIA
+                     */
+
+                    if (
+                        dataControle !== hoje
+                    ) {
+
+                        chamadas = 0;
+
+                    }
+
+
+                    /*
+                     * LIMITE ATUAL
+                     */
+
+                    const limite =
+                        obterLimiteAtualAPI();
+
+
+                    /*
+                     * BLOQUEIA AO ATINGIR O LIMITE
+                     */
+
+                    if (
+                        chamadas >= limite
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const novasChamadas =
+                        chamadas + 1;
+
+
+                    return {
+
+                        ...controle,
+
+                        dataControle:
+                            hoje,
+
+                        chamadasHoje:
+                            novasChamadas,
+
+                        chamadasRestantes:
+                            Math.max(
+                                0,
+                                limite -
+                                novasChamadas
+                            ),
+
+                        limiteDiario:
+                            limite,
+
+                        modoMadrugada:
+                            modoMadrugadaAPI,
+
+                        ultimaChamada:
+                            Date.now()
+
+                    };
+
+                }
+            );
+
+
+        /*
+         * TRANSACTION BLOQUEADA
+         */
+
+        if (
+            !resultado.committed
+        ) {
+
+            console.warn(
+                "🛑 LIMITE DA API ATINGIDO."
+            );
+
+
+            mostrarAvisoAtualizacao();
+
+
+            return false;
+
+        }
+
+
+        const controleFinal =
+            resultado.snapshot.val() ||
+            {};
+
+
+        console.log(
+            "📡 CHAMADA AUTORIZADA:",
+            controleFinal.chamadasHoje +
+            "/" +
+            controleFinal.limiteDiario
+        );
+
+
+        return true;
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "❌ ERRO CONTROLANDO LIMITE:",
+            erro
+        );
+
+
+        /*
+         * SE NÃO CONSEGUIR CONTROLAR,
+         * NÃO FAZ A CHAMADA.
+         */
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHAMADAS RESTANTES
+========================================================= */
+
+async function obterChamadasRestantesAPI() {
+
+    try {
+
+        const snapshot =
+            await get(
+                ref(
+                    db,
+                    "cacheMultiPlay/controle"
+                )
+            );
+
+
+        const limite =
+            obterLimiteAtualAPI();
+
+
+        if (
+            !snapshot.exists()
+        ) {
+
+            return limite;
+
+        }
+
+
+        const dados =
+            snapshot.val() ||
+            {};
+
+
+        const hoje =
+            obterDataUTCControle();
+
+
+        if (
+            String(
+                dados.dataControle || ""
+            ) !== hoje
+        ) {
+
+            return limite;
+
+        }
+
+
+        const chamadas =
+            Number(
+                dados.chamadasHoje || 0
+            );
+
+
+        return Math.max(
+            0,
+            limite -
+            chamadas
+        );
+
+    }
+
+    catch (erro) {
+
+        console.warn(
+            "⚠️ ERRO CONSULTANDO LIMITE:",
+            erro
+        );
+
+
+        return 0;
+
+    }
+
+}
+
+
+/* =========================================================
+   STATUS DA API
+========================================================= */
+
+async function mostrarStatusAPI() {
+
+    const restantes =
+        await obterChamadasRestantesAPI();
+
+
+    const limite =
+        obterLimiteAtualAPI();
+
+
+    console.log(
+        `📊 API: ${restantes}/${limite} restantes`
+    );
+
+
+    return restantes;
+
+}
+
+
+/* =========================================================
+   BUSCA ESPECIAL DAS 00:01
+========================================================= */
+
+async function executarBuscaMadrugada() {
+
+    const agora =
+        obterDataHoraSaoPaulo();
+
+
+    /*
+     * Só executa exatamente
+     * no minuto 00:01.
+     */
+
+    if (
+        agora.hora !== 0 ||
+        agora.minuto !== 1
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Impede repetir a busca
+     * no mesmo dia.
+     */
+
+    if (
+        dataBuscaMadrugada ===
+        agora.data
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Marca imediatamente.
+     */
+
+    dataBuscaMadrugada =
+        agora.data;
+
+    buscaMadrugadaExecutada =
+        true;
+
+
+    console.log(
+        "🌙 00:01 — INICIANDO BUSCA ESPECIAL"
+    );
+
+
+    /*
+     * ATIVA LIMITE 1000
+     */
+
+    ativarModoMadrugada();
+
+
+    try {
+
+        /*
+         * BUSCA JOGOS
+         */
+
+        console.log(
+            "⚽ BUSCANDO JOGOS..."
+        );
+
+
+        await buscarJogosDoDia();
+
+
+        /*
+         * BUSCA COTAÇÕES
+         */
+
+        console.log(
+            "💰 BUSCANDO COTAÇÕES..."
+        );
+
+
+        await carregarCotacoes();
+
+
+        console.log(
+            "✅ BUSCA DA MADRUGADA CONCLUÍDA"
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "❌ ERRO NA BUSCA DA MADRUGADA:",
+            erro
+        );
+
+    }
+
+    finally {
+
+        /*
+         * VOLTA PARA 100
+         */
+
+        desativarModoMadrugada();
+
+
+        console.log(
+            "🔒 LIMITE VOLTOU PARA 100"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   VERIFICAÇÃO AUTOMÁTICA
+========================================================= */
+
+setInterval(
+    async () => {
+
+        try {
+
+            await executarBuscaMadrugada();
+
+        }
+
+        catch (erro) {
+
+            console.error(
+                "❌ ERRO NO CICLO DA MADRUGADA:",
+                erro
+            );
+
+        }
+
+    },
+    30 * 1000
+);
 /* =========================================================
    DESCOBRIR DIA DA SEMANA PELA DATA REAL DO JOGO
 ========================================================= */
@@ -3861,172 +4445,9 @@ function agruparJogosPorCompeticao(jogos) {
 
 }
 
-/* =========================================================
-   RESERVAR UMA CHAMADA DA API
-========================================================= */
-
-async function reservarChamadaAPI() {
-
-    const controleRef = ref(
-        db,
-        "cacheMultiPlay/controle"
-    );
-
-    try {
-
-        const resultado = await runTransaction(
-            controleRef,
-            controleAtual => {
-
-                const hoje = obterDataUTCControle();
-
-                const controle =
-                    controleAtual &&
-                    typeof controleAtual === "object"
-                        ? controleAtual
-                        : {};
-
-                const dataControle =
-                    String(controle.dataControle || "");
-
-                let chamadas =
-                    Number(controle.chamadasHoje || 0);
-
-                // NOVO DIA
-                if (dataControle !== hoje) {
-                    chamadas = 0;
-                }
-
-                // LIMITE REAL DA API
-                if (chamadas >= LIMITE_API_DIA) {
-                    return;
-                }
-
-                const novasChamadas = chamadas + 1;
-
-                return {
-
-                    ...controle,
-
-                    dataControle: hoje,
-
-                    chamadasHoje: novasChamadas,
-
-                    chamadasRestantes:
-                        Math.max(
-                            0,
-                            LIMITE_API_DIA - novasChamadas
-                        ),
-
-                    limiteDiario:
-                        LIMITE_API_DIA,
-
-                    ultimaChamada:
-                        Date.now()
-                };
-
-            }
-        );
-
-        if (!resultado.committed) {
-
-            console.warn(
-                "🛑 LIMITE DIÁRIO DA API ATINGIDO."
-            );
-
-            mostrarAvisoAtualizacao();
-
-            return false;
-        }
-
-        const controleFinal =
-            resultado.snapshot.val() || {};
-
-        console.log(
-            "📡 Chamada API autorizada:",
-            controleFinal.chamadasHoje +
-            "/" +
-            LIMITE_API_DIA
-        );
-
-        return true;
-
-    } catch (erro) {
-
-        console.error(
-            "❌ Erro controlando limite da API:",
-            erro
-        );
-
-        return false;
-    }
-}
-
-/* =========================================================
-   CONSULTAR QUANTAS CHAMADAS RESTAM
-========================================================= */
-
-async function obterChamadasRestantesAPI() {
-
-    try {
-
-        const snapshot = await get(
-            ref(
-                db,
-                "cacheMultiPlay/controle"
-            )
-        );
-
-        if (!snapshot.exists()) {
-            return LIMITE_API_DIA;
-        }
-
-        const dados = snapshot.val() || {};
-
-        const hoje = obterDataUTCControle();
-
-        if (
-            String(dados.dataControle || "") !== hoje
-        ) {
-            return LIMITE_API_DIA;
-        }
-
-        const chamadas =
-            Number(dados.chamadasHoje || 0);
-
-        return Math.max(
-            0,
-            LIMITE_API_DIA - chamadas
-        );
-
-    } catch (erro) {
-
-        console.warn(
-            "⚠️ Não foi possível consultar o limite:",
-            erro
-        );
-
-        return 0;
-    }
-}
-/* =========================================================
-   MOSTRAR STATUS DO LIMITE
-========================================================= */
-
-async function mostrarStatusAPI() {
-
-    const restantes =
-        await obterChamadasRestantesAPI();
 
 
-    console.log(
-        `📊 API: ${restantes}/${LIMITE_SEGURANCA} chamadas restantes hoje`
-    );
 
-
-    return restantes;
-
-}
 /* =========================================================
    API FOOTBALL
 ========================================================= */
