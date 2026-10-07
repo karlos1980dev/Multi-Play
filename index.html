@@ -2779,8 +2779,38 @@ body.cor5 {
     transform: scale(.98);
 
 }
-</style>
+/* ========================================================= MODAL PIX - ABERTO Necessário porque o CSS original usa display:none !important ========================================================= */ #codigoModal.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 99999 !important; } 
+/* ========================================================= MODAL PIX ========================================================= */ #codigoModal.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 99999 !important; } /* VALOR DO PIX */ #valorPix { font-size: 22px; font-weight: bold; display: block; margin: 10px 0; } /* QR CODE */ #qrPix { display: flex; justify-content: center; align-items: center; margin: 15px auto; } 
+#codigoModal.ativo {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 99999 !important;
+}
 
+#codigoModal #codigoAposta {
+    margin: 10px 0;
+    padding: 12px;
+    background: #f1f1f1;
+    border-radius: 8px;
+    word-break: break-all;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+#codigoModal #qrPix {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px auto;
+}
+/* ========================================================= CORREÇÃO FINAL — MODAL DE SUCESSO DO SALDO ========================================================= */ #modalSucessoSaldo { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } #modalSucessoSaldo.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; z-index: 9999999 !important; } /* ========================================================= MODAL PIX — codigoModal ========================================================= */ #codigoModal { display: none !important; visibility: hidden; opacity: 0; pointer-events: none; } #codigoModal.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; z-index: 99999999 !important; } /* ========================================================= VALOR PIX ========================================================= */ #valorPix { display: block; margin: 10px 0; font-size: 22px; font-weight: bold; color: #008000; } /* ========================================================= PIX COPIA E COLA ========================================================= */ #codigoModal #codigoAposta { width: 100%; margin: 10px 0; padding: 12px; background: #f1f1f1; border: 1px solid #ccc; border-radius: 8px; word-break: break-all; font-size: 11px; line-height: 1.5; color: #000; text-align: left; max-height: 130px; overflow-y: auto; } /* ========================================================= QR CODE ========================================================= */ #codigoModal #qrPix { display: flex !important; justify-content: center; align-items: center; width: 100%; margin: 15px auto; } #codigoModal #qrPix img, #codigoModal #qrPix canvas { width: 220px !important; height: 220px !important; max-width: 100%; } /* ========================================================= BOTÃO COPIAR PIX ========================================================= */ #btnCopiar { background: #0072d3 !important; } 
+/* ========================================================= REMOVER MARCA AZUL APÓS CLICAR ========================================================= */ #btnFecharSucessoSaldo, #btnFecharSucessoSaldo:focus, #btnFecharSucessoSaldo:active, #btnFecharSucessoSaldo:focus-visible { outline: none !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent !important; } /* Remove destaque azul do toque no Android */ button { -webkit-tap-highlight-color: transparent; } /* Mantém o botão OK normal ao tocar */ #btnFecharSucessoSaldo:active { background: #111 !important; color: #fff !important; transform: none !important; } 
+
+/* ========================================================= CORREÇÃO DEFINITIVA DO MODAL PIX ========================================================= */ #codigoModal { display: none !important; position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; z-index: 99999999 !important; background: rgba(0, 0, 0, 0.75) !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; justify-content: center !important; align-items: center !important; } #codigoModal.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; } /* Caixa do PIX fica acima do fundo */ #codigoModal .codigo-conteudo { position: relative !important; z-index: 100000000 !important; pointer-events: auto !important; background: #fff !important; } /* Área dos botões */ #codigoModal .modal-botoes { position: relative !important; z-index: 100000001 !important; display: flex !important; gap: 7px !important; flex-wrap: wrap !important; pointer-events: auto !important; } /* Todos os botões */ #codigoModal .modal-botoes button { position: relative !important; z-index: 100000002 !important; pointer-events: auto !important; touch-action: manipulation !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent !important; outline: none !important; } /* Remove sobra azul ao tocar */ #codigoModal .modal-botoes button:focus, #codigoModal .modal-botoes button:focus-visible, #codigoModal .modal-botoes button:active { outline: none !important; box-shadow: none !important; } /* Cores dos botões */ #codigoModal #btnCopiar { background: #0072d3 !important; color: #fff !important; } #codigoModal #btnWhatsapp { background: #00a884 !important; color: #fff !important; } #codigoModal #btnFechar { background: #555 !important; color: #fff !important; } /* QR não pode bloquear os botões */ #codigoModal #qrPix { position: relative !important; z-index: 1 !important; pointer-events: none !important; } /* Código PIX também não bloqueia os botões */ #codigoModal #codigoAposta { position: relative !important; z-index: 1 !important; } /* Remove destaque azul padrão do Android */ #codigoModal, #codigoModal *, #codigoModal button { -webkit-tap-highlight-color: transparent !important; } 
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 
 
@@ -3697,598 +3727,10 @@ function stringToByteArray$1(str) {
    CONFIGURAÇÃO DA API
 ========================================================= */
 
-const LIMITE_API_DIA = 100;
+/* ========================================================= CONFIGURAÇÃO ========================================================= */ const LIMITE_API_DIA = 100; const LIMITE_MADRUGADA = 5000; const TEMPO_ATUALIZACAO_COTACAO = 10 * 60 * 1000; /* ========================================================= ESTADO ========================================================= */ let modoMadrugadaAPI = false; let buscaMadrugadaExecutada = false; let dataBuscaMadrugada = ""; /* ========================================================= DATA/HORA DE SÃO PAULO ========================================================= */ function obterDataHoraSaoPaulo() { const agora = new Date(); const partes = new Intl.DateTimeFormat( "en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" } ).formatToParts(agora); const valores = {}; partes.forEach(parte => { if ( parte.type !== "literal" ) { valores[parte.type] = parte.value; } }); return { ano: Number(valores.year), mes: Number(valores.month), dia: Number(valores.day), hora: Number(valores.hour), minuto: Number(valores.minute), segundo: Number(valores.second), data: `${valores.year}-${valores.month}-${valores.day}` }; } /* ========================================================= DATA DE CONTROLE IMPORTANTE: AGORA TUDO USA SÃO PAULO ========================================================= */ function obterDataControleAPI() { const agora = obterDataHoraSaoPaulo(); return agora.data; } /* ========================================================= VERIFICAR HORÁRIO DA MADRUGADA ========================================================= */ function estaNoHorarioMadrugada() { const agora = obterDataHoraSaoPaulo(); return ( agora.hora === 0 && agora.minuto === 1 ); } /* ========================================================= LIMITE ATUAL ========================================================= */ function obterLimiteAtualAPI() { if ( modoMadrugadaAPI ) { return LIMITE_MADRUGADA; } return LIMITE_API_DIA; } /* ========================================================= ATIVAR MODO MADRUGADA ========================================================= */ function ativarModoMadrugada() { modoMadrugadaAPI = true; console.log( "🌙 MODO MADRUGADA ATIVADO" ); console.log( "🚀 LIMITE TEMPORÁRIO:", LIMITE_MADRUGADA ); } /* ========================================================= DESATIVAR MODO MADRUGADA ========================================================= */ function desativarModoMadrugada() { modoMadrugadaAPI = false; console.log( "🔒 MODO MADRUGADA ENCERRADO" ); console.log( "📊 LIMITE NORMAL:", LIMITE_API_DIA ); } /* ========================================================= RESERVAR CHAMADA DA API ========================================================= */ async function reservarChamadaAPI() { const controleRef = ref( db, "cacheMultiPlay/controle" ); try { const resultado = await runTransaction( controleRef, controleAtual => { const hoje = obterDataControleAPI(); const controle = controleAtual && typeof controleAtual === "object" ? controleAtual : {}; const dataControle = String( controle.dataControle || "" ); let chamadas = Number( controle.chamadasHoje || 0 ); /* ===================================== NOVO DIA — ZERA CONTADOR ===================================== */ if ( dataControle !== hoje ) { chamadas = 0; } /* ===================================== LIMITE ATUAL ===================================== */ const limite = obterLimiteAtualAPI(); /* ===================================== BLOQUEIA SE ATINGIU LIMITE ===================================== */ if ( chamadas >= limite ) { return; } /* ===================================== RESERVA UMA CHAMADA ===================================== */ const novasChamadas = chamadas + 1; return { ...controle, dataControle: hoje, chamadasHoje: novasChamadas, chamadasRestantes: Math.max( 0, limite - novasChamadas ), limiteDiario: limite, modoMadrugada: modoMadrugadaAPI, ultimaChamada: Date.now() }; } ); /* ============================================= TRANSACTION NÃO COMMITOU ============================================= */ if ( !resultado.committed ) { console.warn( "🛑 LIMITE DA API ATINGIDO." ); mostrarAvisoAtualizacao(); return false; } const controleFinal = resultado.snapshot.val() || {}; console.log( "📡 CHAMADA AUTORIZADA:", `${controleFinal.chamadasHoje}/${controleFinal.limiteDiario}` ); return true; } catch (erro) { console.error( "❌ ERRO CONTROLANDO LIMITE:", erro ); /* * SEGURANÇA: * SE NÃO CONSEGUIR RESERVAR, * NÃO FAZ A CHAMADA. */ return false; } } /* ========================================================= OBTER CHAMADAS RESTANTES ========================================================= */ async function obterChamadasRestantesAPI() { try { const snapshot = await get( ref( db, "cacheMultiPlay/controle" ) ); const limite = obterLimiteAtualAPI(); /* ============================================= AINDA NÃO EXISTE CONTROLE ============================================= */ if ( !snapshot.exists() ) { return limite; } const dados = snapshot.val() || {}; /* ============================================= DATA DE SÃO PAULO ============================================= */ const hoje = obterDataControleAPI(); /* ============================================= É OUTRO DIA ============================================= */ if ( String( dados.dataControle || "" ) !== hoje ) { return limite; } const chamadas = Number( dados.chamadasHoje || 0 ); return Math.max( 0, limite - chamadas ); } catch (erro) { console.warn( "⚠️ ERRO CONSULTANDO LIMITE:", erro ); /* * POR SEGURANÇA, * NÃO LIBERA CHAMADAS. */ return 0; } } /* ========================================================= STATUS DA API ========================================================= */ async function mostrarStatusAPI() { const restantes = await obterChamadasRestantesAPI(); const limite = obterLimiteAtualAPI(); console.log( `📊 API: ${restantes}/${limite} restantes` ); return restantes; } /* ========================================================= BUSCA ESPECIAL DAS 00:01 ========================================================= */ async function executarBuscaMadrugada() { const agora = obterDataHoraSaoPaulo(); /* ============================================= SÓ EXECUTA ÀS 00:01 ============================================= */ if ( agora.hora !== 0 || agora.minuto !== 1 ) { return; } /* ============================================= NÃO REPETE NO MESMO DIA ============================================= */ if ( dataBuscaMadrugada === agora.data ) { return; } /* ============================================= MARCA IMEDIATAMENTE ============================================= */ dataBuscaMadrugada = agora.data; buscaMadrugadaExecutada = true; console.log( "🌙 00:01 — INICIANDO BUSCA ESPECIAL" ); /* ============================================= ATIVA 5000 ============================================= */ ativarModoMadrugada(); try { /* ========================================= BUSCAR JOGOS ========================================= */ console.log( "⚽ BUSCANDO JOGOS..." ); await buscarJogosDoDia(); /* ========================================= BUSCAR COTAÇÕES ========================================= */ console.log( "💰 BUSCANDO COTAÇÕES..." ); await carregarCotacoes(); console.log( "✅ BUSCA DA MADRUGADA CONCLUÍDA" ); } catch (erro) { console.error( "❌ ERRO NA BUSCA DA MADRUGADA:", erro ); } finally { /* ========================================= VOLTA PARA 100 ========================================= */ desativarModoMadrugada(); console.log( "🔒 LIMITE VOLTOU PARA 100" ); } } /* ========================================================= VERIFICAÇÃO AUTOMÁTICA EXECUTA A CADA 30 SEGUNDOS ========================================================= */ setInterval( async () => { try { await executarBuscaMadrugada(); } catch (erro) { console.error( "❌ ERRO NO CICLO DA MADRUGADA:", erro ); } }, 30 * 1000 ); /* ========================================================= STATUS INICIAL ========================================================= */ (async () => { const agora = obterDataHoraSaoPaulo(); console.log( "🇧🇷 DATA/HORA SP:", agora.data, `${String(agora.hora).padStart(2, "0")}:${String(agora.minuto).padStart(2, "0")}:${String(agora.segundo).padStart(2, "0")}` ); await mostrarStatusAPI(); })(); 
 
-const LIMITE_MADRUGADA = 5000;
 
-const TEMPO_ATUALIZACAO_COTACAO =
-    10 * 60 * 1000;
 
-
-/* =========================================================
-   ESTADO
-========================================================= */
-
-let modoMadrugadaAPI = false;
-
-let buscaMadrugadaExecutada = false;
-
-let dataBuscaMadrugada = "";
-
-
-/* =========================================================
-   DATA/HORA DE SÃO PAULO
-========================================================= */
-
-function obterDataHoraSaoPaulo() {
-
-    const agora = new Date();
-
-    const partes =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: "America/Sao_Paulo",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hourCycle: "h23"
-            }
-        ).formatToParts(agora);
-
-
-    const valores = {};
-
-    partes.forEach(parte => {
-
-        if (
-            parte.type !== "literal"
-        ) {
-
-            valores[parte.type] =
-                parte.value;
-
-        }
-
-    });
-
-
-    return {
-
-        ano:
-            Number(valores.year),
-
-        mes:
-            Number(valores.month),
-
-        dia:
-            Number(valores.day),
-
-        hora:
-            Number(valores.hour),
-
-        minuto:
-            Number(valores.minute),
-
-        segundo:
-            Number(valores.second),
-
-        data:
-            `${valores.year}-${valores.month}-${valores.day}`
-
-    };
-
-}
-
-
-/* =========================================================
-   VERIFICAR SE É 00:01
-========================================================= */
-
-function estaNoHorarioMadrugada() {
-
-    const agora =
-        obterDataHoraSaoPaulo();
-
-
-    return (
-        agora.hora === 0 &&
-        agora.minuto === 1
-    );
-
-}
-
-
-/* =========================================================
-   LIMITE ATUAL
-========================================================= */
-
-function obterLimiteAtualAPI() {
-
-    if (
-        modoMadrugadaAPI
-    ) {
-
-        return LIMITE_MADRUGADA;
-
-    }
-
-
-    return LIMITE_API_DIA;
-
-}
-
-
-/* =========================================================
-   ATIVAR MADRUGADA
-========================================================= */
-
-function ativarModoMadrugada() {
-
-    modoMadrugadaAPI =
-        true;
-
-
-    console.log(
-        "🌙 MODO MADRUGADA ATIVADO"
-    );
-
-
-    console.log(
-        "🚀 LIMITE TEMPORÁRIO:",
-        LIMITE_MADRUGADA
-    );
-
-}
-
-
-/* =========================================================
-   DESATIVAR MADRUGADA
-========================================================= */
-
-function desativarModoMadrugada() {
-
-    modoMadrugadaAPI =
-        false;
-
-
-    console.log(
-        "🔒 MODO MADRUGADA ENCERRADO"
-    );
-
-
-    console.log(
-        "📊 LIMITE NORMAL:",
-        LIMITE_API_DIA
-    );
-
-}
-
-
-/* =========================================================
-   RESERVAR CHAMADA DA API
-========================================================= */
-
-async function reservarChamadaAPI() {
-
-    const controleRef =
-        ref(
-            db,
-            "cacheMultiPlay/controle"
-        );
-
-
-    try {
-
-        const resultado =
-            await runTransaction(
-                controleRef,
-                controleAtual => {
-
-                    const hoje =
-                        obterDataUTCControle();
-
-
-                    const controle =
-                        controleAtual &&
-                        typeof controleAtual === "object"
-                            ? controleAtual
-                            : {};
-
-
-                    const dataControle =
-                        String(
-                            controle.dataControle || ""
-                        );
-
-
-                    let chamadas =
-                        Number(
-                            controle.chamadasHoje || 0
-                        );
-
-
-                    /*
-                     * NOVO DIA
-                     */
-
-                    if (
-                        dataControle !== hoje
-                    ) {
-
-                        chamadas = 0;
-
-                    }
-
-
-                    /*
-                     * LIMITE ATUAL
-                     */
-
-                    const limite =
-                        obterLimiteAtualAPI();
-
-
-                    /*
-                     * BLOQUEIA AO ATINGIR O LIMITE
-                     */
-
-                    if (
-                        chamadas >= limite
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    const novasChamadas =
-                        chamadas + 1;
-
-
-                    return {
-
-                        ...controle,
-
-                        dataControle:
-                            hoje,
-
-                        chamadasHoje:
-                            novasChamadas,
-
-                        chamadasRestantes:
-                            Math.max(
-                                0,
-                                limite -
-                                novasChamadas
-                            ),
-
-                        limiteDiario:
-                            limite,
-
-                        modoMadrugada:
-                            modoMadrugadaAPI,
-
-                        ultimaChamada:
-                            Date.now()
-
-                    };
-
-                }
-            );
-
-
-        /*
-         * TRANSACTION BLOQUEADA
-         */
-
-        if (
-            !resultado.committed
-        ) {
-
-            console.warn(
-                "🛑 LIMITE DA API ATINGIDO."
-            );
-
-
-            mostrarAvisoAtualizacao();
-
-
-            return false;
-
-        }
-
-
-        const controleFinal =
-            resultado.snapshot.val() ||
-            {};
-
-
-        console.log(
-            "📡 CHAMADA AUTORIZADA:",
-            controleFinal.chamadasHoje +
-            "/" +
-            controleFinal.limiteDiario
-        );
-
-
-        return true;
-
-    }
-
-    catch (erro) {
-
-        console.error(
-            "❌ ERRO CONTROLANDO LIMITE:",
-            erro
-        );
-
-
-        /*
-         * SE NÃO CONSEGUIR CONTROLAR,
-         * NÃO FAZ A CHAMADA.
-         */
-
-        return false;
-
-    }
-
-}
-
-
-/* =========================================================
-   CHAMADAS RESTANTES
-========================================================= */
-
-async function obterChamadasRestantesAPI() {
-
-    try {
-
-        const snapshot =
-            await get(
-                ref(
-                    db,
-                    "cacheMultiPlay/controle"
-                )
-            );
-
-
-        const limite =
-            obterLimiteAtualAPI();
-
-
-        if (
-            !snapshot.exists()
-        ) {
-
-            return limite;
-
-        }
-
-
-        const dados =
-            snapshot.val() ||
-            {};
-
-
-        const hoje =
-            obterDataUTCControle();
-
-
-        if (
-            String(
-                dados.dataControle || ""
-            ) !== hoje
-        ) {
-
-            return limite;
-
-        }
-
-
-        const chamadas =
-            Number(
-                dados.chamadasHoje || 0
-            );
-
-
-        return Math.max(
-            0,
-            limite -
-            chamadas
-        );
-
-    }
-
-    catch (erro) {
-
-        console.warn(
-            "⚠️ ERRO CONSULTANDO LIMITE:",
-            erro
-        );
-
-
-        return 0;
-
-    }
-
-}
-
-
-/* =========================================================
-   STATUS DA API
-========================================================= */
-
-async function mostrarStatusAPI() {
-
-    const restantes =
-        await obterChamadasRestantesAPI();
-
-
-    const limite =
-        obterLimiteAtualAPI();
-
-
-    console.log(
-        `📊 API: ${restantes}/${limite} restantes`
-    );
-
-
-    return restantes;
-
-}
-
-
-/* =========================================================
-   BUSCA ESPECIAL DAS 00:01
-========================================================= */
-
-async function executarBuscaMadrugada() {
-
-    const agora =
-        obterDataHoraSaoPaulo();
-
-
-    /*
-     * Só executa exatamente
-     * no minuto 00:01.
-     */
-
-    if (
-        agora.hora !== 0 ||
-        agora.minuto !== 1
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-     * Impede repetir a busca
-     * no mesmo dia.
-     */
-
-    if (
-        dataBuscaMadrugada ===
-        agora.data
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-     * Marca imediatamente.
-     */
-
-    dataBuscaMadrugada =
-        agora.data;
-
-    buscaMadrugadaExecutada =
-        true;
-
-
-    console.log(
-        "🌙 00:01 — INICIANDO BUSCA ESPECIAL"
-    );
-
-
-    /*
-     * ATIVA LIMITE 5000
-     */
-
-    ativarModoMadrugada();
-
-
-    try {
-
-        /*
-         * BUSCA JOGOS
-         */
-
-        console.log(
-            "⚽ BUSCANDO JOGOS..."
-        );
-
-
-        await buscarJogosDoDia();
-
-
-        /*
-         * BUSCA COTAÇÕES
-         */
-
-        console.log(
-            "💰 BUSCANDO COTAÇÕES..."
-        );
-
-
-        await carregarCotacoes();
-
-
-        console.log(
-            "✅ BUSCA DA MADRUGADA CONCLUÍDA"
-        );
-
-    }
-
-    catch (erro) {
-
-        console.error(
-            "❌ ERRO NA BUSCA DA MADRUGADA:",
-            erro
-        );
-
-    }
-
-    finally {
-
-        /*
-         * VOLTA PARA 100
-         */
-
-        desativarModoMadrugada();
-
-
-        console.log(
-            "🔒 LIMITE VOLTOU PARA 100"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   VERIFICAÇÃO AUTOMÁTICA
-========================================================= */
-
-setInterval(
-    async () => {
-
-        try {
-
-            await executarBuscaMadrugada();
-
-        }
-
-        catch (erro) {
-
-            console.error(
-                "❌ ERRO NO CICLO DA MADRUGADA:",
-                erro
-            );
-
-        }
-
-    },
-    30 * 1000
-);
 /* =========================================================
    DESCOBRIR DIA DA SEMANA PELA DATA REAL DO JOGO
 ========================================================= */
@@ -7001,7 +6443,409 @@ async function atualizarUmaAposta(
                 statusAPI: statusAPI
             }
         );
+/* ============================================================
+   ATUALIZAÇÃO DE PLACAR AO VIVO
+============================================================ */
 
+let intervaloPlacarAoVivo = null;
+let atualizandoPlacar = false;
+
+
+/* ============================================================
+   STATUS QUE NÃO DEVEM MAIS ATUALIZAR
+============================================================ */
+
+function statusFinalPlacar(status) {
+
+    const s =
+        String(status || "")
+            .toUpperCase()
+            .trim();
+
+    return [
+        "FT",
+        "AET",
+        "PEN",
+        "CANC",
+        "PST",
+        "ABD",
+        "AWD",
+        "WO"
+    ].includes(s);
+}
+
+
+/* ============================================================
+   PEGAR PLACAR
+============================================================ */
+
+function pegarPlacar(jogo) {
+
+    if (!jogo) {
+        return null;
+    }
+
+    const casa =
+        jogo?.goals?.home ??
+        jogo?.score?.fulltime?.home ??
+        jogo?.score?.extratime?.home ??
+        null;
+
+    const fora =
+        jogo?.goals?.away ??
+        jogo?.score?.fulltime?.away ??
+        jogo?.score?.extratime?.away ??
+        null;
+
+
+    if (
+        casa === null ||
+        fora === null ||
+        casa === undefined ||
+        fora === undefined
+    ) {
+
+        return null;
+    }
+
+
+    return {
+        casa: Number(casa),
+        fora: Number(fora)
+    };
+}
+
+
+/* ============================================================
+   BUSCAR PLACARES AO VIVO
+============================================================ */
+
+async function buscarPlacaresAoVivo() {
+
+    if (atualizandoPlacar) {
+        return;
+    }
+
+    atualizandoPlacar = true;
+
+    try {
+
+        console.log(
+            "⚽ BUSCANDO PLACARES AO VIVO..."
+        );
+
+
+        const agora =
+            new Date();
+
+        const hora =
+            agora.getHours();
+
+
+        /*
+           Fora do horário de partidas,
+           não precisa consultar.
+        */
+
+        if (
+            hora < 8 ||
+            hora >= 24
+        ) {
+
+            console.log(
+                "ℹ️ Fora do horário de atualização."
+            );
+
+            return;
+        }
+
+
+        const url =
+            API_BASE_URL +
+            "/fixtures?live=all";
+
+
+        const resposta =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+                    headers: {
+                        "x-apisports-key":
+                            API_KEY
+                    }
+                }
+            );
+
+
+        if (!resposta.ok) {
+
+            console.error(
+                "❌ ERRO API PLACAR:",
+                resposta.status
+            );
+
+            return;
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (
+            !dados ||
+            !Array.isArray(
+                dados.response
+            )
+        ) {
+
+            console.error(
+                "❌ RESPOSTA DE PLACAR INVÁLIDA:",
+                dados
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "⚽ JOGOS AO VIVO:",
+            dados.response.length
+        );
+
+
+        dados.response.forEach(
+            jogoAPI => {
+
+                const fixtureId =
+                    String(
+                        jogoAPI?.fixture?.id ||
+                        ""
+                    ).trim();
+
+
+                if (!fixtureId) {
+                    return;
+                }
+
+
+                const placar =
+                    pegarPlacar(
+                        jogoAPI
+                    );
+
+
+                if (!placar) {
+                    return;
+                }
+
+
+                const status =
+                    String(
+                        jogoAPI?.fixture?.status?.short ||
+                        ""
+                    ).toUpperCase();
+
+
+                console.log(
+                    "⚽ PLACAR:",
+                    fixtureId,
+                    placar.casa,
+                    "x",
+                    placar.fora,
+                    status
+                );
+
+
+                /*
+                   Procura o jogo na lista
+                */
+
+                const jogo =
+                    jogosSalvos.find(
+                        j =>
+                            String(
+                                j.fixtureId ||
+                                j.apiFixtureId ||
+                                j.idAPI ||
+                                j.id ||
+                                ""
+                            ) === fixtureId
+                    );
+
+
+                if (!jogo) {
+
+                    console.warn(
+                        "⚠️ Jogo não encontrado na tela:",
+                        fixtureId
+                    );
+
+                    return;
+                }
+
+
+                /*
+                   Atualiza objeto
+                */
+
+                jogo.placarA =
+                    placar.casa;
+
+                jogo.placarB =
+                    placar.fora;
+
+                jogo.statusAPI =
+                    status;
+
+                jogo.apiStatus =
+                    status;
+
+
+                /*
+                   Atualiza finalizado
+                */
+
+                jogo.finalizado =
+                    statusFinalPlacar(
+                        status
+                    );
+
+
+                /*
+                   Salva cache
+                */
+
+                salvarCachePlacarFirebase(
+                    fixtureId,
+                    {
+                        placarA:
+                            placar.casa,
+
+                        placarB:
+                            placar.fora,
+
+                        status:
+                            status,
+
+                        atualizadoEm:
+                            Date.now()
+                    }
+                );
+
+
+                /*
+                   Atualiza visual
+                */
+
+                atualizarPlacarNaTela(
+                    jogo
+                );
+
+            }
+        );
+
+
+    } catch (erro) {
+
+        console.error(
+            "❌ ERRO ATUALIZAÇÃO PLACAR:",
+            erro
+        );
+
+    } finally {
+
+        atualizandoPlacar =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   INICIAR ATUALIZAÇÃO
+============================================================ */
+
+function iniciarAtualizacaoPlacar() {
+
+    /*
+       Evita criar vários intervalos.
+    */
+
+    if (intervaloPlacarAoVivo) {
+
+        clearInterval(
+            intervaloPlacarAoVivo
+        );
+
+    }
+
+
+    /*
+       Busca imediatamente.
+    */
+
+    buscarPlacaresAoVivo();
+
+
+    /*
+       Depois atualiza a cada 20 segundos.
+    */
+
+    intervaloPlacarAoVivo =
+        setInterval(
+            function() {
+
+                buscarPlacaresAoVivo();
+
+            },
+            20000
+        );
+
+
+    console.log(
+        "✅ ATUALIZAÇÃO DE PLACAR INICIADA"
+    );
+
+}
+
+
+/* ============================================================
+   PARAR
+============================================================ */
+
+function pararAtualizacaoPlacar() {
+
+    if (
+        intervaloPlacarAoVivo
+    ) {
+
+        clearInterval(
+            intervaloPlacarAoVivo
+        );
+
+        intervaloPlacarAoVivo =
+            null;
+
+    }
+
+}
+
+
+/* ============================================================
+   DISPONIBILIZAR
+============================================================ */
+
+window.buscarPlacaresAoVivo =
+    buscarPlacaresAoVivo;
+
+window.iniciarAtualizacaoPlacar =
+    iniciarAtualizacaoPlacar;
+
+window.pararAtualizacaoPlacar =
+    pararAtualizacaoPlacar;
 
         // =================================================
         // SOMENTE ESTES STATUS PODEM FINALIZAR O JOGO
@@ -23729,218 +23573,21 @@ document.addEventListener("click", function(event) {
     );
 
     abrirModalCashOut(aposta);
+
+const modal =
+    document.getElementById("cashOutModal");
+
+if (modal) {
     modal.style.display = "block";
-modal.classList.add("ativo");
+    modal.classList.add("ativo");
+}
 
 configurarBotoesCashOut();
 
 iniciarTimerCashOut();
 });
-/* =====================================================
-   MODAL SUCESSO SAQUE
-===================================================== */
 
-function abrirModalSucessoSaque(
-    codigoSaque,
-    valor,
-    ehCashOut
-) {
-
-    const modal =
-        document.getElementById(
-            "modalSucessoSaque"
-        );
-
-    if (!modal) {
-
-        console.error(
-            "❌ #modalSucessoSaque não encontrado."
-        );
-
-        return;
-
-    }
-
-
-    const titulo =
-        document.getElementById(
-            "tituloSucessoSaque"
-        );
-
-
-    const mensagem =
-        document.getElementById(
-            "mensagemSucessoSaque"
-        );
-
-
-    const codigo =
-        document.getElementById(
-            "codigoSucessoSaque"
-        );
-
-
-    const valorElemento =
-        document.getElementById(
-            "valorSucessoSaque"
-        );
-
-
-    if (titulo) {
-
-        titulo.textContent =
-            ehCashOut
-                ? "Cash Out solicitado!"
-                : "Saque solicitado!";
-
-    }
-
-
-    if (mensagem) {
-
-        mensagem.textContent =
-            ehCashOut
-                ? "Seu Cash Out foi registrado com sucesso."
-                : "Sua solicitação de saque foi enviada com sucesso.";
-
-    }
-
-
-    if (codigo) {
-
-        codigo.textContent =
-            codigoSaque || "-";
-
-    }
-
-
-    if (valorElemento) {
-
-        valorElemento.textContent =
-            dinheiro(valor);
-
-    }
-
-
-    modal.classList.add(
-        "ativo"
-    );
-
-}
-
-
-/* =====================================================
-   FECHAR MODAL SUCESSO
-===================================================== */
-
-function fecharModalSucessoSaque() {
-
-    const modal =
-        document.getElementById(
-            "modalSucessoSaque"
-        );
-
-    if (!modal) {
-        return;
-    }
-
-
-    modal.classList.remove(
-        "ativo"
-    );
-
-}
-
-
-const btnFecharSucesso =
-    document.getElementById(
-        "btnFecharSucessoSaque"
-    );
-
-
-if (btnFecharSucesso) {
-
-    btnFecharSucesso.addEventListener(
-        "click",
-        fecharModalSucessoSaque
-    );
-
-}
-function abrirModalSucessoSaldo(
-    codigo,
-    valor
-) {
-
-    const modal =
-        document.getElementById(
-            "modalSucessoSaldo"
-        );
-
-    if (!modal) {
-
-        console.error(
-            "❌ #modalSucessoSaldo não encontrado."
-        );
-
-        return;
-    }
-
-
-    const campoCodigo =
-        document.getElementById(
-            "codigoSucessoSaldo"
-        );
-
-    const campoValor =
-        document.getElementById(
-            "valorSucessoSaldo"
-        );
-
-
-    if (campoCodigo) {
-
-        campoCodigo.textContent =
-            codigo || "-";
-    }
-
-
-    if (campoValor) {
-
-        campoValor.textContent =
-            dinheiro(valor);
-    }
-
-
-    modal.classList.add("ativo");
-}
-
-
-function fecharModalSucessoSaldo() {
-
-    const modal =
-        document.getElementById(
-            "modalSucessoSaldo"
-        );
-
-    if (!modal) return;
-
-    modal.classList.remove("ativo");
-}
-
-
-const btnFecharSucessoSaldo =
-    document.getElementById(
-        "btnFecharSucessoSaldo"
-    );
-
-
-if (btnFecharSucessoSaldo) {
-
-    btnFecharSucessoSaldo.addEventListener(
-        "click",
-        fecharModalSucessoSaldo
-    );
-}
+ /* ============================================================ PIX DE PAGAMENTO NÃO ALTERA O MODAL DE SAQUE #modalPix ============================================================ */ const PIX_CHAVE_PAGAMENTO = "02562631595"; const PIX_NOME_PAGAMENTO = "CARLOS DOS SANTOS REIS"; const PIX_CIDADE_PAGAMENTO = "SALVADOR"; window.codigoPixSolicitado = ""; window.valorPixSolicitado = 0; /* ============================================================ REMOVER ACENTOS ============================================================ */ function removerAcentosPixPagamento(texto) { return String(texto || "") .normalize("NFD") .replace(/[\u0300-\u036f]/g, ""); } /* ============================================================ CAMPO EMV ============================================================ */ function campoPixPagamento(id, valor) { const texto = String(valor ?? ""); const tamanho = texto.length .toString() .padStart(2, "0"); return String(id) + tamanho + texto; } /* ============================================================ CRC16 ============================================================ */ function crc16PixPagamento(texto) { let crc = 0xFFFF; for ( let i = 0; i < texto.length; i++ ) { crc ^= texto.charCodeAt(i) << 8; for ( let j = 0; j < 8; j++ ) { if (crc & 0x8000) { crc = (crc << 1) ^ 0x1021; } else { crc <<= 1; } crc &= 0xFFFF; } } return crc .toString(16) .toUpperCase() .padStart(4, "0"); } /* ============================================================ CRIAR PAYLOAD PIX ============================================================ */ function criarPayloadPixPagamento( chave, nome, cidade, valor, identificador ) { chave = String(chave || "") .trim(); nome = removerAcentosPixPagamento(nome) .substring(0, 25) .toUpperCase(); cidade = removerAcentosPixPagamento(cidade) .substring(0, 15) .toUpperCase(); if (!chave) { console.error( "❌ CHAVE PIX NÃO INFORMADA" ); return null; } const merchantAccount = campoPixPagamento( "00", "BR.GOV.BCB.PIX" ) + campoPixPagamento( "01", chave ); let payload = campoPixPagamento( "00", "01" ); payload += campoPixPagamento( "26", merchantAccount ); payload += campoPixPagamento( "52", "0000" ); payload += campoPixPagamento( "53", "986" ); payload += campoPixPagamento( "54", Number(valor).toFixed(2) ); payload += campoPixPagamento( "58", "BR" ); payload += campoPixPagamento( "59", nome ); payload += campoPixPagamento( "60", cidade ); let txid = String( identificador || "PEDIDO" ) .replace( /[^a-zA-Z0-9]/g, "" ) .substring(0, 25); if (!txid) { txid = "PEDIDO"; } payload += campoPixPagamento( "62", campoPixPagamento( "05", txid ) ); const semCRC = payload + "6304"; const crc = crc16PixPagamento( semCRC ); return semCRC + crc; } /* ============================================================ GERAR PIX + QR CODE ============================================================ */ function gerarPixPagamento( valor, pedidoId ) { const valorNumerico = Number(valor); if ( !Number.isFinite(valorNumerico) || valorNumerico <= 0 ) { console.error( "❌ VALOR PIX INVÁLIDO:", valor ); return null; } const payload = criarPayloadPixPagamento( PIX_CHAVE_PAGAMENTO, PIX_NOME_PAGAMENTO, PIX_CIDADE_PAGAMENTO, valorNumerico, pedidoId ); if (!payload) { console.error( "❌ PAYLOAD PIX NÃO GERADO" ); return null; } /* ======================================================== COPIA E COLA ======================================================== */ const campo = document.getElementById( "codigoAposta" ); if (campo) { /* IMPORTANTE: codigoAposta é DIV. Não usar campo.value. */ campo.textContent = payload; campo.dataset.pix = payload; } /* ======================================================== QR CODE ======================================================== */ const qr = document.getElementById( "qrPix" ); if (!qr) { console.error( "❌ #qrPix NÃO ENCONTRADO" ); return payload; } qr.innerHTML = ""; if ( typeof QRCode !== "function" ) { console.error( "❌ BIBLIOTECA QRCODE NÃO ENCONTRADA" ); return payload; } new QRCode( qr, { text: payload, width: 220, height: 220 } ); console.log( "✅ PIX + QR CODE GERADOS" ); return payload; } /* ============================================================ ABRIR MODAL DE SUCESSO ============================================================ */ window.abrirModalSucessoSaldo = function(codigo, valor) { const modal = document.getElementById( "modalSucessoSaldo" ); if (!modal) { console.error( "❌ #modalSucessoSaldo NÃO ENCONTRADO" ); return; } const codigoFinal = String( codigo || "" ).trim(); const valorFinal = Number(valor); if (!codigoFinal) { console.error( "❌ CÓDIGO PIX VAZIO" ); return; } if ( !Number.isFinite(valorFinal) || valorFinal <= 0 ) { console.error( "❌ VALOR PIX INVÁLIDO:", valor ); return; } window.codigoPixSolicitado = codigoFinal; window.valorPixSolicitado = valorFinal; const codigoCampo = document.getElementById( "codigoSucessoSaldo" ); if (codigoCampo) { codigoCampo.textContent = codigoFinal; } const valorCampo = document.getElementById( "valorSucessoSaldo" ); if (valorCampo) { valorCampo.textContent = valorFinal.toLocaleString( "pt-BR", { style: "currency", currency: "BRL" } ); } modal.classList.add( "ativo" ); modal.style.display = "flex"; modal.style.visibility = "visible"; modal.style.opacity = "1"; modal.style.pointerEvents = "auto"; console.log( "✅ MODAL DE SUCESSO ABERTO" ); }; /* ============================================================ FECHAR MODAL DE SUCESSO ============================================================ */ function fecharModalSucessoSaldo() { const modal = document.getElementById( "modalSucessoSaldo" ); if (!modal) { return; } modal.classList.remove( "ativo" ); modal.style.display = "none"; modal.style.visibility = "hidden"; modal.style.opacity = "0"; modal.style.pointerEvents = "none"; } /* ============================================================ ABRIR PIX APÓS OK ============================================================ */ function executarOKSaldo(event) { if (event) { event.preventDefault(); event.stopPropagation(); } const codigo = String( window.codigoPixSolicitado || "" ).trim(); const valor = Number( window.valorPixSolicitado ); console.log( "🟢 OK → PIX", { codigo, valor } ); if (!codigo) { console.error( "❌ CÓDIGO DA SOLICITAÇÃO NÃO ENCONTRADO" ); return; } if ( !Number.isFinite(valor) || valor <= 0 ) { console.error( "❌ VALOR DA SOLICITAÇÃO NÃO ENCONTRADO" ); return; } /* ======================================================== FECHAR SUCESSO ======================================================== */ fecharModalSucessoSaldo(); /* ======================================================== GERAR PIX ======================================================== */ const payload = gerarPixPagamento( valor, codigo ); if (!payload) { console.error( "❌ NÃO FOI POSSÍVEL GERAR O PIX" ); return; } /* ======================================================== VALOR ======================================================== */ const valorPix = document.getElementById( "valorPix" ); if (valorPix) { valorPix.textContent = valor.toLocaleString( "pt-BR", { style: "currency", currency: "BRL" } ); } /* ======================================================== ABRIR MODAL PIX ======================================================== */ const modal = document.getElementById( "codigoModal" ); if (!modal) { console.error( "❌ #codigoModal NÃO ENCONTRADO" ); return; } modal.classList.add( "ativo" ); modal.style.display = "flex"; modal.style.visibility = "visible"; modal.style.opacity = "1"; modal.style.pointerEvents = "auto"; modal.style.zIndex = "99999999"; console.log( "✅ MODAL PIX ABERTO" ); /* Remove foco azul do botão OK. */ const botaoOK = document.getElementById( "btnFecharSucessoSaldo" ); if (botaoOK) { botaoOK.blur(); } } /* ============================================================ PEGAR PIX ATUAL ============================================================ */ function obterPixAtual() { const campo = document.getElementById( "codigoAposta" ); if (!campo) { return ""; } return String( campo.dataset.pix || campo.textContent || "" ).trim(); } /* ============================================================ COPIAR PIX ============================================================ */ async function copiarPixPagamento( event ) { if (event) { event.preventDefault(); event.stopPropagation(); } const pix = obterPixAtual(); if (!pix) { console.error( "❌ PIX NÃO ENCONTRADO" ); return; } try { if ( navigator.clipboard && window.isSecureContext ) { await navigator.clipboard.writeText( pix ); } else { const textarea = document.createElement( "textarea" ); textarea.value = pix; textarea.style.position = "fixed"; textarea.style.left = "-9999px"; textarea.style.top = "0"; textarea.style.opacity = "0"; document.body.appendChild( textarea ); textarea.focus(); textarea.select(); document.execCommand( "copy" ); textarea.remove(); } console.log( "✅ PIX COPIADO" ); const botao = document.getElementById( "btnCopiar" ); if (botao) { const textoOriginal = botao.textContent; botao.textContent = "✅ Copiado!"; setTimeout( () => { if ( document.body.contains( botao ) ) { botao.textContent = textoOriginal; } }, 1500 ); botao.blur(); } } catch (erro) { console.error( "❌ ERRO AO COPIAR PIX:", erro ); } } /* ============================================================ WHATSAPP ============================================================ */ function enviarPixWhatsApp( event ) { if (event) { event.preventDefault(); event.stopPropagation(); } const pix = obterPixAtual(); if (!pix) { console.error( "❌ PIX NÃO ENCONTRADO" ); return; } const valor = Number( window.valorPixSolicitado || 0 ); const valorFormatado = valor.toLocaleString( "pt-BR", { style: "currency", currency: "BRL" } ); const mensagem = "Pagamento PIX\n" + "Valor: " + valorFormatado + "\n\n" + "PIX Copia e Cola:\n" + pix; const url = "https://wa.me/?text=" + encodeURIComponent( mensagem ); window.open( url, "_blank", "noopener,noreferrer" ); const botao = document.getElementById( "btnWhatsapp" ); if (botao) { botao.blur(); } } /* ============================================================ FECHAR MODAL PIX ============================================================ */ function fecharCodigoModal( event ) { if (event) { event.preventDefault(); event.stopPropagation(); } const modal = document.getElementById( "codigoModal" ); if (!modal) { return; } modal.classList.remove( "ativo" ); modal.style.display = "none"; modal.style.visibility = "hidden"; modal.style.opacity = "0"; modal.style.pointerEvents = "none"; const botao = event?.currentTarget; if (botao) { botao.blur(); } console.log( "🔴 MODAL PIX FECHADO" ); } /* ============================================================ CONFIGURAR BOTÕES ============================================================ */ function configurarBotoesPixPagamento() { const btnOK = document.getElementById( "btnFecharSucessoSaldo" ); const btnCopiar = document.getElementById( "btnCopiar" ); const btnWhatsapp = document.getElementById( "btnWhatsapp" ); const btnFechar = document.getElementById( "btnFechar" ); /* ======================================================== OK ======================================================== */ if (btnOK) { btnOK.type = "button"; /* onclick = null evita eventos antigos deste botão. */ btnOK.onclick = executarOKSaldo; } /* ======================================================== COPIAR ======================================================== */ if (btnCopiar) { btnCopiar.type = "button"; btnCopiar.onclick = copiarPixPagamento; } /* ======================================================== WHATSAPP ======================================================== */ if (btnWhatsapp) { btnWhatsapp.type = "button"; btnWhatsapp.onclick = enviarPixWhatsApp; } /* ======================================================== FECHAR ======================================================== */ if (btnFechar) { btnFechar.type = "button"; btnFechar.onclick = fecharCodigoModal; } console.log( "✅ BOTÕES PIX CONFIGURADOS" ); } /* ============================================================ CSS DEFINITIVO DO MODAL PIX COLOCADO POR ÚLTIMO PARA VENCER OS CSS ANTIGOS ============================================================ */ function aplicarCSSDefinitivoPix() { if ( document.getElementById( "cssDefinitivoPixPagamento" ) ) { return; } const style = document.createElement( "style" ); style.id = "cssDefinitivoPixPagamento"; style.textContent = ` /* ========================================== MODAL PIX ========================================== */ #codigoModal { display: none !important; position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; background: rgba(0,0,0,.75) !important; z-index: 99999999 !important; align-items: center !important; justify-content: center !important; padding: 15px !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; } #codigoModal.ativo { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; } /* ========================================== CONTEÚDO ========================================== */ #codigoModal .codigo-conteudo { position: relative !important; z-index: 100000000 !important; width: 100% !important; max-width: 360px !important; background: #fff !important; pointer-events: auto !important; border-radius: 12px !important; padding: 20px !important; } /* ========================================== BOTÕES ========================================== */ #codigoModal .modal-botoes { position: relative !important; z-index: 100000001 !important; display: flex !important; gap: 7px !important; flex-wrap: wrap !important; pointer-events: auto !important; } #codigoModal .modal-botoes button { position: relative !important; z-index: 100000002 !important; pointer-events: auto !important; touch-action: manipulation !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent !important; user-select: none !important; outline: none !important; } #codigoModal .modal-botoes button:focus, #codigoModal .modal-botoes button:focus-visible, #codigoModal .modal-botoes button:active { outline: none !important; box-shadow: none !important; } /* ========================================== QR NÃO BLOQUEIA CLIQUE ========================================== */ #codigoModal #qrPix { position: relative !important; z-index: 1 !important; pointer-events: none !important; text-align: center !important; } #codigoModal #codigoAposta { position: relative !important; z-index: 1 !important; pointer-events: none !important; word-break: break-all !important; font-size: 12px !important; max-height: 100px !important; overflow: auto !important; } /* ========================================== CORES ========================================== */ #codigoModal #btnCopiar { background: #0072d3 !important; color: #fff !important; } #codigoModal #btnWhatsapp { background: #00a884 !important; color: #fff !important; } #codigoModal #btnFechar { background: #555 !important; color: #fff !important; } /* ========================================== REMOVE SOBRA AZUL ========================================== */ #btnFecharSucessoSaldo, #btnFecharSucessoSaldo:focus, #btnFecharSucessoSaldo:focus-visible, #btnFecharSucessoSaldo:active, #btnCopiar:focus, #btnCopiar:focus-visible, #btnCopiar:active, #btnWhatsapp:focus, #btnWhatsapp:focus-visible, #btnWhatsapp:active, #btnFechar:focus, #btnFechar:focus-visible, #btnFechar:active { outline: none !important; box-shadow: none !important; -webkit-tap-highlight-color: transparent !important; } `; document.head.appendChild( style ); } /* ============================================================ INICIALIZAÇÃO ============================================================ */ function iniciarPixPagamento() { aplicarCSSDefinitivoPix(); configurarBotoesPixPagamento(); } if ( document.readyState === "loading" ) { document.addEventListener( "DOMContentLoaded", iniciarPixPagamento, { once: true } ); } else { iniciarPixPagamento(); } /* ============================================================ GARANTIR NOVAMENTE APÓS O DOM ============================================================ */ setTimeout( function() { aplicarCSSDefinitivoPix(); configurarBotoesPixPagamento(); }, 500 );
 function obterIndicacaoDaURL() {
 
     const caminho =
@@ -24174,6 +23821,7 @@ function obterIndicadorCadastro() {
     };
 
 }
+/* ========================================================= BOTÕES DO MODAL PIX ========================================================= */ document.addEventListener("DOMContentLoaded", function () { /* ===================================================== COPIAR PIX ===================================================== */ const btnCopiar = document.getElementById("btnCopiar"); if (btnCopiar) { btnCopiar.onclick = async function (event) { event.preventDefault(); event.stopPropagation(); const campo = document.getElementById("codigoAposta"); if (!campo) { alert("PIX não encontrado."); return; } const pix = String( campo.dataset.pix || campo.textContent || "" ).trim(); if (!pix) { alert("PIX não encontrado."); return; } try { await navigator.clipboard.writeText(pix); alert("PIX Copia e Cola copiado!"); } catch (erro) { console.error( "Erro ao copiar PIX:", erro ); /* Fallback para Android */ const textarea = document.createElement("textarea"); textarea.value = pix; textarea.style.position = "fixed"; textarea.style.left = "-9999px"; document.body.appendChild(textarea); textarea.select(); try { document.execCommand("copy"); alert("PIX Copia e Cola copiado!"); } catch (e) { alert("Não foi possível copiar o PIX."); } document.body.removeChild(textarea); } this.blur(); }; } /* ===================================================== WHATSAPP ===================================================== */ const btnWhatsapp = document.getElementById("btnWhatsapp"); if (btnWhatsapp) { btnWhatsapp.onclick = function (event) { event.preventDefault(); event.stopPropagation(); const campo = document.getElementById("codigoAposta"); const pix = String( campo?.dataset.pix || campo?.textContent || "" ).trim(); if (!pix) { alert("PIX não encontrado."); return; } const valor = Number( window.valorPixSolicitado || 0 ); const mensagem = "Pagamento PIX%0A" + "Valor: " + valor.toLocaleString( "pt-BR", { style: "currency", currency: "BRL" } ) + "%0A%0A" + "PIX Copia e Cola:%0A" + pix; const url = "https://wa.me/?text=" + mensagem; window.open( url, "_blank" ); this.blur(); }; } /* ===================================================== FECHAR ===================================================== */ const btnFechar = document.getElementById("btnFechar"); if (btnFechar) { btnFechar.onclick = function (event) { event.preventDefault(); event.stopPropagation(); const modal = document.getElementById("codigoModal"); if (modal) { modal.classList.remove("ativo"); modal.style.display = "none"; modal.style.visibility = "hidden"; modal.style.opacity = "0"; modal.style.pointerEvents = "none"; } this.blur(); }; } }); 
 
 await carregarIndicacao();
 await carregarJogador();
