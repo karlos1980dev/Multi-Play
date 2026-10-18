@@ -1,0 +1,498 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101010">
+<title>Limpar Firebase</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:16px;
+  background:#101010;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+
+.container{
+  max-width:650px;
+  margin:20px auto;
+  background:#1b1b1b;
+  padding:20px;
+  border-radius:16px;
+  border:1px solid #333;
+}
+
+h1{
+  font-size:25px;
+  text-align:center;
+  margin-top:0;
+}
+
+p{
+  color:#ccc;
+  line-height:1.5;
+}
+
+label{
+  display:block;
+  margin-top:18px;
+  margin-bottom:7px;
+  font-weight:bold;
+}
+
+input,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #444;
+  border-radius:9px;
+  background:#101010;
+  color:white;
+  font-size:14px;
+}
+
+textarea{
+  min-height:220px;
+  resize:vertical;
+  font-family:monospace;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:13px;
+  border:0;
+  border-radius:9px;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.conectar{background:#2563eb;color:white}
+.consultar{background:#444;color:white}
+.limpar{background:#dc2626;color:white}
+
+.aviso{
+  padding:13px;
+  background:#422006;
+  color:#fcd34d;
+  border-radius:9px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.status{
+  margin-top:15px;
+  padding:14px;
+  border-radius:9px;
+  background:#292929;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.exemplo{
+  color:#aaa;
+  font-size:12px;
+}
+
+.status.ok{border:1px solid #16a34a}
+.status.erro{border:1px solid #dc2626}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🔥 Limpador Firebase</h1>
+
+  <p>
+    Conecte seu projeto e escolha qual caminho do Realtime Database
+    deseja limpar.
+  </p>
+
+  <div class="aviso">
+    ⚠️ <b>Atenção:</b> os dados apagados não poderão ser recuperados
+    por este programa. Faça um backup antes de continuar.
+    Nunca torne as regras do banco públicas para facilitar a exclusão.
+  </div>
+
+  <label for="config">1. Configuração Firebase</label>
+
+  <textarea id="config" spellcheck="false">{
+  "apiKey": "AIzaSyCIDFHMzgkN3HGLn-XA8ieC_5DDBvbJ7o",
+  "authDomain": "rifa-782a3.firebaseapp.com",
+  "databaseURL": "https://rifa-782a3-default-rtdb.firebaseio.com",
+  "projectId": "rifa-782a3",
+  "storageBucket": "rifa-782a3.firebasestorage.app",
+  "messagingSenderId": "88068598855",
+  "appId": "1:88068598855:web:a230a06db76a4bbc125562"
+}</textarea>
+
+  <button
+    type="button"
+    class="conectar"
+    id="btnConectar"
+    onclick="conectarFirebase()">
+    CONECTAR AO FIREBASE
+  </button>
+
+  <label for="caminho">2. Caminho que deseja limpar</label>
+
+  <input
+    id="caminho"
+    type="text"
+    placeholder="Ex.: rifa/numeros"
+    value="rifa/numeros"
+    autocomplete="off">
+
+  <p class="exemplo">
+    Exemplos: rifa/numeros, rifa/participantes, jogadores,
+    solicitacoesRecarga. Informe um caminho específico.
+  </p>
+
+  <button
+    type="button"
+    class="consultar"
+    id="btnConsultar"
+    onclick="consultarDados()"
+    disabled>
+    CONSULTAR CAMINHO
+  </button>
+
+  <label for="confirmacao">3. Confirmação do caminho</label>
+
+  <input
+    id="confirmacao"
+    type="text"
+    placeholder="Consulte primeiro o caminho"
+    autocomplete="off">
+
+  <button
+    type="button"
+    class="limpar"
+    id="btnLimpar"
+    onclick="limparDados()"
+    disabled>
+    APAGAR DADOS DO CAMINHO
+  </button>
+
+  <div class="status" id="status">
+    Status: aguardando conexão.
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+let appFirebase = null;
+let bancoFirebase = null;
+let projetoConectado = "";
+let caminhoConfirmado = "";
+let operacaoEmAndamento = false;
+
+const elemento = id => document.getElementById(id);
+
+function status(mensagem, tipo = ""){
+  const campo = elemento("status");
+  campo.textContent = mensagem;
+  campo.className = "status " + tipo;
+}
+
+function obterCaminho(){
+  return elemento("caminho").value
+    .trim()
+    .replace(/^\/+|\/+$/g, "");
+}
+
+function bloquearExclusao(){
+  caminhoConfirmado = "";
+  elemento("btnLimpar").disabled = true;
+}
+
+function conectarFirebase(){
+  if(operacaoEmAndamento) return;
+
+  bloquearExclusao();
+
+  const botao = elemento("btnConectar");
+  botao.disabled = true;
+
+  try{
+    const config = JSON.parse(elemento("config").value.trim());
+
+    if(
+      !config.apiKey ||
+      !config.databaseURL ||
+      !config.projectId
+    ){
+      throw new Error(
+        "Informe apiKey, databaseURL e projectId."
+      );
+    }
+
+    const url = new URL(config.databaseURL);
+
+    if(url.protocol !== "https:"){
+      throw new Error(
+        "A URL do Realtime Database precisa usar HTTPS."
+      );
+    }
+
+    /*
+      Se já existe um app padrão, reutiliza-o somente
+      se for do mesmo projeto e tiver a mesma URL.
+      Não apaga apps nem reutiliza um banco excluído.
+    */
+    let appExistente = null;
+
+    try{
+      appExistente = firebase.app();
+    }catch(e){
+      appExistente = null;
+    }
+
+    if(appExistente){
+      const mesmoProjeto =
+        appExistente.options.projectId === config.projectId;
+
+      const mesmaUrl =
+        (appExistente.options.databaseURL || "").replace(/\/+$/,"") ===
+        config.databaseURL.replace(/\/+$/,"");
+
+      if(!mesmoProjeto || !mesmaUrl){
+        throw new Error(
+          "Já existe uma conexão com outro projeto. " +
+          "Recarregue a página antes de conectar outro Firebase."
+        );
+      }
+
+      appFirebase = appExistente;
+    }else{
+      appFirebase = firebase.initializeApp(config);
+    }
+
+    bancoFirebase = firebase.database(appFirebase);
+    projetoConectado = config.projectId;
+
+    elemento("btnConsultar").disabled = false;
+    elemento("confirmacao").value = "";
+
+    status(
+      "Conectado com sucesso!\n\n" +
+      "Projeto: " + projetoConectado +
+      "\nBanco: " + config.databaseURL +
+      "\n\nAgora clique em CONSULTAR CAMINHO.",
+      "ok"
+    );
+
+  }catch(erro){
+    bancoFirebase = null;
+    projetoConectado = "";
+    elemento("btnConsultar").disabled = true;
+
+    status(
+      "Erro ao conectar:\n" + erro.message,
+      "erro"
+    );
+
+  }finally{
+    botao.disabled = false;
+  }
+}
+
+async function consultarDados(){
+  if(operacaoEmAndamento) return;
+
+  if(!bancoFirebase){
+    status("Primeiro conecte ao Firebase.", "erro");
+    return;
+  }
+
+  const caminho = obterCaminho();
+
+  bloquearExclusao();
+
+  if(!caminho){
+    status(
+      "Informe um caminho específico. A raiz inteira do banco não é permitida.",
+      "erro"
+    );
+    return;
+  }
+
+  const botao = elemento("btnConsultar");
+  botao.disabled = true;
+
+  try{
+    status("Consultando o caminho:\n" + caminho);
+
+    const snapshot = await bancoFirebase.ref(caminho).get();
+
+    if(!snapshot.exists()){
+      elemento("confirmacao").value = "";
+
+      status(
+        "Consulta concluída.\n\n" +
+        "Caminho: " + caminho +
+        "\nNenhum dado encontrado.\n" +
+        "Nada foi apagado.",
+        "erro"
+      );
+      return;
+    }
+
+    let quantidade = 0;
+
+    snapshot.forEach(function(){
+      quantidade++;
+    });
+
+    /*
+      Libera a exclusão apenas depois de uma consulta
+      bem-sucedida, com dados existentes.
+    */
+    caminhoConfirmado = caminho;
+    elemento("confirmacao").value = caminho;
+    elemento("btnLimpar").disabled = false;
+
+    status(
+      "CONSULTA CONCLUÍDA\n\n" +
+      "Projeto: " + projetoConectado +
+      "\nCaminho: " + caminho +
+      "\nItens diretos: " + quantidade +
+      "\n\nO botão APAGAR foi liberado.\n" +
+      "Confira o projeto e o caminho antes de excluir.",
+      "ok"
+    );
+
+  }catch(erro){
+    bloquearExclusao();
+
+    status(
+      "Não foi possível consultar os dados.\n\n" +
+      erro.message +
+      "\n\nVerifique a URL do banco e as regras de leitura.",
+      "erro"
+    );
+
+  }finally{
+    botao.disabled = false;
+  }
+}
+
+async function limparDados(){
+  if(operacaoEmAndamento) return;
+
+  if(!bancoFirebase){
+    status("Primeiro conecte ao Firebase.", "erro");
+    return;
+  }
+
+  const caminho = obterCaminho();
+  const confirmacao = elemento("confirmacao").value.trim();
+
+  if(!caminho || caminho !== caminhoConfirmado){
+    bloquearExclusao();
+
+    status(
+      "Consulte novamente o caminho antes de apagar.",
+      "erro"
+    );
+    return;
+  }
+
+  if(confirmacao !== caminho){
+    status(
+      "A confirmação não corresponde ao caminho consultado.",
+      "erro"
+    );
+    return;
+  }
+
+  const autorizacao = prompt(
+    "ATENÇÃO: esta exclusão é permanente.\n\n" +
+    "Projeto: " + projetoConectado +
+    "\nCaminho: " + caminho +
+    "\n\nDigite 12345 para continuar:"
+  );
+
+  if(autorizacao !== "12345"){
+    status("Exclusão cancelada. Nada foi apagado.");
+    return;
+  }
+
+  operacaoEmAndamento = true;
+  elemento("btnLimpar").disabled = true;
+  elemento("btnConsultar").disabled = true;
+  elemento("btnConectar").disabled = true;
+
+  try{
+    status(
+      "Excluindo dados...\n\n" +
+      "Projeto: " + projetoConectado +
+      "\nCaminho: " + caminho
+    );
+
+    await bancoFirebase.ref(caminho).remove();
+
+    caminhoConfirmado = "";
+    elemento("confirmacao").value = "";
+
+    status(
+      "EXCLUSÃO CONCLUÍDA!\n\n" +
+      "Projeto: " + projetoConectado +
+      "\nCaminho apagado: " + caminho +
+      "\n\nOs dados desse caminho foram removidos.",
+      "ok"
+    );
+
+  }catch(erro){
+    bloquearExclusao();
+
+    status(
+      "Não foi possível apagar os dados.\n\n" +
+      erro.message +
+      "\n\nVerifique se as regras do Firebase autorizam " +
+      "a exclusão e se a conexão continua ativa.",
+      "erro"
+    );
+
+  }finally{
+    operacaoEmAndamento = false;
+    elemento("btnConectar").disabled = false;
+    elemento("btnConsultar").disabled = !bancoFirebase;
+    elemento("btnLimpar").disabled = true;
+  }
+}
+
+elemento("caminho").addEventListener("input", function(){
+  bloquearExclusao();
+});
+
+elemento("confirmacao").addEventListener("input", function(){
+  if(this.value.trim() !== caminhoConfirmado){
+    elemento("btnLimpar").disabled = true;
+  }else if(caminhoConfirmado && bancoFirebase){
+    elemento("btnLimpar").disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
