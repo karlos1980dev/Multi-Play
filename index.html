@@ -18645,28 +18645,33 @@ function atualizarBotoesDias() {
    SELECIONAR DIA
 ========================================================= */
 
+
 async function selecionarDiaJogos(offset) {
 
     offset = Number(offset);
 
-    console.log(
-        "🖱️ BOTÃO CLICADO:",
-        offset
-    );
+    console.log("🖱️ BOTÃO CLICADO:", offset);
 
     if (
         !Number.isInteger(offset) ||
         offset < 0 ||
         offset > 2
     ) {
-        console.error(
-            "❌ Offset inválido:",
-            offset
-        );
+        console.error("❌ Offset inválido:", offset);
         return;
-        
     }
 
+    /* =========================================
+       DETECTA A VOLTA DE AMANHÃ PARA HOJE
+    ========================================= */
+
+    const diaAnterior = Number(offsetDiaSelecionado);
+
+    if (diaAnterior === 1 && offset === 0) {
+        console.log("🔄 Voltando de amanhã para hoje. Recarregando página...");
+        location.reload();
+        return;
+    }
 
     /* =========================================
        SALVA DIA
@@ -18674,76 +18679,41 @@ async function selecionarDiaJogos(offset) {
 
     offsetDiaSelecionado = offset;
 
-
     /* =========================================
        ATIVA BOTÃO
     ========================================= */
 
-    const botoes =
-        document.querySelectorAll(
-            "#diasContainer .btn-dia"
-        );
+    const botoes = document.querySelectorAll(
+        "#diasContainer .btn-dia"
+    );
 
     botoes.forEach(botao => {
-
-        botao.classList.remove(
-            "ativo"
-        );
-
+        botao.classList.remove("ativo");
     });
 
-
-    const botaoSelecionado =
-        document.querySelector(
-            `#diasContainer .btn-dia[data-offset="${offset}"]`
-        );
-
+    const botaoSelecionado = document.querySelector(
+        `#diasContainer .btn-dia[data-offset="${offset}"]`
+    );
 
     if (botaoSelecionado) {
-
-        botaoSelecionado.classList.add(
-            "ativo"
-        );
-
+        botaoSelecionado.classList.add("ativo");
     } else {
-
-        console.error(
-            "❌ Botão não encontrado:",
-            offset
-        );
-
+        console.error("❌ Botão não encontrado:", offset);
     }
-
 
     /* =========================================
        DATA DO BOTÃO
     ========================================= */
 
-    const data =
-        String(
-            obterDataDia(offset)
-        ).trim();
+    const data = String(obterDataDia(offset)).trim();
 
-
-    console.log(
-        "📅 CARREGANDO:",
-        {
-            offset,
-            data
-        }
-    );
-
+    console.log("📅 CARREGANDO:", { offset, data });
 
     /* =========================================
-       SE ESTE DIA JÁ FOI CARREGADO,
-       NÃO BUSCA NOVAMENTE
+       USA JOGOS JÁ CARREGADOS
     ========================================= */
 
-    if (
-        Array.isArray(
-            jogosPorData[data]
-        )
-    ) {
+    if (Array.isArray(jogosPorData[data])) {
 
         console.log(
             "♻️ USANDO JOGOS JÁ CARREGADOS:",
@@ -18751,52 +18721,31 @@ async function selecionarDiaJogos(offset) {
             jogosPorData[data].length
         );
 
-        jogos =
-            jogosPorData[data];
+        jogos = jogosPorData[data];
 
-        /*
-         * Mostra novamente os jogos desse dia.
-         *
-         * carregarJogos() deve ser chamado com
-         * os dados já existentes, caso sua função
-         * aceite os jogos como segundo parâmetro.
-         */
-
-        await carregarJogos(
-            data,
-            jogosPorData[data]
-        );
+        await carregarJogos(data, jogosPorData[data]);
 
         return;
     }
 
-
     /* =========================================
-       PRIMEIRA VEZ QUE ESTE DIA É ABERTO
+       PRIMEIRA BUSCA DO DIA
     ========================================= */
 
-    console.log(
-        "🌐 PRIMEIRA BUSCA DO DIA:",
-        data
-    );
-
+    console.log("🌐 PRIMEIRA BUSCA DO DIA:", data);
 
     await carregarJogos(data);
 
-
     /* =========================================
-       GUARDA O RESULTADO DESSE DIA
+       GUARDA RESULTADOS
     ========================================= */
 
-    if (
-        Array.isArray(jogos)
-    ) {
+    if (Array.isArray(jogos)) {
 
-        jogosPorData[data] =
-            [...jogos];
+        jogosPorData[data] = [...jogos];
 
         console.log(
-            "💾 JOGOS GUARDADOS NA MEMÓRIA:",
+            "💾 JOGOS GUARDADOS:",
             data,
             jogosPorData[data].length
         );
@@ -18805,14 +18754,10 @@ async function selecionarDiaJogos(offset) {
 
         jogosPorData[data] = [];
 
-        console.warn(
-            "⚠️ Nenhum jogo para guardar:",
-            data
-        );
-
+        console.warn("⚠️ Nenhum jogo para guardar:", data);
     }
-
 }
+
 /* =====================================================
    INICIAR
 ===================================================== */
